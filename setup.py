@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, division, print_function
-#import sys
-#print('\n'.join(sys.path))
 
 
 CYTHON_FILES = [
@@ -18,13 +16,9 @@ CYTHON_FILES = [
     'vtool/spatial_verification.py',
 ]
 
-#cython_files=CYTHON_FILES,
-
 if __name__ == '__main__':
-    import sys
     from utool.util_setup import setuptools_setup
     import vtool
-    print(sys.argv)
     setuptools_setup(
         setup_fpath=__file__,
         module=vtool,
