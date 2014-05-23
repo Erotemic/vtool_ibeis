@@ -18,10 +18,10 @@ CYTHON_FILES = [
 
 if __name__ == '__main__':
     from utool.util_setup import setuptools_setup
-    import vtool
     setuptools_setup(
         setup_fpath=__file__,
-        module=vtool,
+        package_name='vtool',
+        version='1.0.0.dev1',
         description=('Vision tools - tools for computer vision'),
         url='https://github.com/Erotemic/vtool',
         author='Jon Crall',
