@@ -16,17 +16,24 @@ CYTHON_FILES = [
     'vtool/spatial_verification.py',
 ]
 
+
+INSTALL_REQUIRES = [
+    'numpy >= 1.8.0',
+    'functools32 >= 3.2.3-1',
+    #'cv2',  # no pipi index
+]
+
 if __name__ == '__main__':
     from utool.util_setup import setuptools_setup
     setuptools_setup(
         setup_fpath=__file__,
         name='vtool',
-        version='1.0.0.dev1',
         description=('Vision tools - tools for computer vision'),
         url='https://github.com/Erotemic/vtool',
         author='Jon Crall',
         author_email='erotemic@gmail.com',
         keywords='',
+        install_requires=INSTALL_REQUIRES,
         package_data={},
         classifiers=[],
     )
