@@ -1,6 +1,19 @@
 #!/usr/bin/env python2.7
 from __future__ import absolute_import, division, print_function
+from Cython.Build import cythonize
+from setuptools import Extension
+from Cython.Distutils import build_ext
+import numpy as np
 
+#extensions = [Extension('vtool/linalg_cython.pyx')]
+#extensions = cythonize('vtool/*.pyx')
+
+ext_modules = [
+    Extension('linalg_cython', ['vtool/linalg_cython.pyx'],
+              include_dirs=[np.get_include()])
+]
+
+#ext_modules = cythonize("vtool/linalg_cython.pyx")
 
 CYTHON_FILES = [
     'vtool/chip.py',
@@ -28,6 +41,8 @@ if __name__ == '__main__':
     setuptools_setup(
         setup_fpath=__file__,
         name='vtool',
+        ext_modules=ext_modules,
+        cmdclass={'build_ext': build_ext},
         description=('Vision tools - tools for computer vision'),
         url='https://github.com/Erotemic/vtool',
         author='Jon Crall',
