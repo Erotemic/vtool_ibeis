@@ -1,19 +1,31 @@
 #!/usr/bin/env python2.7
 from __future__ import absolute_import, division, print_function
-from Cython.Build import cythonize
-from setuptools import Extension
+#from Cython.Build import cythonize
 from Cython.Distutils import build_ext
-import numpy as np
+from setuptools import setup
+import utool
 
 #extensions = [Extension('vtool/linalg_cython.pyx')]
 #extensions = cythonize('vtool/*.pyx')
-
-ext_modules = [
-    Extension('linalg_cython', ['vtool/linalg_cython.pyx'],
-              include_dirs=[np.get_include()])
-]
-
+#[
+#    Extension('vtool.linalg_cython', ['vtool/linalg_cython.pyx'],
+#              include_dirs=[np.get_include()])
+#]
+r'''
+set PATH=%HOME%\code\utool\utool\util_scripts;%PATH%
+cyth.py vtool\linalg_cython.pyx
+cd %HOME%\code\vtool
+python %HOME%/code/vtool/vtool/tests/test_linalg.py
+ls vtool/*_cython*
+python setup.py build_ext --inplace && python vtool/tests/test_linalg.py
+python
+python -c "import utool; utool.checkpath('vtool/linalg_cython.pyd', verbose=True)"
+cyth.py %HOME%/code/vtool/vtool/linalg_cython.pyx
+'''
 #ext_modules = cythonize("vtool/linalg_cython.pyx")
+
+ext_modules = utool.find_ext_modules()
+
 
 CYTHON_FILES = [
     'vtool/chip.py',
@@ -38,7 +50,10 @@ INSTALL_REQUIRES = [
 
 if __name__ == '__main__':
     from utool.util_setup import setuptools_setup
-    setuptools_setup(
+
+    #python -c "import pyximport; pyximport.install(reload_support=True, setup_args={'script_args': ['--compiler=mingw32']})"
+
+    kwargs = setuptools_setup(
         setup_fpath=__file__,
         name='vtool',
         ext_modules=ext_modules,
@@ -52,3 +67,4 @@ if __name__ == '__main__':
         package_data={},
         classifiers=[],
     )
+    setup(**kwargs)
