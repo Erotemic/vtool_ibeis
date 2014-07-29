@@ -41,13 +41,17 @@ CYTHON_FILES = [
     'vtool/spatial_verification.py',
 ]
 
+import six
+
 
 INSTALL_REQUIRES = [
     'Cython >= 0.20.2',
     'numpy >= 1.8.0',
-    'functools32 >= 3.2.3-1',
     #'cv2',  # no pipi index
 ]
+
+if six.PY2:
+    INSTALL_REQUIRES += ['functools32 >= 3.2.3-1']
 
 if __name__ == '__main__':
     from utool.util_setup import setuptools_setup
