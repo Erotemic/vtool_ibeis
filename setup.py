@@ -61,6 +61,7 @@ if __name__ == '__main__':
     kwargs = setuptools_setup(
         setup_fpath=__file__,
         name='vtool',
+        packages=['vtool', 'vtool.tests'],
         ext_modules=ext_modules,
         cmdclass={'build_ext': build_ext},
         description=('Vision tools - tools for computer vision'),
