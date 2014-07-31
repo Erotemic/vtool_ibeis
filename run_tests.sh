@@ -85,12 +85,15 @@ EOF
     RUN_TEST $VTOOL_DIR/tests/test_exhaustive_ori_extract.py --noshow 
     RUN_TEST $VTOOL_DIR/tests/test_vtool.py 
     RUN_TEST $VTOOL_DIR/tests/test_akmeans.py 
-    RUN_TEST $VTOOL_DIR/tests/test_linalg.py 
     RUN_TEST $VTOOL_DIR/tests/test_spatial_verification.py --noshow 
-
+    RUN_TEST $VTOOL_DIR/tests/time_cythonized_funcs.py 
 fi
 
 
+python -c "import utool; print('\n'.join(utool.glob('~/code/vtool/', 'test_*.py', recursive=True, verbose=True)))"
+python -c "import utool; print(      len(utool.glob('~/code/vtool/', 'test_*.py', recursive=True, verbose=True)))"
+
+python -c "import utool; print('\n'.join(utool.glob('~/code/ibeis/', 'test_*.py', recursive=True, verbose=True)))"
 #---------------------------------------------
 # END TESTING
 END_TESTS
