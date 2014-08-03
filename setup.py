@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function
 from Cython.Distutils import build_ext
 from setuptools import setup
 import utool
+import six
 
 #extensions = [Extension('vtool/linalg_cython.pyx')]
 #extensions = cythonize('vtool/*.pyx')
@@ -40,8 +41,6 @@ CYTHON_FILES = [
     'vtool/segmentation.py',
     'vtool/spatial_verification.py',
 ]
-
-import six
 
 
 INSTALL_REQUIRES = [
