@@ -1,10 +1,49 @@
 #!/usr/bin/env python2.7
 from __future__ import absolute_import, division, print_function
-#from Cython.Build import cythonize
-from Cython.Distutils import build_ext
 from setuptools import setup
+from utool import util_setup
 import utool
 import six
+
+
+ext_modules = utool.find_ext_modules()
+
+
+INSTALL_REQUIRES = [
+    'Cython >= 0.20.2',
+    'numpy >= 1.8.0',
+    #'cv2',  # no pipi index
+]
+
+if six.PY2:
+    INSTALL_REQUIRES += ['functools32 >= 3.2.3-1']
+
+if __name__ == '__main__':
+
+    kwargs = util_setup.setuptools_setup(
+        setup_fpath=__file__,
+        name='vtool',
+        packages=util_setup.find_packages(),
+        version=util_setup.parse_package_for_version('vtool'),
+        licence=util_setup.read_license('LICENSE'),
+        long_description=util_setup.parse_readme('README.md'),
+        ext_modules=ext_modules,
+        cmdclass=util_setup.get_cmdclass(),
+        description=('Vision tools - tools for computer vision'),
+        url='https://github.com/Erotemic/vtool',
+        author='Jon Crall',
+        author_email='erotemic@gmail.com',
+        keywords='',
+        install_requires=INSTALL_REQUIRES,
+        package_data={},
+        classifiers=[],
+    )
+    setup(**kwargs)
+
+#from Cython.Build import cythonize
+#from Cython.Distutils import build_ext
+
+#python -c "import pyximport; pyximport.install(reload_support=True, setup_args={'script_args': ['--compiler=mingw32']})"
 
 #extensions = [Extension('vtool/linalg_cython.pyx')]
 #extensions = cythonize('vtool/*.pyx')
@@ -24,52 +63,3 @@ python -c "import utool; utool.checkpath('vtool/linalg_cython.pyd', verbose=True
 cyth.py %HOME%/code/vtool/vtool/linalg_cython.pyx
 '''
 #ext_modules = cythonize("vtool/linalg_cython.pyx")
-
-ext_modules = utool.find_ext_modules()
-
-
-CYTHON_FILES = [
-    'vtool/chip.py',
-    'vtool/image.py',
-    'vtool/exif.py',
-    'vtool/histogram.py',
-    'vtool/ellipse.py',
-    'vtool/keypoint.py',
-    'vtool/linalg.py',
-    'vtool/math.py',
-    'vtool/patch.py',
-    'vtool/segmentation.py',
-    'vtool/spatial_verification.py',
-]
-
-
-INSTALL_REQUIRES = [
-    'Cython >= 0.20.2',
-    'numpy >= 1.8.0',
-    #'cv2',  # no pipi index
-]
-
-if six.PY2:
-    INSTALL_REQUIRES += ['functools32 >= 3.2.3-1']
-
-if __name__ == '__main__':
-    from utool.util_setup import setuptools_setup
-
-    #python -c "import pyximport; pyximport.install(reload_support=True, setup_args={'script_args': ['--compiler=mingw32']})"
-
-    kwargs = setuptools_setup(
-        setup_fpath=__file__,
-        name='vtool',
-        packages=['vtool', 'vtool.tests'],
-        ext_modules=ext_modules,
-        cmdclass={'build_ext': build_ext},
-        description=('Vision tools - tools for computer vision'),
-        url='https://github.com/Erotemic/vtool',
-        author='Jon Crall',
-        author_email='erotemic@gmail.com',
-        keywords='',
-        install_requires=INSTALL_REQUIRES,
-        package_data={},
-        classifiers=[],
-    )
-    setup(**kwargs)
