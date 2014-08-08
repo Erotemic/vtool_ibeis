@@ -2,11 +2,11 @@
 from __future__ import absolute_import, division, print_function
 from setuptools import setup
 from utool import util_setup
-import utool
 import six
 
+import cyth
 
-ext_modules = utool.find_ext_modules()
+cyth.translate('vtool/keypoint.py')
 
 
 INSTALL_REQUIRES = [
@@ -19,13 +19,14 @@ if six.PY2:
     INSTALL_REQUIRES += ['functools32 >= 3.2.3-1']
 
 if __name__ == '__main__':
+    ext_modules = util_setup.find_ext_modules()
 
     kwargs = util_setup.setuptools_setup(
         setup_fpath=__file__,
         name='vtool',
         packages=util_setup.find_packages(),
         version=util_setup.parse_package_for_version('vtool'),
-        licence=util_setup.read_license('LICENSE'),
+        license=util_setup.read_license('LICENSE'),
         long_description=util_setup.parse_readme('README.md'),
         ext_modules=ext_modules,
         cmdclass=util_setup.get_cmdclass(),
