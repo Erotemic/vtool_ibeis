@@ -64,3 +64,5 @@ failed.txt
 
 _*_cyth.pyx
 _*_cyth.c
+
+*_cyth_bench.py
