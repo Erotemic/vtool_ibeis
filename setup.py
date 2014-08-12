@@ -6,7 +6,8 @@ import six
 
 import cyth
 
-cyth.translate('vtool/keypoint.py')
+#cyth.translate('vtool/keypoint.py')
+cyth.translate('vtool/keypoint.py', 'vtool/spatial_verification.py')
 
 
 INSTALL_REQUIRES = [
