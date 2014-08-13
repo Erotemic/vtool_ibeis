@@ -4,10 +4,10 @@ from setuptools import setup
 from utool import util_setup
 import six
 
-import cyth
+#import cyth
 
 #cyth.translate('vtool/keypoint.py')
-cyth.translate('vtool/keypoint.py', 'vtool/spatial_verification.py')
+#cyth.translate('vtool/keypoint.py', 'vtool/spatial_verification.py')
 
 
 INSTALL_REQUIRES = [

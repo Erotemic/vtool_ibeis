@@ -66,3 +66,5 @@ _*_cyth.pyx
 _*_cyth.c
 
 *_cyth_bench.py
+
+run_cyth_benchmarks.sh
