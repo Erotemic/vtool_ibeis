@@ -61,7 +61,6 @@ vtool/*_cython.c
 test_times.txt
 
 failed.txt
-
 _*_cyth.pyx
 _*_cyth.c
 
