@@ -58,7 +58,7 @@ tmp.py
 
 vtool/*_cython.c
 
-test_times.txt
+_test_times.txt
 
 failed.txt
 _*_cyth.pyx
