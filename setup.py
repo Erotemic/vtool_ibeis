@@ -20,8 +20,6 @@ if six.PY2:
     INSTALL_REQUIRES += ['functools32 >= 3.2.3-1']
 
 if __name__ == '__main__':
-    ext_modules = util_setup.find_ext_modules()
-
     kwargs = util_setup.setuptools_setup(
         setup_fpath=__file__,
         name='vtool',
@@ -29,7 +27,7 @@ if __name__ == '__main__':
         version=util_setup.parse_package_for_version('vtool'),
         license=util_setup.read_license('LICENSE'),
         long_description=util_setup.parse_readme('README.md'),
-        ext_modules=ext_modules,
+        ext_modules=util_setup.find_ext_modules(),
         cmdclass=util_setup.get_cmdclass(),
         description=('Vision tools - tools for computer vision'),
         url='https://github.com/Erotemic/vtool',
