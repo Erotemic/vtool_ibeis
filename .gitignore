@@ -61,9 +61,17 @@ vtool/*_cython.c
 _test_times.txt
 
 failed.txt
-_*_cyth.pyx
-_*_cyth.c
 
+# utool output
+_test_times.txt
+failed.txt
+
+# Cyth
+*_cyth.pyx
+*_cyth.pxd
+*_cyth.pyd
+*_cyth.so
+*_cyth.c
+*_cyth.html
 *_cyth_bench.py
-
 run_cyth_benchmarks.sh
