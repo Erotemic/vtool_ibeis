@@ -76,3 +76,5 @@ failed.txt
 *_cyth_bench.py
 run_cyth_benchmarks.sh
 run_cyth_benchmarks.py
+
+*.orig
