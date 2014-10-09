@@ -11,6 +11,86 @@ Subpackages
 Submodules
 ----------
 
+vtool._keypoint_cyth module
+---------------------------
+
+.. automodule:: vtool._keypoint_cyth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._keypoint_cyth_bench module
+---------------------------------
+
+.. automodule:: vtool._keypoint_cyth_bench
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._linalg_cyth module
+-------------------------
+
+.. automodule:: vtool._linalg_cyth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._linalg_cyth_bench module
+-------------------------------
+
+.. automodule:: vtool._linalg_cyth_bench
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._nearest_neighbors_cyth module
+------------------------------------
+
+.. automodule:: vtool._nearest_neighbors_cyth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._nearest_neighbors_cyth_bench module
+------------------------------------------
+
+.. automodule:: vtool._nearest_neighbors_cyth_bench
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._spatial_verification_cyth module
+---------------------------------------
+
+.. automodule:: vtool._spatial_verification_cyth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._spatial_verification_cyth_bench module
+---------------------------------------------
+
+.. automodule:: vtool._spatial_verification_cyth_bench
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._trig_cyth module
+-----------------------
+
+.. automodule:: vtool._trig_cyth
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._trig_cyth_bench module
+-----------------------------
+
+.. automodule:: vtool._trig_cyth_bench
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vtool.chip module
 -----------------
 
