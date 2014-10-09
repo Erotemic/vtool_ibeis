@@ -1,0 +1,486 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool.image &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vtool.image</h1><div class="highlight"><pre>
+<span class="c"># LICENCE</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c"># Python</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">map</span>
+<span class="c"># Science</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">utool</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">geometry</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span>
+    <span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[img]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+<span class="n">CV2_INTERPOLATION_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;nearest&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">,</span>
+    <span class="s">&#39;linear&#39;</span><span class="p">:</span>  <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">,</span>
+    <span class="s">&#39;area&#39;</span><span class="p">:</span>    <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_AREA</span><span class="p">,</span>
+    <span class="s">&#39;cubic&#39;</span><span class="p">:</span>   <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_CUBIC</span><span class="p">,</span>
+    <span class="s">&#39;lanczos&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span>
+<span class="p">}</span>
+
+<span class="n">CV2_WARP_KWARGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;flags&#39;</span><span class="p">:</span> <span class="n">CV2_INTERPOLATION_TYPES</span><span class="p">[</span><span class="s">&#39;lanczos&#39;</span><span class="p">],</span>
+    <span class="s">&#39;borderMode&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span>
+<span class="p">}</span>
+
+
+<span class="n">EXIF_TAG_GPS</span>      <span class="o">=</span> <span class="s">&#39;GPSInfo&#39;</span>
+<span class="n">EXIF_TAG_DATETIME</span> <span class="o">=</span> <span class="s">&#39;DateTimeOriginal&#39;</span>
+
+
+<div class="viewcode-block" id="dummy_img"><a class="viewcode-back" href="../../vtool.html#vtool.image.dummy_img">[docs]</a><span class="k">def</span> <span class="nf">dummy_img</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Creates a dummy test image &quot;&quot;&quot;</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">200</span>
+    <span class="k">return</span> <span class="n">img</span>
+
+</div>
+<span class="n">IMREAD_COLOR</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_COLOR</span> <span class="k">if</span> <span class="n">cv2</span><span class="o">.</span><span class="n">__version__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;3&#39;</span> <span class="k">else</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_LOAD_IMAGE_COLOR</span>
+
+
+<div class="viewcode-block" id="imread"><a class="viewcode-back" href="../../vtool.html#vtool.image.imread">[docs]</a><span class="k">def</span> <span class="nf">imread</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">delete_if_corrupted</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># opencv always reads in BGR mode (fastest load time)</span>
+        <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">IMREAD_COLOR</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">iswarning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">imgBGR</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">imgBGR</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;cannot read img_fpath=</span><span class="si">%s</span><span class="s"> does not exist&#39;</span> <span class="o">%</span> <span class="n">img_fpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;cannot read img_fpath=</span><span class="si">%s</span><span class="s"> seems corrupted.&#39;</span> <span class="o">%</span> <span class="n">img_fpath</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;[gtool] &#39;</span> <span class="o">+</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">delete_if_corrupted</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;[gtool] deleting corrupted image&#39;</span><span class="p">)</span>
+                <span class="n">utool</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imgBGR</span>
+
+</div>
+<div class="viewcode-block" id="imwrite"><a class="viewcode-back" href="../../vtool.html#vtool.image.imwrite">[docs]</a><span class="k">def</span> <span class="nf">imwrite</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">imgBGR</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">imgBGR</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[gtool] Caught Exception: </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">ex</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[gtool] ERROR reading: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">img_fpath</span><span class="p">,))</span>
+        <span class="k">raise</span>
+
+</div>
+<div class="viewcode-block" id="get_size"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_size">[docs]</a><span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the image size in (width, height) &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_num_channels"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_num_channels">[docs]</a><span class="k">def</span> <span class="nf">get_num_channels</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the number of color channels &quot;&quot;&quot;</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">nChannels</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">nChannels</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">nChannels</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Cannot determine number of channels&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nChannels</span>
+
+</div>
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="subpixel_values"><a class="viewcode-back" href="../../vtool.html#vtool.image.subpixel_values">[docs]</a><span class="k">def</span> <span class="nf">subpixel_values</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    adapted from</span>
+<span class="sd">    stackoverflow.com/uestions/12729228/simple-efficient-binlinear-</span>
+<span class="sd">    interpolation-of-images-in-numpy-and-python</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Image info</span>
+    <span class="n">nChannels</span> <span class="o">=</span> <span class="n">get_num_channels</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c"># Subpixel locations to sample</span>
+    <span class="n">ptsT</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">ptsT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">ptsT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c"># Get quantized pixel locations near subpixel pts</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c"># Make sure the values do not go past the boundary</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c"># Find bilinear weights</span>
+    <span class="n">wa</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">wb</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="n">wc</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">wd</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="k">if</span>  <span class="n">nChannels</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">wa</span><span class="p">]</span> <span class="o">*</span>  <span class="n">nChannels</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">wb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">wb</span><span class="p">]</span> <span class="o">*</span>  <span class="n">nChannels</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">wc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">wc</span><span class="p">]</span> <span class="o">*</span>  <span class="n">nChannels</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">wd</span><span class="p">]</span> <span class="o">*</span>  <span class="n">nChannels</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="c"># Sample values</span>
+    <span class="n">Ia</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">y0</span><span class="p">,</span> <span class="n">x0</span><span class="p">]</span>
+    <span class="n">Ib</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">]</span>
+    <span class="n">Ic</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">]</span>
+    <span class="n">Id</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">x1</span><span class="p">]</span>
+    <span class="c"># Perform the bilinear interpolation</span>
+    <span class="n">subpxl_vals</span> <span class="o">=</span> <span class="p">(</span><span class="n">wa</span> <span class="o">*</span> <span class="n">Ia</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">wb</span> <span class="o">*</span> <span class="n">Ib</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">wc</span> <span class="o">*</span> <span class="n">Ic</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">wd</span> <span class="o">*</span> <span class="n">Id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">subpxl_vals</span>
+
+</div>
+<div class="viewcode-block" id="open_pil_image"><a class="viewcode-back" href="../../vtool.html#vtool.image.open_pil_image">[docs]</a><span class="k">def</span> <span class="nf">open_pil_image</span><span class="p">(</span><span class="n">image_fpath</span><span class="p">):</span>
+    <span class="n">pil_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_fpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pil_img</span>
+
+</div>
+<div class="viewcode-block" id="open_image_size"><a class="viewcode-back" href="../../vtool.html#vtool.image.open_image_size">[docs]</a><span class="k">def</span> <span class="nf">open_image_size</span><span class="p">(</span><span class="n">image_fpath</span><span class="p">):</span>
+    <span class="n">pil_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_fpath</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">pil_img</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">return</span> <span class="n">size</span>
+
+</div>
+<div class="viewcode-block" id="get_gpathlist_sizes"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_gpathlist_sizes">[docs]</a><span class="k">def</span> <span class="nf">get_gpathlist_sizes</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; reads the size of each image in gpath_list &quot;&quot;&quot;</span>
+    <span class="n">gsize_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">open_image_size</span><span class="p">(</span><span class="n">gpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">gpath</span> <span class="ow">in</span> <span class="n">gpath_list</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">gsize_list</span>
+
+</div>
+<div class="viewcode-block" id="cvt_BGR2L"><a class="viewcode-back" href="../../vtool.html#vtool.image.cvt_BGR2L">[docs]</a><span class="k">def</span> <span class="nf">cvt_BGR2L</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">):</span>
+    <span class="n">imgLAB</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2LAB</span><span class="p">)</span>
+    <span class="n">imgL</span> <span class="o">=</span> <span class="n">imgLAB</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">imgL</span>
+
+</div>
+<div class="viewcode-block" id="cvt_BGR2RGB"><a class="viewcode-back" href="../../vtool.html#vtool.image.cvt_BGR2RGB">[docs]</a><span class="k">def</span> <span class="nf">cvt_BGR2RGB</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">):</span>
+    <span class="n">imgRGB</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imgRGB</span>
+
+</div>
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="warpAffine"><a class="viewcode-back" href="../../vtool.html#vtool.image.warpAffine">[docs]</a><span class="k">def</span> <span class="nf">warpAffine</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Aff</span><span class="p">,</span> <span class="n">dsize</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    dsize = (width, height) of return image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warped_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">warpAffine</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Aff</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dsize</span><span class="p">),</span> <span class="o">**</span><span class="n">CV2_WARP_KWARGS</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">warped_img</span>
+
+</div>
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="warpHomog"><a class="viewcode-back" href="../../vtool.html#vtool.image.warpHomog">[docs]</a><span class="k">def</span> <span class="nf">warpHomog</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Homog</span><span class="p">,</span> <span class="n">dsize</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    dsize = (width, height) of return image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warped_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">warpPerspective</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Homog</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dsize</span><span class="p">),</span> <span class="o">**</span><span class="n">CV2_WARP_KWARGS</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">warped_img</span>
+
+</div>
+<div class="viewcode-block" id="blend_images"><a class="viewcode-back" href="../../vtool.html#vtool.image.blend_images">[docs]</a><span class="k">def</span> <span class="nf">blend_images</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">img1</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">img2</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s">&#39;chips must be same shape to blend&#39;</span>
+    <span class="n">chip_blend</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img2</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">img2</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">chip_blend</span> <span class="o">=</span> <span class="n">img1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">img2</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">chip_blend</span>
+
+</div>
+<div class="viewcode-block" id="print_image_checks"><a class="viewcode-back" href="../../vtool.html#vtool.image.print_image_checks">[docs]</a><span class="k">def</span> <span class="nf">print_image_checks</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">):</span>
+    <span class="n">hasimg</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">checkpath</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hasimg</span><span class="p">:</span>
+        <span class="n">_tup</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">utool</span><span class="o">.</span><span class="n">filesize_str</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[io] Image </span><span class="si">%r</span><span class="s"> (</span><span class="si">%s</span><span class="s">) exists. Is it corrupted?&#39;</span> <span class="o">%</span> <span class="n">_tup</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[io] Image </span><span class="si">%r</span><span class="s"> does not exists &#39;</span> <span class="p">(</span><span class="n">img_fpath</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">hasimg</span>
+
+</div>
+<div class="viewcode-block" id="resize"><a class="viewcode-back" href="../../vtool.html#vtool.image.resize">[docs]</a><span class="k">def</span> <span class="nf">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dsize</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dsize</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="resized_dims_and_ratio"><a class="viewcode-back" href="../../vtool.html#vtool.image.resized_dims_and_ratio">[docs]</a><span class="k">def</span> <span class="nf">resized_dims_and_ratio</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">max_dsize</span><span class="p">):</span>
+    <span class="n">max_width</span><span class="p">,</span> <span class="n">max_height</span> <span class="o">=</span> <span class="n">max_dsize</span>
+    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">img_size</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_width</span> <span class="o">/</span> <span class="n">width</span><span class="p">,</span> <span class="n">max_height</span> <span class="o">/</span> <span class="n">height</span><span class="p">)</span>
+    <span class="n">dsize</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">dsize</span><span class="p">,</span> <span class="n">ratio</span>
+
+</div>
+<div class="viewcode-block" id="resized_clamped_thumb_dims"><a class="viewcode-back" href="../../vtool.html#vtool.image.resized_clamped_thumb_dims">[docs]</a><span class="k">def</span> <span class="nf">resized_clamped_thumb_dims</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">max_dsize</span><span class="p">):</span>
+    <span class="n">dsize_</span><span class="p">,</span> <span class="n">ratio</span> <span class="o">=</span> <span class="n">resized_dims_and_ratio</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">max_dsize</span><span class="p">)</span>
+    <span class="n">dsize</span> <span class="o">=</span> <span class="n">img_size</span> <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">dsize_</span>
+    <span class="n">sx</span> <span class="o">=</span> <span class="n">dsize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sy</span> <span class="o">=</span> <span class="n">dsize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">img_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dsize</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span>
+
+</div>
+<div class="viewcode-block" id="resize_thumb"><a class="viewcode-back" href="../../vtool.html#vtool.image.resize_thumb">[docs]</a><span class="k">def</span> <span class="nf">resize_thumb</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">max_dsize</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; Resize an image such that its max width or height is: &quot;&quot;&quot;</span>
+    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">img_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+    <span class="n">dsize</span><span class="p">,</span> <span class="n">ratio</span> <span class="o">=</span> <span class="n">resized_dims_and_ratio</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">max_dsize</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cvt_BGR2RGB</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dsize</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="scale_bbox_to_verts_gen"><a class="viewcode-back" href="../../vtool.html#vtool.image.scale_bbox_to_verts_gen">[docs]</a><span class="k">def</span> <span class="nf">scale_bbox_to_verts_gen</span><span class="p">(</span><span class="n">bbox_list</span><span class="p">,</span> <span class="n">theta_list</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">):</span>
+    <span class="c"># TODO: input verts support and better name</span>
+    <span class="k">for</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bbox_list</span><span class="p">,</span> <span class="n">theta_list</span><span class="p">):</span>
+        <span class="c"># Transformation matrixes</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">rotation_around_bbox_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+        <span class="c"># Get verticies of the annotation polygon</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c"># Rotate and transform to thumbnail space</span>
+        <span class="n">xyz_pts</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">homogonize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">trans_pts</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">unhomogonize</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">xyz_pts</span><span class="p">))</span>
+        <span class="n">new_verts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">trans_pts</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="n">new_verts</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_trimread</span><span class="p">(</span><span class="n">gpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Try an imread &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">imread</span><span class="p">(</span><span class="n">gpath</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+
+<div class="viewcode-block" id="get_scale_factor"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_scale_factor">[docs]</a><span class="k">def</span> <span class="nf">get_scale_factor</span><span class="p">(</span><span class="n">src_img</span><span class="p">,</span> <span class="n">dst_img</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns scale factor from one image to the next &quot;&quot;&quot;</span>
+    <span class="n">src_h</span><span class="p">,</span> <span class="n">src_w</span> <span class="o">=</span> <span class="n">src_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">dst_h</span><span class="p">,</span> <span class="n">dst_w</span> <span class="o">=</span> <span class="n">dst_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">sx</span> <span class="o">=</span> <span class="n">dst_w</span> <span class="o">/</span> <span class="n">src_w</span>
+    <span class="n">sy</span> <span class="o">=</span> <span class="n">dst_h</span> <span class="o">/</span> <span class="n">src_h</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="cvt_bbox_xywh_to_pt1pt2"><a class="viewcode-back" href="../../vtool.html#vtool.image.cvt_bbox_xywh_to_pt1pt2">[docs]</a><span class="k">def</span> <span class="nf">cvt_bbox_xywh_to_pt1pt2</span><span class="p">(</span><span class="n">xywh</span><span class="p">,</span> <span class="n">sx</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">round_</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Converts bbox to thumb format with a scale factor&quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">_w</span><span class="p">,</span> <span class="n">_h</span><span class="p">)</span> <span class="o">=</span> <span class="n">xywh</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">_w</span><span class="p">)</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y1</span> <span class="o">+</span> <span class="n">_h</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">round_</span><span class="p">:</span>
+        <span class="n">pt1</span> <span class="o">=</span> <span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="n">utool</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">y1</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+        <span class="n">pt2</span> <span class="o">=</span> <span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">x2</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="n">utool</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">y2</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pt1</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="p">(</span><span class="n">y1</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+        <span class="n">pt2</span> <span class="o">=</span> <span class="p">((</span><span class="n">x2</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="p">(</span><span class="n">y2</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="ThumbnailCacheContext"><a class="viewcode-back" href="../../vtool.html#vtool.image.ThumbnailCacheContext">[docs]</a><span class="k">class</span> <span class="nc">ThumbnailCacheContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Lazy computation of of images as thumbnails.</span>
+
+<span class="sd">    Just pass a list of uuids corresponding to the images. Then compute images</span>
+<span class="sd">    flagged as dirty and give them back to the context.  thumbs_list will be</span>
+<span class="sd">    populated on contex exit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid_list</span><span class="p">,</span> <span class="n">asrgb</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">thumb_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">thumb_dpath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">appname</span><span class="o">=</span><span class="s">&#39;vtool&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">thumb_dpath</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># Get default thumb path</span>
+            <span class="n">thumb_dpath</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">get_app_resource_dir</span><span class="p">(</span><span class="n">appname</span><span class="p">,</span> <span class="s">&#39;thumbs&#39;</span><span class="p">)</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">ensuredir</span><span class="p">(</span><span class="n">thumb_dpath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumb_gpaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">join</span><span class="p">(</span><span class="n">thumb_dpath</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;thumb.png&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">uuid</span> <span class="ow">in</span> <span class="n">uuid_list</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asrgb</span> <span class="o">=</span> <span class="n">asrgb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumb_size</span> <span class="o">=</span> <span class="n">thumb_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumb_list</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirty_list</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirty_gpaths</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># These items need to be computed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirty_list</span> <span class="o">=</span> <span class="p">[</span><span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">gpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">gpath</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">thumb_gpaths</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirty_gpaths</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">filter_items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thumb_gpaths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_list</span><span class="p">)</span>
+        <span class="c">#print(&#39;[gtool.thumb] len(dirty_gpaths): %r&#39; % len(self.dirty_gpaths))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">needs_compute</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirty_gpaths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="ThumbnailCacheContext.save_dirty_thumbs_from_images"><a class="viewcode-back" href="../../vtool.html#vtool.image.ThumbnailCacheContext.save_dirty_thumbs_from_images">[docs]</a>    <span class="k">def</span> <span class="nf">save_dirty_thumbs_from_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pass in any images marked by the context as dirty here &quot;&quot;&quot;</span>
+        <span class="c"># Remove any non images</span>
+        <span class="n">isvalid_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">img_list</span><span class="p">]</span>
+        <span class="n">valid_images</span>  <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">filter_items</span><span class="p">(</span><span class="n">img_list</span><span class="p">,</span> <span class="n">isvalid_list</span><span class="p">)</span>
+        <span class="n">valid_fpath</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">filter_items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thumb_gpaths</span><span class="p">,</span> <span class="n">isvalid_list</span><span class="p">)</span>
+        <span class="c"># Resize to thumbnails</span>
+        <span class="n">max_dsize</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thumb_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thumb_size</span><span class="p">)</span>
+        <span class="n">valid_thumbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">resize_thumb</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">max_dsize</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">valid_images</span><span class="p">]</span>
+        <span class="c"># Write thumbs to disk</span>
+        <span class="k">for</span> <span class="n">gpath</span><span class="p">,</span> <span class="n">thumb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">valid_fpath</span><span class="p">,</span> <span class="n">valid_thumbs</span><span class="p">):</span>
+            <span class="n">imwrite</span><span class="p">(</span><span class="n">gpath</span><span class="p">,</span> <span class="n">thumb</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ThumbnailCacheContext.filter_dirty_items"><a class="viewcode-back" href="../../vtool.html#vtool.image.ThumbnailCacheContext.filter_dirty_items">[docs]</a>    <span class="k">def</span> <span class="nf">filter_dirty_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns only items marked by the context as dirty &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">utool</span><span class="o">.</span><span class="n">filter_items</span><span class="p">(</span><span class="n">list_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_list</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">trace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;[gtool.thumb] Error while in thumbnail context&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;[gtool.thumb] Error in context manager!: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">False</span>  <span class="c"># return a falsey value on error</span>
+        <span class="c"># Try to read thumbnails on disk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumb_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">_trimread</span><span class="p">(</span><span class="n">gpath</span><span class="p">)</span> <span class="k">for</span> <span class="n">gpath</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">thumb_gpaths</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asrgb</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thumb_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">if</span> <span class="n">thumb</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">cvt_BGR2RGB</span><span class="p">(</span><span class="n">thumb</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">thumb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">thumb_list</span><span class="p">]</span>
+
+
+<span class="c"># Parallel code for resizing many images</span></div>
+<div class="viewcode-block" id="resize_worker"><a class="viewcode-back" href="../../vtool.html#vtool.image.resize_worker">[docs]</a><span class="k">def</span> <span class="nf">resize_worker</span><span class="p">(</span><span class="n">tup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; worker function for parallel generator &quot;&quot;&quot;</span>
+    <span class="n">gfpath</span><span class="p">,</span> <span class="n">new_gfpath</span><span class="p">,</span> <span class="n">new_size</span> <span class="o">=</span> <span class="n">tup</span>
+    <span class="c">#print(&#39;[preproc] writing detectimg: %r&#39; % new_gfpath)</span>
+    <span class="c">#if not exists(new_gfpath):</span>
+    <span class="c">#    return new_gfpath</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">gfpath</span><span class="p">)</span>
+    <span class="n">new_img</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">new_size</span><span class="p">)</span>
+    <span class="n">imwrite</span><span class="p">(</span><span class="n">new_gfpath</span><span class="p">,</span> <span class="n">new_img</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_gfpath</span>
+
+</div>
+<div class="viewcode-block" id="resize_imagelist_generator"><a class="viewcode-back" href="../../vtool.html#vtool.image.resize_imagelist_generator">[docs]</a><span class="k">def</span> <span class="nf">resize_imagelist_generator</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">,</span> <span class="n">new_gpath_list</span><span class="p">,</span> <span class="n">newsize_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Resizes images and yeilds results asynchronously  &quot;&quot;&quot;</span>
+    <span class="c"># Compute and write detectimg in asychronous process</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;force_serial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;force_serial&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;ordered&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ordered&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">arg_iter</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">,</span> <span class="n">new_gpath_list</span><span class="p">,</span> <span class="n">newsize_list</span><span class="p">)</span>
+    <span class="n">arg_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">arg_iter</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">utool</span><span class="o">.</span><span class="n">util_parallel</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">resize_worker</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="resize_imagelist_to_sqrtarea"><a class="viewcode-back" href="../../vtool.html#vtool.image.resize_imagelist_to_sqrtarea">[docs]</a><span class="k">def</span> <span class="nf">resize_imagelist_to_sqrtarea</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">,</span> <span class="n">new_gpath_list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                 <span class="n">sqrt_area</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                 <span class="n">checkexists</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Resizes images and yeilds results asynchronously  &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.chip</span> <span class="kn">import</span> <span class="n">get_scaled_sizes_with_area</span>
+    <span class="n">target_area</span> <span class="o">=</span> <span class="n">sqrt_area</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="c"># Read image sizes</span>
+    <span class="n">gsize_list</span> <span class="o">=</span> <span class="n">get_gpathlist_sizes</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">)</span>
+    <span class="c"># Compute new sizes which preserve aspect ratio</span>
+    <span class="n">newsize_list</span> <span class="o">=</span> <span class="n">get_scaled_sizes_with_area</span><span class="p">(</span><span class="n">target_area</span><span class="p">,</span> <span class="n">gsize_list</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">new_gpath_list</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c"># Compute names for the new images if not given</span>
+        <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># Create an output directory if not specified</span>
+            <span class="n">output_dir</span>      <span class="o">=</span> <span class="s">&#39;resized_sqrtarea</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sqrt_area</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">ensuredir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">size_suffix_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">newsize</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">newsize</span> <span class="ow">in</span> <span class="n">newsize_list</span><span class="p">]</span>
+        <span class="n">new_gname_list</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">append_suffixlist_to_namelist</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">,</span> <span class="n">size_suffix_list</span><span class="p">)</span>
+        <span class="n">new_gpath_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">gname</span><span class="p">)</span> <span class="k">for</span> <span class="n">gname</span> <span class="ow">in</span> <span class="n">new_gname_list</span><span class="p">]</span>
+        <span class="n">new_gpath_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">unixpath</span><span class="p">,</span> <span class="n">new_gpath_list</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_gpath_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">),</span> <span class="s">&#39;unequal len&#39;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">newsize_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">),</span> <span class="s">&#39;unequal len&#39;</span>
+    <span class="c"># Evaluate generator</span>
+    <span class="k">if</span> <span class="n">checkexists</span><span class="p">:</span>
+        <span class="n">exists_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">exists</span><span class="p">,</span> <span class="n">new_gpath_list</span><span class="p">))</span>
+        <span class="n">gpath_list_</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">filterfalse_items</span><span class="p">(</span><span class="n">gpath_list</span><span class="p">,</span> <span class="n">exists_list</span><span class="p">)</span>
+        <span class="n">new_gpath_list_</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">filterfalse_items</span><span class="p">(</span><span class="n">new_gpath_list</span><span class="p">,</span> <span class="n">exists_list</span><span class="p">)</span>
+        <span class="n">newsize_list_</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">filterfalse_items</span><span class="p">(</span><span class="n">newsize_list</span><span class="p">,</span> <span class="n">exists_list</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gpath_list_</span> <span class="o">=</span> <span class="n">gpath_list</span>
+        <span class="n">new_gpath_list_</span> <span class="o">=</span> <span class="n">new_gpath_list</span>
+        <span class="n">newsize_list_</span> <span class="o">=</span> <span class="n">newsize_list</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">resize_imagelist_generator</span><span class="p">(</span><span class="n">gpath_list_</span><span class="p">,</span> <span class="n">new_gpath_list_</span><span class="p">,</span>
+                                           <span class="n">newsize_list_</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="c">#return [res for res in generator]</span>
+    <span class="k">return</span> <span class="n">new_gpath_list</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

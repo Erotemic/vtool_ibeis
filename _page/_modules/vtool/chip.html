@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool.chip &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vtool.chip</h1><div class="highlight"><pre>
+<span class="c"># LICENCE</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c"># Science</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="kn">as</span> <span class="nn">npl</span>
+<span class="c"># VTool</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">image</span> <span class="k">as</span> <span class="n">gtool</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">image_filters</span> <span class="k">as</span> <span class="n">gfilt_tool</span>
+<span class="kn">from</span> <span class="nn">utool.util_inject</span> <span class="kn">import</span> <span class="n">inject</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">inject</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[chip]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+<span class="nd">@profile</span>
+<span class="k">def</span> <span class="nf">_get_image_to_chip_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; transforms image space into chipspace</span>
+<span class="sd">        bbox   - bounding box of chip in image space</span>
+<span class="sd">        chipsz - size of the chip</span>
+<span class="sd">        theta  - rotation of the bounding box</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">=</span> <span class="n">bbox</span>
+    <span class="p">(</span><span class="n">cw_</span><span class="p">,</span> <span class="n">ch_</span><span class="p">)</span>     <span class="o">=</span> <span class="n">chipsz</span>
+    <span class="c"># Translate from bbox center to (0, 0)</span>
+    <span class="n">tx1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">ty1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">T1</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">tx1</span><span class="p">,</span> <span class="n">ty1</span><span class="p">)</span>
+    <span class="c"># Scale to chip height</span>
+    <span class="n">sx</span> <span class="o">=</span> <span class="p">(</span><span class="n">cw_</span> <span class="o">/</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">sy</span> <span class="o">=</span> <span class="p">(</span><span class="n">ch_</span> <span class="o">/</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">S</span>  <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+    <span class="c"># Rotate to chip orientation</span>
+    <span class="n">R</span>  <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">rotation_mat3x3</span><span class="p">(</span><span class="o">-</span><span class="n">theta</span><span class="p">)</span>
+    <span class="c"># Translate from (0, 0) to chip center</span>
+    <span class="n">tx2</span> <span class="o">=</span> <span class="p">(</span><span class="n">cw_</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ty2</span> <span class="o">=</span> <span class="p">(</span><span class="n">ch_</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">tx2</span><span class="p">,</span> <span class="n">ty2</span><span class="p">)</span>
+    <span class="c"># Merge into single transformation (operate left-to-right aka data on left)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">T2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">C</span>
+
+
+<span class="nd">@profile</span>
+<span class="k">def</span> <span class="nf">_get_chip_to_image_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; transforms chip space into imgspace</span>
+<span class="sd">        bbox   - bounding box of chip in image space</span>
+<span class="sd">        chipsz - size of the chip</span>
+<span class="sd">        theta  - rotation of the bounding box</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span>    <span class="o">=</span> <span class="n">_get_image_to_chip_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">invC</span> <span class="o">=</span> <span class="n">npl</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">invC</span>
+
+
+<span class="nd">@profile</span>
+<span class="k">def</span> <span class="nf">_extract_chip</span><span class="p">(</span><span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Crops chip from image ; Rotates and scales; &quot;&quot;&quot;</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">gfpath</span><span class="p">)</span>  <span class="c"># Read parent image</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">_get_image_to_chip_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>  <span class="c"># Build transformation</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">warpAffine</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">new_size</span><span class="p">)</span>  <span class="c"># Rotate and scale</span>
+    <span class="k">return</span> <span class="n">chipBGR</span>
+
+
+<span class="nd">@profile</span>
+<span class="k">def</span> <span class="nf">_filter_chip</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">,</span> <span class="n">filter_funcs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; applies a list of preprocessing filters to a chip &quot;&quot;&quot;</span>
+    <span class="n">chipBGR_</span> <span class="o">=</span> <span class="n">chipBGR</span>
+    <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">filter_funcs</span><span class="p">:</span>
+        <span class="n">chipBGR_</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chipBGR_</span>
+
+
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="get_scaled_size_with_area"><a class="viewcode-back" href="../../vtool.html#vtool.chip.get_scaled_size_with_area">[docs]</a><span class="k">def</span> <span class="nf">get_scaled_size_with_area</span><span class="p">(</span><span class="n">target_area</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns new_size which scales (w, h) as close to target_area as possible</span>
+<span class="sd">    and maintains aspect ratio</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ht</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">target_area</span> <span class="o">*</span> <span class="n">h</span> <span class="o">/</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">wt</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">ht</span> <span class="o">/</span> <span class="n">h</span>
+    <span class="n">new_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">wt</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ht</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">new_size</span>
+
+</div>
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="get_scaled_sizes_with_area"><a class="viewcode-back" href="../../vtool.html#vtool.chip.get_scaled_sizes_with_area">[docs]</a><span class="k">def</span> <span class="nf">get_scaled_sizes_with_area</span><span class="p">(</span><span class="n">target_area</span><span class="p">,</span> <span class="n">size_list</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">get_scaled_size_with_area</span><span class="p">(</span><span class="n">target_area</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="ow">in</span> <span class="n">size_list</span><span class="p">]</span>
+
+</div>
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="compute_chip"><a class="viewcode-back" href="../../vtool.html#vtool.chip.compute_chip">[docs]</a><span class="k">def</span> <span class="nf">compute_chip</span><span class="p">(</span><span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot; Extracts a chip and applies filters &quot;&quot;&quot;</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">_extract_chip</span><span class="p">(</span><span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">)</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">_filter_chip</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">,</span> <span class="n">filter_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chipBGR</span>
+
+</div>
+<span class="nd">@profile</span>
+<div class="viewcode-block" id="get_filter_list"><a class="viewcode-back" href="../../vtool.html#vtool.chip.get_filter_list">[docs]</a><span class="k">def</span> <span class="nf">get_filter_list</span><span class="p">(</span><span class="n">chipcfg_dict</span><span class="p">):</span>
+    <span class="n">filter_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">chipcfg_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;adapteq&#39;</span><span class="p">):</span>
+        <span class="n">filter_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gfilt_tool</span><span class="o">.</span><span class="n">adapteq_fn</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chipcfg_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;histeq&#39;</span><span class="p">):</span>
+        <span class="n">filter_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gfilt_tool</span><span class="o">.</span><span class="n">histeq_fn</span><span class="p">)</span>
+    <span class="c">#if chipcfg_dict.get(&#39;maxcontrast&#39;):</span>
+        <span class="c">#filter_list.append(maxcontr_fn)</span>
+    <span class="c">#if chipcfg_dict.get(&#39;rank_eq&#39;):</span>
+        <span class="c">#filter_list.append(rankeq_fn)</span>
+    <span class="c">#if chipcfg_dict.get(&#39;local_eq&#39;):</span>
+        <span class="c">#filter_list.append(localeq_fn)</span>
+    <span class="k">if</span> <span class="n">chipcfg_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;grabcut&#39;</span><span class="p">):</span>
+        <span class="n">filter_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gfilt_tool</span><span class="o">.</span><span class="n">grabcut_fn</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filter_list</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

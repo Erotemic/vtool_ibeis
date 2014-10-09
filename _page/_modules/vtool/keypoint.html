@@ -1,0 +1,686 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool.keypoint &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vtool.keypoint</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">python -c &quot;import vtool, doctest; print(doctest.testmod(vtool.keypoint))&quot;</span>
+
+
+<span class="sd">Keypoints are stored in the invA format by default.</span>
+<span class="sd">Unfortunately many places in the code reference this as A instead of invA</span>
+<span class="sd">because I was confused when I first started writing this.</span>
+
+<span class="sd">to rectify this I am changing terminology.</span>
+
+<span class="sd">invV - maps from ucircle onto an ellipse (perdoch.invA)</span>
+<span class="sd">   V - maps from ellipse to ucircle      (perdoch.A)</span>
+<span class="sd">   Z - the conic matrix                  (perdoch.E)</span>
+
+
+<span class="sd">Data formats:</span>
+<span class="sd">kpts = [x, y, iv11, iv21, iv22, ori]</span>
+<span class="sd">invV = ((iv11, iv12, x),</span>
+<span class="sd">        (iv21, iv22, y),</span>
+<span class="sd">        (   0,    0, 1))</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c"># Python</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
+<span class="c"># Science</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="kn">as</span> <span class="nn">npl</span>
+<span class="kn">from</span> <span class="nn">numpy.core.umath_tests</span> <span class="kn">import</span> <span class="n">matrix_multiply</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">rollaxis</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">diag</span><span class="p">)</span>
+<span class="c"># VTool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">chip</span> <span class="k">as</span> <span class="n">ctool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">trig</span>
+<span class="c"># UTool</span>
+<span class="kn">import</span> <span class="nn">utool</span>
+<span class="c">#(print, print_, printDBG, rrr, profile) = utool.inject(__name__, &#39;[kpts]&#39;)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">// These are cython style comments used for maintaining python compatibility</span>
+<span class="sd">#if CYTH</span>
+<span class="sd">from vtool.keypoint import get_invVR_mats_shape, get_invVR_mats_sqrd_scale, get_invVR_mats_oris</span>
+
+<span class="sd">cdef np.float64_t TAU = 2 * np.pi</span>
+<span class="sd">#endif</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c">#:%s/numpy_floatarray_\([13]\)dimension/np.ndarray[np.float64_t, ndim=\1]/gc</span>
+<span class="c">#:%s/np.ndarray\[np.float64_t, ndim=\([13]\)\]/numpy_floatarray_\1dimension/gc</span>
+
+
+<span class="n">TAU</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c"># tauday.com</span>
+<span class="n">GRAVITY_THETA</span> <span class="o">=</span> <span class="n">TAU</span> <span class="o">/</span> <span class="mi">4</span>
+<span class="n">KPTS_DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+
+<span class="n">XDIM</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">YDIM</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">SCAX_DIM</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">SKEW_DIM</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">SCAY_DIM</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">ORI_DIM</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">LOC_DIMS</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">XDIM</span><span class="p">,</span> <span class="n">YDIM</span><span class="p">])</span>
+<span class="n">SHAPE_DIMS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">SCAX_DIM</span><span class="p">,</span> <span class="n">SKEW_DIM</span><span class="p">,</span> <span class="n">SCAY_DIM</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="get_grid_kpts"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_grid_kpts">[docs]</a><span class="k">def</span> <span class="nf">get_grid_kpts</span><span class="p">(</span><span class="n">wh</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">wh_stride</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns a regular grid of keypoints &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">=</span> <span class="n">wh</span>
+    <span class="p">(</span><span class="n">wstride</span><span class="p">,</span> <span class="n">hstride</span><span class="p">)</span> <span class="o">=</span> <span class="n">wh_stride</span>
+    <span class="n">padding</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">*</span> <span class="mf">1.5</span>
+    <span class="n">xbasis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">padding</span><span class="p">),</span> <span class="n">wstride</span><span class="p">)</span>
+    <span class="n">ybasis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">padding</span><span class="p">),</span> <span class="n">hstride</span><span class="p">)</span>
+    <span class="n">xs_grid</span><span class="p">,</span> <span class="n">ys_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xbasis</span><span class="p">,</span> <span class="n">ybasis</span><span class="p">)</span>
+    <span class="n">_xs</span> <span class="o">=</span> <span class="n">xs_grid</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">_ys</span> <span class="o">=</span> <span class="n">ys_grid</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">nKpts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_xs</span><span class="p">)</span>
+    <span class="n">_zeros</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nKpts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">_iv11s</span> <span class="o">=</span> <span class="n">_zeros</span> <span class="o">+</span> <span class="n">scale</span>
+    <span class="n">_iv21s</span> <span class="o">=</span> <span class="n">_zeros</span>
+    <span class="n">_iv22s</span> <span class="o">=</span> <span class="n">_zeros</span> <span class="o">+</span> <span class="n">scale</span>
+    <span class="n">_oris</span> <span class="o">=</span> <span class="n">_zeros</span>
+    <span class="n">kpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">_xs</span><span class="p">,</span> <span class="n">_ys</span><span class="p">,</span> <span class="n">_iv11s</span><span class="p">,</span> <span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span><span class="p">,</span> <span class="n">_oris</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">kpts</span>
+
+
+<span class="c"># --- raw keypoint components ---</span></div>
+<div class="viewcode-block" id="get_xys"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_xys">[docs]</a><span class="k">def</span> <span class="nf">get_xys</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Keypoint locations in chip space &quot;&quot;&quot;</span>
+    <span class="n">_xys</span> <span class="o">=</span> <span class="n">kpts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">_xys</span>
+
+</div>
+<div class="viewcode-block" id="get_homog_xyzs"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_homog_xyzs">[docs]</a><span class="k">def</span> <span class="nf">get_homog_xyzs</span><span class="p">(</span><span class="n">kpts_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Keypoint locations in chip space &quot;&quot;&quot;</span>
+    <span class="n">_xys</span> <span class="o">=</span> <span class="n">get_xys</span><span class="p">(</span><span class="n">kpts_</span><span class="p">)</span>
+    <span class="n">_zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts_</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">kpts_</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">_xyzs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">_xys</span><span class="p">,</span> <span class="n">_zs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_xyzs</span>
+
+</div>
+<div class="viewcode-block" id="get_invVs"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invVs">[docs]</a><span class="k">def</span> <span class="nf">get_invVs</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Keypoint shapes (oriented with the gravity vector) &quot;&quot;&quot;</span>
+    <span class="n">_invVs</span> <span class="o">=</span> <span class="n">kpts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">_invVs</span>
+
+</div>
+<div class="viewcode-block" id="get_oris"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_oris">[docs]</a><span class="k">def</span> <span class="nf">get_oris</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Keypoint orientations</span>
+<span class="sd">    (in isotropic guassian space relative to the gravity vector)</span>
+<span class="sd">    (in simpler words: the orientation is is taken from keypoints warped to the unit circle)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">_oris</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">kpts</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">kpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">_oris</span> <span class="o">=</span> <span class="n">kpts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s">&#39;[ktool] Invalid kpts.shape = </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">kpts</span><span class="o">.</span><span class="n">shape</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">_oris</span>
+
+
+<span class="c"># --- keypoint properties ---</span>
+</div>
+<div class="viewcode-block" id="get_sqrd_scales"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_sqrd_scales">[docs]</a><span class="k">def</span> <span class="nf">get_sqrd_scales</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; gets average squared scale (does not take into account elliptical shape &quot;&quot;&quot;</span>
+    <span class="n">_iv11s</span><span class="p">,</span> <span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span> <span class="o">=</span> <span class="n">get_invVs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">_scales_sqrd</span> <span class="o">=</span> <span class="n">_iv11s</span> <span class="o">*</span> <span class="n">_iv22s</span>
+    <span class="k">return</span> <span class="n">_scales_sqrd</span>
+
+</div>
+<div class="viewcode-block" id="get_scales"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_scales">[docs]</a><span class="k">def</span> <span class="nf">get_scales</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;  Gets average scale (does not take into account elliptical shape &quot;&quot;&quot;</span>
+    <span class="n">_scales</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">get_sqrd_scales</span><span class="p">(</span><span class="n">kpts</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_scales</span>
+
+
+<span class="c"># --- keypoint matrixes ---</span>
+</div>
+<div class="viewcode-block" id="get_ori_mats"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_ori_mats">[docs]</a><span class="k">def</span> <span class="nf">get_ori_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns keypoint orientation matrixes &quot;&quot;&quot;</span>
+    <span class="n">_oris</span> <span class="o">=</span> <span class="n">get_oris</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">R_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">ltool</span><span class="o">.</span><span class="n">rotation_mat2x2</span><span class="p">(</span><span class="n">ori</span><span class="p">)</span> <span class="k">for</span> <span class="n">ori</span> <span class="ow">in</span> <span class="n">_oris</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">R_mats</span>
+
+</div>
+<div class="viewcode-block" id="get_invV_mats2x2"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invV_mats2x2">[docs]</a><span class="k">def</span> <span class="nf">get_invV_mats2x2</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">with_ori</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns keypoint shape matrixes</span>
+<span class="sd">        (default orientation is down)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nKpts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_iv11s</span><span class="p">,</span> <span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span> <span class="o">=</span> <span class="n">get_invVs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">_zeros</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">nKpts</span><span class="p">)</span>
+    <span class="n">invV_arrs</span> <span class="o">=</span> <span class="n">array</span><span class="p">(((</span><span class="n">_iv11s</span><span class="p">,</span> <span class="n">_zeros</span><span class="p">),</span>
+                       <span class="p">(</span><span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span><span class="p">)))</span>  <span class="c"># R x C x N</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">rollaxis</span><span class="p">(</span><span class="n">invV_arrs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>     <span class="c"># N x R x C</span>
+    <span class="k">if</span> <span class="n">with_ori</span><span class="p">:</span>
+        <span class="c"># You must apply rotations before you apply shape</span>
+        <span class="c"># This is because we are dealing with \emph{inv}(V).</span>
+        <span class="c"># numpy operates with data on the right (operate right-to-left)</span>
+        <span class="n">R_mats</span>  <span class="o">=</span> <span class="n">get_ori_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+        <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">,</span> <span class="n">R_mats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">invV_mats</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_invV_mats"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invV_mats">[docs]</a><span class="k">def</span> <span class="nf">get_invV_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">with_trans</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">with_ori</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ashomog</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ascontiguous</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; packs keypoint shapes into affine invV matrixes</span>
+<span class="sd">        (default is just the 2x2 shape. But translation, orientation,</span>
+<span class="sd">        homogonous, and contiguous flags can be set.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nKpts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">get_invV_mats2x2</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">with_ori</span><span class="o">=</span><span class="n">with_ori</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">with_trans</span> <span class="ow">or</span> <span class="n">ashomog</span><span class="p">:</span>
+        <span class="n">_iv11s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">_iv12s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">_iv21s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">_iv22s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="c"># Use homogenous coordinates</span>
+        <span class="n">_zeros</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">nKpts</span><span class="p">)</span>
+        <span class="n">_ones</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="n">nKpts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">with_trans</span><span class="p">:</span>
+            <span class="n">_iv13s</span><span class="p">,</span> <span class="n">_iv23s</span> <span class="o">=</span> <span class="n">get_xys</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_iv13s</span> <span class="o">=</span> <span class="n">_iv23s</span> <span class="o">=</span> <span class="n">_zeros</span>
+        <span class="n">invV_tups</span> <span class="o">=</span> <span class="p">((</span><span class="n">_iv11s</span><span class="p">,</span> <span class="n">_iv12s</span><span class="p">,</span> <span class="n">_iv13s</span><span class="p">),</span>
+                     <span class="p">(</span><span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span><span class="p">,</span> <span class="n">_iv23s</span><span class="p">),</span>
+                     <span class="p">(</span><span class="n">_zeros</span><span class="p">,</span> <span class="n">_zeros</span><span class="p">,</span>  <span class="n">_ones</span><span class="p">))</span>
+        <span class="n">invV_arrs</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">invV_tups</span><span class="p">)</span>        <span class="c"># R x C x N</span>
+        <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">rollaxis</span><span class="p">(</span><span class="n">invV_arrs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c"># N x R x C</span>
+    <span class="k">if</span> <span class="n">ascontiguous</span><span class="p">:</span>
+        <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">invV_mats</span>
+
+<span class="c"># --- scaled and offset keypoint components ---</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="transform_kpts_to_imgspace"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.transform_kpts_to_imgspace">[docs]</a><span class="k">def</span> <span class="nf">transform_kpts_to_imgspace</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">bbox_theta</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Transforms keypoints so they are plotable in imagespace</span>
+<span class="sd">        kpts   - xyacdo keypoints</span>
+<span class="sd">        bbox   - chip bounding boxes in image space</span>
+<span class="sd">        theta  - chip rotationsinvC</span>
+<span class="sd">        chipsz - chip extent (in keypoint / chip space)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Get keypoints in matrix format</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">get_invV_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">with_trans</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">with_ori</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c"># Get chip to imagespace transform</span>
+    <span class="n">invC</span> <span class="o">=</span> <span class="n">ctool</span><span class="o">.</span><span class="n">_get_chip_to_image_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">bbox_theta</span><span class="p">)</span>
+    <span class="c"># Apply transform to keypoints</span>
+    <span class="n">invCinvV_mats</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">invC</span><span class="p">,</span> <span class="n">invV_mats</span><span class="p">)</span>
+    <span class="c"># Flatten back into keypoint format</span>
+    <span class="n">imgkpts</span> <span class="o">=</span> <span class="n">flatten_invV_mats_to_kpts</span><span class="p">(</span><span class="n">invCinvV_mats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imgkpts</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="offset_kpts"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.offset_kpts">[docs]</a><span class="k">def</span> <span class="nf">offset_kpts</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">offset</span> <span class="o">==</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">scale_factor</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">kpts</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">scaleedoffset_mat3x3</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">)</span>
+    <span class="n">kpts_</span> <span class="o">=</span> <span class="n">transform_kpts</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kpts_</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="transform_kpts"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.transform_kpts">[docs]</a><span class="k">def</span> <span class="nf">transform_kpts</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">get_invV_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">with_trans</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">with_ori</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">MinvV_mats</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">invV_mats</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">MinvV_mats</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">MinvV_mats</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>  <span class="c"># NOQA</span>
+        <span class="c">#print(ex)</span>
+        <span class="n">MinvV_mats</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">rowwise_division</span><span class="p">(</span><span class="n">MinvV_mats</span><span class="p">,</span> <span class="n">MinvV_mats</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="c">#utool.printex(ex, &#39;WARNING: transform produced nonhomogonous keypoint&#39;)</span>
+    <span class="n">kpts_</span> <span class="o">=</span> <span class="n">flatten_invV_mats_to_kpts</span><span class="p">(</span><span class="n">MinvV_mats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kpts_</span>
+
+<span class="c">#---------------------</span>
+<span class="c"># invV_mats functions</span>
+<span class="c">#---------------------</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_invVR_mats_sqrd_scale"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invVR_mats_sqrd_scale">[docs]</a><span class="k">def</span> <span class="nf">get_invVR_mats_sqrd_scale</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the squared scale of the invVR keyponts</span>
+
+<span class="sd">    &gt;&gt;&gt; from vtool.keypoint import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(0)</span>
+<span class="sd">    &gt;&gt;&gt; invVR_mats = np.random.rand(1000, 3, 3).astype(np.float64)</span>
+<span class="sd">    &gt;&gt;&gt; output = get_invVR_mats_sqrd_scale(invVR_mats)</span>
+<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
+<span class="sd">    1i468l@838vatv@4</span>
+
+<span class="sd">    #CYTH_INLINE</span>
+<span class="sd">    #CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]</span>
+<span class="sd">    #CYTH_PARAM_TYPES:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=3] invVR_mats</span>
+<span class="sd">    #if CYTH</span>
+<span class="sd">    cdef unsigned int nMats = invVR_mats.shape[0]</span>
+<span class="sd">    # Prealloc output</span>
+<span class="sd">    cdef np.ndarray[np.float64_t, ndim=1] out = np.zeros((nMats,), dtype=np.float64)</span>
+<span class="sd">    #cdef size_t ix</span>
+<span class="sd">    cdef Py_ssize_t ix</span>
+<span class="sd">    for ix in range(nMats):</span>
+<span class="sd">        # simple determinant: ad - bc</span>
+<span class="sd">        out[ix] = ((invVR_mats[ix, 0, 0] * invVR_mats[ix, 1, 1]) -</span>
+<span class="sd">                   (invVR_mats[ix, 0, 1] * invVR_mats[ix, 1, 0]))</span>
+<span class="sd">    return out</span>
+<span class="sd">    #else</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">npl</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="s">&quot;#endif&quot;</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_invVR_mats_shape"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invVR_mats_shape">[docs]</a><span class="k">def</span> <span class="nf">get_invVR_mats_shape</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Extracts keypoint shape components</span>
+
+<span class="sd">    &gt;&gt;&gt; from vtool.keypoint import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(0)</span>
+<span class="sd">    &gt;&gt;&gt; invVR_mats = np.random.rand(1000, 3, 3).astype(np.float64)</span>
+<span class="sd">    &gt;&gt;&gt; output = get_invVR_mats_shape(invVR_mats)</span>
+<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
+<span class="sd">    oq9o@yqhtgloy58!</span>
+
+<span class="sd">    #CYTH_INLINE</span>
+<span class="sd">    #if CYTH</span>
+<span class="sd">    #CYTH_PARAM_TYPES:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=3] invVR_mats</span>
+<span class="sd">    cdef:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _iv11s</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _iv12s</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _iv21s</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _iv22s</span>
+<span class="sd">        #double [:] _iv11s</span>
+<span class="sd">        #double [:] _iv12s</span>
+<span class="sd">        #double [:] _iv21s</span>
+<span class="sd">        #double [:] _iv22s</span>
+<span class="sd">    #endif</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># TODO</span>
+    <span class="c"># http://stackoverflow.com/questions/14386822/fast-numpy-fancy-indexing</span>
+    <span class="c">#(a.ravel()[(cols + (rows * a.shape[1]).reshape((-1,1))).ravel()]).reshape(rows.size, cols.size)</span>
+
+    <span class="c"># So, this doesn&#39;t work</span>
+    <span class="c"># Try this instead</span>
+    <span class="c">#http://docs.cython.org/src/userguide/memoryviews.html#memoryviews</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    &#39;#if cyth&#39;</span>
+<span class="sd">    &#39;#m_acro numpy_fancy_index_macro&#39;</span>
+<span class="sd">    &#39;#e_ndmacro&#39;</span>
+<span class="sd">    _iv11s = invVR_mats.take(:, axis=1)</span>
+<span class="sd">    _iv12s = invVR_mats[:, 0, 1]</span>
+<span class="sd">    _iv21s = invVR_mats[:, 1, 0]</span>
+<span class="sd">    _iv22s = invVR_mats[:, 1, 1]</span>
+<span class="sd">    &#39;#else&#39;</span>
+<span class="sd">    #cols, rows, dims = invVR_mats.shape</span>
+<span class="sd">    #invVR_mats.ravel()[(cols + (rows * a.shape[1]).reshape((-1, 1))).ravel()])</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_iv11s</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">_iv12s</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">_iv21s</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">_iv22s</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="s">&#39;#endif&#39;</span>
+
+    <span class="c">#&#39;#pragma cyth numpy_fancy_index_assign&#39;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">_iv11s</span><span class="p">,</span> <span class="n">_iv12s</span><span class="p">,</span> <span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span><span class="p">)</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_invVR_mats_xys"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invVR_mats_xys">[docs]</a><span class="k">def</span> <span class="nf">get_invVR_mats_xys</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; extracts xys from matrix encoding</span>
+<span class="sd">    #if CYTH</span>
+<span class="sd">    #CYTH_PARAM_TYPES:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=3] invVR_mats</span>
+<span class="sd">    cdef:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=2] _xys</span>
+<span class="sd">    #endif</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_xys</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">_xys</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_invVR_mats_oris"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invVR_mats_oris">[docs]</a><span class="k">def</span> <span class="nf">get_invVR_mats_oris</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; extracts orientation from matrix encoding</span>
+
+<span class="sd">    &gt;&gt;&gt; from vtool.keypoint import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(0)</span>
+<span class="sd">    &gt;&gt;&gt; invVR_mats = np.random.rand(1000, 2, 2).astype(np.float64)</span>
+<span class="sd">    &gt;&gt;&gt; output = get_invVR_mats_oris(invVR_mats)</span>
+<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
+<span class="sd">    mcoxq8!3ml5bj9rx</span>
+
+<span class="sd">    #CYTH_INLINE</span>
+<span class="sd">    #CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]</span>
+<span class="sd">    #CYTH_PARAMS:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=3] invVR_mats</span>
+<span class="sd">    #if CYTH</span>
+<span class="sd">    cdef:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _oris</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _iv12s</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _iv11s</span>
+
+<span class="sd">    _iv11s = invVR_mats[:, 0, 0]</span>
+<span class="sd">    _iv12s = invVR_mats[:, 0, 1]</span>
+<span class="sd">    _oris = np.arctan2(_iv12s, _iv11s)  # outputs from -TAU/2 to TAU/2</span>
+<span class="sd">    _oris[_oris &lt; 0] = _oris[_oris &lt; 0] + TAU  # map to 0 to TAU (keep coords)</span>
+<span class="sd">    _oris = (-_oris) % TAU</span>
+<span class="sd">    return _oris</span>
+<span class="sd">    #else</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Extract only the needed shape components</span>
+    <span class="n">_iv11s</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">_iv12s</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c"># Solve for orientations. Adjust gravity vector pointing down</span>
+    <span class="n">_oris</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">trig</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">_iv12s</span><span class="p">,</span> <span class="n">_iv11s</span><span class="p">))</span> <span class="o">%</span> <span class="n">TAU</span>
+    <span class="k">return</span> <span class="n">_oris</span>
+    <span class="s">&quot;#endif&quot;</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="rectify_invV_mats_are_up"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.rectify_invV_mats_are_up">[docs]</a><span class="k">def</span> <span class="nf">rectify_invV_mats_are_up</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Useful if invVR_mats is no longer lower triangular</span>
+<span class="sd">    rotates affine shape matrixes into downward (lower triangular) position</span>
+
+<span class="sd">    &gt;&gt;&gt; from vtool.keypoint import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(0)</span>
+<span class="sd">    &gt;&gt;&gt; invVR_mats = np.random.rand(1000, 2, 2).astype(np.float64)</span>
+<span class="sd">    &gt;&gt;&gt; output = rectify_invV_mats_are_up(invVR_mats)</span>
+<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
+<span class="sd">    2wir&amp;6ybcga0bpvz</span>
+
+<span class="sd">    #if CYTH</span>
+<span class="sd">    # TODO: Template this for [float64_t, float32_t]</span>
+<span class="sd">    #CYTH_PARAM_TYPES:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=3] invVR_mats</span>
+<span class="sd">    cdef:</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=3] invV_mats</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _oris</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _a</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _b</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _c</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] _d</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] det_</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] b2a2</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] iv11</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] iv21</span>
+<span class="sd">        np.ndarray[np.float64_t, ndim=1] iv22</span>
+<span class="sd">    #endif</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Get orientation encoded in the matrix</span>
+    <span class="c">#_oris = get_invVR_mats_oris_cyth(invVR_mats)</span>
+    <span class="n">_oris</span> <span class="o">=</span> <span class="n">get_invVR_mats_oris</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+    <span class="c"># Extract keypoint shape components</span>
+    <span class="c">#(_a, _b, _c, _d) = get_invVR_mats_shape_cyth(invVR_mats)</span>
+    <span class="p">(</span><span class="n">_a</span><span class="p">,</span> <span class="n">_b</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="n">_d</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_invVR_mats_shape</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+    <span class="c">#</span>
+    <span class="c"># Convert to lower triangular (rectify orientation downwards)</span>
+    <span class="n">det_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">_a</span> <span class="o">*</span> <span class="n">_d</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">_b</span> <span class="o">*</span> <span class="n">_c</span><span class="p">)))</span>
+    <span class="n">b2a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">_b</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">_a</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">iv11</span> <span class="o">=</span> <span class="n">b2a2</span> <span class="o">/</span> <span class="n">det_</span>
+    <span class="n">iv21</span> <span class="o">=</span> <span class="p">((</span><span class="n">_d</span> <span class="o">*</span> <span class="n">_b</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">_c</span> <span class="o">*</span> <span class="n">_a</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">b2a2</span> <span class="o">*</span> <span class="n">det_</span><span class="p">)</span>
+    <span class="n">iv22</span> <span class="o">=</span> <span class="n">det_</span> <span class="o">/</span> <span class="n">b2a2</span>
+    <span class="c"># Rebuild the matrixes</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">invVR_mats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">iv11</span> <span class="o">*</span> <span class="n">det_</span>
+    <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">iv21</span> <span class="o">*</span> <span class="n">det_</span>
+    <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">iv22</span> <span class="o">*</span> <span class="n">det_</span>
+    <span class="k">return</span> <span class="n">invV_mats</span><span class="p">,</span> <span class="n">_oris</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="flatten_invV_mats_to_kpts"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.flatten_invV_mats_to_kpts">[docs]</a><span class="k">def</span> <span class="nf">flatten_invV_mats_to_kpts</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; flattens invV matrices into kpts format &quot;&quot;&quot;</span>
+    <span class="n">invV_mats</span><span class="p">,</span> <span class="n">_oris</span> <span class="o">=</span> <span class="n">rectify_invV_mats_are_up</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">)</span>
+    <span class="n">_xs</span>    <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">_ys</span>    <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">_iv11s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">_iv21s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span> <span class="s">&#39;expected lower triangular matrix&#39;</span>
+    <span class="n">_iv22s</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">kpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">_xs</span><span class="p">,</span> <span class="n">_ys</span><span class="p">,</span> <span class="n">_iv11s</span><span class="p">,</span> <span class="n">_iv21s</span><span class="p">,</span> <span class="n">_iv22s</span><span class="p">,</span> <span class="n">_oris</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">kpts</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_V_mats"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_V_mats">[docs]</a><span class="k">def</span> <span class="nf">get_V_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">get_invV_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">V_mats</span> <span class="o">=</span> <span class="n">invert_invV_mats</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">V_mats</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_Z_mats"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_Z_mats">[docs]</a><span class="k">def</span> <span class="nf">get_Z_mats</span><span class="p">(</span><span class="n">V_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        transform into conic matrix Z</span>
+<span class="sd">        Z = (V.T).dot(V)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Vt_mats</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">,</span> <span class="n">V_mats</span><span class="p">)))</span>
+    <span class="n">Z_mats</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">Vt_mats</span><span class="p">,</span> <span class="n">V_mats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Z_mats</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="invert_invV_mats"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.invert_invV_mats">[docs]</a><span class="k">def</span> <span class="nf">invert_invV_mats</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">V_mats</span> <span class="o">=</span> <span class="n">npl</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">npl</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+        <span class="c"># FIXME: !!!</span>
+        <span class="c"># Debug inverse</span>
+        <span class="n">V_mats_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">invV</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">V_mats_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">npl</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">invV</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">npl</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hz_str</span><span class="p">(</span><span class="s">&#39;ERROR: invV_mats[</span><span class="si">%d</span><span class="s">] = &#39;</span> <span class="o">%</span> <span class="n">ix</span><span class="p">,</span> <span class="n">invV</span><span class="p">))</span>
+                <span class="n">V_mats_list</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">(</span><span class="n">invV</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">utool</span><span class="o">.</span><span class="n">SUPER_STRICT</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="n">V_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">V_mats_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">V_mats</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_invV_xy_axis_extents"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_invV_xy_axis_extents">[docs]</a><span class="k">def</span> <span class="nf">get_invV_xy_axis_extents</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; gets the scales of the major and minor elliptical axis.</span>
+<span class="sd">        from invV_mats (faster)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">invV_mats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c"># Take the SVD of only the shape part</span>
+        <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">invV_mats</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">Us_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ltool</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">invV</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">invV</span> <span class="ow">in</span> <span class="n">invV_mats</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">Us_axis_extent</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Columns of U.dot(S) are in principle scaled directions &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">xyexnts</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">Us_axis_extent</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">U</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">Us_list</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">xyexnts</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_xy_axis_extents"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_xy_axis_extents">[docs]</a><span class="k">def</span> <span class="nf">get_xy_axis_extents</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; gets the scales of the major and minor elliptical axis</span>
+<span class="sd">        from kpts (slower due to conversion to invV_mats)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">get_invV_mats</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">ashomog</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">get_invV_xy_axis_extents</span><span class="p">(</span><span class="n">invV_mats</span><span class="p">)</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_kpts_bounds"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_kpts_bounds">[docs]</a><span class="k">def</span> <span class="nf">get_kpts_bounds</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns the width and height of keypoint bounding box &quot;&quot;&quot;</span>
+    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">get_xys</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">xyexnts</span> <span class="o">=</span> <span class="n">get_xy_axis_extents</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="n">xs</span> <span class="o">+</span> <span class="n">xyexnts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="p">(</span><span class="n">ys</span> <span class="o">+</span> <span class="n">xyexnts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_diag_extent_sqrd"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_diag_extent_sqrd">[docs]</a><span class="k">def</span> <span class="nf">get_diag_extent_sqrd</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the diagonal extent of keypoint locations &quot;&quot;&quot;</span>
+    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">get_xys</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">x_extent_sqrd</span> <span class="o">=</span> <span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">xs</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">y_extent_sqrd</span> <span class="o">=</span> <span class="p">(</span><span class="n">ys</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">ys</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">extent_sqrd</span> <span class="o">=</span> <span class="n">x_extent_sqrd</span> <span class="o">+</span> <span class="n">y_extent_sqrd</span>
+    <span class="k">return</span> <span class="n">extent_sqrd</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="cast_split"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.cast_split">[docs]</a><span class="k">def</span> <span class="nf">cast_split</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">KPTS_DTYPE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; breakup keypoints into location, shape, and orientation &quot;&quot;&quot;</span>
+    <span class="n">kptsT</span> <span class="o">=</span> <span class="n">kpts</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">_xs</span>   <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">kptsT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">_ys</span>   <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">kptsT</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">_invVs</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">kptsT</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">_oris</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">kptsT</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_oris</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_xs</span><span class="p">,</span> <span class="n">_ys</span><span class="p">,</span> <span class="n">_invVs</span><span class="p">,</span> <span class="n">_oris</span>
+
+
+<span class="c"># --- strings ---</span>
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_xy_strs"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_xy_strs">[docs]</a><span class="k">def</span> <span class="nf">get_xy_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; strings debugging and output &quot;&quot;&quot;</span>
+    <span class="n">_xs</span><span class="p">,</span> <span class="n">_ys</span>   <span class="o">=</span> <span class="n">get_xys</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">xy_strs</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;xy=(</span><span class="si">%.1f</span><span class="s">, </span><span class="si">%.1f</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,))</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">_xs</span><span class="p">,</span> <span class="n">_ys</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">xy_strs</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_shape_strs"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_shape_strs">[docs]</a><span class="k">def</span> <span class="nf">get_shape_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; strings debugging and output &quot;&quot;&quot;</span>
+    <span class="n">invVs</span> <span class="o">=</span> <span class="n">get_invVs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">shape_strs</span>  <span class="o">=</span> <span class="p">[((</span><span class="s">&#39;[(</span><span class="si">%3.1f</span><span class="s">,  0.00),</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span>
+                     <span class="s">&#39; (</span><span class="si">%3.1f</span><span class="s">, </span><span class="si">%3.1f</span><span class="s">)]&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">iv11</span><span class="p">,</span> <span class="n">iv21</span><span class="p">,</span> <span class="n">iv22</span><span class="p">,))</span>
+                   <span class="k">for</span> <span class="n">iv11</span><span class="p">,</span> <span class="n">iv21</span><span class="p">,</span> <span class="n">iv22</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">invVs</span><span class="p">)]</span>
+    <span class="n">shape_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;invV=</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span>  <span class="n">_str</span> <span class="k">for</span> <span class="n">_str</span> <span class="ow">in</span> <span class="n">shape_strs</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">shape_strs</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_ori_strs"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_ori_strs">[docs]</a><span class="k">def</span> <span class="nf">get_ori_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="n">_oris</span> <span class="o">=</span> <span class="n">get_oris</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">ori_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ori=&#39;</span> <span class="o">+</span> <span class="n">utool</span><span class="o">.</span><span class="n">theta_str</span><span class="p">(</span><span class="n">ori</span><span class="p">)</span> <span class="k">for</span> <span class="n">ori</span> <span class="ow">in</span> <span class="n">_oris</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ori_strs</span>
+
+
+<span class="c">#@profile</span></div>
+<div class="viewcode-block" id="get_kpts_strs"><a class="viewcode-back" href="../../vtool.html#vtool.keypoint.get_kpts_strs">[docs]</a><span class="k">def</span> <span class="nf">get_kpts_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+    <span class="n">xy_strs</span> <span class="o">=</span> <span class="n">get_xy_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">shape_strs</span> <span class="o">=</span> <span class="n">get_shape_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">ori_strs</span> <span class="o">=</span> <span class="n">get_ori_strs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">kpts_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">---</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xy_strs</span><span class="p">,</span> <span class="n">shape_strs</span><span class="p">,</span> <span class="n">ori_strs</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">kpts_strs</span>
+
+</div>
+<span class="kn">import</span> <span class="nn">cyth</span>
+<span class="k">if</span> <span class="n">cyth</span><span class="o">.</span><span class="n">DYNAMIC</span><span class="p">:</span>
+    <span class="k">exec</span><span class="p">(</span><span class="n">cyth</span><span class="o">.</span><span class="n">import_cyth_execstr</span><span class="p">(</span><span class="n">__name__</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c"># &lt;AUTOGEN_CYTH&gt;</span>
+    <span class="c"># Regen command: python -c &quot;import vtool.keypoint&quot; --cyth-write</span>
+    <span class="k">pass</span>
+    <span class="c"># &lt;/AUTOGEN_CYTH&gt;</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

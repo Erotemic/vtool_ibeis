@@ -1,0 +1,575 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool.clustering2 &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vtool.clustering2</h1><div class="highlight"><pre>
+<span class="c"># LICENCE</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">import</span> <span class="nn">utool</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">spsparse</span>
+<span class="kn">import</span> <span class="nn">pyflann</span>
+<span class="kn">import</span> <span class="nn">vtool.nearest_neighbors</span> <span class="kn">as</span> <span class="nn">nntool</span>
+
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[clustering2]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+<span class="n">CLUSTERS_FNAME</span> <span class="o">=</span> <span class="s">&#39;akmeans_centroids&#39;</span>
+
+
+<div class="viewcode-block" id="get_akmeans_cfgstr"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.get_akmeans_cfgstr">[docs]</a><span class="k">def</span> <span class="nf">get_akmeans_cfgstr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+                       <span class="n">use_data_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cfgstr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">akmeans_cfgstr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c"># compute a hashstr based on the data</span>
+        <span class="n">cfgstr</span> <span class="o">+=</span> <span class="s">&#39;_nC=</span><span class="si">%d</span><span class="s">,nIter=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">)</span>
+        <span class="n">akmeans_cfgstr</span> <span class="o">=</span> <span class="n">nntool</span><span class="o">.</span><span class="n">get_flann_cfgstr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span>
+                                                 <span class="n">cfgstr</span><span class="p">,</span> <span class="n">use_data_hash</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">akmeans_cfgstr</span>
+
+</div>
+<div class="viewcode-block" id="cached_akmeans"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.cached_akmeans">[docs]</a><span class="k">def</span> <span class="nf">cached_akmeans</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+                   <span class="n">cache_dir</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">force_recomp</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">use_data_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                   <span class="n">cfgstr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">refine</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                   <span class="n">appname</span><span class="o">=</span><span class="s">&#39;vtool&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; precompute aproximate kmeans with builtin caching &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;+--- START CACHED AKMEANS&#39;</span><span class="p">)</span>
+    <span class="c"># filename prefix constants</span>
+    <span class="k">if</span> <span class="n">cache_dir</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans] using default cache dir&#39;</span><span class="p">)</span>
+        <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">get_app_resource_dir</span><span class="p">(</span><span class="n">appname</span><span class="p">)</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">ensuredir</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+    <span class="c"># Build a cfgstr if the full one is not specified</span>
+    <span class="n">akmeans_cfgstr</span> <span class="o">=</span> <span class="n">get_akmeans_cfgstr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span>
+                                        <span class="n">use_data_hash</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># Try and load a previous centroiding</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">use_cache</span> <span class="ow">or</span> <span class="n">force_recomp</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">UserWarning</span><span class="p">(</span><span class="s">&#39;forceing recommpute&#39;</span><span class="p">)</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">load_cache</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">CLUSTERS_FNAME</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans.precompute] load successful&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">refine</span><span class="p">:</span>
+            <span class="c"># Refines the centroid centers if specified</span>
+            <span class="n">centroids</span> <span class="o">=</span> <span class="n">refine_akmeans</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="n">max_iters</span><span class="p">,</span>
+                                       <span class="n">flann_params</span><span class="o">=</span><span class="n">flann_params</span><span class="p">,</span>
+                                       <span class="n">cache_dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">,</span>
+                                       <span class="n">akmeans_cfgstr</span><span class="o">=</span><span class="n">akmeans_cfgstr</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="s">&#39;bad number of centroids&#39;</span>
+        <span class="k">assert</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;bad dimensionality&#39;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;L___ END CACHED AKMEANS&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">centroids</span>
+    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s">&#39;cache miss&#39;</span><span class="p">,</span> <span class="n">iswarning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">UserWarning</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="c"># First time computation</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans.precompute] pre_akmeans(): calling akmeans&#39;</span><span class="p">)</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">akmeans</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans.precompute] save and return&#39;</span><span class="p">)</span>
+    <span class="n">utool</span><span class="o">.</span><span class="n">save_cache</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">CLUSTERS_FNAME</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="p">,</span> <span class="n">centroids</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="s">&#39;bad number of centroids&#39;</span>
+    <span class="k">assert</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;bad dimensionality&#39;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;L___ END CACHED AKMEANS&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">centroids</span>
+
+</div>
+<div class="viewcode-block" id="akmeans"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.akmeans">[docs]</a><span class="k">def</span> <span class="nf">akmeans</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">ave_unchanged_thresh</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">ave_unchanged_iterwin</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approximiate K-Means (using FLANN)</span>
+<span class="sd">    Input: data - np.array with rows of data.</span>
+<span class="sd">    Description: Quickly partitions data into K=nCentroids centroids.  Cluster</span>
+<span class="sd">    centers are randomly assigned to datapoints.  Each datapoint is assigned to</span>
+<span class="sd">    its approximate nearest centroid center.  The centroid centers are recomputed.</span>
+<span class="sd">    Repeat until approximate convergence.&quot;&quot;&quot;</span>
+    <span class="c"># Setup iterations</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">initialize_centroids</span><span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">akmeans_iterations</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span>
+                                    <span class="n">ave_unchanged_thresh</span><span class="p">,</span> <span class="n">ave_unchanged_iterwin</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">centroids</span>
+
+</div>
+<div class="viewcode-block" id="initialize_centroids"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.initialize_centroids">[docs]</a><span class="k">def</span> <span class="nf">initialize_centroids</span><span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Initializes centroids to random datapoints &quot;&quot;&quot;</span>
+    <span class="n">nData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">datax_rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nData</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">datax_rand</span><span class="p">)</span>
+    <span class="n">centroidx2_datax</span> <span class="o">=</span> <span class="n">datax_rand</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">nCentroids</span><span class="p">]</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">centroidx2_datax</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">centroids</span>
+
+</div>
+<div class="viewcode-block" id="refine_akmeans"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.refine_akmeans">[docs]</a><span class="k">def</span> <span class="nf">refine_akmeans</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                   <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">cache_dir</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">cfgstr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                   <span class="n">use_data_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Refines the approximates centroids &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans.precompute] refining:&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cache_dir</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
+        <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">get_app_resource_dir</span><span class="p">(</span><span class="s">&#39;vtool&#39;</span><span class="p">)</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">ensuredir</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">akmeans_cfgstr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">akmeans_cfgstr</span> <span class="o">=</span> <span class="n">nntool</span><span class="o">.</span><span class="n">get_flann_cfgstr</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">use_data_hash</span><span class="p">)</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">akmeans_iterations</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">utool</span><span class="o">.</span><span class="n">save_cache</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">CLUSTERS_FNAME</span><span class="p">,</span> <span class="n">akmeans_cfgstr</span><span class="p">,</span> <span class="n">centroids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">centroids</span>
+
+</div>
+<div class="viewcode-block" id="akmeans_iterations"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.akmeans_iterations">[docs]</a><span class="k">def</span> <span class="nf">akmeans_iterations</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span>
+                        <span class="n">flann_params</span><span class="p">,</span> <span class="n">ave_unchanged_thresh</span><span class="p">,</span> <span class="n">ave_unchanged_iterwin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper function which continues the iterations of akmeans</span>
+
+<span class="sd">    &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(42)</span>
+<span class="sd">    &gt;&gt;&gt; data = np.random.randn(100, 2)</span>
+<span class="sd">    &gt;&gt;&gt; nCentroids = 5</span>
+<span class="sd">    &gt;&gt;&gt; flann_params = {}</span>
+<span class="sd">    &gt;&gt;&gt; max_iters = 100</span>
+<span class="sd">    &gt;&gt;&gt; ave_unchanged_thresh = 100</span>
+<span class="sd">    &gt;&gt;&gt; ave_unchanged_iterwin = 100</span>
+<span class="sd">    &gt;&gt;&gt; centroids = initialize_centroids(nCentroids, data)</span>
+<span class="sd">    &gt;&gt;&gt; centroids = akmeans_iterations(data, centroids, max_iters, flann_params, ave_unchanged_thresh, ave_unchanged_iterwin)</span>
+<span class="sd">    &gt;&gt;&gt; plot_centroids(data, centroids)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nCentroids</span> <span class="o">=</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c"># Initialize assignments</span>
+    <span class="n">datax2_centroidx_old</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nData</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="c"># Keep track of how many points have changed over an iteration window</span>
+    <span class="n">win2_unchanged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ave_unchanged_iterwin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">centroids</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">((</span>
+        <span class="s">&#39;[akmeans] akmeans: data.shape=</span><span class="si">%r</span><span class="s"> ; nCentroids=</span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="s">&#39;[akmeans] * max_iters=</span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="s">&#39;[akmeans] * ave_unchanged_iterwin=</span><span class="si">%r</span><span class="s"> ; ave_unchanged_thresh=</span><span class="si">%r</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">nCentroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span>
+         <span class="n">ave_unchanged_thresh</span><span class="p">,</span> <span class="n">ave_unchanged_iterwin</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">_mark</span><span class="p">,</span> <span class="n">_end</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">log_progress</span><span class="p">(</span><span class="s">&#39;Akmeans: &#39;</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">):</span>
+        <span class="n">_mark</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+        <span class="c"># 1) Assign each datapoint to the nearest centroid</span>
+        <span class="p">(</span><span class="n">datax2_centroidx</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+        <span class="c"># 2) Compute new centroids based on assignments</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="n">compute_centroids</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">datax2_centroidx</span><span class="p">)</span>
+        <span class="c"># 3) Convergence Check: which datapoints changed membership?</span>
+        <span class="n">num_changed</span> <span class="o">=</span> <span class="p">(</span><span class="n">datax2_centroidx_old</span> <span class="o">!=</span> <span class="n">datax2_centroidx</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">win2_unchanged</span><span class="p">[</span><span class="n">count</span> <span class="o">%</span> <span class="n">ave_unchanged_iterwin</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_changed</span>
+        <span class="n">ave_unchanged</span> <span class="o">=</span> <span class="n">win2_unchanged</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ave_unchanged</span> <span class="o">&lt;</span> <span class="n">ave_unchanged_thresh</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">datax2_centroidx_old</span> <span class="o">=</span> <span class="n">datax2_centroidx</span>
+    <span class="n">_end</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">centroids</span>
+
+</div>
+<div class="viewcode-block" id="compute_centroids"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.compute_centroids">[docs]</a><span class="k">def</span> <span class="nf">compute_centroids</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">datax2_centroidx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes centroids given datax assignments</span>
+<span class="sd">    TODO: maybe use the grouping code instad of the LR algorithm</span>
+
+<span class="sd">    &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(42)</span>
+<span class="sd">    &gt;&gt;&gt; data = np.random.randn(100, 2)</span>
+<span class="sd">    &gt;&gt;&gt; nCentroids = 5</span>
+<span class="sd">    &gt;&gt;&gt; flann_params = {}</span>
+<span class="sd">    &gt;&gt;&gt; centroids = initialize_centroids(nCentroids, data)</span>
+<span class="sd">    &gt;&gt;&gt; centroids_ = centroids.copy()</span>
+<span class="sd">    &gt;&gt;&gt; (datax2_centroidx, _) = pyflann.FLANN().nn(centroids, data, 1, **flann_params)</span>
+<span class="sd">    &gt;&gt;&gt; out = compute_centroids(data, centroids, datax2_centroidx)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nCentroids</span> <span class="o">=</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c"># sort data by centroid</span>
+    <span class="n">datax_sortx</span> <span class="o">=</span> <span class="n">datax2_centroidx</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">datax_sort</span>  <span class="o">=</span> <span class="n">datax2_centroidx</span><span class="p">[</span><span class="n">datax_sortx</span><span class="p">]</span>
+    <span class="c"># group datapoints by centroid using a sliding grouping algorithm</span>
+    <span class="n">centroidx2_dataLRx</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nCentroids</span>
+    <span class="n">_L</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_R</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nData</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c"># Slide R</span>
+        <span class="k">if</span> <span class="n">_R</span> <span class="o">==</span> <span class="n">nData</span> <span class="ow">or</span> <span class="n">datax_sort</span><span class="p">[</span><span class="n">_L</span><span class="p">]</span> <span class="o">!=</span> <span class="n">datax_sort</span><span class="p">[</span><span class="n">_R</span><span class="p">]:</span>
+            <span class="n">centroidx2_dataLRx</span><span class="p">[</span><span class="n">datax_sort</span><span class="p">[</span><span class="n">_L</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">_L</span><span class="p">,</span> <span class="n">_R</span><span class="p">)</span>
+            <span class="n">_L</span> <span class="o">=</span> <span class="n">_R</span>
+    <span class="c"># Compute the centers of each group (centroid) of datapoints</span>
+    <span class="k">for</span> <span class="n">centroidx</span><span class="p">,</span> <span class="n">dataLRx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">centroidx2_dataLRx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dataLRx</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">continue</span>  <span class="c"># ON EMPTY CLUSTER</span>
+        <span class="p">(</span><span class="n">_L</span><span class="p">,</span> <span class="n">_R</span><span class="p">)</span> <span class="o">=</span> <span class="n">dataLRx</span>
+        <span class="c"># The centroid center is the mean of its datapoints</span>
+        <span class="n">centroids</span><span class="p">[</span><span class="n">centroidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">datax_sortx</span><span class="p">[</span><span class="n">_L</span><span class="p">:</span><span class="n">_R</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c">#centroids[centroidx] = np.array(np.round(centroids[centroidx]), dtype=np.uint8)</span>
+    <span class="k">return</span> <span class="n">centroids</span>
+
+
+<span class="c">#def group_indicies2(idx2_groupid):</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 4, size=100))</span>
+
+<span class="c">#    #http://stackoverflow.com/questions/4651683/numpy-grouping-using-itertools-groupby-performance</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    # Sort items and idx2_groupid by groupid</span>
+<span class="c">#    sortx = idx2_groupid.argsort()</span>
+<span class="c">#    groupids_sorted = idx2_groupid[sortx]</span>
+<span class="c">#    num_items = idx2_groupid.size</span>
+<span class="c">#    # Find the boundaries between groups</span>
+<span class="c">#    diff = np.ones(num_items + 1, idx2_groupid.dtype)</span>
+<span class="c">#    diff[1:(num_items)] = np.diff(groupids_sorted)</span>
+<span class="c">#    idxs = np.where(diff &gt; 0)[0]</span>
+<span class="c">#    num_groups = idxs.size - 1</span>
+<span class="c">#    # Groups are between bounding indexes</span>
+<span class="c">#    lrx_pairs = np.vstack((idxs[0:num_groups], idxs[1:num_groups + 1])).T</span>
+<span class="c">#    groupxs = [sortx[lx:rx] for lx, rx in lrx_pairs]</span>
+<span class="c">#    return groupxs</span>
+
+</div>
+<div class="viewcode-block" id="group_indicies_pandas"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.group_indicies_pandas">[docs]</a><span class="k">def</span> <span class="nf">group_indicies_pandas</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from vtool.clustering2 import *</span>
+<span class="sd">    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 8000, size=1000000))</span>
+
+<span class="sd">    keys1, groupxs2 = group_indicies_pandas(idx2_groupid)</span>
+<span class="sd">    keys2, groupxs2 = group_indicies(idx2_groupid)</span>
+
+<span class="sd">    %timeit group_indicies_pandas(idx2_groupid)</span>
+<span class="sd">    %timeit group_indicies(idx2_groupid)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+    <span class="c"># Pandas is actually unreasonably fast here</span>
+    <span class="c">#%timeit dataframe = pd.DataFrame(idx2_groupid, columns=[&#39;groupid&#39;])  # 135 us</span>
+    <span class="c">#%timeit dfgroup = dataframe.groupby(&#39;groupid&#39;)  # 33.9 us</span>
+    <span class="c">#%timeit groupid2_idxs = dfgroup.indices  # 197 ns</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">)</span>  <span class="c"># 66 us</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>    <span class="c"># 32.9 us</span>
+    <span class="n">groupid2_idxs</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">indices</span>     <span class="c"># 194 ns</span>
+    <span class="c"># Compute inverted index</span>
+    <span class="n">groupxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">groupid2_idxs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>  <span class="c"># 412 ns</span>
+    <span class="n">keys</span>    <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">groupid2_idxs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>    <span class="c"># 488 ns</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span>
+<span class="c">#    # Consistency check</span>
+<span class="c">#    #for wx in _wx2_idxs.keys():</span>
+<span class="c">#    #    assert set(_wx2_idxs[wx]) == set(_wx2_idxs2[wx])</span>
+
+
+<span class="c">#@profile</span>
+</div>
+<div class="viewcode-block" id="jagged_group"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.jagged_group">[docs]</a><span class="k">def</span> <span class="nf">jagged_group</span><span class="p">(</span><span class="n">groupids_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; flattens and returns group indexes into the flattened list &quot;&quot;&quot;</span>
+    <span class="c">#flatx2_itemx = np.array(utool.flatten(itemxs_iter))</span>
+    <span class="n">flatids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">groupids_list</span><span class="p">))</span>
+    <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span> <span class="o">=</span> <span class="n">group_indicies</span><span class="p">(</span><span class="n">flatids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span>
+
+</div>
+<div class="viewcode-block" id="apply_jagged_grouping"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_jagged_grouping">[docs]</a><span class="k">def</span> <span class="nf">apply_jagged_grouping</span><span class="p">(</span><span class="n">unflat_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; takes unflat_list and flat group indicies. Returns the unflat grouping &quot;&quot;&quot;</span>
+    <span class="n">flat_items</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">unflat_items</span><span class="p">))</span>
+    <span class="n">item_groups</span> <span class="o">=</span> <span class="n">apply_grouping</span><span class="p">(</span><span class="n">flat_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">item_groups</span>
+    <span class="c">#itemxs_iter = [[count] * len(idx2_groupid) for count, idx2_groupid in enumerate(groupids_list)]</span>
+
+</div>
+<div class="viewcode-block" id="group_indicies"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.group_indicies">[docs]</a><span class="k">def</span> <span class="nf">group_indicies</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 4, size=100))</span>
+
+<span class="sd">    #http://stackoverflow.com/questions/4651683/numpy-grouping-using-itertools-groupby-performance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Sort items and idx2_groupid by groupid</span>
+    <span class="n">sortx</span> <span class="o">=</span> <span class="n">idx2_groupid</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>  <span class="c"># 2.9%</span>
+    <span class="n">groupids_sorted</span> <span class="o">=</span> <span class="n">idx2_groupid</span><span class="p">[</span><span class="n">sortx</span><span class="p">]</span>  <span class="c"># 3.1%</span>
+    <span class="n">num_items</span> <span class="o">=</span> <span class="n">idx2_groupid</span><span class="o">.</span><span class="n">size</span>
+    <span class="c"># Find the boundaries between groups</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_items</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>  <span class="c"># 8.6%</span>
+    <span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="n">num_items</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">groupids_sorted</span><span class="p">)</span>  <span class="c"># 22.5%</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># 8.8%</span>
+    <span class="n">num_groups</span> <span class="o">=</span> <span class="n">idxs</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c"># 1.3%</span>
+    <span class="c"># Groups are between bounding indexes</span>
+    <span class="n">lrx_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">num_groups</span><span class="p">],</span> <span class="n">idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">num_groups</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>  <span class="c"># 28.8%</span>
+    <span class="n">groupxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">sortx</span><span class="p">[</span><span class="n">lx</span><span class="p">:</span><span class="n">rx</span><span class="p">]</span> <span class="k">for</span> <span class="n">lx</span><span class="p">,</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">lrx_pairs</span><span class="p">]</span>  <span class="c"># 17.5%</span>
+    <span class="c"># Unique group keys</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">groupids_sorted</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">num_groups</span><span class="p">]]</span>  <span class="c"># 4.7%</span>
+    <span class="c">#items_sorted = items[sortx]</span>
+    <span class="c">#vals = [items_sorted[lx:rx] for lx, rx in lrx_pairs]</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span>
+
+</div>
+<div class="viewcode-block" id="apply_grouping"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_grouping">[docs]</a><span class="k">def</span> <span class="nf">apply_grouping</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">items</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">idxs</span> <span class="ow">in</span> <span class="n">groupxs</span><span class="p">]</span>
+    <span class="c">#return [items[idxs] for idxs in groupxs]</span>
+
+</div>
+<div class="viewcode-block" id="groupby"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupby">[docs]</a><span class="k">def</span> <span class="nf">groupby</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; items    = np.array(np.arange(100))</span>
+<span class="sd">    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 4, size=100))</span>
+<span class="sd">    &gt;&gt;&gt; items = idx2_groupid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span> <span class="o">=</span> <span class="n">group_indicies</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">items</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="k">for</span> <span class="n">idxs</span> <span class="ow">in</span> <span class="n">groupxs</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">vals</span>
+
+</div>
+<div class="viewcode-block" id="groupby_gen"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupby_gen">[docs]</a><span class="k">def</span> <span class="nf">groupby_gen</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; items    = np.array(np.arange(100))</span>
+<span class="sd">    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 4, size=100))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">groupby</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">)):</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="groupby_dict"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupby_dict">[docs]</a><span class="k">def</span> <span class="nf">groupby_dict</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="c"># Build a dict</span>
+    <span class="n">grouped</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">groupby_gen</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">grouped</span>
+
+</div>
+<div class="viewcode-block" id="double_group"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.double_group">[docs]</a><span class="k">def</span> <span class="nf">double_group</span><span class="p">(</span><span class="n">inner_key_list</span><span class="p">,</span> <span class="n">outer_keys_list</span><span class="p">,</span> <span class="n">items_list</span><span class="p">,</span> <span class="n">ensure_numpy</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes corresponding lists as input and builds a double mapping.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inner_key_list (list): each value_i is a scalar key.</span>
+<span class="sd">        outer_keys_list (list): each value_i list of scalar keys</span>
+<span class="sd">        items_list (list): value_i is a list that corresponds to outer_keys_i</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        utool.ddict of dicts: outerkey2_innerkey2_items</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; inner_key_list = [100, 200, 300, 400]</span>
+<span class="sd">        &gt;&gt;&gt; outer_keys_list = [[10, 20, 20], [30], [30, 10], [20]]</span>
+<span class="sd">        &gt;&gt;&gt; items_list = [[1, 2, 3], [4], [5, 6], [7]]</span>
+<span class="sd">        &gt;&gt;&gt; ensure_numpy = True</span>
+<span class="sd">        &gt;&gt;&gt; outerkey2_innerkey2_items = double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy)</span>
+<span class="sd">        &gt;&gt;&gt; print(utool.dict_str(outerkey2_innerkey2_items))</span>
+<span class="sd">        {</span>
+<span class="sd">            10: {300: array([6]), 100: array([1])},</span>
+<span class="sd">            20: {400: array([7]), 100: array([2, 3])},</span>
+<span class="sd">            30: {200: array([4]), 300: array([5])},</span>
+<span class="sd">        }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ensure_numpy</span><span class="p">:</span>
+        <span class="n">inner_key_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inner_key_list</span><span class="p">)</span>
+        <span class="n">outer_keys_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">outer_keys_list</span><span class="p">))</span>
+        <span class="n">items_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">items_list</span><span class="p">))</span>
+    <span class="n">outerkey2_innerkey2_items</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">ddict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">_iter</span> <span class="o">=</span>  <span class="nb">zip</span><span class="p">(</span><span class="n">inner_key_list</span><span class="p">,</span> <span class="n">outer_keys_list</span><span class="p">,</span> <span class="n">items_list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">inner_key</span><span class="p">,</span> <span class="n">outer_keys</span><span class="p">,</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">_iter</span><span class="p">:</span>
+        <span class="n">group_outerkeys</span><span class="p">,</span> <span class="n">groupxs</span> <span class="o">=</span> <span class="n">group_indicies</span><span class="p">(</span><span class="n">outer_keys</span><span class="p">)</span>
+        <span class="n">items_group</span> <span class="o">=</span> <span class="n">apply_grouping</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">outer_key</span><span class="p">,</span> <span class="n">subitems</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">group_outerkeys</span><span class="p">,</span> <span class="n">items_group</span><span class="p">):</span>
+            <span class="n">outerkey2_innerkey2_items</span><span class="p">[</span><span class="n">outer_key</span><span class="p">][</span><span class="n">inner_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">subitems</span>
+    <span class="k">return</span> <span class="n">outerkey2_innerkey2_items</span>
+    <span class="c">#daid2_wx2_drvecs = utool.ddict(lambda: utool.ddict(list))</span>
+    <span class="c">#for wx, aids, rvecs in zip(wx_sublist, aids_list, rvecs_list1):</span>
+    <span class="c">#    group_aids, groupxs = clustertool.group_indicies(aids)</span>
+    <span class="c">#    rvecs_group = clustertool.apply_grouping(rvecs, groupxs)</span>
+    <span class="c">#    for aid, subrvecs in zip(group_aids, rvecs_group):</span>
+    <span class="c">#        daid2_wx2_drvecs[aid][wx] = subrvecs</span>
+
+</div>
+<div class="viewcode-block" id="sparse_normalize_rows"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.sparse_normalize_rows">[docs]</a><span class="k">def</span> <span class="nf">sparse_normalize_rows</span><span class="p">(</span><span class="n">csr_mat</span><span class="p">):</span>
+    <span class="k">pass</span>
+    <span class="c">#return sklearn.preprocessing.normalize(csr_mat, norm=&#39;l2&#39;, axis=1, copy=False)</span>
+
+</div>
+<div class="viewcode-block" id="sparse_multiply_rows"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.sparse_multiply_rows">[docs]</a><span class="k">def</span> <span class="nf">sparse_multiply_rows</span><span class="p">(</span><span class="n">csr_mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Row-wise multiplication of a sparse matrix by a sparse vector &quot;&quot;&quot;</span>
+    <span class="n">csr_vec</span> <span class="o">=</span> <span class="n">spsparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="c">#csr_vec.shape = (1, csr_vec.size)</span>
+    <span class="n">sparse_stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">csr_vec</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csr_mat</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">spsparse</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">sparse_stack</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;csr&#39;</span><span class="p">)</span>
+
+
+<span class="c"># ---------------</span>
+<span class="c"># Plotting Code</span>
+<span class="c"># ---------------</span>
+</div>
+<div class="viewcode-block" id="plot_centroids"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.plot_centroids">[docs]</a><span class="k">def</span> <span class="nf">plot_centroids</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">num_pca_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                   <span class="n">labels</span><span class="o">=</span><span class="s">&#39;centroids&#39;</span><span class="p">,</span> <span class="n">fnum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots centroids and datapoints. Plots accurately up to 3 dimensions.</span>
+<span class="sd">    If there are more than 3 dimensions, PCA is used to recude the dimenionality</span>
+<span class="sd">    to the &lt;num_pca_dims&gt; principal components</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># http://www.janeriksolem.net/2012/03/isomap-with-scikit-learn.html</span>
+    <span class="k">if</span> <span class="n">__debug__</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;INFO&#39;</span><span class="p">),</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s">&#39;data&#39;</span><span class="p">),</span>
+            <span class="s">&#39;data&#39;</span><span class="p">,</span>
+            <span class="s">&#39;data.shape&#39;</span><span class="p">,</span>
+        <span class="p">])</span>
+    <span class="kn">from</span> <span class="nn">plottool</span> <span class="kn">import</span> <span class="n">draw_func2</span> <span class="k">as</span> <span class="n">df2</span>
+    <span class="n">data_dims</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">show_dims</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_pca_dims</span><span class="p">,</span> <span class="n">data_dims</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data_dims</span> <span class="o">!=</span> <span class="n">show_dims</span><span class="p">:</span>
+        <span class="c"># we can&#39;t physiologically see the data, so look at a projection</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans] Doing PCA&#39;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">decomposition</span>
+        <span class="n">pcakw</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">show_dims</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="n">whiten</span><span class="p">)</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="o">**</span><span class="n">pcakw</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">pca_data</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">pca_centroids</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans] ...Finished PCA&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># pca is not necessary</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[akmeans] No need for PCA&#39;</span><span class="p">)</span>
+        <span class="n">pca_data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">pca_centroids</span> <span class="o">=</span> <span class="n">centroids</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">pca_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c"># Make a color for each centroid</span>
+    <span class="n">data_x</span> <span class="o">=</span> <span class="n">pca_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">data_y</span> <span class="o">=</span> <span class="n">pca_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">clus_x</span> <span class="o">=</span> <span class="n">pca_centroids</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">clus_y</span> <span class="o">=</span> <span class="n">pca_centroids</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">nCentroids</span> <span class="o">=</span> <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="o">==</span> <span class="s">&#39;centroids&#39;</span><span class="p">:</span>
+        <span class="n">datax2_label</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">datax2_label</span> <span class="o">=</span> <span class="n">labels</span>
+    <span class="n">datax2_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">datax2_label</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">datax2_label</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c">#if datax2_centroids is None:</span>
+    <span class="c">#    (datax2_centroidx, _) = pyflann.FLANN().nn(centroids, data, 1)</span>
+    <span class="c">#data_colors = colors[np.array(datax2_centroidx, dtype=np.int32)]</span>
+    <span class="n">nColors</span> <span class="o">=</span> <span class="n">datax2_label</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">datax2_label</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;nColors=</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nColors</span><span class="p">,))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;K=</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">K</span><span class="p">,))</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">distinct_colors</span><span class="p">(</span><span class="n">nColors</span><span class="p">,</span> <span class="n">brightness</span><span class="o">=.</span><span class="mi">95</span><span class="p">))</span>
+    <span class="n">clus_colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">distinct_colors</span><span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">brightness</span><span class="o">=.</span><span class="mi">95</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">labels</span> <span class="o">!=</span> <span class="s">&#39;centroids&#39;</span> <span class="ow">or</span> <span class="n">nColors</span> <span class="o">==</span> <span class="n">K</span>
+    <span class="k">if</span> <span class="n">__debug__</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;INFO&#39;</span><span class="p">),</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span>
+            <span class="s">&#39;colors&#39;</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">get_stats</span><span class="p">,</span> <span class="s">&#39;colors&#39;</span><span class="p">),</span>
+            <span class="s">&#39;colors.shape&#39;</span><span class="p">,</span>
+            <span class="s">&#39;datax2_label&#39;</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">get_stats</span><span class="p">,</span> <span class="s">&#39;datax2_label&#39;</span><span class="p">),</span>
+            <span class="s">&#39;datax2_label.shape&#39;</span><span class="p">,</span>
+        <span class="p">])</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">data_colors</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">datax2_label</span><span class="p">]</span>
+    <span class="c"># Create a figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fnum</span><span class="p">,</span> <span class="n">doclf</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">docla</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_x</span><span class="p">,</span> <span class="n">data_y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>  <span class="n">c</span><span class="o">=</span><span class="n">data_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c">#df2.plt.scatter(data_x, data_y, s=20,  c=data_colors, marker=&#39;o&#39;, alpha=.2)</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">clus_x</span><span class="p">,</span> <span class="n">clus_y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">clus_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">autoscale</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">dark_background</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c"># NOQA</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s">&#39;3d&#39;</span><span class="p">)</span>
+        <span class="n">data_z</span> <span class="o">=</span> <span class="n">pca_data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">clus_z</span> <span class="o">=</span> <span class="n">pca_centroids</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="c">#ax.scatter(data_x, data_y, data_z, s=20,  c=data_colors, marker=&#39;o&#39;, alpha=.2)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_x</span><span class="p">,</span> <span class="n">data_y</span><span class="p">,</span> <span class="n">data_z</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>  <span class="n">c</span><span class="o">=</span><span class="n">data_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">clus_x</span><span class="p">,</span> <span class="n">clus_y</span><span class="p">,</span> <span class="n">clus_z</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">clus_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">autoscale</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">dark_background</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="c">#ax.set_alpha(.1)</span>
+        <span class="c">#utool.embed()</span>
+        <span class="c">#ax.set_frame_on(False)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">waswhitestr</span> <span class="o">=</span> <span class="s">&#39; +whitening&#39;</span> <span class="o">*</span> <span class="n">whiten</span>
+    <span class="n">titlestr</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;{prefix}AKmeans: K={K}.&#39;</span>
+                <span class="s">&#39;PCA projection {data_dims}D -&gt; {show_dims}D&#39;</span>
+                <span class="s">&#39;{waswhitestr}&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">locals</span><span class="p">())</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">titlestr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

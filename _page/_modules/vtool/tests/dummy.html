@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool.tests.dummy &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vtool.tests.dummy</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">keypoint</span> <span class="k">as</span> <span class="n">ktool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">image</span> <span class="k">as</span> <span class="n">gtool</span>
+<span class="kn">import</span> <span class="nn">vtool.math</span> <span class="kn">as</span> <span class="nn">mtool</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utool</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[dummy]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+<span class="n">DEFAULT_DTYPE</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span>
+
+
+<div class="viewcode-block" id="dummy_seed"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.dummy_seed">[docs]</a><span class="k">def</span> <span class="nf">dummy_seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_dummy_xy"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_dummy_xy">[docs]</a><span class="k">def</span> <span class="nf">get_dummy_xy</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">dummy_seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xy</span>
+
+</div>
+<div class="viewcode-block" id="get_dummy_kpts_pair"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_dummy_kpts_pair">[docs]</a><span class="k">def</span> <span class="nf">get_dummy_kpts_pair</span><span class="p">(</span><span class="n">wh_stride</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)):</span>
+    <span class="n">_kw0</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">wh_stride</span><span class="o">=</span><span class="n">wh_stride</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">_kw1</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="o">**</span><span class="n">_kw0</span><span class="p">)</span>
+    <span class="n">_kw2</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span> <span class="o">**</span><span class="n">_kw0</span><span class="p">)</span>
+    <span class="n">kpts1</span> <span class="o">=</span> <span class="n">perterbed_grid_kpts</span><span class="p">(</span><span class="o">**</span><span class="n">_kw1</span><span class="p">)</span>
+    <span class="n">kpts2</span> <span class="o">=</span> <span class="n">perterbed_grid_kpts</span><span class="p">(</span><span class="o">**</span><span class="n">_kw2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span>
+
+</div>
+<div class="viewcode-block" id="get_dummy_dpts"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_dummy_dpts">[docs]</a><span class="k">def</span> <span class="nf">get_dummy_dpts</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Random SIFTish keypoints &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+    <span class="n">dpts_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">dpts_norm</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">dpts_</span><span class="p">)</span>
+    <span class="c"># do SIFT normalization</span>
+    <span class="n">dpts_norm</span><span class="p">[</span><span class="n">dpts_norm</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">2</span>
+    <span class="n">dpts</span> <span class="o">=</span> <span class="p">(</span><span class="n">ltool</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">dpts_norm</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dpts</span>
+
+</div>
+<div class="viewcode-block" id="get_dummy_kpts"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_dummy_kpts">[docs]</a><span class="k">def</span> <span class="nf">get_dummy_kpts</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DEFAULT_DTYPE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Some testing data &quot;&quot;&quot;</span>
+    <span class="n">kpts</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">5.21657705</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.11095951</span><span class="p">,</span> <span class="mf">24.1498699</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">2.35508823</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.11095952</span><span class="p">,</span> <span class="mf">24.1498692</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">12.2165705</span><span class="p">,</span> <span class="mf">12.01909553</span><span class="p">,</span> <span class="mf">10.5286992</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">13.3555705</span><span class="p">,</span> <span class="mf">17.63429554</span><span class="p">,</span> <span class="mf">14.1040992</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">16.0527005</span><span class="p">,</span> <span class="mf">3.407312351</span><span class="p">,</span> <span class="mf">11.7353722</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">kpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">kpts</span><span class="p">]</span> <span class="o">*</span> <span class="n">num</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kpts</span>
+
+</div>
+<div class="viewcode-block" id="get_kpts_dummy_img"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_kpts_dummy_img">[docs]</a><span class="k">def</span> <span class="nf">get_kpts_dummy_img</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">sf</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_kpts_bounds</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">dummy_img</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">sf</span><span class="p">,</span> <span class="n">h</span> <span class="o">*</span> <span class="n">sf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img</span>
+
+</div>
+<div class="viewcode-block" id="get_dummy_invV_mats"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_dummy_invV_mats">[docs]</a><span class="k">def</span> <span class="nf">get_dummy_invV_mats</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">DEFAULT_DTYPE</span><span class="p">):</span>
+    <span class="n">invV_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                           <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),),</span>
+
+                          <span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                           <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),),</span>
+
+                          <span class="p">((</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                           <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),),</span>
+
+                          <span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                           <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">invV_mats</span>
+
+</div>
+<div class="viewcode-block" id="get_dummy_matching_kpts"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.get_dummy_matching_kpts">[docs]</a><span class="k">def</span> <span class="nf">get_dummy_matching_kpts</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">DEFAULT_DTYPE</span><span class="p">):</span>
+    <span class="n">kpts1</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span>  <span class="mf">3.28846716e+02</span><span class="p">,</span>   <span class="mf">1.21753590e+02</span><span class="p">,</span>   <span class="mf">1.25637716e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.18816503e+01</span><span class="p">,</span>   <span class="mf">1.00417606e+01</span><span class="p">,</span>   <span class="mf">1.14933074e-02</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.01069363e+02</span><span class="p">,</span>   <span class="mf">1.31472857e+02</span><span class="p">,</span>   <span class="mf">1.29744163e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.26813604e+01</span><span class="p">,</span>   <span class="mf">1.23529540e+01</span><span class="p">,</span>   <span class="mf">2.56660535e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">4.08240651e+02</span><span class="p">,</span>   <span class="mf">1.86241170e+02</span><span class="p">,</span>   <span class="mf">1.68589858e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.33149406e+01</span><span class="p">,</span>   <span class="mf">1.42353870e+01</span><span class="p">,</span>   <span class="mf">1.20307208e-02</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.88036559e+02</span><span class="p">,</span>   <span class="mf">3.76789856e+02</span><span class="p">,</span>   <span class="mf">1.47105962e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">8.80294520e+00</span><span class="p">,</span>   <span class="mf">1.20673321e+01</span><span class="p">,</span>   <span class="mf">6.02803372e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.91987002e+02</span><span class="p">,</span>   <span class="mf">1.56273941e+02</span><span class="p">,</span>   <span class="mf">1.59259660e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">7.87242786e+00</span><span class="p">,</span>   <span class="mf">2.02183781e+01</span><span class="p">,</span>   <span class="mf">1.82204839e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.76012028e+02</span><span class="p">,</span>   <span class="mf">3.58504941e+02</span><span class="p">,</span>   <span class="mf">1.55394668e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.52683674e+00</span><span class="p">,</span>   <span class="mf">2.38340761e+01</span><span class="p">,</span>   <span class="mf">6.25445998e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.90943404e+02</span><span class="p">,</span>   <span class="mf">3.44728235e+02</span><span class="p">,</span>   <span class="mf">2.09021796e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.29564521e+01</span><span class="p">,</span>   <span class="mf">5.58724982e+00</span><span class="p">,</span>   <span class="mf">6.08949162e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.13005196e+02</span><span class="p">,</span>   <span class="mf">3.63265206e+02</span><span class="p">,</span>   <span class="mf">9.32637456e+00</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.18802434e+01</span><span class="p">,</span>   <span class="mf">2.15849429e+01</span><span class="p">,</span>   <span class="mf">9.10939207e-02</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.49344296e+02</span><span class="p">,</span>   <span class="mf">4.47038587e+02</span><span class="p">,</span>   <span class="mf">1.92400430e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">8.61497903e+00</span><span class="p">,</span>   <span class="mf">1.94933361e+01</span><span class="p">,</span>   <span class="mf">5.97432787e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">4.12149038e+02</span><span class="p">,</span>   <span class="mf">3.85985588e+02</span><span class="p">,</span>   <span class="mf">3.25077165e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.86535559e+01</span><span class="p">,</span>   <span class="mf">7.91420083e+00</span><span class="p">,</span>   <span class="mf">6.23798141e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.76955263e+02</span><span class="p">,</span>   <span class="mf">3.62479481e+02</span><span class="p">,</span>   <span class="mf">2.50461522e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">6.14592975e+00</span><span class="p">,</span>   <span class="mf">1.45263025e+01</span><span class="p">,</span>   <span class="mf">2.53605042e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.86279299e+02</span><span class="p">,</span>   <span class="mf">3.98880867e+02</span><span class="p">,</span>   <span class="mf">3.92990884e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.95396603e+01</span><span class="p">,</span>   <span class="mf">1.51900915e+01</span><span class="p">,</span>   <span class="mf">2.34707827e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.72267165e+02</span><span class="p">,</span>   <span class="mf">3.39945945e+02</span><span class="p">,</span>   <span class="mf">1.80826449e+01</span><span class="p">,</span> <span class="mf">5.12738475e+00</span><span class="p">,</span>   <span class="mf">5.43937103e+01</span><span class="p">,</span>   <span class="mf">6.00411182e-01</span><span class="p">]],</span>
+                  <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="c">##</span>
+    <span class="n">kpts2</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span>  <span class="mf">3.09621904e+02</span><span class="p">,</span>   <span class="mf">1.01906467e+02</span><span class="p">,</span>   <span class="mf">1.01749649e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">8.13185135e+00</span><span class="p">,</span>   <span class="mf">9.76679199e+00</span><span class="p">,</span>   <span class="mf">5.98161838e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.95794687e+02</span><span class="p">,</span>   <span class="mf">1.32017193e+02</span><span class="p">,</span>   <span class="mf">1.31069994e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.24562360e+01</span><span class="p">,</span>   <span class="mf">1.12054328e+01</span><span class="p">,</span>   <span class="mf">2.65517495e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.78841354e+02</span><span class="p">,</span>   <span class="mf">2.90189530e+02</span><span class="p">,</span>   <span class="mf">1.65034851e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">8.23787708e+00</span><span class="p">,</span>   <span class="mf">1.04872841e+01</span><span class="p">,</span>   <span class="mf">5.52809448e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.54223322e+02</span><span class="p">,</span>   <span class="mf">3.56999688e+02</span><span class="p">,</span>   <span class="mf">1.56782369e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">9.34924382e+00</span><span class="p">,</span>   <span class="mf">1.39873022e+01</span><span class="p">,</span>   <span class="mf">1.82464324e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.08208701e+02</span><span class="p">,</span>   <span class="mf">1.10979910e+02</span><span class="p">,</span>   <span class="mf">1.23573375e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.32017287e+01</span><span class="p">,</span>   <span class="mf">1.81341743e+01</span><span class="p">,</span>   <span class="mf">6.18054641e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.72120364e+02</span><span class="p">,</span>   <span class="mf">3.06051898e+02</span><span class="p">,</span>   <span class="mf">1.41604565e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">6.41663265e-01</span><span class="p">,</span>   <span class="mf">2.40546104e+01</span><span class="p">,</span>   <span class="mf">9.96961592e-02</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.99782152e+02</span><span class="p">,</span>   <span class="mf">3.84726911e+02</span><span class="p">,</span>   <span class="mf">2.54674401e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.13622177e+01</span><span class="p">,</span>   <span class="mf">1.52564237e+01</span><span class="p">,</span>   <span class="mf">2.82467605e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.73039551e+02</span><span class="p">,</span>   <span class="mf">4.09726917e+02</span><span class="p">,</span>   <span class="mf">7.87345363e+00</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.11725136e+01</span><span class="p">,</span>   <span class="mf">2.50426481e+01</span><span class="p">,</span>   <span class="mf">6.34441839e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.49597555e+02</span><span class="p">,</span>   <span class="mf">4.07510942e+02</span><span class="p">,</span>   <span class="mf">2.37571881e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">7.80666851e+00</span><span class="p">,</span>   <span class="mf">1.35347776e+01</span><span class="p">,</span>   <span class="mf">5.83382941e+00</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">4.06788317e+02</span><span class="p">,</span>   <span class="mf">3.33934196e+02</span><span class="p">,</span>   <span class="mf">3.04510906e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">1.78787314e+01</span><span class="p">,</span>   <span class="mf">1.28190063e+01</span><span class="p">,</span>   <span class="mf">1.59551101e-01</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.55198510e+02</span><span class="p">,</span>   <span class="mf">3.52797004e+02</span><span class="p">,</span>   <span class="mf">2.31707674e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">5.17600302e+00</span><span class="p">,</span>   <span class="mf">2.02805843e+01</span><span class="p">,</span>   <span class="mf">8.69594936e-02</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">3.81289714e+02</span><span class="p">,</span>   <span class="mf">4.07277352e+02</span><span class="p">,</span>   <span class="mf">3.63608634e+01</span><span class="p">,</span>  <span class="o">-</span><span class="mf">2.03970279e+01</span><span class="p">,</span>   <span class="mf">1.69257319e+01</span><span class="p">,</span>   <span class="mf">7.12531509e-03</span><span class="p">],</span>
+                   <span class="p">[</span>  <span class="mf">2.66126484e+02</span><span class="p">,</span>   <span class="mf">4.21403317e+02</span><span class="p">,</span>   <span class="mf">2.23173801e+01</span><span class="p">,</span>   <span class="mf">6.71736273e+00</span><span class="p">,</span>   <span class="mf">5.26069906e+01</span><span class="p">,</span>   <span class="mf">5.96099364e+00</span><span class="p">]],</span>
+                  <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="c">##</span>
+    <span class="n">fm</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">3</span><span class="p">,</span>  <span class="mi">3</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">5</span><span class="p">,</span>  <span class="mi">5</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">6</span><span class="p">,</span>  <span class="mi">6</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">7</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">8</span><span class="p">,</span>  <span class="mi">8</span><span class="p">],</span>
+                <span class="p">[</span> <span class="mi">9</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">fm</span>
+
+</div>
+<div class="viewcode-block" id="make_dummy_fm"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.make_dummy_fm">[docs]</a><span class="k">def</span> <span class="nf">make_dummy_fm</span><span class="p">(</span><span class="n">nKpts</span><span class="p">):</span>
+    <span class="n">fx1_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nKpts</span><span class="p">)</span>
+    <span class="n">fx2_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nKpts</span><span class="p">)</span>
+    <span class="n">fm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">fx1_m</span><span class="p">,</span> <span class="n">fx2_m</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">fm</span>
+
+</div>
+<div class="viewcode-block" id="force_kpts_feasibility"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.force_kpts_feasibility">[docs]</a><span class="k">def</span> <span class="nf">force_kpts_feasibility</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">xys_nonneg</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="c"># Fix locations to be above 0</span>
+    <span class="k">if</span> <span class="n">xys_nonneg</span><span class="p">:</span>
+        <span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">XDIM</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">XDIM</span><span class="p">])</span>
+        <span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">XDIM</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">XDIM</span><span class="p">])</span>
+    <span class="c"># Fix shape to be pos-semidef</span>
+    <span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">SCAX_DIM</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">SCAX_DIM</span><span class="p">])</span>
+    <span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">SCAY_DIM</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">SCAY_DIM</span><span class="p">])</span>
+    <span class="c"># Fix oris between 0 and tau</span>
+    <span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">ORI_DIM</span><span class="p">]</span> <span class="o">=</span> <span class="n">kpts</span><span class="p">[:,</span> <span class="n">ktool</span><span class="o">.</span><span class="n">ORI_DIM</span><span class="p">]</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">tau</span>
+    <span class="k">return</span> <span class="n">kpts</span>
+
+</div>
+<div class="viewcode-block" id="perterbed_grid_kpts"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.perterbed_grid_kpts">[docs]</a><span class="k">def</span> <span class="nf">perterbed_grid_kpts</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">grid_kpts</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_grid_kpts</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">perterb_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">xy_std</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">invV_std</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">ori_std</span><span class="o">=.</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">perterb_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">perterb_kpts</span><span class="p">(</span><span class="n">grid_kpts</span><span class="p">,</span> <span class="o">**</span><span class="n">perterb_kwargs</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="perterb_kpts"><a class="viewcode-back" href="../../../vtool.tests.html#vtool.tests.dummy.perterb_kpts">[docs]</a><span class="k">def</span> <span class="nf">perterb_kpts</span><span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">xy_std</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">invV_std</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ori_std</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">damping</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Adds normally distributed pertibations to keypoints &quot;&quot;&quot;</span>
+    <span class="c"># TODO: Move to ktool</span>
+    <span class="c"># Get standard deviations of pertibations</span>
+    <span class="k">if</span> <span class="n">xy_std</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">xy_std</span>   <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_xys</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">mtool</span><span class="o">.</span><span class="n">eps</span>
+    <span class="k">if</span> <span class="n">invV_std</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">invV_std</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_invVs</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">mtool</span><span class="o">.</span><span class="n">eps</span>
+    <span class="k">if</span> <span class="n">ori_std</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">ori_std</span>  <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_oris</span><span class="p">(</span><span class="n">kpts</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">+</span> <span class="n">mtool</span><span class="o">.</span><span class="n">eps</span>
+    <span class="n">xy_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xy_std</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">)</span>
+    <span class="n">invV_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">invV_std</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">damping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">xy_std</span> <span class="o">/=</span> <span class="n">damping</span>
+        <span class="n">invV_std</span> <span class="o">/=</span> <span class="n">damping</span>
+        <span class="n">ori_std</span> <span class="o">/=</span> <span class="n">damping</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="c"># Create normally distributed pertibations</span>
+    <span class="n">xy_aug</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">xy_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">invV_aug</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">invV_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">key_list</span><span class="o">=</span><span class="p">[(</span><span class="nb">type</span><span class="p">,</span> <span class="s">&#39;invV_std&#39;</span><span class="p">)])</span>
+        <span class="k">raise</span>
+    <span class="n">ori_aug</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">ori_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">)</span>
+    <span class="c"># Augment keypoints</span>
+    <span class="n">aug</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">xy_aug</span><span class="p">,</span> <span class="n">invV_aug</span><span class="p">,</span> <span class="n">ori_aug</span><span class="p">))</span>
+    <span class="n">kpts_</span> <span class="o">=</span> <span class="n">kpts</span> <span class="o">+</span> <span class="n">aug</span>
+    <span class="c"># Ensure keypoint feasibility</span>
+    <span class="n">kpts_</span> <span class="o">=</span> <span class="n">force_kpts_feasibility</span><span class="p">(</span><span class="n">kpts_</span><span class="p">)</span>
+    <span class="c">#print(utool.dict_str({key: type(val) if not isinstance(val, np.ndarray) else val.dtype for key, val in locals().items()}))</span>
+    <span class="c">#assert kpts_.dtype == ktool.KPTS_DTYPE, &#39;bad cast somewhere kpts_.dtype=%r&#39; % (kpts_.dtype)</span>
+    <span class="k">return</span> <span class="n">kpts_</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
