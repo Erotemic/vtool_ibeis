@@ -1,0 +1,157 @@
+vtool package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+
+    vtool.tests
+
+Submodules
+----------
+
+vtool.chip module
+-----------------
+
+.. automodule:: vtool.chip
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.clustering module
+-----------------------
+
+.. automodule:: vtool.clustering
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.clustering2 module
+------------------------
+
+.. automodule:: vtool.clustering2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.ellipse module
+--------------------
+
+.. automodule:: vtool.ellipse
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.exif module
+-----------------
+
+.. automodule:: vtool.exif
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.geometry module
+---------------------
+
+.. automodule:: vtool.geometry
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.histogram module
+----------------------
+
+.. automodule:: vtool.histogram
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.image module
+------------------
+
+.. automodule:: vtool.image
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.image_filters module
+--------------------------
+
+.. automodule:: vtool.image_filters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.keypoint module
+---------------------
+
+.. automodule:: vtool.keypoint
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.linalg module
+-------------------
+
+.. automodule:: vtool.linalg
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.math module
+-----------------
+
+.. automodule:: vtool.math
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.nearest_neighbors module
+------------------------------
+
+.. automodule:: vtool.nearest_neighbors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.patch module
+------------------
+
+.. automodule:: vtool.patch
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.segmentation module
+-------------------------
+
+.. automodule:: vtool.segmentation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.spatial_verification module
+---------------------------------
+
+.. automodule:: vtool.spatial_verification
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.trig module
+-----------------
+
+.. automodule:: vtool.trig
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: vtool
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool.nearest_neighbors &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vtool.nearest_neighbors</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Wrapper around flann (with caching)</span>
+
+<span class="sd">python -c &quot;import vtool, doctest; print(doctest.testmod(vtool.nearest_neighbors))&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">normpath</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">pyflann</span>
+<span class="kn">import</span> <span class="nn">utool</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[nneighbs]&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ann_flann_once"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.ann_flann_once">[docs]</a><span class="k">def</span> <span class="nf">ann_flann_once</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the approximate nearest neighbors of qpts in dpts</span>
+<span class="sd">    &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(1)</span>
+<span class="sd">    &gt;&gt;&gt; dpts = np.random.randint(0, 255, (10, 128)).astype(np.uint8)</span>
+<span class="sd">    &gt;&gt;&gt; qpts = np.random.randint(0, 255, (10, 128)).astype(np.uint8)</span>
+<span class="sd">    &gt;&gt;&gt; qx2_dx, qx2_dist = ann_flann_once(dpts, qpts, 2)</span>
+<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(repr((qx2_dx, qx2_dist))))</span>
+<span class="sd">    8zdwd&amp;q0mu+ez4gp</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># qx2_dx   = query_index -&gt; nearest database index</span>
+    <span class="c"># qx2_dist = query_index -&gt; distance</span>
+    <span class="p">(</span><span class="n">qx2_dx</span><span class="p">,</span> <span class="n">qx2_dist</span><span class="p">)</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span>
+        <span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">qx2_dx</span><span class="p">,</span> <span class="n">qx2_dist</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="assign_to_centroids"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.assign_to_centroids">[docs]</a><span class="k">def</span> <span class="nf">assign_to_centroids</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot; Helper for akmeans &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">qx2_dx</span><span class="p">,</span> <span class="n">qx2_dist</span><span class="p">)</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span>
+        <span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">qx2_dx</span>
+
+</div>
+<div class="viewcode-block" id="get_flann_cfgstr"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_flann_cfgstr">[docs]</a><span class="k">def</span> <span class="nf">get_flann_cfgstr</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">cfgstr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">use_params_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_data_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; np.random.seed(1)</span>
+<span class="sd">    &gt;&gt;&gt; dpts = np.random.randint(0, 255, (10, 128)).astype(np.uint8)</span>
+<span class="sd">    &gt;&gt;&gt; cache_dir = &#39;.&#39;</span>
+<span class="sd">    &gt;&gt;&gt; cfgstr = &#39;_FEAT(alg=heshes)&#39;</span>
+<span class="sd">    &gt;&gt;&gt; flann_params = get_kdtree_flann_params()</span>
+<span class="sd">    &gt;&gt;&gt; print(get_flann_cfgstr(dpts, flann_params, cfgstr))</span>
+<span class="sd">    _FEAT(alg=heshes)_FLANN(4kdtree)_DPTS((10,128)b+oqb%cnuo&amp;oxk7h)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flann_cfgstr</span> <span class="o">=</span> <span class="n">cfgstr</span>
+    <span class="k">if</span> <span class="n">use_params_hash</span><span class="p">:</span>
+        <span class="n">flann_valsig_</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">flann_params</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">flann_valsig</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">remove_chars</span><span class="p">(</span><span class="n">flann_valsig_</span><span class="p">,</span> <span class="s">&#39;, </span><span class="se">\&#39;</span><span class="s">[]&#39;</span><span class="p">)</span>
+        <span class="n">flann_cfgstr</span> <span class="o">+=</span> <span class="s">&#39;_FLANN(&#39;</span> <span class="o">+</span> <span class="n">flann_valsig</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span>
+    <span class="c"># Generate a unique filename for dpts and flann parameters</span>
+    <span class="k">if</span> <span class="n">use_data_hash</span><span class="p">:</span>
+        <span class="c"># flann is dependent on the dpts</span>
+        <span class="n">data_hashstr</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">hashstr_arr</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="s">&#39;_DPTS&#39;</span><span class="p">)</span>
+        <span class="n">flann_cfgstr</span> <span class="o">+=</span> <span class="n">data_hashstr</span>
+    <span class="k">return</span> <span class="n">flann_cfgstr</span>
+
+
+<span class="c">#@utool.indent_func</span></div>
+<div class="viewcode-block" id="get_flann_fpath"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_flann_fpath">[docs]</a><span class="k">def</span> <span class="nf">get_flann_fpath</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">cfgstr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+                    <span class="n">use_params_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_data_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">appname</span><span class="o">=</span><span class="s">&#39;vtool&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns filepath for flann index &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cache_dir</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;[flann] using default cache dir&#39;</span><span class="p">)</span>
+        <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">get_app_resource_dir</span><span class="p">(</span><span class="n">appname</span><span class="p">)</span>
+        <span class="n">utool</span><span class="o">.</span><span class="n">ensuredir</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+    <span class="n">flann_cfgstr</span> <span class="o">=</span> <span class="n">get_flann_cfgstr</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span>
+                                    <span class="n">use_params_hash</span><span class="o">=</span><span class="n">use_params_hash</span><span class="p">,</span>
+                                    <span class="n">use_data_hash</span><span class="o">=</span><span class="n">use_data_hash</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">utool</span><span class="o">.</span><span class="n">NOT_QUIET</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;...flann_cache cfgstr = </span><span class="si">%r</span><span class="s">: &#39;</span> <span class="o">%</span> <span class="n">flann_cfgstr</span><span class="p">)</span>
+    <span class="c"># Append any user labels</span>
+    <span class="n">flann_fname</span> <span class="o">=</span> <span class="s">&#39;flann_index&#39;</span> <span class="o">+</span> <span class="n">flann_cfgstr</span> <span class="o">+</span> <span class="s">&#39;.flann&#39;</span>
+    <span class="n">flann_fpath</span> <span class="o">=</span> <span class="n">normpath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">flann_fname</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">flann_fpath</span>
+
+
+<span class="c">#@utool.indent_func</span></div>
+<div class="viewcode-block" id="flann_cache"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.flann_cache">[docs]</a><span class="k">def</span> <span class="nf">flann_cache</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">cfgstr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_params_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">use_data_hash</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">appname</span><span class="o">=</span><span class="s">&#39;vtool&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tries to load a cached flann index before doing anything</span>
+<span class="sd">    from vtool.nn</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">utool</span><span class="o">.</span><span class="n">NOT_QUIET</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;+--- START CACHED FLANN INDEX &#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+            <span class="s">&#39;cannot build flann when len(dpts) == 0. (prevents a segfault)&#39;</span><span class="p">)</span>
+    <span class="n">flann_fpath</span> <span class="o">=</span> <span class="n">get_flann_fpath</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span>
+                                  <span class="n">use_params_hash</span><span class="o">=</span><span class="n">use_params_hash</span><span class="p">,</span>
+                                  <span class="n">use_data_hash</span><span class="o">=</span><span class="n">use_data_hash</span><span class="p">,</span> <span class="n">appname</span><span class="o">=</span><span class="n">appname</span><span class="p">)</span>
+    <span class="c"># Load the index if it exists</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">flann_fpath</span> <span class="o">=</span> <span class="n">flann_fpath</span>
+    <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">exists</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">flann</span><span class="o">.</span><span class="n">load_index</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">,</span> <span class="n">dpts</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">utool</span><span class="o">.</span><span class="n">NOT_QUIET</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;...flann cache hit&#39;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;L___ END FLANN INDEX &#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">flann</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">utool</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s">&#39;... cannot load index&#39;</span><span class="p">,</span> <span class="n">iswarning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c"># Rebuild the index otherwise</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;...flann cache miss.&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;...building kdtree over </span><span class="si">%d</span><span class="s"> points (this may take a sec).&#39;</span> <span class="o">%</span>
+          <span class="nb">len</span><span class="p">(</span><span class="n">dpts</span><span class="p">))</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;flann.save_index(</span><span class="si">%r</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="n">utool</span><span class="o">.</span><span class="n">path_ndir_split</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">flann</span><span class="o">.</span><span class="n">save_index</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">utool</span><span class="o">.</span><span class="n">NOT_QUIET</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;L___ END CACHED FLANN INDEX &#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flann</span>
+
+</div>
+<div class="viewcode-block" id="flann_augment"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.flann_augment">[docs]</a><span class="k">def</span> <span class="nf">flann_augment</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">new_dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">new_cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span>
+                  <span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; import vtool.tests.dummy as dummy  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; dpts = dummy.get_dummy_dpts(utool.get_nth_prime(10))</span>
+<span class="sd">    &gt;&gt;&gt; new_dpts = dummy.get_dummy_dpts(utool.get_nth_prime(9))</span>
+<span class="sd">    &gt;&gt;&gt; cache_dir = utool.get_app_resource_dir(&#39;vtool&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cfgstr = &#39;_testcfg&#39;</span>
+<span class="sd">    &gt;&gt;&gt; new_cfgstr = &#39;_new_testcfg&#39;</span>
+<span class="sd">    &gt;&gt;&gt; flann_params = get_kdtree_flann_params()</span>
+<span class="sd">    &gt;&gt;&gt; use_cache = False</span>
+<span class="sd">    &gt;&gt;&gt; save = False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">flann_cache</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">)</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">new_dpts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">aug_dpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">dpts</span><span class="p">,</span> <span class="n">new_dpts</span><span class="p">))</span>
+        <span class="n">new_flann_fpath</span> <span class="o">=</span> <span class="n">get_flann_fpath</span><span class="p">(</span>
+            <span class="n">aug_dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">new_cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">)</span>
+        <span class="n">flann</span><span class="o">.</span><span class="n">save_index</span><span class="p">(</span><span class="n">new_flann_fpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flann</span>
+
+</div>
+<div class="viewcode-block" id="get_kdtree_flann_params"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_kdtree_flann_params">[docs]</a><span class="k">def</span> <span class="nf">get_kdtree_flann_params</span><span class="p">():</span>
+    <span class="n">flann_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s">&#39;kdtree&#39;</span><span class="p">,</span>
+        <span class="s">&#39;trees&#39;</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">flann_params</span>
+
+</div>
+<div class="viewcode-block" id="tune_flann"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.tune_flann">[docs]</a><span class="k">def</span> <span class="nf">tune_flann</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span>
+    <span class="c">#num_data = len(dpts)</span>
+    <span class="n">flann_atkwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="s">&#39;autotuned&#39;</span><span class="p">,</span>
+                          <span class="n">target_precision</span><span class="o">=.</span><span class="mo">01</span><span class="p">,</span>
+                          <span class="n">build_weight</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                          <span class="n">memory_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                          <span class="n">sample_fraction</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+    <span class="n">flann_atkwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+    <span class="n">badchar_list</span> <span class="o">=</span> <span class="s">&#39;,{}</span><span class="se">\&#39;</span><span class="s">: &#39;</span>
+    <span class="k">for</span> <span class="n">badchar</span> <span class="ow">in</span> <span class="n">badchar_list</span><span class="p">:</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">badchar</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+    <span class="n">tuned_params</span> <span class="o">=</span> <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+    <span class="n">utool</span><span class="o">.</span><span class="n">myprint</span><span class="p">(</span><span class="n">tuned_params</span><span class="p">)</span>
+    <span class="n">out_file</span> <span class="o">=</span> <span class="s">&#39;flann_tuned&#39;</span> <span class="o">+</span> <span class="n">suffix</span>
+    <span class="n">utool</span><span class="o">.</span><span class="n">write_to</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">tuned_params</span><span class="p">))</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">delete_index</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">tuned_params</span>
+
+</div>
+<div class="viewcode-block" id="invertable_stack"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.invertable_stack">[docs]</a><span class="k">def</span> <span class="nf">invertable_stack</span><span class="p">(</span><span class="n">vecs_list</span><span class="p">,</span> <span class="n">label_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stacks descriptors into a flat structure and returns inverse mapping from</span>
+<span class="sd">    flat database descriptor indexes (dx) to annotation ids (label) and feature</span>
+<span class="sd">    indexes (fx). Feature indexes are w.r.t. annotation indexes.</span>
+
+<span class="sd">    Output:</span>
+<span class="sd">        idx2_desc - flat descriptor stack</span>
+<span class="sd">        idx2_label  - inverted index into annotations</span>
+<span class="sd">        idx2_fx   - inverted index into features</span>
+
+<span class="sd">    # Example with 2D Descriptors</span>
+<span class="sd">    &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">    &gt;&gt;&gt; DESC_TYPE = np.uint8</span>
+<span class="sd">    &gt;&gt;&gt; label_list  = [1, 2, 3, 4, 5]</span>
+<span class="sd">    &gt;&gt;&gt; vecs_list = [</span>
+<span class="sd">    ...     np.array([[0, 0], [0, 1]], dtype=DESC_TYPE),</span>
+<span class="sd">    ...     np.array([[5, 3], [2, 30], [1, 1]], dtype=DESC_TYPE),</span>
+<span class="sd">    ...     np.empty((0, 2), dtype=DESC_TYPE),</span>
+<span class="sd">    ...     np.array([[5, 3], [2, 30], [1, 1]], dtype=DESC_TYPE),</span>
+<span class="sd">    ...     np.array([[3, 3], [42, 42], [2, 6]], dtype=DESC_TYPE),</span>
+<span class="sd">    ...     ]</span>
+<span class="sd">    &gt;&gt;&gt; idx2_vec, idx2_label, idx2_fx = invertable_stack(vecs_list, label_list)</span>
+<span class="sd">    &gt;&gt;&gt; print(repr(idx2_vec.T))</span>
+<span class="sd">    array([[ 0,  0,  5,  2,  1,  5,  2,  1,  3, 42,  2],</span>
+<span class="sd">           [ 0,  1,  3, 30,  1,  3, 30,  1,  3, 42,  6]], dtype=uint8)</span>
+<span class="sd">    &gt;&gt;&gt; print(repr(idx2_label))</span>
+<span class="sd">    array([1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 5])</span>
+<span class="sd">    &gt;&gt;&gt; print(repr(idx2_fx))</span>
+<span class="sd">    array([0, 1, 0, 1, 2, 0, 1, 2, 0, 1, 2])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># INFER DTYPE? dtype = vecs_list[0].dtype</span>
+    <span class="c"># Build inverted index of (label, fx) pairs</span>
+    <span class="n">nFeats</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">vecs_list</span><span class="p">)))</span>
+    <span class="n">nFeat_iter</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">vecs_list</span><span class="p">)</span>
+    <span class="n">label_nFeat_iter</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">label_list</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">vecs_list</span><span class="p">))</span>
+    <span class="c"># generate featx inverted index for each feature in each annotation</span>
+    <span class="n">_ax2_fx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nFeat</span><span class="p">))</span> <span class="k">for</span> <span class="n">nFeat</span> <span class="ow">in</span> <span class="n">nFeat_iter</span><span class="p">]</span>
+    <span class="c"># generate label inverted index for each feature in each annotation</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # this is not a real test the code just happened to be here. syntax is good though</span>
+<span class="sd">    #-ifdef CYTH_TEST_SWAP</span>
+<span class="sd">    _ax2_label = [[label] * nFeat for (label, nFeat) in label_nFeat_iter]</span>
+<span class="sd">    #-else</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_ax2_label</span> <span class="o">=</span> <span class="p">[[</span><span class="n">label</span><span class="p">]</span> <span class="o">*</span> <span class="n">nFeat</span> <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">nFeat</span><span class="p">)</span> <span class="ow">in</span> <span class="n">label_nFeat_iter</span><span class="p">]</span>
+    <span class="c"># endif is optional. the end of the functionscope counts as an #endif</span>
+    <span class="s">&#39;#-endif&#39;</span>
+    <span class="c"># Flatten generators into the inverted index</span>
+    <span class="n">_flatlabels</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">iflatten</span><span class="p">(</span><span class="n">_ax2_label</span><span class="p">)</span>
+    <span class="n">_flatfeatxs</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">iflatten</span><span class="p">(</span><span class="n">_ax2_fx</span><span class="p">)</span>
+
+    <span class="n">idx2_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">_flatlabels</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">nFeats</span><span class="p">)</span>
+    <span class="n">idx2_fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">_flatfeatxs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">nFeats</span><span class="p">)</span>
+    <span class="c"># Stack vecsriptors into numpy array corresponding to inverted inexed</span>
+    <span class="c"># This might throw a MemoryError</span>
+    <span class="n">idx2_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">vecs_list</span><span class="p">)</span>
+    <span class="s">&#39;#pragma cyth_returntup&#39;</span>
+    <span class="k">return</span> <span class="n">idx2_vec</span><span class="p">,</span> <span class="n">idx2_label</span><span class="p">,</span> <span class="n">idx2_fx</span>
+
+<span class="c">#import cyth</span>
+<span class="c">#if cyth.DYNAMIC:</span>
+<span class="c">#    exec(cyth.import_cyth_execstr(__name__))</span>
+<span class="c">#else:</span>
+<span class="c">#    # &lt;AUTOGEN_CYTH&gt;</span>
+<span class="c">#    # Regen command: python -c &quot;import vtool.nearest_neighbors&quot; --cyth-write</span>
+<span class="c">#    try:</span>
+<span class="c">#        if not cyth.WITH_CYTH:</span>
+<span class="c">#            raise ImportError(&#39;no cyth&#39;)</span>
+<span class="c">#        import vtool._nearest_neighbors_cyth</span>
+<span class="c">#        _invertable_stack_cyth = vtool._nearest_neighbors_cyth._invertable_stack_cyth</span>
+<span class="c">#        invertable_stack_cyth = vtool._nearest_neighbors_cyth._invertable_stack_cyth</span>
+<span class="c">#        CYTHONIZED = True</span>
+<span class="c">#    except ImportError:</span>
+<span class="c">#        invertable_stack_cyth = invertable_stack</span>
+<span class="c">#        CYTHONIZED = False</span>
+<span class="c">#    # &lt;/AUTOGEN_CYTH&gt;</span>
+<span class="c">#    pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

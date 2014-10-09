@@ -1,0 +1,2025 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vtool package &mdash; vtool 1.0.0.dev1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0.dev1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="index.html" />
+    <link rel="next" title="vtool.tests package" href="vtool.tests.html" />
+    <link rel="prev" title="Welcome to vtool’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="vtool.tests.html" title="vtool.tests package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to vtool’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="vtool-package">
+<h1>vtool package<a class="headerlink" href="#vtool-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vtool.tests.html">vtool.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.dummy">vtool.tests.dummy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.grabdata">vtool.tests.grabdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.test_akmeans">vtool.tests.test_akmeans module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.test_draw_keypoint">vtool.tests.test_draw_keypoint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.test_exhaustive_ori_extract">vtool.tests.test_exhaustive_ori_extract module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.test_pyflann">vtool.tests.test_pyflann module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.test_spatial_verification">vtool.tests.test_spatial_verification module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.test_vtool">vtool.tests.test_vtool module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests.time_cythonized_funcs">vtool.tests.time_cythonized_funcs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vtool.tests.html#module-vtool.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vtool.chip">
+<span id="vtool-chip-module"></span><h2>vtool.chip module<a class="headerlink" href="#module-vtool.chip" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.chip.compute_chip">
+<tt class="descclassname">vtool.chip.</tt><tt class="descname">compute_chip</tt><big>(</big><em>gfpath</em>, <em>bbox</em>, <em>theta</em>, <em>new_size</em>, <em>filter_list=[]</em><big>)</big><a class="reference internal" href="_modules/vtool/chip.html#compute_chip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.chip.compute_chip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts a chip and applies filters</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.chip.get_filter_list">
+<tt class="descclassname">vtool.chip.</tt><tt class="descname">get_filter_list</tt><big>(</big><em>chipcfg_dict</em><big>)</big><a class="reference internal" href="_modules/vtool/chip.html#get_filter_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.chip.get_filter_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.chip.get_scaled_size_with_area">
+<tt class="descclassname">vtool.chip.</tt><tt class="descname">get_scaled_size_with_area</tt><big>(</big><em>target_area</em>, <em>w</em>, <em>h</em><big>)</big><a class="reference internal" href="_modules/vtool/chip.html#get_scaled_size_with_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.chip.get_scaled_size_with_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns new_size which scales (w, h) as close to target_area as possible
+and maintains aspect ratio</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.chip.get_scaled_sizes_with_area">
+<tt class="descclassname">vtool.chip.</tt><tt class="descname">get_scaled_sizes_with_area</tt><big>(</big><em>target_area</em>, <em>size_list</em><big>)</big><a class="reference internal" href="_modules/vtool/chip.html#get_scaled_sizes_with_area"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.chip.get_scaled_sizes_with_area" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.clustering">
+<span id="vtool-clustering-module"></span><h2>vtool.clustering module<a class="headerlink" href="#module-vtool.clustering" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.clustering.akmeans">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">akmeans</tt><big>(</big><em>data</em>, <em>num_clusters</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>ave_unchanged_thresh=0</em>, <em>ave_unchanged_iterwin=10</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.akmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximiate K-Means (using FLANN)
+Input: data - np.array with rows of data.
+Description: Quickly partitions data into K=num_clusters centroids.  Cluster
+centers are randomly assigned to datapoints.  Each datapoint is assigned to
+its approximate nearest cluster center.  The cluster centers are recomputed.
+Repeat until approximate convergence.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering.force_quit_akmeans">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">force_quit_akmeans</tt><big>(</big><em>signal</em>, <em>frame</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#force_quit_akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.force_quit_akmeans" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering.plot_clusters">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">plot_clusters</tt><big>(</big><em>data</em>, <em>datax2_clusterx</em>, <em>centroids</em>, <em>num_pca_dims=3</em>, <em>whiten=False</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#plot_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.plot_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots centroids and datapoints. Plots accurately up to 3 dimensions.
+If there are more than 3 dimensions, PCA is used to recude the dimenionality
+to the &lt;num_pca_dims&gt; principal components</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering.precompute_akmeans">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">precompute_akmeans</tt><big>(</big><em>data</em>, <em>num_clusters</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>cache_dir=None</em>, <em>force_recomp=False</em>, <em>use_data_hash=True</em>, <em>cfgstr=''</em>, <em>refine=False</em>, <em>akmeans_cfgstr=None</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#precompute_akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.precompute_akmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>precompute aproximate kmeans with builtin caching</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering.refine_akmeans">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">refine_akmeans</tt><big>(</big><em>data</em>, <em>datax2_clusterx</em>, <em>centroids</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>cache_dir=None</em>, <em>cfgstr=''</em>, <em>use_data_hash=True</em>, <em>akmeans_cfgstr=None</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#refine_akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.refine_akmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refines the approximates centroids</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering.sparse_multiply_rows">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">sparse_multiply_rows</tt><big>(</big><em>csr_mat</em>, <em>vec</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#sparse_multiply_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.sparse_multiply_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Row-wise multiplication of a sparse matrix by a sparse vector</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering.sparse_normalize_rows">
+<tt class="descclassname">vtool.clustering.</tt><tt class="descname">sparse_normalize_rows</tt><big>(</big><em>csr_mat</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering.html#sparse_normalize_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering.sparse_normalize_rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.clustering2">
+<span id="vtool-clustering2-module"></span><h2>vtool.clustering2 module<a class="headerlink" href="#module-vtool.clustering2" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.clustering2.akmeans">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">akmeans</tt><big>(</big><em>data</em>, <em>nCentroids</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>ave_unchanged_thresh=0</em>, <em>ave_unchanged_iterwin=10</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.akmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximiate K-Means (using FLANN)
+Input: data - np.array with rows of data.
+Description: Quickly partitions data into K=nCentroids centroids.  Cluster
+centers are randomly assigned to datapoints.  Each datapoint is assigned to
+its approximate nearest centroid center.  The centroid centers are recomputed.
+Repeat until approximate convergence.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.akmeans_iterations">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">akmeans_iterations</tt><big>(</big><em>data</em>, <em>centroids</em>, <em>max_iters</em>, <em>flann_params</em>, <em>ave_unchanged_thresh</em>, <em>ave_unchanged_iterwin</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#akmeans_iterations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.akmeans_iterations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function which continues the iterations of akmeans</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.clustering2</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nCentroids</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flann_params</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">max_iters</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ave_unchanged_thresh</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ave_unchanged_iterwin</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centroids</span> <span class="o">=</span> <span class="n">initialize_centroids</span><span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centroids</span> <span class="o">=</span> <span class="n">akmeans_iterations</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">ave_unchanged_thresh</span><span class="p">,</span> <span class="n">ave_unchanged_iterwin</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_centroids</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.apply_grouping">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">apply_grouping</tt><big>(</big><em>items</em>, <em>groupxs</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#apply_grouping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.apply_grouping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.apply_jagged_grouping">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">apply_jagged_grouping</tt><big>(</big><em>unflat_items</em>, <em>groupxs</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#apply_jagged_grouping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.apply_jagged_grouping" title="Permalink to this definition">¶</a></dt>
+<dd><p>takes unflat_list and flat group indicies. Returns the unflat grouping</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.cached_akmeans">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">cached_akmeans</tt><big>(</big><em>data</em>, <em>nCentroids</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>cache_dir='default'</em>, <em>force_recomp=False</em>, <em>use_data_hash=True</em>, <em>cfgstr=''</em>, <em>refine=False</em>, <em>akmeans_cfgstr=None</em>, <em>use_cache=True</em>, <em>appname='vtool'</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#cached_akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.cached_akmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>precompute aproximate kmeans with builtin caching</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.compute_centroids">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">compute_centroids</tt><big>(</big><em>data</em>, <em>centroids</em>, <em>datax2_centroidx</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#compute_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.compute_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes centroids given datax assignments
+TODO: maybe use the grouping code instad of the LR algorithm</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.clustering2</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nCentroids</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flann_params</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centroids</span> <span class="o">=</span> <span class="n">initialize_centroids</span><span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centroids_</span> <span class="o">=</span> <span class="n">centroids</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">datax2_centroidx</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANN</span><span class="p">()</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">compute_centroids</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">datax2_centroidx</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.double_group">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">double_group</tt><big>(</big><em>inner_key_list</em>, <em>outer_keys_list</em>, <em>items_list</em>, <em>ensure_numpy=False</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#double_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.double_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes corresponding lists as input and builds a double mapping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>inner_key_list</strong> (<em>list</em>) &#8211; each value_i is a scalar key.</li>
+<li><strong>outer_keys_list</strong> (<em>list</em>) &#8211; each value_i list of scalar keys</li>
+<li><strong>items_list</strong> (<em>list</em>) &#8211; value_i is a list that corresponds to outer_keys_i</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">utool.ddict of dicts: outerkey2_innerkey2_items</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.clustering2</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inner_key_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outer_keys_list</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">20</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">items_list</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ensure_numpy</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outerkey2_innerkey2_items</span> <span class="o">=</span> <span class="n">double_group</span><span class="p">(</span><span class="n">inner_key_list</span><span class="p">,</span> <span class="n">outer_keys_list</span><span class="p">,</span> <span class="n">items_list</span><span class="p">,</span> <span class="n">ensure_numpy</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">dict_str</span><span class="p">(</span><span class="n">outerkey2_innerkey2_items</span><span class="p">))</span>
+<span class="go">{</span>
+<span class="go">    10: {300: array([6]), 100: array([1])},</span>
+<span class="go">    20: {400: array([7]), 100: array([2, 3])},</span>
+<span class="go">    30: {200: array([4]), 300: array([5])},</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.get_akmeans_cfgstr">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">get_akmeans_cfgstr</tt><big>(</big><em>data</em>, <em>nCentroids</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>use_data_hash=True</em>, <em>cfgstr=''</em>, <em>akmeans_cfgstr=None</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#get_akmeans_cfgstr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.get_akmeans_cfgstr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.group_indicies">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">group_indicies</tt><big>(</big><em>idx2_groupid</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#group_indicies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.group_indicies" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">idx2_groupid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>#http://stackoverflow.com/questions/4651683/numpy-grouping-using-itertools-groupby-performance</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.group_indicies_pandas">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">group_indicies_pandas</tt><big>(</big><em>idx2_groupid</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#group_indicies_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.group_indicies_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.clustering2</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx2_groupid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8000</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1000000</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>keys1, groupxs2 = group_indicies_pandas(idx2_groupid)
+keys2, groupxs2 = group_indicies(idx2_groupid)</p>
+<p>%timeit group_indicies_pandas(idx2_groupid)
+%timeit group_indicies(idx2_groupid)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.groupby">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">groupby</tt><big>(</big><em>items</em>, <em>idx2_groupid</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#groupby"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.groupby" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">items</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx2_groupid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">items</span> <span class="o">=</span> <span class="n">idx2_groupid</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.groupby_dict">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">groupby_dict</tt><big>(</big><em>items</em>, <em>idx2_groupid</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#groupby_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.groupby_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.groupby_gen">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">groupby_gen</tt><big>(</big><em>items</em>, <em>idx2_groupid</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#groupby_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.groupby_gen" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">items</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">idx2_groupid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.initialize_centroids">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">initialize_centroids</tt><big>(</big><em>nCentroids</em>, <em>data</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#initialize_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.initialize_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes centroids to random datapoints</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.jagged_group">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">jagged_group</tt><big>(</big><em>groupids_list</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#jagged_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.jagged_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>flattens and returns group indexes into the flattened list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.plot_centroids">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">plot_centroids</tt><big>(</big><em>data</em>, <em>centroids</em>, <em>num_pca_dims=3</em>, <em>whiten=False</em>, <em>labels='centroids'</em>, <em>fnum=1</em>, <em>prefix=''</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#plot_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.plot_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots centroids and datapoints. Plots accurately up to 3 dimensions.
+If there are more than 3 dimensions, PCA is used to recude the dimenionality
+to the &lt;num_pca_dims&gt; principal components</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.refine_akmeans">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">refine_akmeans</tt><big>(</big><em>data</em>, <em>centroids</em>, <em>max_iters=5</em>, <em>flann_params={}</em>, <em>cache_dir='default'</em>, <em>cfgstr=''</em>, <em>use_data_hash=True</em>, <em>akmeans_cfgstr=None</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#refine_akmeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.refine_akmeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refines the approximates centroids</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.sparse_multiply_rows">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">sparse_multiply_rows</tt><big>(</big><em>csr_mat</em>, <em>vec</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#sparse_multiply_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.sparse_multiply_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Row-wise multiplication of a sparse matrix by a sparse vector</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.clustering2.sparse_normalize_rows">
+<tt class="descclassname">vtool.clustering2.</tt><tt class="descname">sparse_normalize_rows</tt><big>(</big><em>csr_mat</em><big>)</big><a class="reference internal" href="_modules/vtool/clustering2.html#sparse_normalize_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.clustering2.sparse_normalize_rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.ellipse">
+<span id="vtool-ellipse-module"></span><h2>vtool.ellipse module<a class="headerlink" href="#module-vtool.ellipse" title="Permalink to this headline">¶</a></h2>
+<p>This module should handle all things elliptical</p>
+<dl class="function">
+<dt id="vtool.ellipse.adaptive_scale">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">adaptive_scale</tt><big>(</big><em>img_fpath</em>, <em>kpts</em>, <em>nScales=4</em>, <em>low=-0.5</em>, <em>high=0.5</em>, <em>nSamples=16</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#adaptive_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.adaptive_scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.check_kpts_in_bounds">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">check_kpts_in_bounds</tt><big>(</big><em>kpts_</em>, <em>width</em>, <em>height</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#check_kpts_in_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.check_kpts_in_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.circular_distance">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">circular_distance</tt><big>(</big><em>arr=None</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#circular_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.circular_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.expand_kpts">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">expand_kpts</tt><big>(</big><em>kpts</em>, <em>scales</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#expand_kpts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.expand_kpts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.expand_scales">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">expand_scales</tt><big>(</big><em>kpts</em>, <em>nScales</em>, <em>low</em>, <em>high</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#expand_scales"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.expand_scales" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.expand_subscales">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">expand_subscales</tt><big>(</big><em>kpts</em>, <em>subscale_list</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#expand_subscales"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.expand_subscales" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.extrema_neighbors">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">extrema_neighbors</tt><big>(</big><em>extrema_list</em>, <em>nBins</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#extrema_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.extrema_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.find_maxima">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">find_maxima</tt><big>(</big><em>y_list</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#find_maxima"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.find_maxima" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.find_maxima_with_neighbors">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">find_maxima_with_neighbors</tt><big>(</big><em>scalar_list</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#find_maxima_with_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.find_maxima_with_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.gradient_magnitude">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">gradient_magnitude</tt><big>(</big><em>img</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#gradient_magnitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.gradient_magnitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.homogenous_circle_pts">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">homogenous_circle_pts</tt><big>(</big><em>nSamples</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#homogenous_circle_pts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.homogenous_circle_pts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.interpolate_between">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">interpolate_between</tt><big>(</big><em>peak_list</em>, <em>nScales</em>, <em>high</em>, <em>low</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#interpolate_between"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.interpolate_between" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.interpolate_maxima">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">interpolate_maxima</tt><big>(</big><em>scalar_list</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#interpolate_maxima"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.interpolate_maxima" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.interpolate_peaks">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">interpolate_peaks</tt><big>(</big><em>x_data_list</em>, <em>y_data_list</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#interpolate_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.interpolate_peaks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.interpolate_peaks2">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">interpolate_peaks2</tt><big>(</big><em>x_data_list</em>, <em>y_data_list</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#interpolate_peaks2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.interpolate_peaks2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.kpts_matrices">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">kpts_matrices</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#kpts_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.kpts_matrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.kpts_to_invV">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">kpts_to_invV</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#kpts_to_invV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.kpts_to_invV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.sample_ell_border_pts">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">sample_ell_border_pts</tt><big>(</big><em>expanded_kpts</em>, <em>nSamples</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#sample_ell_border_pts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.sample_ell_border_pts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.sample_ell_border_vals">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">sample_ell_border_vals</tt><big>(</big><em>imgBGR</em>, <em>expanded_kpts</em>, <em>nKp</em>, <em>nScales</em>, <em>nSamples</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#sample_ell_border_vals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.sample_ell_border_vals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.sample_uniform">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">sample_uniform</tt><big>(</big><em>kpts</em>, <em>nSamples=128</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#sample_uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.sample_uniform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.ellipse.subscale_peaks">
+<tt class="descclassname">vtool.ellipse.</tt><tt class="descname">subscale_peaks</tt><big>(</big><em>border_vals_sum</em>, <em>kpts</em>, <em>nScales</em>, <em>low</em>, <em>high</em><big>)</big><a class="reference internal" href="_modules/vtool/ellipse.html#subscale_peaks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.ellipse.subscale_peaks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.exif">
+<span id="vtool-exif-module"></span><h2>vtool.exif module<a class="headerlink" href="#module-vtool.exif" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.exif.check_exif_keys">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">check_exif_keys</tt><big>(</big><em>pil_img</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#check_exif_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.check_exif_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.convert_degrees">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">convert_degrees</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#convert_degrees"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.convert_degrees" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to convert the GPS coordinates stored in the EXIF to degress in float format</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_exif_dict">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_exif_dict</tt><big>(</big><em>pil_img</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_exif_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_exif_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns exif dictionary by TAGID</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_exif_dict2">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_exif_dict2</tt><big>(</big><em>pil_img</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_exif_dict2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_exif_dict2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns exif dictionary by TAG (less efficient)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_exif_tagids">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_exif_tagids</tt><big>(</big><em>tag_list</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_exif_tagids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_exif_tagids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_exist">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_exist</tt><big>(</big><em>data</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_exist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_exist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_lat_lon">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_lat_lon</tt><big>(</big><em>exif_dict</em>, <em>default=(-1</em>, <em>-1)</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_lat_lon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_lat_lon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the latitude and longitude, if available, from the provided exif_data2 (obtained through exif_data2 above)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_lat_lon2">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_lat_lon2</tt><big>(</big><em>exif_data2</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_lat_lon2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_lat_lon2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the latitude and longitude, if available, from the provided exif_data2 (obtained through exif_data2 above)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.get_unixtime">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">get_unixtime</tt><big>(</big><em>exif_dict</em>, <em>default=-1</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#get_unixtime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.get_unixtime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.make_exif_dict_human_readable">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">make_exif_dict_human_readable</tt><big>(</big><em>exif_dict</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#make_exif_dict_human_readable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.make_exif_dict_human_readable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.read_all_exif_tags">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">read_all_exif_tags</tt><big>(</big><em>pil_img</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#read_all_exif_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.read_all_exif_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.read_exif">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">read_exif</tt><big>(</big><em>fpath</em>, <em>tag=None</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#read_exif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.read_exif" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.read_exif_tags">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">read_exif_tags</tt><big>(</big><em>pil_img</em>, <em>exif_tagid_list</em>, <em>default_list=None</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#read_exif_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.read_exif_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.exif.read_one_exif_tag">
+<tt class="descclassname">vtool.exif.</tt><tt class="descname">read_one_exif_tag</tt><big>(</big><em>pil_img</em>, <em>tag</em><big>)</big><a class="reference internal" href="_modules/vtool/exif.html#read_one_exif_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.exif.read_one_exif_tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.geometry">
+<span id="vtool-geometry-module"></span><h2>vtool.geometry module<a class="headerlink" href="#module-vtool.geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.geometry.bbox_of_verts">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">bbox_of_verts</tt><big>(</big><em>verts</em>, <em>castint=False</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#bbox_of_verts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.bbox_of_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.bboxes_from_vert_list">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">bboxes_from_vert_list</tt><big>(</big><em>verts_list</em>, <em>castint=False</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#bboxes_from_vert_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.bboxes_from_vert_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the bounding polygon inside a rectangle</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.draw_verts">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">draw_verts</tt><big>(</big><em>img</em>, <em>verts</em>, <em>color=(0</em>, <em>128</em>, <em>255)</em>, <em>thickness=2</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#draw_verts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.draw_verts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.homogonize">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">homogonize</tt><big>(</big><em>xy_arr</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#homogonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.homogonize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.homogonize_list">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">homogonize_list</tt><big>(</big><em>xy_list</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#homogonize_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.homogonize_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.unhomogonize">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">unhomogonize</tt><big>(</big><em>xyz_arr</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#unhomogonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.unhomogonize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.unhomogonize_list">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">unhomogonize_list</tt><big>(</big><em>xyz_list</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#unhomogonize_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.unhomogonize_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.verts_from_bbox">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">verts_from_bbox</tt><big>(</big><em>bbox</em>, <em>close=False</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#verts_from_bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.verts_from_bbox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.geometry.verts_list_from_bboxes_list">
+<tt class="descclassname">vtool.geometry.</tt><tt class="descname">verts_list_from_bboxes_list</tt><big>(</big><em>bboxes_list</em><big>)</big><a class="reference internal" href="_modules/vtool/geometry.html#verts_list_from_bboxes_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.geometry.verts_list_from_bboxes_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a four-vertex polygon from the bounding rectangle</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.histogram">
+<span id="vtool-histogram-module"></span><h2>vtool.histogram module<a class="headerlink" href="#module-vtool.histogram" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.histogram.hist_argmaxima">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">hist_argmaxima</tt><big>(</big><em>hist</em>, <em>centers=None</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#hist_argmaxima"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.hist_argmaxima" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.histogram.hist_edges_to_centers">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">hist_edges_to_centers</tt><big>(</big><em>edges</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#hist_edges_to_centers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.hist_edges_to_centers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.histogram.hist_interpolated_submaxima">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">hist_interpolated_submaxima</tt><big>(</big><em>hist</em>, <em>centers=None</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#hist_interpolated_submaxima"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.hist_interpolated_submaxima" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.histogram.interpolate_submaxima">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">interpolate_submaxima</tt><big>(</big><em>argmaxima</em>, <em>hist</em>, <em>centers=None</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#interpolate_submaxima"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.interpolate_submaxima" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.histogram.maxima_neighbors">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">maxima_neighbors</tt><big>(</big><em>argmaxima</em>, <em>hist</em>, <em>centers=None</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#maxima_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.maxima_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.histogram.subbin_bounds">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">subbin_bounds</tt><big>(</big><em>z</em>, <em>radius</em>, <em>low</em>, <em>high</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#subbin_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.subbin_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets quantized bounds of a sub-bin/pixel point and a radius.
+Useful for cropping using subpixel points
+Returns: quantized_bounds=(iz1, iz2), subbin_offset</p>
+<p>e.g.
+Illustration: (the bin edges are pipes)</p>
+<blockquote>
+<div>(the bin centers are pluses)</div></blockquote>
+<p>Input = {&#8216;z&#8217;: 1.5, &#8216;radius&#8217;:5.666, &#8216;low&#8217;:0, &#8216;high&#8217;:7}
+Output = {&#8216;z1&#8217;:0, &#8216;z2&#8217;: 7, &#8216;offst&#8217;: 5.66}</p>
+<div class="line-block">
+<div class="line">|   |   |   |   |   |   |   |</div>
+</div>
+<dl class="docutils">
+<dt><a href="#id1"><span class="problematic" id="id2">|_+_|_+_|_+_|_+_|_+_|_+_|_+_|_+_|</span></a></dt>
+<dd><p class="first">^     ^                     ^
+z1    z                     z2</p>
+<blockquote>
+<div>,.___.___.___.___.___.   &lt; radius (5.333)</div></blockquote>
+<dl class="last docutils">
+<dt>.&#8212;.-,                        &lt; z_offset1 (1.6666)</dt>
+<dd>,_.___.___.___.___.___.  &lt; z_offset2 (5.666)</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.histogram.wrap_histogram">
+<tt class="descclassname">vtool.histogram.</tt><tt class="descname">wrap_histogram</tt><big>(</big><em>hist</em>, <em>edges</em><big>)</big><a class="reference internal" href="_modules/vtool/histogram.html#wrap_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.histogram.wrap_histogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.image">
+<span id="vtool-image-module"></span><h2>vtool.image module<a class="headerlink" href="#module-vtool.image" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="vtool.image.ThumbnailCacheContext">
+<em class="property">class </em><tt class="descclassname">vtool.image.</tt><tt class="descname">ThumbnailCacheContext</tt><big>(</big><em>uuid_list</em>, <em>asrgb=True</em>, <em>thumb_size=64</em>, <em>thumb_dpath=None</em>, <em>appname='vtool'</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#ThumbnailCacheContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.ThumbnailCacheContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Lazy computation of of images as thumbnails.</p>
+<p>Just pass a list of uuids corresponding to the images. Then compute images
+flagged as dirty and give them back to the context.  thumbs_list will be
+populated on contex exit</p>
+<dl class="method">
+<dt id="vtool.image.ThumbnailCacheContext.filter_dirty_items">
+<tt class="descname">filter_dirty_items</tt><big>(</big><em>list_</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#ThumbnailCacheContext.filter_dirty_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.ThumbnailCacheContext.filter_dirty_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns only items marked by the context as dirty</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vtool.image.ThumbnailCacheContext.save_dirty_thumbs_from_images">
+<tt class="descname">save_dirty_thumbs_from_images</tt><big>(</big><em>img_list</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#ThumbnailCacheContext.save_dirty_thumbs_from_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.ThumbnailCacheContext.save_dirty_thumbs_from_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass in any images marked by the context as dirty here</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.blend_images">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">blend_images</tt><big>(</big><em>img1</em>, <em>img2</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#blend_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.blend_images" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.cvt_BGR2L">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">cvt_BGR2L</tt><big>(</big><em>imgBGR</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#cvt_BGR2L"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.cvt_BGR2L" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.cvt_BGR2RGB">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">cvt_BGR2RGB</tt><big>(</big><em>imgBGR</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#cvt_BGR2RGB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.cvt_BGR2RGB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.cvt_bbox_xywh_to_pt1pt2">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">cvt_bbox_xywh_to_pt1pt2</tt><big>(</big><em>xywh</em>, <em>sx=1.0</em>, <em>sy=1.0</em>, <em>round_=True</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#cvt_bbox_xywh_to_pt1pt2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.cvt_bbox_xywh_to_pt1pt2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts bbox to thumb format with a scale factor</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.dummy_img">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">dummy_img</tt><big>(</big><em>w</em>, <em>h</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#dummy_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.dummy_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dummy test image</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.get_gpathlist_sizes">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">get_gpathlist_sizes</tt><big>(</big><em>gpath_list</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#get_gpathlist_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.get_gpathlist_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads the size of each image in gpath_list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.get_num_channels">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">get_num_channels</tt><big>(</big><em>img</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#get_num_channels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.get_num_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of color channels</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.get_scale_factor">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">get_scale_factor</tt><big>(</big><em>src_img</em>, <em>dst_img</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#get_scale_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.get_scale_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns scale factor from one image to the next</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.get_size">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">get_size</tt><big>(</big><em>img</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#get_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.get_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the image size in (width, height)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.imread">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">imread</tt><big>(</big><em>img_fpath</em>, <em>delete_if_corrupted=False</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#imread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.imread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.imwrite">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">imwrite</tt><big>(</big><em>img_fpath</em>, <em>imgBGR</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#imwrite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.imwrite" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.open_image_size">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">open_image_size</tt><big>(</big><em>image_fpath</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#open_image_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.open_image_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.open_pil_image">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">open_pil_image</tt><big>(</big><em>image_fpath</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#open_pil_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.open_pil_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.print_image_checks">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">print_image_checks</tt><big>(</big><em>img_fpath</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#print_image_checks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.print_image_checks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resize">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resize</tt><big>(</big><em>img</em>, <em>dsize</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resize_imagelist_generator">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resize_imagelist_generator</tt><big>(</big><em>gpath_list</em>, <em>new_gpath_list</em>, <em>newsize_list</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resize_imagelist_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resize_imagelist_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resizes images and yeilds results asynchronously</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resize_imagelist_to_sqrtarea">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resize_imagelist_to_sqrtarea</tt><big>(</big><em>gpath_list</em>, <em>new_gpath_list=None</em>, <em>sqrt_area=800</em>, <em>output_dir=None</em>, <em>checkexists=True</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resize_imagelist_to_sqrtarea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resize_imagelist_to_sqrtarea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resizes images and yeilds results asynchronously</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resize_thumb">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resize_thumb</tt><big>(</big><em>img</em>, <em>max_dsize=(64</em>, <em>64)</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resize_thumb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resize_thumb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resize an image such that its max width or height is:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resize_worker">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resize_worker</tt><big>(</big><em>tup</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resize_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resize_worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>worker function for parallel generator</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resized_clamped_thumb_dims">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resized_clamped_thumb_dims</tt><big>(</big><em>img_size</em>, <em>max_dsize</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resized_clamped_thumb_dims"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resized_clamped_thumb_dims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.resized_dims_and_ratio">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">resized_dims_and_ratio</tt><big>(</big><em>img_size</em>, <em>max_dsize</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#resized_dims_and_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.resized_dims_and_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.scale_bbox_to_verts_gen">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">scale_bbox_to_verts_gen</tt><big>(</big><em>bbox_list</em>, <em>theta_list</em>, <em>sx</em>, <em>sy</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#scale_bbox_to_verts_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.scale_bbox_to_verts_gen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.subpixel_values">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">subpixel_values</tt><big>(</big><em>img</em>, <em>pts</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#subpixel_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.subpixel_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>adapted from
+stackoverflow.com/uestions/12729228/simple-efficient-binlinear-
+interpolation-of-images-in-numpy-and-python</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.warpAffine">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">warpAffine</tt><big>(</big><em>img</em>, <em>Aff</em>, <em>dsize</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#warpAffine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.warpAffine" title="Permalink to this definition">¶</a></dt>
+<dd><p>dsize = (width, height) of return image</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image.warpHomog">
+<tt class="descclassname">vtool.image.</tt><tt class="descname">warpHomog</tt><big>(</big><em>img</em>, <em>Homog</em>, <em>dsize</em><big>)</big><a class="reference internal" href="_modules/vtool/image.html#warpHomog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image.warpHomog" title="Permalink to this definition">¶</a></dt>
+<dd><p>dsize = (width, height) of return image</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.image_filters">
+<span id="vtool-image-filters-module"></span><h2>vtool.image_filters module<a class="headerlink" href="#module-vtool.image_filters" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.image_filters.adapteq_fn">
+<tt class="descclassname">vtool.image_filters.</tt><tt class="descname">adapteq_fn</tt><big>(</big><em>chipBGR</em><big>)</big><a class="reference internal" href="_modules/vtool/image_filters.html#adapteq_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image_filters.adapteq_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a CLAHE object (Arguments are optional).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image_filters.clean_mask">
+<tt class="descclassname">vtool.image_filters.</tt><tt class="descname">clean_mask</tt><big>(</big><em>mask</em>, <em>num_dilate=3</em>, <em>num_erode=3</em>, <em>window_frac=0.025</em><big>)</big><a class="reference internal" href="_modules/vtool/image_filters.html#clean_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image_filters.clean_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean the mask
+(num_erode, num_dilate) = (1, 1)
+(w, h) = (10, 10)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image_filters.grabcut_fn">
+<tt class="descclassname">vtool.image_filters.</tt><tt class="descname">grabcut_fn</tt><big>(</big><em>chipBGR</em><big>)</big><a class="reference internal" href="_modules/vtool/image_filters.html#grabcut_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image_filters.grabcut_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>naively segments a chip</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.image_filters.histeq_fn">
+<tt class="descclassname">vtool.image_filters.</tt><tt class="descname">histeq_fn</tt><big>(</big><em>chipBGR</em><big>)</big><a class="reference internal" href="_modules/vtool/image_filters.html#histeq_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.image_filters.histeq_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Histogram equalization of a grayscale image. from  _tpl/other</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.keypoint">
+<span id="vtool-keypoint-module"></span><h2>vtool.keypoint module<a class="headerlink" href="#module-vtool.keypoint" title="Permalink to this headline">¶</a></h2>
+<p>python -c &#8220;import vtool, doctest; print(doctest.testmod(vtool.keypoint))&#8221;</p>
+<p>Keypoints are stored in the invA format by default.
+Unfortunately many places in the code reference this as A instead of invA
+because I was confused when I first started writing this.</p>
+<p>to rectify this I am changing terminology.</p>
+<dl class="docutils">
+<dt>invV - maps from ucircle onto an ellipse (perdoch.invA)</dt>
+<dd>V - maps from ellipse to ucircle      (perdoch.A)
+Z - the conic matrix                  (perdoch.E)</dd>
+</dl>
+<p>Data formats:
+kpts = [x, y, iv11, iv21, iv22, ori]
+invV = ((iv11, iv12, x),</p>
+<blockquote>
+<div>(iv21, iv22, y),
+(   0,    0, 1))</div></blockquote>
+<dl class="data">
+<dt id="vtool.keypoint.TAU">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">TAU</tt><em class="property"> = 6.283185307179586</em><a class="headerlink" href="#vtool.keypoint.TAU" title="Permalink to this definition">¶</a></dt>
+<dd><p>%s/<a href="#id3"><span class="problematic" id="id4">numpy_floatarray_</span></a>([13])dimension/np.ndarray[np.float64_t, ndim=1]/gc
+%s/np.ndarray[np.float64_t, ndim=([13])]/<a href="#id5"><span class="problematic" id="id6">numpy_floatarray_</span></a>1dimension/gc</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.cast_split">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">cast_split</tt><big>(</big><em>kpts</em>, <em>dtype=&lt;type 'numpy.float32'&gt;</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#cast_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.cast_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>breakup keypoints into location, shape, and orientation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.flatten_invV_mats_to_kpts">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">flatten_invV_mats_to_kpts</tt><big>(</big><em>invV_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#flatten_invV_mats_to_kpts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.flatten_invV_mats_to_kpts" title="Permalink to this definition">¶</a></dt>
+<dd><p>flattens invV matrices into kpts format</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_V_mats">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_V_mats</tt><big>(</big><em>kpts</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_V_mats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_V_mats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_Z_mats">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_Z_mats</tt><big>(</big><em>V_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_Z_mats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_Z_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>transform into conic matrix Z
+Z = (V.T).dot(V)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_diag_extent_sqrd">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_diag_extent_sqrd</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_diag_extent_sqrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_diag_extent_sqrd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the diagonal extent of keypoint locations</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_grid_kpts">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_grid_kpts</tt><big>(</big><em>wh=(300</em>, <em>300)</em>, <em>wh_stride=(50</em>, <em>50)</em>, <em>scale=20</em>, <em>dtype=&lt;type 'numpy.float32'&gt;</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_grid_kpts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_grid_kpts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a regular grid of keypoints</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_homog_xyzs">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_homog_xyzs</tt><big>(</big><em>kpts_</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_homog_xyzs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_homog_xyzs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keypoint locations in chip space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invVR_mats_oris">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invVR_mats_oris</tt><big>(</big><em>invVR_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invVR_mats_oris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invVR_mats_oris" title="Permalink to this definition">¶</a></dt>
+<dd><p>extracts orientation from matrix encoding</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.keypoint</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invVR_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">get_invVR_mats_oris</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">mcoxq8!3ml5bj9rx</span>
+</pre></div>
+</div>
+<p>#CYTH_INLINE
+#CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]
+#CYTH_PARAMS:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=3] invVR_mats</div></blockquote>
+<p>#if CYTH
+cdef:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=1] _oris
+np.ndarray[np.float64_t, ndim=1] _iv12s
+np.ndarray[np.float64_t, ndim=1] _iv11s</div></blockquote>
+<p>_iv11s = invVR_mats[:, 0, 0]
+_iv12s = invVR_mats[:, 0, 1]
+_oris = np.arctan2(_iv12s, _iv11s)  # outputs from -TAU/2 to TAU/2
+_oris[_oris &lt; 0] = _oris[_oris &lt; 0] + TAU  # map to 0 to TAU (keep coords)
+_oris = (-_oris) % TAU
+return _oris
+#else</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invVR_mats_shape">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invVR_mats_shape</tt><big>(</big><em>invVR_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invVR_mats_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invVR_mats_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts keypoint shape components</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.keypoint</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invVR_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">get_invVR_mats_shape</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">oq9o@yqhtgloy58!</span>
+</pre></div>
+</div>
+<p>#CYTH_INLINE
+#if CYTH
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=3] invVR_mats</div></blockquote>
+<dl class="docutils">
+<dt>cdef:</dt>
+<dd>np.ndarray[np.float64_t, ndim=1] _iv11s
+np.ndarray[np.float64_t, ndim=1] _iv12s
+np.ndarray[np.float64_t, ndim=1] _iv21s
+np.ndarray[np.float64_t, ndim=1] _iv22s
+#double [:] _iv11s
+#double [:] _iv12s
+#double [:] _iv21s
+#double [:] _iv22s</dd>
+</dl>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invVR_mats_sqrd_scale">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invVR_mats_sqrd_scale</tt><big>(</big><em>invVR_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invVR_mats_sqrd_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invVR_mats_sqrd_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the squared scale of the invVR keyponts</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.keypoint</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invVR_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">get_invVR_mats_sqrd_scale</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">1i468l@838vatv@4</span>
+</pre></div>
+</div>
+<p>#CYTH_INLINE
+#CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=3] invVR_mats</div></blockquote>
+<p>#if CYTH
+cdef unsigned int nMats = invVR_mats.shape[0]
+# Prealloc output
+cdef np.ndarray[np.float64_t, ndim=1] out = np.zeros((nMats,), dtype=np.float64)
+#cdef size_t ix
+cdef Py_ssize_t ix
+for ix in range(nMats):</p>
+<blockquote>
+<div><p># simple determinant: ad - bc
+out[ix] = ((invVR_mats[ix, 0, 0] * invVR_mats[ix, 1, 1]) -</p>
+<blockquote>
+<div>(invVR_mats[ix, 0, 1] * invVR_mats[ix, 1, 0]))</div></blockquote>
+</div></blockquote>
+<p>return out
+#else</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invVR_mats_xys">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invVR_mats_xys</tt><big>(</big><em>invVR_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invVR_mats_xys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invVR_mats_xys" title="Permalink to this definition">¶</a></dt>
+<dd><p>extracts xys from matrix encoding
+#if CYTH
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=3] invVR_mats</div></blockquote>
+<dl class="docutils">
+<dt>cdef:</dt>
+<dd>np.ndarray[np.float64_t, ndim=2] _xys</dd>
+</dl>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invV_mats">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invV_mats</tt><big>(</big><em>kpts</em>, <em>with_trans=False</em>, <em>with_ori=False</em>, <em>ashomog=False</em>, <em>ascontiguous=False</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invV_mats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invV_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>packs keypoint shapes into affine invV matrixes
+(default is just the 2x2 shape. But translation, orientation,
+homogonous, and contiguous flags can be set.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invV_mats2x2">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invV_mats2x2</tt><big>(</big><em>kpts</em>, <em>with_ori=False</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invV_mats2x2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invV_mats2x2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns keypoint shape matrixes
+(default orientation is down)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invV_xy_axis_extents">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invV_xy_axis_extents</tt><big>(</big><em>invV_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invV_xy_axis_extents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invV_xy_axis_extents" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets the scales of the major and minor elliptical axis.
+from invV_mats (faster)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_invVs">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_invVs</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_invVs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_invVs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keypoint shapes (oriented with the gravity vector)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_kpts_bounds">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_kpts_bounds</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_kpts_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_kpts_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the width and height of keypoint bounding box</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_kpts_strs">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_kpts_strs</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_kpts_strs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_kpts_strs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_ori_mats">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_ori_mats</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_ori_mats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_ori_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns keypoint orientation matrixes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_ori_strs">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_ori_strs</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_ori_strs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_ori_strs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_oris">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_oris</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_oris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_oris" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keypoint orientations
+(in isotropic guassian space relative to the gravity vector)
+(in simpler words: the orientation is is taken from keypoints warped to the unit circle)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_scales">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_scales</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_scales"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_scales" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets average scale (does not take into account elliptical shape</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_shape_strs">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_shape_strs</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_shape_strs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_shape_strs" title="Permalink to this definition">¶</a></dt>
+<dd><p>strings debugging and output</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_sqrd_scales">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_sqrd_scales</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_sqrd_scales"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_sqrd_scales" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets average squared scale (does not take into account elliptical shape</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_xy_axis_extents">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_xy_axis_extents</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_xy_axis_extents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_xy_axis_extents" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets the scales of the major and minor elliptical axis
+from kpts (slower due to conversion to invV_mats)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_xy_strs">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_xy_strs</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_xy_strs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_xy_strs" title="Permalink to this definition">¶</a></dt>
+<dd><p>strings debugging and output</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.get_xys">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">get_xys</tt><big>(</big><em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#get_xys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.get_xys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keypoint locations in chip space</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.invert_invV_mats">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">invert_invV_mats</tt><big>(</big><em>invV_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#invert_invV_mats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.invert_invV_mats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.offset_kpts">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">offset_kpts</tt><big>(</big><em>kpts</em>, <em>offset=(0.0</em>, <em>0.0)</em>, <em>scale_factor=1.0</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#offset_kpts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.offset_kpts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.rectify_invV_mats_are_up">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">rectify_invV_mats_are_up</tt><big>(</big><em>invVR_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#rectify_invV_mats_are_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.rectify_invV_mats_are_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Useful if invVR_mats is no longer lower triangular
+rotates affine shape matrixes into downward (lower triangular) position</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.keypoint</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invVR_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">rectify_invV_mats_are_up</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">2wir&amp;6ybcga0bpvz</span>
+</pre></div>
+</div>
+<p>#if CYTH
+# TODO: Template this for [float64_t, float32_t]
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=3] invVR_mats</div></blockquote>
+<dl class="docutils">
+<dt>cdef:</dt>
+<dd>np.ndarray[np.float64_t, ndim=3] invV_mats
+np.ndarray[np.float64_t, ndim=1] _oris
+np.ndarray[np.float64_t, ndim=1] _a
+np.ndarray[np.float64_t, ndim=1] _b
+np.ndarray[np.float64_t, ndim=1] _c
+np.ndarray[np.float64_t, ndim=1] _d
+np.ndarray[np.float64_t, ndim=1] <a href="#id7"><span class="problematic" id="id8">det_</span></a>
+np.ndarray[np.float64_t, ndim=1] b2a2
+np.ndarray[np.float64_t, ndim=1] iv11
+np.ndarray[np.float64_t, ndim=1] iv21
+np.ndarray[np.float64_t, ndim=1] iv22</dd>
+</dl>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.transform_kpts">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">transform_kpts</tt><big>(</big><em>kpts</em>, <em>M</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#transform_kpts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.transform_kpts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.keypoint.transform_kpts_to_imgspace">
+<tt class="descclassname">vtool.keypoint.</tt><tt class="descname">transform_kpts_to_imgspace</tt><big>(</big><em>kpts</em>, <em>bbox</em>, <em>bbox_theta</em>, <em>chipsz</em><big>)</big><a class="reference internal" href="_modules/vtool/keypoint.html#transform_kpts_to_imgspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.keypoint.transform_kpts_to_imgspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms keypoints so they are plotable in imagespace
+kpts   - xyacdo keypoints
+bbox   - chip bounding boxes in image space
+theta  - chip rotationsinvC
+chipsz - chip extent (in keypoint / chip space)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.linalg">
+<span id="vtool-linalg-module"></span><h2>vtool.linalg module<a class="headerlink" href="#module-vtool.linalg" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.linalg.L1">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">L1</tt><big>(</big><em>hist1</em>, <em>hist2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#L1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.L1" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns L1 (aka manhatten or grid) distance between two histograms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.L2">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">L2</tt><big>(</big><em>hist1</em>, <em>hist2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#L2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.L2" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns L2 (aka euclidean or standard) distance between two histograms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.L2_sqrd">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">L2_sqrd</tt><big>(</big><em>hist1</em>, <em>hist2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#L2_sqrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.L2_sqrd" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the squared L2 distance
+seealso L2
+Test:
+&gt;&gt;&gt; from vtool.linalg import *  # NOQA
+&gt;&gt;&gt; np.random.seed(53)
+&gt;&gt;&gt; hist1 = np.random.rand(1000, 2)
+&gt;&gt;&gt; hist2 = np.random.rand(1000, 2)
+&gt;&gt;&gt; output = L2_sqrd(hist1, hist2)
+&gt;&gt;&gt; print(utool.hashstr(output))
+v9wc&amp;brmvjy1as!z</p>
+<p>#CYTH_INLINE
+#CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] hist1
+np.ndarray[np.float64_t, ndim=2] hist2</div></blockquote>
+<p>#if CYTH
+cdef:</p>
+<blockquote>
+<div>size_t cx, rx</div></blockquote>
+<p>cdef unsigned int rows = hist1.shape[0]
+cdef unsigned int cols = hist1.shape[1]
+# Prealloc output
+cdef np.ndarray[np.float64_t, ndim=1] out = np.zeros((rows,), dtype=hist1.dtype)
+for rx in range(rows):</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>for cx in range(cols):</dt>
+<dd>out[rx] += (hist1[rx, cx] - hist2[rx, cx]) ** 2</dd>
+</dl>
+</div></blockquote>
+<p>return out
+#else</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.OLD_pdf_norm2d">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">OLD_pdf_norm2d</tt><big>(</big><em>x_</em>, <em>y_</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#OLD_pdf_norm2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.OLD_pdf_norm2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRICATED</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.and_3lists">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">and_3lists</tt><big>(</big><em>arr1</em>, <em>arr2</em>, <em>arr3</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#and_3lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.and_3lists" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.linalg</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">53</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr2</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr3</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">and_3lists</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">arr3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">prxuyy1w%ht57jaf</span>
+</pre></div>
+</div>
+<p>#if CYTH
+#CYTH_INLINE
+cdef:</p>
+<blockquote>
+<div>np.ndarray arr1
+np.ndarray arr2
+np.ndarray arr3</div></blockquote>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.and_lists">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">and_lists</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#and_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.and_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like np.logical_and, but can take more than 2 arguments</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.axiswise_operation2">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">axiswise_operation2</tt><big>(</big><em>arr1</em>, <em>arr2</em>, <em>op</em>, <em>axis=0</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#axiswise_operation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.axiswise_operation2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply opperation to each row</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">arr1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">128</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr2</span> <span class="o">=</span> <span class="n">vecs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>performs an operation between an
+(N x A x B ... x Z) array with an
+(N x 1) array</p>
+<p>%timeit op(arr1, arr2[np.newaxis, :])
+%timeit op(arr1, arr2[None, :])
+%timeit op(arr1, arr2.reshape(1, arr2.shape[0]))
+arr2.shape = (1, arr2.shape[0])
+%timeit op(arr1, arr2)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.colwise_operation">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">colwise_operation</tt><big>(</big><em>arr1</em>, <em>arr2</em>, <em>op</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#colwise_operation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.colwise_operation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.compare_matrix_columns">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">compare_matrix_columns</tt><big>(</big><em>matrix</em>, <em>columns</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#compare_matrix_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.compare_matrix_columns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.compare_matrix_to_rows">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">compare_matrix_to_rows</tt><big>(</big><em>row_matrix</em>, <em>row_list</em>, <em>comp_op=&lt;ufunc 'equal'&gt;</em>, <em>logic_op=&lt;ufunc 'logical_or'&gt;</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#compare_matrix_to_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.compare_matrix_to_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares each row in row_list to each row in row matrix using comp_op
+Both must have the same number of columns.
+Performs logic_op on the results of each individual row</p>
+<p>compop   = np.equal
+logic_op = np.logical_or</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.det_distance">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">det_distance</tt><big>(</big><em>det1</em>, <em>det2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#det_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.det_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns how far off determinants are from one another
+&gt;&gt;&gt; from vtool.linalg import *  # NOQA
+&gt;&gt;&gt; np.random.seed(53)
+&gt;&gt;&gt; det1 = np.random.rand(1000)
+&gt;&gt;&gt; det2 = np.random.rand(1000)
+&gt;&gt;&gt; output = det_distance(det1, det2)
+&gt;&gt;&gt; print(utool.hashstr(output))
+pfce!exwvqz8e1n!</p>
+<p>#CYTH_INLINE
+#CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=1] det1
+np.ndarray[np.float64_t, ndim=1] det2</div></blockquote>
+<p>#if CYTH
+# TODO: Move to ktool?
+cdef unsigned int nDets = det1.shape[0]
+# Prealloc output
+out = np.zeros((nDets,), dtype=det1.dtype)
+cdef size_t ix
+for ix in range(nDets):</p>
+<blockquote>
+<div><p># simple determinant: ad - bc
+if det1[ix] &gt; det2[ix]:</p>
+<blockquote>
+<div>out[ix] = det1[ix] / det2[ix]</div></blockquote>
+<dl class="docutils">
+<dt>else:</dt>
+<dd>out[ix] = det2[ix] / det1[ix]</dd>
+</dl>
+</div></blockquote>
+<p>return out
+#else</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.det_ltri">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">det_ltri</tt><big>(</big><em>ltri</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#det_ltri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.det_ltri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lower triangular determinant</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.dot_ltri">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">dot_ltri</tt><big>(</big><em>ltri1</em>, <em>ltri2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#dot_ltri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.dot_ltri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lower triangular dot product</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.gauss2d_pdf">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">gauss2d_pdf</tt><big>(</big><em>x_</em>, <em>y_</em>, <em>sigma=None</em>, <em>mu=None</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#gauss2d_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.gauss2d_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Input: x and y coordinate of a 2D gaussian</dt>
+<dd>sigma, mu - covariance and mean vector</dd>
+</dl>
+<p>Output: The probability density at that point</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.hist_isect">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">hist_isect</tt><big>(</big><em>hist1</em>, <em>hist2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#hist_isect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.hist_isect" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns histogram intersection distance between two histograms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.homogonize">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">homogonize</tt><big>(</big><em>_xyzs</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#homogonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.homogonize" title="Permalink to this definition">¶</a></dt>
+<dd><p>normalizes 3d homogonous coordinates into 2d coordinates</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.inv_ltri">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">inv_ltri</tt><big>(</big><em>ltri</em>, <em>det</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#inv_ltri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.inv_ltri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lower triangular inverse</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.nearest_point">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">nearest_point</tt><big>(</big><em>x</em>, <em>y</em>, <em>pts</em>, <em>mode='random'</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#nearest_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.nearest_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>finds the nearest point(s) in pts to (x, y)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.normalize_rows">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">normalize_rows</tt><big>(</big><em>arr1</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#normalize_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.normalize_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>from vtool.linalg import *</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.ori_distance">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">ori_distance</tt><big>(</big><em>ori1</em>, <em>ori2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#ori_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.ori_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns how far off determinants are from one another
+&gt;&gt;&gt; from vtool.linalg import *  # NOQA
+&gt;&gt;&gt; np.random.seed(53)
+&gt;&gt;&gt; ori1 = (np.random.rand(1000) * TAU) - np.pi
+&gt;&gt;&gt; ori2 = (np.random.rand(1000) * TAU) - np.pi
+&gt;&gt;&gt; output = utool.hashstr(utool.hashstr(ori_distance(ori1, ori2)))
+&gt;&gt;&gt; print(utool.hashstr(output))
+!755pt!alrfgshiu</p>
+<p>#if CYTH
+#CYTH_INLINE
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray ori1
+np.ndarray ori2</div></blockquote>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.profile">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">profile</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#vtool.linalg.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>#if CYTH
+cdef np.float64_t TAU = 2 * np.pi
+#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rotation_around_bbox_mat3x3">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rotation_around_bbox_mat3x3</tt><big>(</big><em>theta</em>, <em>bbox</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rotation_around_bbox_mat3x3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rotation_around_bbox_mat3x3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rotation_around_mat3x3">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rotation_around_mat3x3</tt><big>(</big><em>theta</em>, <em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rotation_around_mat3x3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rotation_around_mat3x3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rotation_mat2x2">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rotation_mat2x2</tt><big>(</big><em>theta</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rotation_mat2x2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rotation_mat2x2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rotation_mat3x3">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rotation_mat3x3</tt><big>(</big><em>radians</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rotation_mat3x3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rotation_mat3x3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rowwise_division">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rowwise_division</tt><big>(</big><em>arr1</em>, <em>arr2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rowwise_division"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rowwise_division" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rowwise_operation">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rowwise_operation</tt><big>(</big><em>arr1</em>, <em>arr2</em>, <em>op</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rowwise_operation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rowwise_operation" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRICATE, numpy has better ways of doing this.
+Is the rowwise name correct? Should it be colwise?</p>
+<p>performs an operation between an
+(N x A x B ... x Z) array with an
+(N x 1) array</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.rowwise_oridist">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">rowwise_oridist</tt><big>(</big><em>arr1</em>, <em>arr2</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#rowwise_oridist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.rowwise_oridist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.scale_mat3x3">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">scale_mat3x3</tt><big>(</big><em>sx</em>, <em>sy=None</em>, <em>dtype=&lt;type 'numpy.float64'&gt;</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#scale_mat3x3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.scale_mat3x3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.scaleedoffset_mat3x3">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">scaleedoffset_mat3x3</tt><big>(</big><em>offset</em>, <em>scale_factor</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#scaleedoffset_mat3x3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.scaleedoffset_mat3x3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.svd">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">svd</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#svd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.svd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.translation_mat3x3">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">translation_mat3x3</tt><big>(</big><em>x</em>, <em>y</em>, <em>dtype=&lt;type 'numpy.float64'&gt;</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#translation_mat3x3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.translation_mat3x3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.linalg.whiten_xy_points">
+<tt class="descclassname">vtool.linalg.</tt><tt class="descname">whiten_xy_points</tt><big>(</big><em>xy_m</em><big>)</big><a class="reference internal" href="_modules/vtool/linalg.html#whiten_xy_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.linalg.whiten_xy_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>whitens points to mean=0, stddev=1 and returns transformation
+&gt;&gt;&gt; from vtool.linalg import *  # NOQA
+&gt;&gt;&gt; from vtool.tests import dummy
+&gt;&gt;&gt; xy_m = dummy.get_dummy_xy()
+&gt;&gt;&gt; tup = whiten_xy_points(xy_m)
+&gt;&gt;&gt; xy_norm, T = tup
+&gt;&gt;&gt; print(utool.hashstr(tup))
+wg%mpai0hxvil4p2</p>
+<p>#CYTH_INLINE
+#if CYTH
+cdef:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] xy_m
+np.ndarray[np.float64_t, ndim=1] mu_xy
+np.ndarray[np.float64_t, ndim=1] std_xy
+np.ndarray[np.float64_t, ndim=2] T
+np.float64_t tx, ty, sx, sy
+np.ndarray[np.float64_t, ndim=2] xy_norm</div></blockquote>
+<p>#endif</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.math">
+<span id="vtool-math-module"></span><h2>vtool.math module<a class="headerlink" href="#module-vtool.math" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vtool.nearest_neighbors">
+<span id="vtool-nearest-neighbors-module"></span><h2>vtool.nearest_neighbors module<a class="headerlink" href="#module-vtool.nearest_neighbors" title="Permalink to this headline">¶</a></h2>
+<p>Wrapper around flann (with caching)</p>
+<p>python -c &#8220;import vtool, doctest; print(doctest.testmod(vtool.nearest_neighbors))&#8221;</p>
+<dl class="function">
+<dt id="vtool.nearest_neighbors.ann_flann_once">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">ann_flann_once</tt><big>(</big><em>dpts</em>, <em>qpts</em>, <em>num_neighbors</em>, <em>flann_params={}</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#ann_flann_once"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.ann_flann_once" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the approximate nearest neighbors of qpts in dpts
+&gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA
+&gt;&gt;&gt; np.random.seed(1)
+&gt;&gt;&gt; dpts = np.random.randint(0, 255, (10, 128)).astype(np.uint8)
+&gt;&gt;&gt; qpts = np.random.randint(0, 255, (10, 128)).astype(np.uint8)
+&gt;&gt;&gt; qx2_dx, qx2_dist = ann_flann_once(dpts, qpts, 2)
+&gt;&gt;&gt; print(utool.hashstr(repr((qx2_dx, qx2_dist))))
+8zdwd&amp;q0mu+ez4gp</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.assign_to_centroids">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">assign_to_centroids</tt><big>(</big><em>dpts</em>, <em>qpts</em>, <em>num_neighbors=1</em>, <em>flann_params={}</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#assign_to_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.assign_to_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for akmeans</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.flann_augment">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">flann_augment</tt><big>(</big><em>dpts</em>, <em>new_dpts</em>, <em>cache_dir</em>, <em>cfgstr</em>, <em>new_cfgstr</em>, <em>flann_params</em>, <em>use_cache=True</em>, <em>save=True</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#flann_augment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.flann_augment" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.nearest_neighbors</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vtool.tests.dummy</span> <span class="kn">as</span> <span class="nn">dummy</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dpts</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">get_dummy_dpts</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">get_nth_prime</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_dpts</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">get_dummy_dpts</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">get_nth_prime</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache_dir</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">get_app_resource_dir</span><span class="p">(</span><span class="s">&#39;vtool&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfgstr</span> <span class="o">=</span> <span class="s">&#39;_testcfg&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_cfgstr</span> <span class="o">=</span> <span class="s">&#39;_new_testcfg&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flann_params</span> <span class="o">=</span> <span class="n">get_kdtree_flann_params</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">use_cache</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">save</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.flann_cache">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">flann_cache</tt><big>(</big><em>dpts</em>, <em>cache_dir='default'</em>, <em>cfgstr=''</em>, <em>flann_params={}</em>, <em>use_cache=True</em>, <em>save=True</em>, <em>use_params_hash=True</em>, <em>use_data_hash=True</em>, <em>appname='vtool'</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#flann_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.flann_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries to load a cached flann index before doing anything
+from vtool.nn</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.get_flann_cfgstr">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">get_flann_cfgstr</tt><big>(</big><em>dpts</em>, <em>flann_params</em>, <em>cfgstr=''</em>, <em>use_params_hash=True</em>, <em>use_data_hash=True</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#get_flann_cfgstr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.get_flann_cfgstr" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.nearest_neighbors</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">128</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache_dir</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfgstr</span> <span class="o">=</span> <span class="s">&#39;_FEAT(alg=heshes)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flann_params</span> <span class="o">=</span> <span class="n">get_kdtree_flann_params</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">get_flann_cfgstr</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">))</span>
+<span class="go">_FEAT(alg=heshes)_FLANN(4kdtree)_DPTS((10,128)b+oqb%cnuo&amp;oxk7h)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.get_flann_fpath">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">get_flann_fpath</tt><big>(</big><em>dpts</em>, <em>cache_dir='default'</em>, <em>cfgstr=''</em>, <em>flann_params={}</em>, <em>use_params_hash=True</em>, <em>use_data_hash=True</em>, <em>appname='vtool'</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#get_flann_fpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.get_flann_fpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns filepath for flann index</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.get_kdtree_flann_params">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">get_kdtree_flann_params</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#get_kdtree_flann_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.get_kdtree_flann_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.invertable_stack">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">invertable_stack</tt><big>(</big><em>vecs_list</em>, <em>label_list</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#invertable_stack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.invertable_stack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stacks descriptors into a flat structure and returns inverse mapping from
+flat database descriptor indexes (dx) to annotation ids (label) and feature
+indexes (fx). Feature indexes are w.r.t. annotation indexes.</p>
+<dl class="docutils">
+<dt>Output:</dt>
+<dd>idx2_desc - flat descriptor stack
+idx2_label  - inverted index into annotations
+idx2_fx   - inverted index into features</dd>
+</dl>
+<p># Example with 2D Descriptors
+&gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA
+&gt;&gt;&gt; DESC_TYPE = np.uint8
+&gt;&gt;&gt; label_list  = [1, 2, 3, 4, 5]
+&gt;&gt;&gt; vecs_list = [
+...     np.array([[0, 0], [0, 1]], dtype=DESC_TYPE),
+...     np.array([[5, 3], [2, 30], [1, 1]], dtype=DESC_TYPE),
+...     np.empty((0, 2), dtype=DESC_TYPE),
+...     np.array([[5, 3], [2, 30], [1, 1]], dtype=DESC_TYPE),
+...     np.array([[3, 3], [42, 42], [2, 6]], dtype=DESC_TYPE),
+...     ]
+&gt;&gt;&gt; idx2_vec, idx2_label, idx2_fx = invertable_stack(vecs_list, label_list)
+&gt;&gt;&gt; print(repr(idx2_vec.T))
+array([[ 0,  0,  5,  2,  1,  5,  2,  1,  3, 42,  2],</p>
+<blockquote>
+<div>[ 0,  1,  3, 30,  1,  3, 30,  1,  3, 42,  6]], dtype=uint8)</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">idx2_label</span><span class="p">))</span>
+<span class="go">array([1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 5])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">idx2_fx</span><span class="p">))</span>
+<span class="go">array([0, 1, 0, 1, 2, 0, 1, 2, 0, 1, 2])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.nearest_neighbors.tune_flann">
+<tt class="descclassname">vtool.nearest_neighbors.</tt><tt class="descname">tune_flann</tt><big>(</big><em>dpts</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/vtool/nearest_neighbors.html#tune_flann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.nearest_neighbors.tune_flann" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vtool.patch">
+<span id="vtool-patch-module"></span><h2>vtool.patch module<a class="headerlink" href="#module-vtool.patch" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.patch.find_kpts_direction">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">find_kpts_direction</tt><big>(</big><em>imgBGR</em>, <em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#find_kpts_direction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.find_kpts_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.gaussian_patch">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">gaussian_patch</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#gaussian_patch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.gaussian_patch" title="Permalink to this definition">¶</a></dt>
+<dd><p>It is essential that this function is cached!</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.get_orientation_histogram">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">get_orientation_histogram</tt><big>(</big><em>gori</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#get_orientation_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.get_orientation_histogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.get_unwarped_patches">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">get_unwarped_patches</tt><big>(</big><em>chip</em>, <em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#get_unwarped_patches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.get_unwarped_patches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns cropped unwarped patch around a keypoint</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.get_warped_patch">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">get_warped_patch</tt><big>(</big><em>imgBGR</em>, <em>kp</em>, <em>gray=False</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#get_warped_patch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.get_warped_patch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.get_warped_patches">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">get_warped_patches</tt><big>(</big><em>chip</em>, <em>kpts</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#get_warped_patches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.get_warped_patches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns warped patch around a keypoint</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.patch_gradient">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">patch_gradient</tt><big>(</big><em>patch</em>, <em>ksize=1</em>, <em>gaussian_weighted=True</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#patch_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.patch_gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.patch_mag">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">patch_mag</tt><big>(</big><em>gradx</em>, <em>grady</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#patch_mag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.patch_mag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.patch.patch_ori">
+<tt class="descclassname">vtool.patch.</tt><tt class="descname">patch_ori</tt><big>(</big><em>gradx</em>, <em>grady</em><big>)</big><a class="reference internal" href="_modules/vtool/patch.html#patch_ori"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.patch.patch_ori" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns patch orientation relative to the x-axis</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.segmentation">
+<span id="vtool-segmentation-module"></span><h2>vtool.segmentation module<a class="headerlink" href="#module-vtool.segmentation" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.segmentation.clean_mask">
+<tt class="descclassname">vtool.segmentation.</tt><tt class="descname">clean_mask</tt><big>(</big><em>mask</em>, <em>num_dilate=3</em>, <em>num_erode=3</em>, <em>window_frac=0.025</em><big>)</big><a class="reference internal" href="_modules/vtool/segmentation.html#clean_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.segmentation.clean_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean the mask
+(num_erode, num_dilate) = (1, 1)
+(w, h) = (10, 10)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.segmentation.fill_holes">
+<tt class="descclassname">vtool.segmentation.</tt><tt class="descname">fill_holes</tt><big>(</big><em>mask</em><big>)</big><a class="reference internal" href="_modules/vtool/segmentation.html#fill_holes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.segmentation.fill_holes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.segmentation.grabcut">
+<tt class="descclassname">vtool.segmentation.</tt><tt class="descname">grabcut</tt><big>(</big><em>rgb_chip</em><big>)</big><a class="reference internal" href="_modules/vtool/segmentation.html#grabcut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.segmentation.grabcut" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.segmentation.printDBG">
+<tt class="descclassname">vtool.segmentation.</tt><tt class="descname">printDBG</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/vtool/segmentation.html#printDBG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.segmentation.printDBG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.segmentation.resize_img_and_bbox">
+<tt class="descclassname">vtool.segmentation.</tt><tt class="descname">resize_img_and_bbox</tt><big>(</big><em>img_fpath</em>, <em>bbox_</em>, <em>new_size=None</em>, <em>sqrt_area=400.0</em><big>)</big><a class="reference internal" href="_modules/vtool/segmentation.html#resize_img_and_bbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.segmentation.resize_img_and_bbox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="vtool.segmentation.segment">
+<tt class="descclassname">vtool.segmentation.</tt><tt class="descname">segment</tt><big>(</big><em>img_fpath</em>, <em>bbox_</em>, <em>new_size=None</em><big>)</big><a class="reference internal" href="_modules/vtool/segmentation.html#segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.segmentation.segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs grabcut</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.spatial_verification">
+<span id="vtool-spatial-verification-module"></span><h2>vtool.spatial_verification module<a class="headerlink" href="#module-vtool.spatial_verification" title="Permalink to this headline">¶</a></h2>
+<p>python -c &#8220;import vtool, doctest; print(doctest.testmod(vtool.spatial_verification))&#8221;</p>
+<p>Spatial verification of keypoint matches</p>
+<dl class="docutils">
+<dt>Notation::</dt>
+<dd>1_m = img1_matches; 2_m = img2_matches
+x and y are locations, invV is the elliptical shapes.
+fx are the original feature indexes (used for making sure 1 keypoint isn&#8217;t assigned to 2)</dd>
+<dt>Look Into::</dt>
+<dd>Standard
+skimage.transform
+<a class="reference external" href="http://stackoverflow.com/questions/11462781/fast-2d-rigid-body-transformations-in-numpy-scipy">http://stackoverflow.com/questions/11462781/fast-2d-rigid-body-transformations-in-numpy-scipy</a>
+skimage.transform.fast_homography(im, H)</dd>
+</dl>
+<dl class="function">
+<dt id="vtool.spatial_verification.build_lstsqrs_Mx9">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">build_lstsqrs_Mx9</tt><big>(</big><em>xy1_mn</em>, <em>xy2_mn</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#build_lstsqrs_Mx9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.build_lstsqrs_Mx9" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds the M x 9 least squares matrix</p>
+<p class="rubric">Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.spatial_verification</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vtool.tests.dummy</span> <span class="kn">as</span> <span class="nn">dummy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">get_dummy_kpts_pair</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xy1_mn</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_xys</span><span class="p">(</span><span class="n">kpts1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xy2_mn</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_xys</span><span class="p">(</span><span class="n">kpts2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mx9</span> <span class="o">=</span> <span class="n">build_lstsqrs_Mx9</span><span class="p">(</span><span class="n">xy1_mn</span><span class="p">,</span> <span class="n">xy2_mn</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">Mx9</span><span class="p">))</span>
+<span class="go">f@2l62+2!ppow8yw</span>
+</pre></div>
+</div>
+<p>#CYTH_RETURNS np.ndarray[np.float64_t, ndim=2]
+#if CYTH
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] xy1_mn
+np.ndarray[np.float64_t, ndim=2] xy2_mn
+np.ndarray[np.float64_t, ndim=1] x1_mn, y1_mn,  x2_mn, y2_mn
+np.ndarray[np.float64_t, ndim=2] Mx9</div></blockquote>
+<dl class="docutils">
+<dt>cdef:</dt>
+<dd>Py_ssize_t num_pts
+Py_ssize_t ix</dd>
+</dl>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.compute_homog">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">compute_homog</tt><big>(</big><em>xy1_mn</em>, <em>xy2_mn</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#compute_homog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.compute_homog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate 6 degrees of freedom homography transformation
+Computes homography from normalized (0 to 1) point correspondences
+from 2 &#8211;&gt; 1</p>
+<p class="rubric">Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.spatial_verification</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vtool.tests.dummy</span> <span class="kn">as</span> <span class="nn">dummy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vtool.keypoint</span> <span class="kn">as</span> <span class="nn">ktool</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">get_dummy_kpts_pair</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xy1_mn</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_xys</span><span class="p">(</span><span class="n">kpts1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xy2_mn</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_xys</span><span class="p">(</span><span class="n">kpts2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">compute_homog</span><span class="p">(</span><span class="n">xy1_mn</span><span class="p">,</span> <span class="n">xy2_mn</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">xosv18ps9u78@o0u</span>
+</pre></div>
+</div>
+<p>#CYTH_RETURNS np.ndarray[np.float64_t, ndim=2]
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] xy1_mn
+np.ndarray[np.float64_t, ndim=2] xy2_mn</div></blockquote>
+<p>#if CYTH
+cdef:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] Mx9</div></blockquote>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.determine_best_inliers">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">determine_best_inliers</tt><big>(</big><em>inliers_list</em>, <em>errors_list</em>, <em>Aff_mats</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#determine_best_inliers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.determine_best_inliers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Currently this function just uses the number of inliers as a metric</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.get_affine_inliers">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">get_affine_inliers</tt><big>(</big><em>kpts1</em>, <em>kpts2</em>, <em>fm</em>, <em>xy_thresh_sqrd</em>, <em>scale_thresh_sqrd</em>, <em>ori_thresh</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#get_affine_inliers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.get_affine_inliers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates inliers deterministically using elliptical shapes
+Compute all transforms from kpts1 to kpts2 (enumerate all hypothesis)
+We transform from chip1 -&gt; chip2
+The determinants are squared keypoint scales</p>
+<p class="rubric">Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vtool.spatial_verification</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c"># NOQA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vtool.tests.dummy</span> <span class="kn">as</span> <span class="nn">dummy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">vtool.keypoint</span> <span class="kn">as</span> <span class="nn">ktool</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">get_dummy_kpts_pair</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fm</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">.</span><span class="n">make_dummy_fm</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kpts1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xy_thresh_sqrd</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">(</span><span class="o">.</span><span class="mo">00</span><span class="mi">9</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scale_thresh_sqrd</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ori_thresh</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">KPTS_DTYPE</span><span class="p">(</span><span class="n">TAU</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span> <span class="o">=</span> <span class="n">get_affine_inliers</span><span class="p">(</span><span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">fm</span><span class="p">,</span> <span class="n">xy_thresh_sqrd</span><span class="p">,</span> <span class="n">scale_thresh_sqrd</span><span class="p">,</span> <span class="n">ori_thresh</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">utool</span><span class="o">.</span><span class="n">hashstr</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="go">kfvy0iej+56akeb6</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>FROM PERDOCH 2009::</dt>
+<dd>H = inv(Aj).dot(Rj.T).dot(Ri).dot(Ai)
+H = inv(Aj).dot(Ai)
+The input invVs = perdoch.invA&#8217;s</dd>
+</dl>
+<p>#if CYTH
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] kpts1
+np.ndarray[np.float64_t, ndim=2] kpts2
+np.ndarray[np.int64_t, ndim=2] fm
+np.float64_t xy_thresh_sqrd
+np.float64_t scale_thresh_sqrd
+np.float64_t ori_thresh</div></blockquote>
+<dl class="docutils">
+<dt>cdef:</dt>
+<dd>np.ndarray[np.float64_t, ndim=2] kpts1_m
+np.ndarray[np.float64_t, ndim=2] kpts2_m
+np.ndarray[np.float64_t, ndim=3] invVR1s_m
+np.ndarray[np.float64_t, ndim=3] V1s_m
+np.ndarray[np.float64_t, ndim=3] invVR2s_m
+np.ndarray[np.float64_t, ndim=3] Aff_mats
+np.ndarray[np.float64_t, ndim=2] xy2_m
+np.ndarray[np.float64_t, ndim=1] det2_m
+np.ndarray[np.float64_t, ndim=1] ori2_m
+np.ndarray[np.float64_t, ndim=2] Aff
+tuple tup
+list inliers_and_errors_list
+list errors_list</dd>
+</dl>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.get_best_affine_inliers">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">get_best_affine_inliers</tt><big>(</big><em>kpts1</em>, <em>kpts2</em>, <em>fm</em>, <em>xy_thresh_sqrd</em>, <em>scale_thresh</em>, <em>ori_thresh</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#get_best_affine_inliers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.get_best_affine_inliers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests each hypothesis and returns only the best transformation and inliers
+#if CYTH
+#CYTH_PARAM_TYPES:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=2] kpts1
+np.ndarray[np.float64_t, ndim=2] kpts2
+np.ndarray[np.int64_t, ndim=2] fm
+np.float64_t xy_thresh_sqrd
+np.float64_t scale_thresh_sqrd
+np.float64_t ori_thresh</div></blockquote>
+<dl class="docutils">
+<dt>cdef:</dt>
+<dd>list inliers_list
+list aff_inliers
+list Aff_mats
+list errors_list</dd>
+</dl>
+<p>#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.get_homography_inliers">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">get_homography_inliers</tt><big>(</big><em>kpts1</em>, <em>kpts2</em>, <em>fm</em>, <em>aff_inliers</em>, <em>xy_thresh_sqrd</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#get_homography_inliers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.get_homography_inliers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a set of hypothesis inliers, computes a homography and refines inliers</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.profile">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">profile</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#vtool.spatial_verification.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>#if CYTH
+#ctypedef np.float64_t SV_DTYPE
+SV_DTYPE = np.float64
+cdef np.float64_t TAU
+#endif</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="vtool.spatial_verification.spatial_verification">
+<tt class="descclassname">vtool.spatial_verification.</tt><tt class="descname">spatial_verification</tt><big>(</big><em>kpts1</em>, <em>kpts2</em>, <em>fm</em>, <em>xy_thresh</em>, <em>scale_thresh</em>, <em>ori_thresh</em>, <em>dlen_sqrd2=None</em>, <em>min_num_inliers=4</em><big>)</big><a class="reference internal" href="_modules/vtool/spatial_verification.html#spatial_verification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.spatial_verification.spatial_verification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver function
+Spatially validates feature matches</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(homog_inliers, H, aff_inliers, Aff) if sucess else None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool.trig">
+<span id="vtool-trig-module"></span><h2>vtool.trig module<a class="headerlink" href="#module-vtool.trig" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="vtool.trig.atan2">
+<tt class="descclassname">vtool.trig.</tt><tt class="descname">atan2</tt><big>(</big><em>y</em>, <em>x</em><big>)</big><a class="reference internal" href="_modules/vtool/trig.html#atan2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vtool.trig.atan2" title="Permalink to this definition">¶</a></dt>
+<dd><p>does atan2 but returns from 0 to TAU
+&gt;&gt;&gt; from vtool.trig import *  # NOQA
+&gt;&gt;&gt; import utool
+&gt;&gt;&gt; np.random.seed(0)
+&gt;&gt;&gt; y = np.random.rand(1000).astype(np.float64)
+&gt;&gt;&gt; x = np.random.rand(1000).astype(np.float64)
+&gt;&gt;&gt; theta = atan2(y, x)
+&gt;&gt;&gt; assert np.all(theta &gt;= 0)
+&gt;&gt;&gt; assert np.all(theta &lt; 2 * np.pi)
+&gt;&gt;&gt; print(utool.hashstr(theta))
+go!su97%eo4qoyq7</p>
+<p>#CYTH_INLINE
+#if CYTH
+cdef:</p>
+<blockquote>
+<div>np.ndarray[np.float64_t, ndim=1] y
+np.ndarray[np.float64_t, ndim=1] x
+np.ndarray[np.float64_t, ndim=1] theta</div></blockquote>
+<p>#endif</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vtool">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vtool" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">vtool package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-vtool.chip">vtool.chip module</a></li>
+<li><a class="reference internal" href="#module-vtool.clustering">vtool.clustering module</a></li>
+<li><a class="reference internal" href="#module-vtool.clustering2">vtool.clustering2 module</a></li>
+<li><a class="reference internal" href="#module-vtool.ellipse">vtool.ellipse module</a></li>
+<li><a class="reference internal" href="#module-vtool.exif">vtool.exif module</a></li>
+<li><a class="reference internal" href="#module-vtool.geometry">vtool.geometry module</a></li>
+<li><a class="reference internal" href="#module-vtool.histogram">vtool.histogram module</a></li>
+<li><a class="reference internal" href="#module-vtool.image">vtool.image module</a></li>
+<li><a class="reference internal" href="#module-vtool.image_filters">vtool.image_filters module</a></li>
+<li><a class="reference internal" href="#module-vtool.keypoint">vtool.keypoint module</a></li>
+<li><a class="reference internal" href="#module-vtool.linalg">vtool.linalg module</a></li>
+<li><a class="reference internal" href="#module-vtool.math">vtool.math module</a></li>
+<li><a class="reference internal" href="#module-vtool.nearest_neighbors">vtool.nearest_neighbors module</a></li>
+<li><a class="reference internal" href="#module-vtool.patch">vtool.patch module</a></li>
+<li><a class="reference internal" href="#module-vtool.segmentation">vtool.segmentation module</a></li>
+<li><a class="reference internal" href="#module-vtool.spatial_verification">vtool.spatial_verification module</a></li>
+<li><a class="reference internal" href="#module-vtool.trig">vtool.trig module</a></li>
+<li><a class="reference internal" href="#module-vtool">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to vtool&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="vtool.tests.html"
+                        title="next chapter">vtool.tests package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/vtool.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="vtool.tests.html" title="vtool.tests package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to vtool’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jon Crall.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
