@@ -79,3 +79,4 @@ run_cyth_benchmarks.py
 
 *.orig
 _doc
+test_times.txt
