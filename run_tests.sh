@@ -1,6 +1,9 @@
 """
 Runs all tests
 
+
+TODO: autogenerate tests with utool
+
 Bubble text from:
 http://patorjk.com/software/taag/#p=display&f=Cybermedium&t=VTOOL%20TESTS
 """
@@ -86,7 +89,7 @@ EOF
     RUN_TEST $VTOOL_DIR/tests/test_vtool.py 
     RUN_TEST $VTOOL_DIR/tests/test_akmeans.py 
     RUN_TEST $VTOOL_DIR/tests/test_spatial_verification.py --noshow 
-    RUN_TEST $VTOOL_DIR/tests/time_cythonized_funcs.py 
+    #RUN_TEST $VTOOL_DIR/tests/time_cythonized_funcs.py 
 fi
 
 
