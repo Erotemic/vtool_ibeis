@@ -82,3 +82,5 @@ _doc
 test_times.txt
 
 failed_doctests.txt
+vtool/libsver.dll
+vtool/libsver.dll.a
