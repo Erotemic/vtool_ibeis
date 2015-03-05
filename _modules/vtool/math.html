@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vtool.math &mdash; vtool 1.0.0.dev1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html"/>
+        <link rel="up" title="vtool" href="../vtool.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> vtool</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.chip">vtool.chip module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.clustering">vtool.clustering module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.clustering2">vtool.clustering2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.constrained_matching">vtool.constrained_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.coverage_grid">vtool.coverage_grid module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.coverage_kpts">vtool.coverage_kpts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.distance">vtool.distance module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.ellipse">vtool.ellipse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.exif">vtool.exif module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.features">vtool.features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.geometry">vtool.geometry module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.histogram">vtool.histogram module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.image">vtool.image module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.image_filters">vtool.image_filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.keypoint">vtool.keypoint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.linalg">vtool.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.matching">vtool.matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.math">vtool.math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.nearest_neighbors">vtool.nearest_neighbors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.other">vtool.other module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.patch">vtool.patch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.quality_classifier">vtool.quality_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.segmentation">vtool.segmentation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.spatial_verification">vtool.spatial_verification module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.sver_c_wrapper">vtool.sver_c_wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.test_constrained_matching">vtool.test_constrained_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.trig">vtool.trig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">vtool</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+          <li><a href="../vtool.html">vtool</a> &raquo;</li>
+      
+    <li>vtool.math</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for vtool.math</h1><div class="highlight"><pre>
+<span class="c"># LICENCE</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="kn">as</span> <span class="nn">ut</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[math]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+<span class="n">tau</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c"># References: tauday.com</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1E-9</span>
+
+
+<div class="viewcode-block" id="ensure_monotone_strictly_increasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.ensure_monotone_strictly_increasing">[docs]</a><span class="k">def</span> <span class="nf">ensure_monotone_strictly_increasing</span><span class="p">(</span><span class="n">arr_</span><span class="p">,</span> <span class="n">zerohack</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">onehack</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Breaks up streaks of equal values by interpolating between the next lowest and next highest value</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.math import *   # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; arr_ = np.array([0.4, 0.4, 0.4, 0.5, 0.6, 0.6, 0.6, 0.7, 0.9, 0.9, 0.91, 0.92, 1.0, 1.0])</span>
+<span class="sd">        &gt;&gt;&gt; zerohack = True</span>
+<span class="sd">        &gt;&gt;&gt; onehack = True</span>
+<span class="sd">        &gt;&gt;&gt; arr = ensure_monotone_strictly_increasing(arr_, zerohack, onehack)</span>
+<span class="sd">        &gt;&gt;&gt; assert strictly_increasing(arr), &#39;ensure strict monotonic failed&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#with ut.EmbedOnException():</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">ensure_monotone_increasing</span><span class="p">(</span><span class="n">arr_</span><span class="p">)</span>
+    <span class="c">#assert non_decreasing(arr), &#39;ensure monotonic failed&#39;</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">index_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c"># If there are no consecutive numbers then arr must be strictly</span>
+        <span class="c"># increasing</span>
+        <span class="k">return</span> <span class="n">arr</span>
+    <span class="n">consecutive_groups</span> <span class="o">=</span> <span class="n">group_consecutive</span><span class="p">(</span><span class="n">index_list</span><span class="p">)</span>
+    <span class="n">index_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">consecutive_groups</span><span class="p">]</span>
+
+    <span class="n">runlen_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">index_groups</span><span class="p">]</span>
+    <span class="c"># Handle ending corner case</span>
+    <span class="n">isend_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">group</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">index_groups</span><span class="p">]</span>
+    <span class="n">min_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>      <span class="k">if</span> <span class="n">isend</span> <span class="k">else</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">arr</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">/</span> <span class="mf">2.0</span>
+                <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">isend</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">index_groups</span><span class="p">,</span> <span class="n">isend_list</span><span class="p">)]</span>
+    <span class="n">max_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">isend</span> <span class="k">else</span> <span class="n">arr</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">isend</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">index_groups</span><span class="p">,</span> <span class="n">isend_list</span><span class="p">)]</span>
+    <span class="n">fill_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">len_</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="ow">not</span> <span class="n">isend</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">len_</span><span class="p">,</span> <span class="n">isend</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">min_vals</span><span class="p">,</span> <span class="n">max_vals</span><span class="p">,</span> <span class="n">runlen_list</span><span class="p">,</span> <span class="n">isend_list</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">fill</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">index_groups</span><span class="p">,</span> <span class="n">fill_list</span><span class="p">):</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">group</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+
+    <span class="k">if</span> <span class="n">zerohack</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_groups</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c"># Makes the first index 0 hopefully</span>
+        <span class="n">group_</span> <span class="o">=</span> <span class="n">index_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">group_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">group_</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">group_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">group_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">onehack</span><span class="p">:</span>
+        <span class="c"># Dont be so confident</span>
+        <span class="n">maxish</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="o">.</span><span class="mi">99</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">arr</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">newmax</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">maxish</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">arr</span> <span class="o">&gt;=</span> <span class="n">maxish</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">maxish</span><span class="p">,</span> <span class="n">newmax</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">arr</span> <span class="o">&gt;=</span> <span class="n">maxish</span><span class="p">))</span>
+    <span class="c">#assert strictly_increasing(arr), &#39;ensure strict monotonic failed&#39;</span>
+    <span class="c">#import utool as ut</span>
+    <span class="c">#print(ut.get_stats(arr))</span>
+    <span class="c">#if arr.max() == 1.0:</span>
+    <span class="c">#    ut.embed()</span>
+    <span class="k">return</span> <span class="n">arr</span>
+
+</div>
+<div class="viewcode-block" id="group_consecutive"><a class="viewcode-back" href="../../vtool.html#vtool.math.group_consecutive">[docs]</a><span class="k">def</span> <span class="nf">group_consecutive</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns lists of consecutive values</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/7352684/how-to-find-the-groups-of-consecutive-elements-from-an-array-in-numpy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="strictly_increasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.strictly_increasing">[docs]</a><span class="k">def</span> <span class="nf">strictly_increasing</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/4983258/python-how-to-check-list-monotonicity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+</div>
+<div class="viewcode-block" id="strictly_decreasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.strictly_decreasing">[docs]</a><span class="k">def</span> <span class="nf">strictly_decreasing</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/4983258/python-how-to-check-list-monotonicity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+</div>
+<div class="viewcode-block" id="non_increasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.non_increasing">[docs]</a><span class="k">def</span> <span class="nf">non_increasing</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/4983258/python-how-to-check-list-monotonicity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+</div>
+<div class="viewcode-block" id="non_decreasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.non_decreasing">[docs]</a><span class="k">def</span> <span class="nf">non_decreasing</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/4983258/python-how-to-check-list-monotonicity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+</div>
+<div class="viewcode-block" id="ensure_monotone_increasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.ensure_monotone_increasing">[docs]</a><span class="k">def</span> <span class="nf">ensure_monotone_increasing</span><span class="p">(</span><span class="n">arr_</span><span class="p">):</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">arr_</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="c"># Ensure increasing from right</span>
+    <span class="k">for</span> <span class="n">lx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span> <span class="o">-</span> <span class="n">lx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">rx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">rx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">rx</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">rx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c"># ensure increasing from left</span>
+    <span class="k">for</span> <span class="n">lx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">lx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">lx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">lx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">lx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">arr</span>
+
+</div>
+<div class="viewcode-block" id="ensure_monotone_decreasing"><a class="viewcode-back" href="../../vtool.html#vtool.math.ensure_monotone_decreasing">[docs]</a><span class="k">def</span> <span class="nf">ensure_monotone_decreasing</span><span class="p">(</span><span class="n">arr_</span><span class="p">):</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">arr_</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="c"># Ensure decreasing from right</span>
+    <span class="k">for</span> <span class="n">lx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span> <span class="o">-</span> <span class="n">lx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">rx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">rx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">rx</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">rx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c"># ensure increasing from left</span>
+    <span class="k">for</span> <span class="n">lx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">lx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">lx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">lx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">lx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">arr</span>
+
+</div>
+<div class="viewcode-block" id="test_language_modulus"><a class="viewcode-back" href="../../vtool.html#vtool.math.test_language_modulus">[docs]</a><span class="k">def</span> <span class="nf">test_language_modulus</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    References:</span>
+<span class="sd">        http://en.wikipedia.org/wiki/Modulo_operation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">math</span>
+    <span class="kn">import</span> <span class="nn">utool</span> <span class="kn">as</span> <span class="nn">ut</span>
+    <span class="n">TAU</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">num_list</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">29</span><span class="p">]</span>
+    <span class="n">modop_result_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fmod_result_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">num_list</span><span class="p">:</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+        <span class="n">modop_result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num</span> <span class="o">%</span> <span class="n">TAU</span><span class="p">)</span>
+        <span class="n">fmod_result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">fmod</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">TAU</span><span class="p">))</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">make_csv_table</span><span class="p">([</span><span class="n">num_list</span><span class="p">,</span> <span class="n">modop_result_list</span><span class="p">,</span> <span class="n">fmod_result_list</span><span class="p">],</span>
+                              <span class="p">[</span><span class="s">&#39;num&#39;</span><span class="p">,</span>  <span class="s">&#39;modop&#39;</span><span class="p">,</span> <span class="s">&#39;fmod&#39;</span><span class="p">],</span> <span class="s">&#39;mods&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="iceil"><a class="viewcode-back" href="../../vtool.html#vtool.math.iceil">[docs]</a><span class="k">def</span> <span class="nf">iceil</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Integer ceiling. (because numpy doesn&#39;t seem to have it!)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        num (ndarray or scalar):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray or scalar:</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.math --test-iceil</span>
+
+<span class="sd">    Example0:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from utool.util_alg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; num = 1.5</span>
+<span class="sd">        &gt;&gt;&gt; result = repr(vt.iceil(num))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        2</span>
+
+<span class="sd">    Example1:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from utool.util_alg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; num = [1.5, 2.9]</span>
+<span class="sd">        &gt;&gt;&gt; result = ut.numpy_str(vt.iceil(num))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        np.array([2, 3], dtype=np.int32)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="iround"><a class="viewcode-back" href="../../vtool.html#vtool.math.iround">[docs]</a><span class="k">def</span> <span class="nf">iround</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Integer round. (because numpy doesn&#39;t seem to have it!) &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+</div>
+<span class="n">TAU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="gauss_func1d"><a class="viewcode-back" href="../../vtool.html#vtool.math.gauss_func1d">[docs]</a><span class="k">def</span> <span class="nf">gauss_func1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        x (?):</span>
+<span class="sd">        mu (float):</span>
+<span class="sd">        sigma (float):</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.math --test-gauss_func1d</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.math import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; x = np.array([-2, -1, -.5, 0, .5, 1, 2])</span>
+<span class="sd">        &gt;&gt;&gt; mu = 0.0</span>
+<span class="sd">        &gt;&gt;&gt; sigma = 1.0</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; gaussval = gauss_func1d(x, mu, sigma)</span>
+<span class="sd">        &gt;&gt;&gt; if ut.show_was_requested():</span>
+<span class="sd">        &gt;&gt;&gt;     import plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt;     pt.plot(x, gaussval)</span>
+<span class="sd">        &gt;&gt;&gt;     pt.show_if_requested()</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; result = np.array_repr(gaussval, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        array([ 0.05,  0.24,  0.35,  0.4 ,  0.35,  0.24,  0.05])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">TAU</span><span class="p">))</span>
+    <span class="n">exponent_expr_numer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">exponent_expr_denom</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">exponent_expr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">exponent_expr_numer</span><span class="p">,</span> <span class="n">exponent_expr_denom</span><span class="p">)</span>
+    <span class="n">gaussval</span> <span class="o">=</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exponent_expr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gaussval</span>
+
+</div>
+<div class="viewcode-block" id="gauss_func1d_unnormalized"><a class="viewcode-back" href="../../vtool.html#vtool.math.gauss_func1d_unnormalized">[docs]</a><span class="k">def</span> <span class="nf">gauss_func1d_unnormalized</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    faster version of gauss_func1d with no normalization. So the maximum point</span>
+<span class="sd">    will have a value of 1.0</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.math import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; x = np.array([-2, -1, -.5, 0, .5, 1, 2])</span>
+<span class="sd">        &gt;&gt;&gt; sigma = 1.0</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; gaussval = gauss_func1d_unnormalized(x, sigma)</span>
+<span class="sd">        &gt;&gt;&gt; if ut.show_was_requested():</span>
+<span class="sd">        &gt;&gt;&gt;     import plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt;     pt.plot(x, gaussval)</span>
+<span class="sd">        &gt;&gt;&gt;     pt.show_if_requested()</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; result = np.array_repr(gaussval, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        array([ 0.05,  0.24,  0.35,  0.4 ,  0.35,  0.24,  0.05])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exponent_expr_denom</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">exponent_expr_numer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">exponent_expr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">exponent_expr_numer</span><span class="p">,</span> <span class="n">exponent_expr_denom</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="p">)</span>
+    <span class="n">gaussval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exponent_expr</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gaussval</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -c &quot;import utool, vtool.math; utool.doctest_funcs(vtool.math, allexamples=True)&quot;</span>
+<span class="sd">        python -c &quot;import utool, vtool.math; utool.doctest_funcs(vtool.math)&quot;</span>
+<span class="sd">        python -m vtool.math</span>
+<span class="sd">        python -m vtool.math --allexamples</span>
+<span class="sd">        python -m vtool.math --allexamples --noface --nosrc</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing</span>
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">freeze_support</span><span class="p">()</span>  <span class="c"># for win32</span>
+    <span class="kn">import</span> <span class="nn">utool</span> <span class="kn">as</span> <span class="nn">ut</span>  <span class="c"># NOQA</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">doctest_funcs</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jon Crall.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0.dev1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

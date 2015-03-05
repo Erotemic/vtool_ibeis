@@ -28,6 +28,14 @@ vtool.tests.test_akmeans module
     :undoc-members:
     :show-inheritance:
 
+vtool.tests.test_coverage_max_reduce module
+-------------------------------------------
+
+.. automodule:: vtool.tests.test_coverage_max_reduce
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vtool.tests.test_draw_keypoint module
 -------------------------------------
 
