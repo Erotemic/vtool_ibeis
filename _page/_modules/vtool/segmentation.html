@@ -1,59 +1,138 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>vtool.segmentation &mdash; vtool 1.0.0.dev1 documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '1.0.0.dev1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vtool.segmentation &mdash; vtool 1.0.0.dev1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html"/>
+        <link rel="up" title="vtool" href="../vtool.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> vtool</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.chip">vtool.chip module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.clustering">vtool.clustering module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.clustering2">vtool.clustering2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.constrained_matching">vtool.constrained_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.coverage_grid">vtool.coverage_grid module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.coverage_kpts">vtool.coverage_kpts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.distance">vtool.distance module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.ellipse">vtool.ellipse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.exif">vtool.exif module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.features">vtool.features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.geometry">vtool.geometry module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.histogram">vtool.histogram module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.image">vtool.image module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.image_filters">vtool.image_filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.keypoint">vtool.keypoint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.linalg">vtool.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.matching">vtool.matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.math">vtool.math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.nearest_neighbors">vtool.nearest_neighbors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.other">vtool.other module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.patch">vtool.patch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.quality_classifier">vtool.quality_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.segmentation">vtool.segmentation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.spatial_verification">vtool.spatial_verification module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.sver_c_wrapper">vtool.sver_c_wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.test_constrained_matching">vtool.test_constrained_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.trig">vtool.trig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">vtool</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+          <li><a href="../vtool.html">vtool</a> &raquo;</li>
+      
+    <li>vtool.segmentation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
             
   <h1>Source code for vtool.segmentation</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>  <span class="c"># NOQA</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">cv2</span>
-<span class="c"># Tools</span>
-<span class="kn">import</span> <span class="nn">utool</span>
-<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="kn">as</span> <span class="nn">ut</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span>
     <span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[seg]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
 <span class="n">DEBUG_SEGM</span> <span class="o">=</span> <span class="bp">False</span>
@@ -119,13 +198,127 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">drawContours</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">contours</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">out</span>
 
+</div>
+<div class="viewcode-block" id="demo_grabcut"><a class="viewcode-back" href="../../vtool.html#vtool.segmentation.demo_grabcut">[docs]</a><span class="k">def</span> <span class="nf">demo_grabcut</span><span class="p">(</span><span class="n">bgr_img</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        img (ndarray[uint8_t, ndim=2]):  image data</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.segmentation --test-demo_grabcut --show</span>
+
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.segmentation import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; import utool as ut</span>
+<span class="sd">        &gt;&gt;&gt; import plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; img_fpath = ut.grab_test_imgpath(&#39;easy1.png&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; bgr_img = vt.imread(img_fpath)</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; result = demo_grabcut(bgr_img)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        &gt;&gt;&gt; if ut.show_was_requested():</span>
+<span class="sd">        &gt;&gt;&gt;     pt.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">plottool</span> <span class="kn">as</span> <span class="nn">pt</span>
+    <span class="kn">from</span> <span class="nn">plottool</span> <span class="kn">import</span> <span class="n">interact_impaint</span>
+    <span class="n">label_colors</span> <span class="o">=</span> <span class="p">[</span>       <span class="mi">255</span><span class="p">,</span>           <span class="mi">170</span><span class="p">,</span>            <span class="mi">50</span><span class="p">,</span>          <span class="mi">0</span><span class="p">]</span>
+    <span class="n">label_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_FGD</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_FGD</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_BGD</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span><span class="p">]</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">bgr_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">init_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c"># Initialize: mask</span>
+    <span class="c"># Set inside to cv2.GC_PR_FGD (probably forground)</span>
+    <span class="n">init_mask</span><span class="p">[</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_BGD</span> <span class="o">*</span> <span class="n">label_colors</span><span class="p">[</span><span class="n">label_values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_BGD</span><span class="p">)]</span>
+    <span class="c"># Set border to cv2.GC_BGD (definitely background)</span>
+    <span class="n">init_mask</span><span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span> <span class="o">*</span> <span class="n">label_colors</span><span class="p">[</span><span class="n">label_values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span><span class="p">)]</span>
+    <span class="n">init_mask</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span> <span class="o">*</span> <span class="n">label_colors</span><span class="p">[</span><span class="n">label_values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span><span class="p">)]</span>
+    <span class="n">init_mask</span><span class="p">[:,</span>  <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span> <span class="o">*</span> <span class="n">label_colors</span><span class="p">[</span><span class="n">label_values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span><span class="p">)]</span>
+    <span class="n">init_mask</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span> <span class="o">*</span> <span class="n">label_colors</span><span class="p">[</span><span class="n">label_values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span><span class="p">)]</span>
+    <span class="c">#import vtool as vt</span>
+    <span class="n">cached_mask_fpath</span> <span class="o">=</span> <span class="s">&#39;tmp_mask.png&#39;</span>
+    <span class="n">custom_mask</span> <span class="o">=</span> <span class="n">interact_impaint</span><span class="o">.</span><span class="n">cached_impaint</span><span class="p">(</span><span class="n">bgr_img</span><span class="p">,</span> <span class="n">cached_mask_fpath</span><span class="p">,</span> <span class="n">label_colors</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="c">#if ut.checkpath(cached_mask_fpath):</span>
+    <span class="c">#    custom_mask = vt.imread(cached_mask_fpath, grayscale=True)</span>
+    <span class="c">#else:</span>
+    <span class="c">#    custom_mask = interact_impaint.impaint_mask(bgr_img, label_colors, init_mask=init_mask)</span>
+    <span class="c">#    vt.imwrite(cached_mask_fpath, custom_mask)</span>
+
+    <span class="n">prior_mask</span> <span class="o">=</span> <span class="n">custom_mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c"># Convert colors to out labels</span>
+    <span class="n">label_locs</span> <span class="o">=</span> <span class="p">[</span><span class="n">custom_mask</span> <span class="o">==</span> <span class="n">color</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">label_colors</span><span class="p">]</span>
+    <span class="c"># Put user labels in there</span>
+    <span class="k">for</span> <span class="n">label_loc</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">label_locs</span><span class="p">,</span> <span class="n">label_values</span><span class="p">):</span>
+        <span class="n">prior_mask</span><span class="p">[</span><span class="n">label_loc</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;running grabcut&#39;</span><span class="p">)</span>
+    <span class="n">post_mask</span> <span class="o">=</span> <span class="n">grabcut</span><span class="p">(</span><span class="n">bgr_img</span><span class="p">,</span> <span class="n">prior_mask</span><span class="p">)</span>
+    <span class="n">seg_chip</span> <span class="o">=</span> <span class="n">mask_colored_img</span><span class="p">(</span><span class="n">bgr_img</span><span class="p">,</span> <span class="n">post_mask</span><span class="p">,</span> <span class="s">&#39;bgr&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;finished running grabcut&#39;</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">post_mask</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">seg_chip</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="grabcut"><a class="viewcode-back" href="../../vtool.html#vtool.segmentation.grabcut">[docs]</a><span class="k">def</span> <span class="nf">grabcut</span><span class="p">(</span><span class="n">bgr_img</span><span class="p">,</span> <span class="n">prior_mask</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Referencs:</span>
+<span class="sd">        http://docs.opencv.org/trunk/doc/py_tutorials/py_imgproc/py_grabcut/py_grabcut.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Grab Cut Parameters</span>
+    <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">=</span> <span class="n">bgr_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">rect</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">num_iters</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_INIT_WITH_MASK</span>
+    <span class="n">bgd_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span> <span class="o">*</span> <span class="mi">5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">fgd_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span> <span class="o">*</span> <span class="mi">5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="c"># Grab Cut Execution</span>
+    <span class="n">post_mask</span> <span class="o">=</span> <span class="n">prior_mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">grabCut</span><span class="p">(</span><span class="n">bgr_img</span><span class="p">,</span> <span class="n">post_mask</span><span class="p">,</span> <span class="n">rect</span><span class="p">,</span> <span class="n">bgd_model</span><span class="p">,</span> <span class="n">fgd_model</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">binary</span><span class="p">:</span>
+        <span class="n">is_forground</span> <span class="o">=</span> <span class="p">(</span><span class="n">post_mask</span> <span class="o">==</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_FGD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">post_mask</span> <span class="o">==</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_FGD</span><span class="p">)</span>
+        <span class="n">post_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_forground</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s">&#39;uint8&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label_colors</span> <span class="o">=</span> <span class="p">[</span>       <span class="mi">255</span><span class="p">,</span>           <span class="mi">170</span><span class="p">,</span>            <span class="mi">50</span><span class="p">,</span>          <span class="mi">0</span><span class="p">]</span>
+        <span class="n">label_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">GC_FGD</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_FGD</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_BGD</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_BGD</span><span class="p">]</span>
+        <span class="n">pos_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">post_mask</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">label_values</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pos_list</span><span class="p">,</span> <span class="n">label_colors</span><span class="p">):</span>
+            <span class="n">post_mask</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+    <span class="k">return</span> <span class="n">post_mask</span>
+
+</div>
+<span class="n">into_hsv_flags</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;bgr&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2HSV</span><span class="p">,</span>
+    <span class="s">&#39;rgb&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2HSV</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">from_hsv_flags</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;bgr&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_HSV2BGR</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="mask_colored_img"><a class="viewcode-back" href="../../vtool.html#vtool.segmentation.mask_colored_img">[docs]</a><span class="k">def</span> <span class="nf">mask_colored_img</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;bgr&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">/=</span> <span class="mf">255.0</span>
+    <span class="n">into_hsv_flag</span> <span class="o">=</span> <span class="n">into_hsv_flags</span><span class="p">[</span><span class="n">encoding</span><span class="p">]</span>
+    <span class="n">from_hsv_flag</span> <span class="o">=</span> <span class="n">from_hsv_flags</span><span class="p">[</span><span class="n">encoding</span><span class="p">]</span>
+    <span class="c"># Mask out value component</span>
+    <span class="n">img_hsv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">into_hsv_flag</span><span class="p">)</span>
+    <span class="n">img_hsv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img_hsv</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+    <span class="n">VAL_INDEX</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">img_hsv</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">VAL_INDEX</span><span class="p">]</span> <span class="o">*=</span> <span class="n">mask</span>
+    <span class="n">img_hsv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">img_hsv</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">masked_img_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img_hsv</span><span class="p">,</span> <span class="n">from_hsv_flag</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">masked_img_rgb</span>
+
 
 <span class="c"># Open CV relevant values:</span>
 <span class="c"># grabcut_mode = cv2.GC_EVAL</span>
 <span class="c"># grabcut_mode = cv2.GC_INIT_WITH_RECT</span>
 <span class="c"># cv2.GC_BGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD, cv2.GC_FGD</span>
 <span class="c">#@profile</span></div>
-<div class="viewcode-block" id="grabcut"><a class="viewcode-back" href="../../vtool.html#vtool.segmentation.grabcut">[docs]</a><span class="k">def</span> <span class="nf">grabcut</span><span class="p">(</span><span class="n">rgb_chip</span><span class="p">):</span>
+<div class="viewcode-block" id="grabcut2"><a class="viewcode-back" href="../../vtool.html#vtool.segmentation.grabcut2">[docs]</a><span class="k">def</span> <span class="nf">grabcut2</span><span class="p">(</span><span class="n">rgb_chip</span><span class="p">):</span>
     <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">=</span> <span class="n">rgb_chip</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>  <span class="c"># Initialize: mask</span>
     <span class="c"># Set inside to cv2.GC_PR_FGD (probably forground)</span>
@@ -149,16 +342,12 @@
     <span class="n">chip_mask</span> <span class="o">=</span> <span class="n">clean_mask</span><span class="p">(</span><span class="n">chip_mask</span><span class="p">)</span>
     <span class="n">chip_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">chip_mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
     <span class="c"># Mask value component of HSV space</span>
-    <span class="n">chip_hsv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">rgb_chip</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2HSV</span><span class="p">)</span>
-    <span class="n">chip_hsv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">chip_hsv</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
-    <span class="n">chip_hsv</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="n">chip_mask</span>
-    <span class="n">chip_hsv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chip_hsv</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-    <span class="n">seg_chip</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">chip_hsv</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_HSV2RGB</span><span class="p">)</span>
+    <span class="n">seg_chip</span> <span class="o">=</span> <span class="n">mask_colored_img</span><span class="p">(</span><span class="n">rgb_chip</span><span class="p">,</span> <span class="n">chip_mask</span><span class="p">,</span> <span class="s">&#39;rgb&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">seg_chip</span>
 
 </div>
 <div class="viewcode-block" id="segment"><a class="viewcode-back" href="../../vtool.html#vtool.segmentation.segment">[docs]</a><span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">bbox_</span><span class="p">,</span> <span class="n">new_size</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="s">&#39;Runs grabcut&#39;</span>
+    <span class="sd">&quot;&quot;&quot; Runs grabcut &quot;&quot;&quot;</span>
     <span class="n">printDBG</span><span class="p">(</span><span class="s">&#39;[segm] segment(img_fpath=</span><span class="si">%r</span><span class="s">, bbox=</span><span class="si">%r</span><span class="s">)&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">bbox_</span><span class="p">))</span>
     <span class="n">num_iters</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">bgd_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span> <span class="o">*</span> <span class="mi">5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -172,7 +361,7 @@
     <span class="p">(</span><span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span><span class="p">)</span> <span class="o">=</span> <span class="n">img_resz</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>                       <span class="c"># Image Shape</span>
     <span class="n">printDBG</span><span class="p">(</span><span class="s">&#39; * img_resz.shape=</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">((</span><span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span><span class="p">),))</span>
     <span class="c"># WH Safe</span>
-    <span class="n">tlbr</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">xywh_to_tlbr</span><span class="p">(</span><span class="n">bbox_resz</span><span class="p">,</span> <span class="p">(</span><span class="n">img_w</span><span class="p">,</span> <span class="n">img_h</span><span class="p">))</span>  <span class="c"># Rectangle ANNOTATION</span>
+    <span class="n">tlbr</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">xywh_to_tlbr</span><span class="p">(</span><span class="n">bbox_resz</span><span class="p">,</span> <span class="p">(</span><span class="n">img_w</span><span class="p">,</span> <span class="n">img_h</span><span class="p">))</span>  <span class="c"># Rectangle ANNOTATION</span>
     <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="o">=</span> <span class="n">tlbr</span>
     <span class="n">rect</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">bbox_resz</span><span class="p">)</span>                               <span class="c"># Initialize: rect</span>
     <span class="n">printDBG</span><span class="p">(</span><span class="s">&#39; * rect=</span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rect</span><span class="p">,))</span>
@@ -181,7 +370,7 @@
     <span class="n">_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>  <span class="c"># Initialize: mask</span>
     <span class="n">_mask</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_FGD</span>             <span class="c"># Set ANNOTATION to cv2.GC_PR_FGD</span>
     <span class="c"># Grab Cut</span>
-    <span class="n">tt</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="s">&#39; * cv2.grabCut()&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">DEBUG_SEGM</span><span class="p">)</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="s">&#39; * cv2.grabCut()&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">DEBUG_SEGM</span><span class="p">)</span>
     <span class="n">cv2</span><span class="o">.</span><span class="n">grabCut</span><span class="p">(</span><span class="n">img_resz</span><span class="p">,</span> <span class="n">_mask</span><span class="p">,</span> <span class="n">rect</span><span class="p">,</span> <span class="n">bgd_model</span><span class="p">,</span> <span class="n">fgd_model</span><span class="p">,</span> <span class="n">num_iters</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
     <span class="n">tt</span><span class="o">.</span><span class="n">toc</span><span class="p">()</span>
     <span class="n">img_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">_mask</span> <span class="o">==</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_FGD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">_mask</span> <span class="o">==</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GC_PR_FGD</span><span class="p">),</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s">&#39;uint8&#39;</span><span class="p">)</span>
@@ -196,47 +385,75 @@
     <span class="n">chip_hsv</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="n">chip_mask</span>
     <span class="n">chip_hsv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chip_hsv</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="n">seg_chip</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">chip_hsv</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_HSV2RGB</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">seg_chip</span><span class="p">,</span> <span class="n">img_mask</span></div>
+    <span class="k">return</span> <span class="n">seg_chip</span><span class="p">,</span> <span class="n">img_mask</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.segmentation</span>
+<span class="sd">        python -m vtool.segmentation --allexamples</span>
+<span class="sd">        python -m vtool.segmentation --allexamples --noface --nosrc</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing</span>
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">freeze_support</span><span class="p">()</span>  <span class="c"># for win32</span>
+    <span class="kn">import</span> <span class="nn">utool</span> <span class="kn">as</span> <span class="nn">ut</span>  <span class="c"># NOQA</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">doctest_funcs</span><span class="p">()</span>
 </pre></div>
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jon Crall.
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2014, Jon Crall.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0.dev1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
