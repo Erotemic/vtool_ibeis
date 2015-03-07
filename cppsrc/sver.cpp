@@ -18,6 +18,22 @@ indices into kpts{1,2} indicating a match
 #include <cstdio>
 #include <opencv2/core/core.hpp>
 #include <vector>
+#include <iostream>
+
+ 
+#if WIN32
+   //typedef unsigned __int64 index_t;
+   typedef size_t index_t;
+#else
+   typedef size_t index_t;
+#endif
+
+#define DEBUG_SVER 1
+#if DEBUG_SVER
+#define printDBG_SVER(msg) std::cerr << "[sver.cpp] " << msg << std::endl;
+#else
+#define printDBG_SVER(msg);
+#endif
 
 // References:
 // http://stackoverflow.com/questions/487108/how-to-supress-specific-warnings-in-g
@@ -27,7 +43,7 @@ indices into kpts{1,2} indicating a match
 //#define RUNTIME_BOUNDS_CHECKING
 #ifdef RUNTIME_BOUNDS_CHECKING
 #define CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len) \
-    for(size_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2) { \
+    for(index_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2) { \
         if((fm[fm_ind] >= (kpts1_len/6)) || (fm[fm_ind + 1] >= (kpts2_len/6))) { \
             puts("CHECK_FM_BOUNDS: bad fm indexes"); \
             return; \
@@ -71,9 +87,9 @@ template<typename T> Matx<T, 3, 3> get_invV_mat(T x, T y, T a, T c, T d, T theta
        );
 }
 
-void debug_print_kpts(double* kpts, size_t kpts_len)
+void debug_print_kpts(double* kpts, index_t kpts_len)
 {
-    for(size_t i = 0; i < kpts_len * 6; i += 6)
+    for(index_t i = 0; i < kpts_len * 6; i += 6)
     {
         printf("kpts[%lu]: [%f, %f, %f, %f, %f, %f]\n", i / 6,
                kpts[i + 0], kpts[i + 1], kpts[i + 2],
@@ -136,13 +152,21 @@ template<typename T> inline Matx<T, 3, 3> get_Aff_mat(const Matx<T, 3, 3>& invVR
 }
 
 extern "C" {
-    void get_affine_inliers(double* kpts1, size_t kpts1_len,
-                            double* kpts2, size_t kpts2_len,
-                            size_t* fm, size_t fm_len,
+    void get_affine_inliers(double* kpts1, index_t kpts1_len,
+                            double* kpts2, index_t kpts2_len,
+                            index_t* fm, index_t fm_len,
                             double xy_thresh_sqrd, double scale_thresh_sqrd, double ori_thresh,
                             // memory is expected to by allocated by the caller (i.e. via numpy.empty)
                             bool* out_inlier_flags, double* out_errors_list, double* out_matrices_list)
     {
+        printDBG_SVER("get_affine_inliers\n");
+        printDBG_SVER(" * kpts1_len = " << kpts1_len);
+        printDBG_SVER(" * kpts2_len = " << kpts2_len);
+        printDBG_SVER(" * fm_len = " << fm_len);
+        printDBG_SVER(" * xy_thresh_sqrd = " << xy_thresh_sqrd);
+        printDBG_SVER(" * scale_thresh_sqrd = " << scale_thresh_sqrd);
+        printDBG_SVER(" * ori_thresh = " << ori_thresh);
+        printDBG_SVER(" * sizeof(index_t) = " << sizeof(index_t));
         MARKUSED(kpts1_len);
         MARKUSED(kpts2_len);
         CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len);
@@ -162,20 +186,20 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         //   (less allocation == faster code)
 #define MATRIX_REF(i) (*((i)+((Matx<double, 3, 3>*)out_matrices_list)))
         //vector<vector<double> > xy_errs, scale_errs, ori_errs;
-        for(size_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2)
+        for(index_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2)
         {
             SETUP_invVRs(fm_ind,)
             //Aff_mats.push_back(get_Aff_mat(invVR1_m, invVR2_m));
             MATRIX_REF(fm_ind / 2) = get_Aff_mat(invVR1_m, invVR2_m);
         }
-        const size_t num_matches = fm_len / 2;
-        for(size_t i = 0; i < num_matches; i++)
+        const index_t num_matches = fm_len / 2;
+        for(index_t i = 0; i < num_matches; i++)
         {
             //xy_errs.push_back(vector<double>());
             //scale_errs.push_back(vector<double>());
             //ori_errs.push_back(vector<double>());
             Matx<double, 3, 3> Aff_mat = MATRIX_REF(i);
-            for(size_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2)
+            for(index_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2)
             {
                 SETUP_invVRs(fm_ind,)
                 // _test_hypothesis_inliers
@@ -205,9 +229,9 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
 #undef MATRIX_REF
         /*
         #define SHOW_ERRVEC(vec) \
-        for(size_t i = 0; i < vec.size(); i++) { \
+        for(index_t i = 0; i < vec.size(); i++) { \
             putchar('['); \
-            for(size_t j = 0; j < vec[i].size(); j++) { \
+            for(index_t j = 0; j < vec[i].size(); j++) { \
                 printf("%f, ", vec[i][j]); \
             } \
             puts("]"); \
@@ -225,46 +249,54 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         //  that the output is operated on directly (via MATRIX_REF)
         /*
         //printf("%lu\n", Aff_mats.size());
-        for(size_t i = 0; i < Aff_mats.size(); i++) {
-            const size_t mat_size = 3*3*sizeof(double);
+        for(index_t i = 0; i < Aff_mats.size(); i++) {
+            const index_t mat_size = 3*3*sizeof(double);
             //char msg[] = {'M', 'a', 't', 0x30+i%10, 0};
             //debug_print_mat3x3(msg, Aff_mats[i]);
             double* dest = (out_matrices_list+(3*3*i));
             //char* destc = (char*)(out_matrices_list+(3*3*i));
             //printf("%x\n", dest);
-            //printf("before: "); for(size_t j=0; j < 9; j++) {printf("%f ", *(dest+j)); }
-            //printf("\nbefore: "); for(size_t j=0; j < mat_size; j+=8) {printf("0x%08x ", *(destc+j)); }
+            //printf("before: "); for(index_t j=0; j < 9; j++) {printf("%f ", *(dest+j)); }
+            //printf("\nbefore: "); for(index_t j=0; j < mat_size; j+=8) {printf("0x%08x ", *(destc+j)); }
             memcpy(dest, &Aff_mats[i], mat_size);
-            //printf("\nafter: "); for(size_t j=0; j < 9; j++) {printf("%f ", *(dest+j)); }
-            //printf("\nafter: "); for(size_t j=0; j < mat_size; j+=8) {printf("0x%08x ", *(destc+j)); }
+            //printf("\nafter: "); for(index_t j=0; j < 9; j++) {printf("%f ", *(dest+j)); }
+            //printf("\nafter: "); for(index_t j=0; j < mat_size; j+=8) {printf("0x%08x ", *(destc+j)); }
             //puts("\n");
         }
         */
     }
 
-    int get_best_affine_inliers(double* kpts1, size_t kpts1_len,
-                                double* kpts2, size_t kpts2_len,
-                                size_t* fm, size_t fm_len,
+    int get_best_affine_inliers(double* kpts1, index_t kpts1_len,
+                                double* kpts2, index_t kpts2_len,
+                                index_t* fm, index_t fm_len,
                                 double xy_thresh_sqrd, double scale_thresh_sqrd, double ori_thresh,
                                 // memory is expected to by allocated by the caller (i.e. via numpy.empty)
                                 bool* out_inliers, double* out_errors, double* out_matrix)
     {
+        printDBG_SVER("get_best_affine_inliers\n");
+        printDBG_SVER(" * kpts1_len = " << kpts1_len);
+        printDBG_SVER(" * kpts2_len = " << kpts2_len);
+        printDBG_SVER(" * fm_len = " << fm_len);
+        printDBG_SVER(" * xy_thresh_sqrd = " << xy_thresh_sqrd);
+        printDBG_SVER(" * scale_thresh_sqrd = " << scale_thresh_sqrd);
+        printDBG_SVER(" * ori_thresh = " << ori_thresh);
+        printDBG_SVER(" * sizeof(index_t) = " << sizeof(index_t));
         MARKUSED(kpts1_len);
         MARKUSED(kpts2_len);
         CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len);
-        const size_t num_matches = fm_len / 2;
+        const index_t num_matches = fm_len / 2;
         int current_max_inliers = 0;
         bool* tmp_inliers = new bool[num_matches];
         double* tmp_errors = new double[num_matches * 3];
 
         {
-            for(size_t i1 = 0; i1 < fm_len; i1 += 2)
+            for(index_t i1 = 0; i1 < fm_len; i1 += 2)
             {
                 SETUP_invVRs(i1, i1_)
                     Matx<double, 3, 3> Aff_mat = get_Aff_mat(i1_invVR1_m, i1_invVR2_m);
                 int inliers_for_i1 = 0;
                 //#pragma omp parallel for reduction(+:inliers_for_i1)
-                for(size_t i2 = 0; i2 < fm_len; i2 += 2)
+                for(index_t i2 = 0; i2 < fm_len; i2 += 2)
                 {
                     SETUP_invVRs(i2, i2_)
                         Matx<double, 3, 3> i2_invVR1_mt = Aff_mat * i2_invVR1_m;
