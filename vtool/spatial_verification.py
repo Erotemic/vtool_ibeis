@@ -22,8 +22,25 @@ import scipy.sparse.linalg as spsl
 from numpy.core.umath_tests import matrix_multiply
 import vtool.keypoint as ktool
 import vtool.linalg as ltool
+import vtool.distance as dtool
+
+try:
+    #if ut.WIN32:
+    #    raise Exception('forcing sver_c_wrapper off')
+    from vtool import sver_c_wrapper
+    HAS_SVER_C_WRAPPER = True
+except Exception as ex:
+    HAS_SVER_C_WRAPPER = False
+    if ut.VERBOSE:
+        ut.printex(ex, 'please build the sver c wrapper (run with --rebuild-sver')
+    if False:
+        raise
+
 profile = ut.profile
-#(print, print_, printDBG, rrr, profile) = ut.inject(__name__, '[sver]', DEBUG=False)
+(print, print_, printDBG, rrr, profile) = ut.inject(__name__, '[sver]', DEBUG=False)
+
+
+VERBOSE_SVER = ut.get_argflag('--verb-sver')
 
 """
 #if CYTH
@@ -34,12 +51,55 @@ cdef np.float64_t TAU
 """
 
 SV_DTYPE = np.float64
+INDEX_DTYPE = np.int32
 TAU = 2 * np.pi  # tauday.org
+
+
+def build_affine_lstsqrs_Mx6(xy1_mn, xy2_mn):
+    """
+    CURRENTLY NOT WORKING
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.spatial_verification import *  # NOQA
+        >>> import vtool.tests.dummy as dummy
+        >>> kpts1, kpts2 = dummy.get_dummy_kpts_pair()
+        >>> xy1_mn = ktool.get_xys(kpts1).astype(np.float64)
+        >>> xy2_mn = ktool.get_xys(kpts2).astype(np.float64)
+        >>> Mx6 = build_affine_lstsqrs_Mx6(xy1_mn, xy2_mn)
+        >>> print(ut.numpy_str(Mx6))
+        >>> result = ut.hashstr(Mx6)
+        >>> print(result)
+
+    Ignore;
+        (U, S, V) = npl.svd(Mx6, full_matrices=True, compute_uv=True)
+        a = V[-6]  # Hack for Cython.wraparound(False)
+        a.reshape(2, 3)
+        A = np.vstack((a[0:3], a[3:6], (0, 0, 1)))
+    """
+    x1_mn = xy1_mn[0]
+    y1_mn = xy1_mn[1]
+    x2_mn = xy2_mn[0]
+    y2_mn = xy2_mn[1]
+    num_pts = x1_mn.shape[0]
+    Mx6 = np.empty((2 * num_pts, 6), dtype=SV_DTYPE)
+    for ix in range(num_pts):  # Loop over inliers
+        # Concatenate all 2x9 matrices into an Mx6 matrix
+        x1 = x1_mn[ix]
+        x2 = x2_mn[ix]
+        y1 = y1_mn[ix]
+        y2 = y2_mn[ix]
+        Mx6[ix * 2]     = (x1, y1,  1,  0,  0,  0)
+        Mx6[ix * 2 + 1] = ( 0,  0,  0, x2, y2,  1)
+    return Mx6
 
 
 @profile
 def build_lstsqrs_Mx9(xy1_mn, xy2_mn):
     """ Builds the M x 9 least squares matrix
+
+    CommandLine:
+        python -m vtool.spatial_verification --test-build_lstsqrs_Mx9
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -49,9 +109,20 @@ def build_lstsqrs_Mx9(xy1_mn, xy2_mn):
         >>> xy1_mn = ktool.get_xys(kpts1).astype(np.float64)
         >>> xy2_mn = ktool.get_xys(kpts2).astype(np.float64)
         >>> Mx9 = build_lstsqrs_Mx9(xy1_mn, xy2_mn)
+        >>> print(ut.numpy_str(Mx9))
         >>> result = ut.hashstr(Mx9)
         >>> print(result)
         f@2l62+2!ppow8yw
+
+    Ignore:
+        http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#findhomography
+        cv2.findHomography(xy1_mn.T, xy2_mn.T)
+        cv2.findHomography(xy1_mn.T, xy1_mn.T)
+
+    References:
+        http://dip.sun.ac.za/~stefan/TW793/attach/notes/homography_estimation.pdf
+        http://szeliski.org/Book/drafts/SzeliskiBook_20100903_draft.pdf Page 317
+        http://vision.ece.ucsb.edu/~zuliani/Research/RANSAC/docs/RANSAC4Dummies.pdf page 53
 
     Cyth:
         #CYTH_RETURNS np.ndarray[np.float64_t, ndim=2]
@@ -71,7 +142,8 @@ def build_lstsqrs_Mx9(xy1_mn, xy2_mn):
     x2_mn = xy2_mn[0]
     y2_mn = xy2_mn[1]
     num_pts = x1_mn.shape[0]
-    Mx9 = np.zeros((2 * num_pts, 9), dtype=SV_DTYPE)
+    #Mx9 = np.zeros((2 * num_pts, 9), dtype=SV_DTYPE)
+    Mx9 = np.empty((2 * num_pts, 9), dtype=SV_DTYPE)
     """
     #if CYTH
     for ix in range(num_pts):  # Loop over inliers
@@ -105,12 +177,63 @@ def build_lstsqrs_Mx9(xy1_mn, xy2_mn):
     return Mx9
 
 
+def try_svd(M):
+    try:
+        USV = npl.svd(M, full_matrices=True, compute_uv=True)
+    except MemoryError as ex:
+        ut.printex(ex, '[sver] Caught MemErr during full SVD. Trying sparse SVD.')
+        M_sparse = sps.lil_matrix(M)
+        USV = spsl.svds(M_sparse)
+    except npl.LinAlgError as ex:
+        ut.printex(ex, '[sver] svd did not converge')
+        raise
+    except Exception as ex:
+        ut.printex(ex, '[sver] svd error')
+        raise
+    return USV
+
+
+@profile
+def compute_affine(xy1_mn, xy2_mn):
+    """
+    Args:
+        xy1_mn (ndarray[ndim=2]): xy points in image1
+        xy2_mn (ndarray[ndim=2]): corresponding xy points in image 2
+
+    Returns:
+        ndarray[shape=(3,3)]: A - affine matrix
+
+    CommandLine:
+        python -m vtool.spatial_verification --test-compute_affine
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.spatial_verification import *  # NOQA
+        >>> import vtool.tests.dummy as dummy
+        >>> import vtool.keypoint as ktool
+        >>> kpts1, kpts2 = dummy.get_dummy_kpts_pair()
+        >>> xy1_mn = ktool.get_xys(kpts1)
+        >>> xy2_mn = ktool.get_xys(kpts2)
+        >>> A = compute_affine(xy1_mn, xy1_mn)
+        >>> result =str(A)
+        >>> result = np.array_str(A, precision=2)
+        >>> print(result)
+    """
+    # Solve for the nullspace of the Mx6 matrix (solves least squares)
+    Mx6 = build_affine_lstsqrs_Mx6(xy1_mn, xy2_mn)
+    U, S, V = try_svd(Mx6)
+    a = V[5]  # Hack for Cython.wraparound(False)
+    A = np.vstack((a[0:3], a[3:6], (0, 0, 1)))
+    return A
+
+
 @profile
 def compute_homog(xy1_mn, xy2_mn):
     """
     Generate 6 degrees of freedom homography transformation
     Computes homography from normalized (0 to 1) point correspondences
     from 2 --> 1
+    (database->query)
 
     Args:
         xy1_mn (ndarray[ndim=2]): xy points in image1
@@ -149,18 +272,7 @@ def compute_homog(xy1_mn, xy2_mn):
     # Solve for the nullspace of the Mx9 matrix (solves least squares)
     #Mx9 = build_lstsqrs_Mx9_cyth(xy1_mn, xy2_mn)  # NOQA  # TODO: re-enable
     Mx9 = build_lstsqrs_Mx9(xy1_mn, xy2_mn)
-    try:
-        (U, S, V) = npl.svd(Mx9, full_matrices=True, compute_uv=True)
-    except MemoryError as ex:
-        print('[sver] Caught MemErr %r during full SVD. Trying sparse SVD.' % (ex))
-        Mx9Sparse = sps.lil_matrix(Mx9)
-        (U, S, V) = spsl.svds(Mx9Sparse)
-    except npl.LinAlgError as ex:
-        print('[sver] svd did not converge: %r' % ex)
-        raise
-    except Exception as ex:
-        print('[sver] svd error: %r' % ex)
-        raise
+    U, S, V = try_svd(Mx9)
     # Rearange the nullspace into a homography
     #h = V[-1]  # v = V.H
     h = V[8]  # Hack for Cython.wraparound(False)
@@ -174,6 +286,9 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
                              xy_thresh_sqrd, scale_thresh_sqrd, ori_thresh):
     """
     Critical section code. Inner loop of _test_hypothesis_inliers
+
+    CommandLine:
+        python -m vtool.spatial_verification --test-_test_hypothesis_inliers
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -192,11 +307,13 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
         >>> scale_thresh_sqrd = np.float64(2)
         >>> ori_thresh = np.float64(TAU / 4)
         >>> # Get keypoints to project in matrix form
-        >>> invVR1s_m = ktool.get_invV_mats(kpts1_m, with_trans=True, with_ori=True)
-        >>> V1s_m = ktool.get_V_mats(kpts1_m, with_trans=True, with_ori=True)
-        >>> invVR2s_m = ktool.get_invV_mats(kpts2_m, with_trans=True, with_ori=True)
+        >>> #invVR1s_m = ktool.get_invV_mats(kpts1_m, with_trans=True, with_ori=True)
+        >>> #print(invVR1s_m[0])
+        >>> invVR1s_m = ktool.get_invVR_mats3x3(kpts1_m)
+        >>> RV1s_m = ktool.get_RV_mats_3x3(kpts1_m)
+        >>> invVR2s_m = ktool.get_invVR_mats3x3(kpts2_m)
         >>> # The transform from kp1 to kp2 is given as:
-        >>> Aff_mats = matrix_multiply(invVR2s_m, V1s_m)
+        >>> Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)
         >>> Aff = Aff_mats[0]
         >>> # Get components to test projects against
         >>> xy2_m  = ktool.get_invVR_mats_xys(invVR2s_m)
@@ -254,9 +371,9 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
     _det1_mt  = ktool.get_invVR_mats_sqrd_scale(invVR1s_mt)
     _ori1_mt  = ktool.get_invVR_mats_oris(invVR1s_mt)
     ## Check for projection errors
-    xy_err    = ltool.L2_sqrd(xy2_m.T, _xy1_mt.T)
-    scale_err = ltool.det_distance(_det1_mt, det2_m)
-    ori_err   = ltool.ori_distance(_ori1_mt, ori2_m)
+    xy_err    = dtool.L2_sqrd(xy2_m.T, _xy1_mt.T)
+    scale_err = dtool.det_distance(_det1_mt, det2_m)
+    ori_err   = dtool.ori_distance(_ori1_mt, ori2_m)
 
     # Mark keypoints which are inliers to this hypothosis
     xy_inliers_flag    = np.less(xy_err, xy_thresh_sqrd)
@@ -268,6 +385,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
     hypo_inliers_flag = xy_inliers_flag  # Try to re-use memory
     np.logical_and(hypo_inliers_flag, ori_inliers_flag, out=hypo_inliers_flag)
     np.logical_and(hypo_inliers_flag, scale_inliers_flag, out=hypo_inliers_flag)
+    #other.iter_reduce_ufunc(np.logical_and
     #hypo_inliers_flag = ltool.and_3lists(xy_inliers_flag, ori_inliers_flag, scale_inliers_flag)
     hypo_errors = (xy_err, ori_err, scale_err)
     hypo_inliers = np.where(hypo_inliers_flag)[0]
@@ -290,6 +408,9 @@ def get_affine_inliers(kpts1, kpts2, fm,
         H = inv(Aj).dot(Rj.T).dot(Ri).dot(Ai)
         H = inv(Aj).dot(Ai)
         The input invVs = perdoch.invA's
+
+    CommandLine:
+        python -m vtool.spatial_verification --test-get_affine_inliers
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -359,17 +480,19 @@ def get_affine_inliers(kpts1, kpts2, fm,
     kpts2_m = kpts2.take(fm.T[1], axis=0)
 
     # Get keypoints to project in matrix form
-    invVR2s_m = ktool.get_invV_mats(kpts2_m, with_trans=True, with_ori=True)
-    invVR1s_m = ktool.get_invV_mats(kpts1_m, with_trans=True, with_ori=True)
-    V1s_m     = ktool.invert_invV_mats(invVR1s_m)  # 539 us
+    #invVR2s_m = ktool.get_invV_mats(kpts2_m, with_trans=True, with_ori=True)
+    #invVR1s_m = ktool.get_invV_mats(kpts1_m, with_trans=True, with_ori=True)
+    invVR2s_m = ktool.get_invVR_mats3x3(kpts2_m)
+    invVR1s_m = ktool.get_invVR_mats3x3(kpts1_m)
+    RV1s_m    = ktool.invert_invV_mats(invVR1s_m)  # 539 us
     # BUILD ALL HYPOTHESIS TRANSFORMS: The transform from kp1 to kp2 is:
-    Aff_mats = matrix_multiply(invVR2s_m, V1s_m)
+    Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)
     # Get components to test projects against
     xy2_m  = ktool.get_xys(kpts2_m)
     det2_m = ktool.get_sqrd_scales(kpts2_m)
     ori2_m = ktool.get_oris(kpts2_m)
     # SLOWER EQUIVALENT
-    # V1s_m    = ktool.get_V_mats(kpts1_m, with_trans=True, with_ori=True)  # 5.2 ms
+    # RV1s_m    = ktool.get_V_mats(kpts1_m, with_trans=True, with_ori=True)  # 5.2 ms
     # xy2_m  = ktool.get_invVR_mats_xys(invVR2s_m)
     # ori2_m = ktool.get_invVR_mats_oris(invVR2s_m)
     # assert np.all(ktool.get_oris(kpts2_m) == ktool.get_invVR_mats_oris(invVR2s_m))
@@ -412,10 +535,15 @@ def get_best_affine_inliers(kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh,
     """
     # Test each affine hypothesis
     # get list if inliers, errors, the affine matrix for each hypothesis
-    aff_inliers_list, aff_errors_list, Aff_mats = get_affine_inliers(kpts1, kpts2, fm,
-                                                                     xy_thresh_sqrd,
-                                                                     scale_thresh,
-                                                                     ori_thresh)
+    if HAS_SVER_C_WRAPPER:
+        aff_inliers_list, aff_errors_list, Aff_mats = sver_c_wrapper.get_affine_inliers_cpp(
+            kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh, ori_thresh)
+    else:
+        aff_inliers_list, aff_errors_list, Aff_mats = get_affine_inliers(kpts1, kpts2, fm,
+                                                                         xy_thresh_sqrd,
+                                                                         scale_thresh,
+                                                                         ori_thresh)
+
     # Determine the best hypothesis using the number of inliers
     # TODO: other measures in the error lists could be used as well
     nInliers_list = np.array([len(inliers) for inliers in aff_inliers_list])
@@ -431,6 +559,10 @@ def get_best_affine_inliers(kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh,
 def get_homography_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd):
     """
     Given a set of hypothesis inliers, computes a homography and refines inliers
+    returned homography maps image1 space into image2 space
+
+    CommandLine:
+        python -m vtool.spatial_verification --test-get_homography_inliers
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -439,29 +571,23 @@ def get_homography_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd):
         >>> import vtool.keypoint as ktool
         >>> kpts1, kpts2 = dummy.get_dummy_kpts_pair((100, 100))
         >>> fm = dummy.make_dummy_fm(len(kpts1)).astype(np.int32)
+        >>> aff_inliers = np.arange(len(fm))
+        >>> xy_thresh_sqrd = .01 * ktool.get_kpts_dlen_sqrd(kpts2)
+        >>> homogtup = get_homography_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd)
+        >>> homog_inliers, homog_errors, H = homogtup
+        >>> result = ut.list_str(homogtup, precision=3)
+        >>> print(result)
+        (
+            np.array([0, 1, 2, 3, 4, 5, 6, 7, 8], dtype=np.int32),
+            (np.array([   4.365,    5.284,    3.294,   13.049,  114.46 ,   48.971,
+                        17.655,   25.825,    3.819], dtype=np.float64), None, None),
+            np.array([[  9.178e-01,  -4.824e-02,   7.212e+00],
+                      [ -6.856e-03,   9.088e-01,   4.131e+00],
+                      [ -1.213e-04,  -3.454e-04,   1.000e+00]], dtype=np.float64),
+        )
 
-    Timeit::
-        %timeit kpts1.take(fm.T[0].astype(np.int32), axis=0)
-        %timeit kpts1[fm.T[0]]
-
-        %timeit kpts1[fm.T[0]]
-        %timeit kpts2[fm.T[1]]
-        4.23 us per loop
-
-        %timeit kpts1[fm.take(0, axis=1)]
-        %timeit kpts2[fm.take(1, axis=1)]
-        5.32 us per loop
-
-        INDEX_TYPE = np.int32
-        %timeit kpts1.take(fm.take(0, axis=1), axis=0)
-        %timeit kpts2.take(fm.take(1, axis=1), axis=0)
-        2.77 us per loop
-
-        %timeit kpts1.take(fm.T[0], axis=0)
-        %timeit kpts2.take(fm.T[1], axis=0)
-        1.48 us per loop
     """
-    fm_affine = fm[aff_inliers]
+    fm_affine = fm.take(aff_inliers, axis=0)
 
     kpts1_m = kpts1.take(fm.T[0], axis=0)
     kpts2_m = kpts2.take(fm.T[1], axis=0)
@@ -474,26 +600,36 @@ def get_homography_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd):
     # Normalize affine inliers xy locations
     xy1_ma = ktool.get_xys(kpts1_ma)
     xy2_ma = ktool.get_xys(kpts2_ma)
-    xy1_mn, T1 = ltool.whiten_xy_points(xy1_ma)
-    xy2_mn, T2 = ltool.whiten_xy_points(xy2_ma)
+    xy1_man, T1 = ltool.whiten_xy_points(xy1_ma)
+    xy2_man, T2 = ltool.whiten_xy_points(xy2_ma)
     # Compute homgraphy transform from chip1 -> chip2 using affine inliers
-    H_prime = compute_homog(xy1_mn, xy2_mn)
+    H_prime = compute_homog(xy1_man, xy2_man)
+    #H_prime /= H_prime[2, 2]
+
+    # Different methods?
+    #H_prime = compute_affine(xy1_man, xy2_man)
+    #import cv2
+    #H_prime = cv2.findHomography(xy1_man.T, xy2_man.T)[0]
+    #H = compute_affine(xy1_ma, xy2_ma)
+    #print(H)
 
     # Then compute ax = b  [aka: x = npl.solve(a, b)]
     H = npl.solve(T2, H_prime).dot(T1)  # Unnormalize
+    # homographies that only differ by a scale factor are equivalent
+    H /= H[2, 2]
+
     # Transform all xy1 matches to xy2 space
-    xyz1_m  = ktool.get_homog_xyzs(kpts1_m)
-    xyz1_mt = ltool.matrix_multiply(H, xyz1_m)
-    xy1_mt  = ltool.homogonize(xyz1_mt)
+    xy1_mt  = ktool.transform_kpts_xys(H, kpts1_m)
     xy2_m   = ktool.get_xys(kpts2_m)
 
     # --- Find (Squared) Homography Distance Error ---
-    # You cannot test for scale or orientation easilly here because
-    # you no longer have an ellipse when using a projective transformation
-    xy_err = ltool.L2_sqrd(xy1_mt.T, xy2_m.T)
+    # You cannot test for scale or orientation easily here because
+    # you no longer have an ellipse? (maybe, probably have a conic) when using a
+    # projective transformation
+    xy_err = dtool.L2_sqrd(xy1_mt.T, xy2_m.T)
     homog_errors = (xy_err, None, None)
     # Estimate final inliers
-    homog_inliers = np.where(xy_err < xy_thresh_sqrd)[0]
+    homog_inliers = np.where(xy_err < xy_thresh_sqrd)[0].astype(INDEX_DTYPE)
     return homog_inliers, homog_errors, H
 
 
@@ -509,6 +645,8 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
     Driver function
     Spatially validates feature matches
 
+    Returned homography maps image1 space into image2 space.
+
     Args:
         kpts1 (ndarray[ndim=2]): all keypoints in image 1
         kpts2 (ndarray[ndim=2]): all keypoints in image 2
@@ -523,54 +661,64 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
     Returns:
         tuple : (homog_inliers, homog_errors, H, aff_inliers, aff_errors, Aff) if success else None
 
+    CommandLine:
+        python -m vtool.spatial_verification --test-spatially_verify_kpts --show
+        python -m vtool.spatial_verification --test-spatially_verify_kpts
+
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.spatial_verification import *
-        >>> import ibeis
-        >>> import pyflann
-        >>> from ibeis.model.hots import query_request
-        >>> ibs = ibeis.opendb('PZ_MTEST')
-        >>> qaid = 1
-        >>> daid = ibs.get_annot_groundtruth(qaid)[0]
-        >>> kpts1, kpts2 = ibs.get_annot_kpts([qaid, daid])
-        >>> qvecs, dvecs = ibs.get_annot_vecs([qaid, daid])
-        >>> # Simple ratio-test matching
-        >>> flann = pyflann.FLANN()
-        >>> flann.build_index(dvecs)
-        >>> qfx2_dfx, qfx2_dist = flann.nn_index(qvecs, 2)
-        >>> ratio = (qfx2_dist.T[1] / qfx2_dist.T[0])
-        >>> valid = ratio < 1.2
-        >>> valid_qfx = np.where(valid)[0]
-        >>> valid_dfx = qfx2_dfx.T[0][valid]
-        >>> fm = np.vstack((valid_qfx, valid_dfx)).T
-        >>> fs = ratio[valid]
-        >>> fk = np.ones(fs.size)
+        >>> import vtool.tests.dummy as dummy
+        >>> (kpts1, kpts2, fm, fs, rchip1, rchip2) = dummy.testdata_ratio_matches()
         >>> xy_thresh = .01
         >>> dlen_sqrd2 = 447271.015
         >>> min_nInliers = 4
-        >>> returnAff = False
+        >>> returnAff = True
         >>> ori_thresh = 1.57
         >>> scale_thresh = 2.0
+        >>> svtup = spatially_verify_kpts(kpts1, kpts2, fm, xy_thresh, scale_thresh, ori_thresh, dlen_sqrd2, min_nInliers, returnAff)
+        >>> assert svtup is not None and len(svtup) == 6, 'sver failed'
+        >>> homog_inliers, homog_errors, H = svtup[0:3]
+        >>> aff_inliers, aff_errors, Aff = svtup[3:6]
+        >>> if ut.show_was_requested():
+        >>>     import plottool as pt
+        >>>     homog_tup = (homog_inliers, H)
+        >>>     aff_tup = (aff_inliers, Aff)
+        >>>     pt.draw_sv.show_sv(rchip1, rchip2, kpts1, kpts2, fm, aff_tup=aff_tup, homog_tup=homog_tup)
+        >>>     pt.show_if_requested()
+        >>> result = ut.list_type_profile(svtup)
+        >>> #result = ut.list_str(svtup, precision=3)
+        >>> print(result)
+        tuple(numpy.ndarray, tuple(numpy.ndarray, NoneType, NoneType), numpy.ndarray, numpy.ndarray, tuple(numpy.ndarray*3), numpy.ndarray)
+
     """
-    if ut.VERYVERBOSE:
-        print('[sver] Starting spatial verification')
+    if len(fm) == 0:
+        if VERBOSE_SVER:
+            print('[sver] Cannot verify with no matches')
+        svtup = None
+        return svtup
     # Cast keypoints to float64 to avoid numerical issues
     kpts1 = kpts1.astype(np.float64, casting='same_kind', copy=False)
     kpts2 = kpts2.astype(np.float64, casting='same_kind', copy=False)
     # Get diagonal length if not provided
     if dlen_sqrd2 is None:
-        kpts2_m = kpts2[fm.T[1]]
-        dlen_sqrd2 = ktool.get_diag_extent_sqrd(kpts2_m)
+        kpts2_m = kpts2.take(fm.T[1], axis=0)
+        dlen_sqrd2 = ktool.get_kpts_dlen_sqrd(kpts2_m)
     # Determine the best hypothesis transformation and get its inliers
     xy_thresh_sqrd = dlen_sqrd2 * xy_thresh
-    aff_inliers, aff_errors, Aff = get_best_affine_inliers(
-        kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh, ori_thresh)
+    if HAS_SVER_C_WRAPPER:
+        aff_inliers, aff_errors, Aff = sver_c_wrapper.get_best_affine_inliers_cpp(
+            kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh, ori_thresh)
+    else:
+        aff_inliers, aff_errors, Aff = get_best_affine_inliers(
+            kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh, ori_thresh)
     # Return if there are not enough inliers to compute homography
     if len(aff_inliers) < min_nInliers:
-        if ut.VERYVERBOSE:
+        if VERBOSE_SVER:
             print('[sver] Failed spatial verification len(aff_inliers) = %r' %
                   (len(aff_inliers),))
-        return None
+        svtup = None
+        return svtup
     # Refine inliers using a projective transformation (homography)
     try:
         homog_inliers, homog_errors, H = get_homography_inliers(
@@ -588,54 +736,14 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
             print('SUPER_STRICT is on. Reraising')
             raise
         return None
-    if ut.VERYVERBOSE:
-        print('[sver] Finished spatial verification.')
+    if VERBOSE_SVER:
+        print('[sver] Succesfully finished spatial verification.')
     if returnAff:
         svtup = (homog_inliers, homog_errors, H, aff_inliers, aff_errors, Aff)
         return svtup
     else:
         svtup = (homog_inliers, homog_errors, H, None, None, None)
         return svtup
-
-
-def ibeis_test(qreq_):
-    import six
-    from ibeis.model.hots import pipeline
-    cfgdict = dict(dupvote_weight=1.0, prescore_method='nsum', score_method='nsum')
-    ibs, qreq_ = pipeline.get_pipeline_testdata('PZ_MTEST', cfgdict=cfgdict)
-    locals_ = pipeline.testrun_pipeline_upto(qreq_, 'spatial_verification')
-    qaid2_chipmatch = locals_['qaid2_chipmatch_FILT']
-    xy_thresh       = qreq_.qparams.xy_thresh
-    scale_thresh    = qreq_.qparams.scale_thresh
-    ori_thresh      = qreq_.qparams.ori_thresh
-    use_chip_extent = qreq_.qparams.use_chip_extent
-    min_nInliers    = qreq_.qparams.min_nInliers
-    qaid = six.next(six.iterkeys(qaid2_chipmatch))
-    chipmatch = qaid2_chipmatch[qaid]
-    (daid2_fm, daid2_fs, daid2_fk) = chipmatch
-    topx2_aid, nRerank = pipeline.get_prescore_shortlist(qaid, chipmatch, qreq_)
-    daid2_fm_V, daid2_fs_V, daid2_fk_V = pipeline.new_fmfsfk()
-    kpts1 = qreq_.ibs.get_annot_kpts(qaid)
-    topx2_kpts = qreq_.ibs.get_annot_kpts(topx2_aid)
-    topx2_dlen_sqrd = pipeline.precompute_topx2_dlen_sqrd(qreq_, daid2_fm, topx2_aid, topx2_kpts, nRerank, use_chip_extent)
-    topx = 0
-    daid = topx2_aid[topx]
-    fm = daid2_fm[daid]
-    dlen_sqrd2 = topx2_dlen_sqrd[topx]
-    kpts2 = topx2_kpts[topx]
-    fs    = daid2_fs[daid]
-    fk    = daid2_fk[daid]  # NOQA
-
-    import vtool.spatial_verification as sver
-    returnAff = True
-
-    homog_inliers, homog_errors, H, aff_inliers, aff_errors, Aff = sver.spatially_verify_kpts(
-        kpts1, kpts2, fm, xy_thresh, scale_thresh, ori_thresh,
-        dlen_sqrd2=dlen_sqrd2, min_nInliers=min_nInliers, returnAff=returnAff)
-
-    homog_xy_errors = homog_errors[0]
-
-    fs = fs * (1 - np.sqrt(homog_xy_errors / (dlen_sqrd2)))
 
 #try:
 #    import cyth

@@ -5,10 +5,10 @@ import six
 from PIL.ExifTags import TAGS, GPSTAGS
 from PIL import Image
 #from utool import util_progress
-import utool
+import utool as ut
 from utool import util_time
 from vtool import image as gtool
-(print, print_, printDBG, rrr, profile) = utool.inject(
+(print, print_, printDBG, rrr, profile) = ut.inject(
     __name__, '[exif]', DEBUG=False)
 
 
@@ -46,7 +46,7 @@ def get_exif_dict(pil_img):
     except (IndexError, AttributeError, OverflowError):
         exif_dict = {}
     except Exception as ex:
-        utool.printex(ex, 'get_exif_dict failed in an unexpected way')
+        ut.printex(ex, 'get_exif_dict failed in an unexpected way')
         raise
     return exif_dict
 
@@ -222,3 +222,43 @@ def get_lat_lon2(exif_data2):
             if gps_longitude_ref != 'E':
                 lon = 0 - lon
     return lat, lon
+
+
+def parse_exif_unixtime(image_fpath):
+    r"""
+    Args:
+        image_fpath (str):
+
+    Returns:
+        float: unixtime
+
+    CommandLine:
+        python -m vtool.exif --test-parse_exif_unixtime
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.exif import *  # NOQA
+        >>> image_fpath = ut.grab_file_url('http://images.summitpost.org/original/769474.JPG')
+        >>> unixtime = parse_exif_unixtime(image_fpath)
+        >>> result = str(unixtime)
+        >>> print(result)
+        1325369249.0
+    """
+    import vtool.image as gtool
+    pil_img = gtool.open_pil_image(image_fpath)
+    exif_dict = get_exif_dict(pil_img)
+    unixtime = get_unixtime(exif_dict)
+    return unixtime
+
+
+if __name__ == '__main__':
+    """
+    CommandLine:
+        python -m vtool.exif
+        python -m vtool.exif --allexamples
+        python -m vtool.exif --allexamples --noface --nosrc
+    """
+    import multiprocessing
+    multiprocessing.freeze_support()  # for win32
+    import utool as ut  # NOQA
+    ut.doctest_funcs()

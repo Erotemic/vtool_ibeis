@@ -45,6 +45,7 @@ import numpy.linalg as npl
 from numpy.core.umath_tests import matrix_multiply
 from vtool import linalg as ltool
 from vtool import chip as ctool
+from vtool import distance as dtool
 from vtool import trig
 import utool as ut
 #(print, print_, printDBG, rrr, profile) = ut.inject(__name__, '[kpts]')
@@ -101,14 +102,6 @@ def get_xys(kpts):
     """ Keypoint locations in chip space """
     _xys = kpts.T[0:2]
     return _xys
-
-
-def get_homog_xyzs(kpts_):
-    """ Keypoint locations in chip space """
-    _xys = get_xys(kpts_)
-    _zs = np.ones(len(kpts_), dtype=kpts_.dtype)
-    _xyzs = np.vstack((_xys, _zs))
-    return _xyzs
 
 
 def get_invVs(kpts):
@@ -240,13 +233,23 @@ def get_invVR_mats2x2(kpts):
                 [ 2.,  3.]],
                [[ 0., -1.],
                 [ 3., -2.]]])
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.keypoint import *  # NOQA
+        >>> kpts = np.empty((0, 6))
+        >>> invVR_mats2x2 = get_invVR_mats2x2(kpts)
+        >>> assert invVR_mats2x2.shape == (0, 2, 2)
     """
+    if len(kpts) == 0:
+        return np.empty((0, 2, 2))
     invV_mats2x2 = get_invV_mats2x2(kpts)
     # You must apply rotations before you apply shape
     # This is because we are dealing with \emph{inv}(V).
     # numpy operates with data on the right (operate right-to-left)
     R_mats2x2  = get_ori_mats(kpts)
-    invVR_mats2x2 = matrix_multiply(invV_mats2x2, R_mats2x2)
+    with ut.EmbedOnException():
+        invVR_mats2x2 = matrix_multiply(invV_mats2x2, R_mats2x2)
     return invVR_mats2x2
 
 
@@ -327,6 +330,19 @@ def get_invV_mats3x3(kpts):
     #                          [_zeros, _zeros,  _ones]])  # R x C x N
     #invV_mats3x3 = np.rollaxis(invV_arrs3x3, 2)  # N x R x C
     return invV_mats3x3
+
+
+#@profile
+def get_RV_mats_3x3(kpts):
+    """
+    prefered over get_invV_mats
+
+    Returns:
+        V_mats (ndarray) : sequence of matrices that transform an ellipse to unit circle
+    """
+    invVR_mats = get_invVR_mats3x3(kpts)
+    RV_mats = invert_invV_mats(invVR_mats)
+    return RV_mats
 
 
 def get_invVR_mats3x3(kpts):
@@ -489,7 +505,7 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
                 [  0.  ,   0.  ,   1.  ]]])
 
     Ignore:
-        >>> from vtool.coverage_image import *  # NOQA
+        >>> from vtool.coverage_kpts import *  # NOQA
         >>> import vtool as vt
         >>> kpts = vt.dummy.get_dummy_kpts()
         >>> invVR_aff2Ds = [np.array(((a, 0, x),
@@ -540,7 +556,7 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
     # Adjust for the requested scale factor
     S2 = ltool.scale_mat3x3(scale_factor, scale_factor)
     #perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
-    M_list = reduce(matrix_multiply, (S2, invVR_aff2Ds, S1, T1))
+    M_list = reduce(matrix_multiply, (S2, invVR_aff2Ds, S1.dot(T1)))
     return M_list
 
 
@@ -565,7 +581,43 @@ def transform_kpts_to_imgspace(kpts, bbox, bbox_theta, chipsz):
 
 #@profile
 def offset_kpts(kpts, offset=(0.0, 0.0), scale_factor=1.0):
-    if offset == (0.0, 0.0) and scale_factor == 1.0:
+    r"""
+    Args:
+        kpts (ndarray[float32_t, ndim=2]):  keypoints
+        offset (tuple):
+        scale_factor (float):
+
+    Returns:
+        ndarray[float32_t, ndim=2]: kpts -  keypoints
+
+    CommandLine:
+        python -m vtool.keypoint --test-offset_kpts
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.keypoint import *  # NOQA
+        >>> import vtool as vt
+        >>> # build test data
+        >>> kpts = vt.dummy.get_dummy_kpts()
+        >>> offset = (0.0, 0.0)
+        >>> scale_factor = (1.5, .5)
+        >>> # execute function
+        >>> kpts_ = offset_kpts(kpts, offset, scale_factor)
+        >>> # verify results
+        >>> orig = ut.numpy_str(kpts, precision=2)
+        >>> new = ut.numpy_str(kpts_, precision=2)
+        >>> print(orig)
+        >>> print(new)
+        >>> result = new
+        >>> print(result)
+        np.array([[ 20.  ,  25.  ,   5.22,  -5.11,  24.15,   0.  ],
+                  [ 29.  ,  25.  ,   2.36,  -5.11,  24.15,   0.  ],
+                  [ 30.  ,  30.  ,  12.22,  12.02,  10.53,   0.  ],
+                  [ 31.  ,  29.  ,  13.36,  17.63,  14.1 ,   0.  ],
+                  [ 32.  ,  31.  ,  16.05,   3.41,  11.74,   0.  ]], dtype=np.float32)
+
+    """
+    if offset == (0.0, 0.0) and (scale_factor == 1.0 or scale_factor == (1.0, 1.0)):
         return kpts
     M = ltool.scaleedoffset_mat3x3(offset, scale_factor)
     kpts_ = transform_kpts(kpts, M)
@@ -575,6 +627,8 @@ def offset_kpts(kpts, offset=(0.0, 0.0), scale_factor=1.0):
 #@profile
 def transform_kpts(kpts, M):
     r"""
+    returns M.dot(kpts_mat)
+
     Args:
         kpts (ndarray[float32_t, ndim=2]):  keypoints
         M (ndarray): transform matrix
@@ -591,17 +645,17 @@ def transform_kpts(kpts, M):
         >>> import vtool as vt
         >>> # build test data
         >>> kpts = vt.dummy.get_dummy_kpts()
-        >>> M = np.array([[10, 0, 0], [10, 10, 0], [0, 0, 1]])
+        >>> M = np.array([[10, 0, 0], [10, 10, 0], [0, 0, 1]], dtype=np.float64)
         >>> # execute function
         >>> kpts = transform_kpts(kpts, M)
         >>> # verify results
-        >>> result = kpts_repr(kpts)
+        >>> result = ut.numpy_str(kpts, precision=3).replace('-0. ', ' 0. ')
         >>> print(result)
-        array([[ 200.  ,  450.  ,   52.17,    1.06,  241.5 ,   -0.  ],
-               [ 290.  ,  540.  ,   23.55,  -27.56,  241.5 ,   -0.  ],
-               [ 300.  ,  600.  ,  122.17,  242.36,  105.29,   -0.  ],
-               [ 310.  ,  600.  ,  133.56,  309.9 ,  141.04,   -0.  ],
-               [ 320.  ,  630.  ,  160.53,  194.6 ,  117.35,   -0.  ]])
+        np.array([[ 200.   ,  450.   ,   52.166,    1.056,  241.499,    0.   ],
+                  [ 290.   ,  540.   ,   23.551,  -27.559,  241.499,    0.   ],
+                  [ 300.   ,  600.   ,  122.166,  242.357,  105.287,    0.   ],
+                  [ 310.   ,  600.   ,  133.556,  309.899,  141.041,    0.   ],
+                  [ 320.   ,  630.   ,  160.527,  194.6  ,  117.354,    0.   ]], dtype=np.float64)
 
     IGNORE:
         >>> # HOW DO WE KEEP SHAPE AFTER HOMOGRAPHY?
@@ -643,16 +697,29 @@ def transform_kpts(kpts, M):
         assert np.all(MinvVR_mats3x3[:, 2, 0:2] == 0)
         assert np.all(MinvVR_mats3x3[:, 2, 2] == 1)
     except AssertionError as ex:  # NOQA
+        # THERE IS NO WAY TO GET KEYPOINTS TRANFORMED BY A HOMOGENOUS
+        # TRANSFORM MATRIX INTO THE 6 COMPONENT KEYPOINT VECTOR.
         #print(ex)
-        #MinvVR_mats3x3 = ltool.rowwise_division(MinvVR_mats3x3, MinvVR_mats3x3[:, 2, 2]) # 16.4 us
+        #oris = get_invVR_mats_oris(MinvVR_mats3x3)
+        #Lmats = [ltool.rotation_mat3x3(-ori) for ori in oris]
+        #matrix_multiply(MinvVR_mats3x3, Lmats)
+        #matrix_multiply(Lmats, MinvVR_mats3x3)
+        #scipy.linalg.lu(MinvVR_mats3x3[0])
+        #scipy.linalg.qr(MinvVR_mats3x3[0])
+        #ut.embed()
+        import warnings
+        warnings.warn('WARNING: [vtool.keypoint] transform produced non-affine keypoint')
+        #ut.printex(ex, )
+        #raise
+        # We can approximate it very very roughly
         MinvVR_mats3x3 = np.divide(MinvVR_mats3x3, MinvVR_mats3x3[:, None, None, 2, 2])  # 2.6 us
+        raise
         #MinvVR_mats3x3 / MinvVR_mats3x3[:, None, None, 2, :]
-        #ut.printex(ex, 'WARNING: transform produced nonhomogonous keypoint')
     kpts_ = flatten_invV_mats_to_kpts(MinvVR_mats3x3)
     return kpts_
 
 
-def transform_kpts_xys(kpts, H):
+def transform_kpts_xys(H, kpts):
     r"""
     Args:
         kpts (ndarray[float32_t, ndim=2]):  keypoints
@@ -674,10 +741,12 @@ def transform_kpts_xys(kpts, H):
         ...               [  2.,   3.,   6.],
         ...               [  1.,   1.,   2.]])
         >>> # execute function
-        >>> xy_t = transform_kpts_xys(kpts, H)
+        >>> xy_t = transform_kpts_xys(H, kpts)
         >>> # verify results
-        >>> result = str(xy_t)
+        >>> result = ut.numpy_str(xy_t, precision=3)
         >>> print(result)
+        np.array([[ 2.979,  2.982,  2.984,  2.984,  2.985],
+                  [ 2.574,  2.482,  2.516,  2.5  ,  2.508]], dtype=np.float64)
 
     Ignore::
         %pylab qt4
@@ -686,10 +755,13 @@ def transform_kpts_xys(kpts, H):
         pt.draw_kpts2(kpts)
         pt.update()
     """
-    xyz   = get_homog_xyzs(kpts)
-    xyz_t = matrix_multiply(H, xyz)
-    xy_t  = ltool.homogonize(xyz_t)
+    xy = get_xys(kpts)
+    xy_t = ltool.transform_points_with_homography(H, xy)
     return xy_t
+    #xyz   = get_homog_xyzs(kpts)
+    #xyz_t = matrix_multiply(H, xyz)
+    #xy_t  = ltool.add_homogenous_coordinate(xyz_t)
+    #return xy_t
 
 #---------------------
 # invV_mats functions
@@ -707,13 +779,11 @@ def get_invVR_mats_sqrd_scale(invVR_mats):
         >>> # ENABLE_DOCTEST
         >>> from vtool.keypoint import *  # NOQA
         >>> np.random.seed(0)
-        >>> invVR_mats = np.random.rand(1000, 3, 3).astype(np.float64)
+        >>> invVR_mats = np.random.rand(7, 3, 3).astype(np.float64)
         >>> det_arr = get_invVR_mats_sqrd_scale(invVR_mats)
-        >>> result = (ut.hashstr(det_arr))
+        >>> result = ut.numpy_str(det_arr, precision=2)
         >>> print(result)
-        ry07!8e8v8!9h!50
-
-    1i468l@838vatv@4
+        np.array([-0.16, -0.09, -0.34,  0.59, -0.2 ,  0.18,  0.06], dtype=np.float64)
 
     #CYTH_INLINE
     #CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]
@@ -857,16 +927,17 @@ def get_invVR_mats_xys(invVR_mats):
 def get_invVR_mats_oris(invVR_mats):
     r""" extracts orientation from matrix encoding
 
+    CommandLine:
+        python -m vtool.keypoint --test-get_invVR_mats_oris
 
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.keypoint import *  # NOQA
         >>> np.random.seed(0)
-        >>> invVR_mats = np.random.rand(1000, 2, 2).astype(np.float64)
+        >>> invVR_mats = np.random.rand(7, 2, 2).astype(np.float64)
         >>> output = get_invVR_mats_oris(invVR_mats)
-        >>> result = (ut.hashstr(output))
-        >>> print(result)
-        mcoxq8!3ml5bj9rx
+        >>> result = ut.numpy_str(output, precision=2)
+        np.array([ 5.37,  5.29,  5.9 ,  5.26,  4.74,  5.6 ,  4.9 ], dtype=np.float64)
 
     Cyth:
         #CYTH_INLINE
@@ -1009,6 +1080,29 @@ def get_Z_mats(V_mats):
 
 #@profile
 def invert_invV_mats(invV_mats):
+    r"""
+    Args:
+        invV_mats (ndarray[float32_t, ndim=3]):  keypoint shapes (possibly translation)
+
+    Returns:
+        ndarray[float32_t, ndim=3]: V_mats
+
+    CommandLine:
+        python -m vtool.keypoint --test-invert_invV_mats
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.keypoint import *  # NOQA
+        >>> import vtool as vt
+        >>> # build test data
+        >>> kpts = vt.dummy.get_dummy_kpts()
+        >>> invV_mats = vt.get_invVR_mats3x3(kpts)
+        >>> # execute function
+        >>> V_mats = invert_invV_mats(invV_mats)
+        >>> test = vt.matrix_multiply(invV_mats, V_mats)
+        >>> # This should give us identity
+        >>> assert np.allclose(test, np.eye(3))
+    """
     try:
         V_mats = npl.inv(invV_mats)
     except npl.LinAlgError:
@@ -1081,7 +1175,7 @@ def get_xy_axis_extents(kpts):
 
 
 #@profile
-def get_kpts_bounds(kpts):
+def get_kpts_image_extent(kpts):
     """
     returns the width and height of keypoint bounding box
     This combines xy and shape information
@@ -1094,7 +1188,7 @@ def get_kpts_bounds(kpts):
         tuple: wh_bound
 
     CommandLine:
-        python -m vtool.keypoint --test-get_kpts_bounds
+        python -m vtool.keypoint --test-get_kpts_image_extent
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -1103,7 +1197,7 @@ def get_kpts_bounds(kpts):
         >>> # build test data
         >>> kpts = vt.dummy.get_dummy_kpts()
         >>> # execute function
-        >>> wh_bound = get_kpts_bounds(kpts)
+        >>> wh_bound = get_kpts_image_extent(kpts)
         >>> # verify results
         >>> result = kpts_repr(np.array(wh_bound))
         >>> print(result)
@@ -1117,38 +1211,37 @@ def get_kpts_bounds(kpts):
     return wh_bound
 
 
-#@profile
-def get_diag_extent_sqrd(kpts):
-    """
-    Returns the diagonal extent of keypoint x,y locations
-    SHAPES ARE NOT ACCOUNTED FOR
+def get_kpts_dlen_sqrd(kpts):
+    r"""
+    returns diagonal length squared of keypoint extent
 
     Args:
-        kpts (ndarray[float32_t, ndim=2][ndims=2]):  keypoints
+        kpts (ndarray[float32_t, ndim=2]):  keypoints
 
     Returns:
-        ?: extent_sqrd
+        float: dlen_sqrd
 
     CommandLine:
-        python -m vtool.keypoint --test-get_diag_extent_sqrd
+        python -m vtool.keypoint --test-get_kpts_dlen_sqrd
 
     Example:
-        >>> # DISABLE_DOCTEST
+        >>> # ENABLE_DOCTEST
         >>> from vtool.keypoint import *  # NOQA
         >>> import vtool as vt
         >>> # build test data
         >>> kpts = vt.dummy.get_dummy_kpts()
         >>> # execute function
-        >>> extent_sqrd = get_diag_extent_sqrd(kpts)
+        >>> dlen_sqrd = get_kpts_dlen_sqrd(kpts)
         >>> # verify results
-        >>> result = str(extent_sqrd)
+        >>> result = '%.2f' % dlen_sqrd
         >>> print(result)
+        5681.31
     """
-    xs, ys = get_xys(kpts)
-    x_extent_sqrd = (xs.max() - xs.min()) ** 2
-    y_extent_sqrd = (ys.max() - ys.min()) ** 2
-    extent_sqrd = x_extent_sqrd + y_extent_sqrd
-    return extent_sqrd
+    if len(kpts) == 0:
+        return 0.0
+    w, h = get_kpts_image_extent(kpts)
+    dlen_sqrd = (w ** 2) + (h ** 2)
+    return dlen_sqrd
 
 
 #@profile
@@ -1210,28 +1303,86 @@ def kpts_repr(arr, precision=2, suppress_small=True, linebreak=False):
     return reprstr
 
 
+def kp_cpp_infostr(kp):
+    """ mirrors c++ debug code """
+    x, y = kp[0:2]
+    a11, a21, a22 = kp[2:5]
+    a12 = 0.0
+    ori = kp[5]
+    s = np.sqrt(a11 * a22)
+    a11 /= s
+    a12 /= s
+    a21 /= s
+    a22 /= s
+    infostr_list = [
+        ('+---'),
+        ('|     xy = (%s, %s)' % (x, y)),
+        ('| hat{invV} = [(%s, %s),' % (a11, a12,)),
+        ('|              (%s, %s)]' % (a21, a22,)),
+        ('|    sc  = %s' % (s,)),
+        ('|    ori = %s' % (ori,)),
+        ('L___'),
+    ]
+    return '\n'.join(infostr_list)
+
+
+def kpts_docrepr(arr, name='arr', indent=True, *args, **kwargs):
+    r"""
+    CommandLine:
+        python -m vtool.keypoint --test-kpts_docrepr
+
+    Example:
+        >>> # DISABLE_DOCTEST
+        >>> from vtool.keypoint import *  # NOQA
+        >>> # build test data
+        >>> np.random.seed(0)
+        >>> arr = np.random.rand(3, 3)
+        >>> args = tuple()
+        >>> kwargs = dict()
+        >>> # execute function
+        >>> result = kpts_docrepr(arr)
+        >>> # verify results
+        >>> print(result)
+    """
+    reprstr_ = kpts_repr(arr, *args, **kwargs)
+    eq = ' = '
+    if len(name) == 0:
+        eq = ''
+    prefix = name + eq + 'np.'
+    docrepr_ = ut.indent(prefix + reprstr_, ' ' * len(prefix))[len(prefix):]
+    if indent:
+        docrepr = ut.indent('>>> ' + ut.indent(docrepr_, '... ')[4:], ' ' * 8)
+    else:
+        docrepr = docrepr_
+    return docrepr
+
+
 def get_match_spatial_squared_error(kpts1, kpts2, H, fx2_to_fx1):
     """ transforms img2 to img2 and finds squared spatial error
 
     Args:
         kpts1 (ndarray[float32_t, ndim=2]):  keypoints
         kpts2 (ndarray[float32_t, ndim=2]):  keypoints
-        H (ndarray[float64_t, ndim=2]):  homography/perspective matrix
+        H (ndarray[float64_t, ndim=2]):  homography/perspective matrix mapping image 1 to image 2 space
         fx2_to_fx1 (ndarray): has shape (nMatch, K)
 
     Returns:
         ndarray: fx2_to_xyerr_sqrd has shape (nMatch, K)
 
-    Example:
+    CommandLine:
+        python -m vtool.keypoint --test-get_match_spatial_squared_error:0
+        python -m vtool.keypoint --test-get_match_spatial_squared_error:1
+
+    Example0:
         >>> # ENABLE_DOCTEST
-        >>> from vtool.constrained_matching import *  # NOQA
+        >>> from vtool.keypoint import *  # NOQA
         >>> # build test data
         >>> kpts1 = np.array([[ 129.83,   46.97,   15.84,    4.66,    7.24,    0.  ],
-        ...                  [ 137.88,   49.87,   20.09,    5.76,    6.2 ,    0.  ],
-        ...                  [ 115.95,   53.13,   12.96,    1.73,    8.77,    0.  ],
-        ...                  [ 324.88,  172.58,  127.69,   41.29,   50.5 ,    0.  ],
-        ...                  [ 285.44,  254.61,  136.06,   -4.77,   76.69,    0.  ],
-        ...                  [ 367.72,  140.81,  172.13,   12.99,   96.15,    0.  ]], dtype=np.float32)
+        ...                   [ 137.88,   49.87,   20.09,    5.76,    6.2 ,    0.  ],
+        ...                   [ 115.95,   53.13,   12.96,    1.73,    8.77,    0.  ],
+        ...                   [ 324.88,  172.58,  127.69,   41.29,   50.5 ,    0.  ],
+        ...                   [ 285.44,  254.61,  136.06,   -4.77,   76.69,    0.  ],
+        ...                   [ 367.72,  140.81,  172.13,   12.99,   96.15,    0.  ]], dtype=np.float32)
         >>> kpts2 = np.array([[ 318.93,   11.98,   12.11,    0.38,    8.04,    0.  ],
         ...                   [ 509.47,   12.53,   22.4 ,    1.31,    5.04,    0.  ],
         ...                   [ 514.03,   13.04,   19.25,    1.74,    4.72,    0.  ],
@@ -1251,23 +1402,62 @@ def get_match_spatial_squared_error(kpts1, kpts2, H, fx2_to_fx1):
         >>> fx2_to_xyerr_sqrd = get_match_spatial_squared_error(kpts1, kpts2, H, fx2_to_fx1)
         >>> fx2_to_xyerr = np.sqrt(fx2_to_xyerr_sqrd)
         >>> # verify results
-        >>> result = str(fx2_to_xyerr)
+        >>> result = ut.numpy_str(fx2_to_xyerr, precision=3)
         >>> print(result)
-        [[  82.84813777  186.23801821  183.97945482  192.63939757]
-         [ 382.98822312  374.35627682  122.17899418  289.15964849]
-         [ 387.56336468  378.93044982  126.38890667  292.39140223]
-         [ 419.24610836  176.66835461  400.17549807  167.41056948]
-         [ 174.269059    274.28862645  281.03010583   33.520562  ]
-         [  54.08322366  269.64496323   94.71123543  277.70556825]]
+        np.array([[  82.848,  186.238,  183.979,  192.639],
+                  [ 382.988,  374.356,  122.179,  289.16 ],
+                  [ 387.563,  378.93 ,  126.389,  292.391],
+                  [ 419.246,  176.668,  400.175,  167.411],
+                  [ 174.269,  274.289,  281.03 ,   33.521],
+                  [  54.083,  269.645,   94.711,  277.706]], dtype=np.float64)
 
+    Example1:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.keypoint import *  # NOQA
+        >>> # build test data
+        >>> kpts1 = np.array([[  6.,   4.,   15.84,    4.66,    7.24,    0.  ],
+        ...                   [  9.,   3.,   20.09,    5.76,    6.2 ,    0.  ],
+        ...                   [  1.,   1.,   12.96,    1.73,    8.77,    0.  ],])
+        >>> kpts2 = np.array([[  2.,   1.,   12.11,    0.38,    8.04,    0.  ],
+        ...                   [  5.,   1.,   22.4 ,    1.31,    5.04,    0.  ],
+        ...                   [  6.,   1.,   19.25,    1.74,    4.72,    0.  ],])
+        >>> H = np.array([[ 2,  0, 0],
+        >>>               [ 0,  1, 0],
+        >>>               [ 0,  0, 1]])
+        >>> fx2_to_fx1 = np.array([[2, 1, 0],
+        >>>                        [0, 1, 2],
+        >>>                        [2, 1, 0]], dtype=np.int32)
+        >>> # execute function
+        >>> fx2_to_xyerr_sqrd = get_match_spatial_squared_error(kpts1, kpts2, H, fx2_to_fx1)
+        >>> fx2_to_xyerr = np.sqrt(fx2_to_xyerr_sqrd)
+        >>> # verify results
+        >>> result = ut.numpy_str(fx2_to_xyerr, precision=3)
+        >>> print(result)
+        np.array([[  0.   ,  16.125,  10.44 ],
+                  [  7.616,  13.153,   3.   ],
+                  [  4.   ,  12.166,   6.708]], dtype=np.float64)
     """
-    # Transform img1 keypoints into img2 space
-    xy2    = get_xys(kpts2)
-    xy1_t = transform_kpts_xys(kpts1, H)
+    DEBUG = True
+    if DEBUG:
+        try:
+            assert kpts2.shape[0] == fx2_to_fx1.shape[0]
+            assert kpts1.shape[0] >= fx2_to_fx1.max()
+        except AssertionError as ex:
+            ut.printex(ex, 'bad shape', keys=[
+                'kpts2.shape',
+                'kpts1.shape',
+                'fx2_to_fx1.shape',
+                'fx2_to_fx1.max()']
+            )
+            raise
+    # Transform img1 xy-keypoints into img2 space
+    xy1_t = transform_kpts_xys(H, kpts1)
+    # Get untransformed image 2 xy-keypoints
+    xy2   = get_xys(kpts2)
     # get spatial keypoint distance to all neighbor candidates
     bcast_xy2   = xy2[:, None, :].T
     bcast_xy1_t = xy1_t.T[fx2_to_fx1]
-    fx2_to_xyerr_sqrd = ltool.L2_sqrd(bcast_xy2, bcast_xy1_t)
+    fx2_to_xyerr_sqrd = dtool.L2_sqrd(bcast_xy2, bcast_xy1_t)
     return fx2_to_xyerr_sqrd
 
 

@@ -80,3 +80,7 @@ run_cyth_benchmarks.py
 *.orig
 _doc
 test_times.txt
+
+failed_doctests.txt
+vtool/libsver.dll
+vtool/libsver.dll.a

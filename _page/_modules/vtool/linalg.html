@@ -1,72 +1,157 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>vtool.linalg &mdash; vtool 1.0.0.dev1 documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '1.0.0.dev1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vtool.linalg &mdash; vtool 1.0.0.dev1 documentation</title>
+  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="vtool 1.0.0.dev1 documentation" href="../../index.html"/>
+        <link rel="up" title="vtool" href="../vtool.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> vtool</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.chip">vtool.chip module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.clustering">vtool.clustering module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.clustering2">vtool.clustering2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.constrained_matching">vtool.constrained_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.coverage_grid">vtool.coverage_grid module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.coverage_kpts">vtool.coverage_kpts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.distance">vtool.distance module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.ellipse">vtool.ellipse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.exif">vtool.exif module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.features">vtool.features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.geometry">vtool.geometry module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.histogram">vtool.histogram module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.image">vtool.image module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.image_filters">vtool.image_filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.keypoint">vtool.keypoint module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.linalg">vtool.linalg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.matching">vtool.matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.math">vtool.math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.nearest_neighbors">vtool.nearest_neighbors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.other">vtool.other module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.patch">vtool.patch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.quality_classifier">vtool.quality_classifier module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.segmentation">vtool.segmentation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.spatial_verification">vtool.spatial_verification module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.sver_c_wrapper">vtool.sver_c_wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.test_constrained_matching">vtool.test_constrained_matching module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool.trig">vtool.trig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vtool.html#module-vtool">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">vtool</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+          <li><a href="../vtool.html">vtool</a> &raquo;</li>
+      
+    <li>vtool.linalg</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
             
   <h1>Source code for vtool.linalg</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO: Look at this file</span>
+<span class="sd">    http://www.lfd.uci.edu/~gohlke/code/transformations.py.html</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
-<span class="c"># Science</span>
+<span class="c">#import sys</span>
+<span class="c">#sys.exit(1)</span>
+<span class="c"># THE NUMPY ERROR HAPPENS BECAUSE OF OPENCV</span>
 <span class="kn">import</span> <span class="nn">cv2</span>
-<span class="kn">import</span> <span class="nn">six</span>
-<span class="kn">import</span> <span class="nn">functools</span>
+<span class="c">#import six</span>
+<span class="c">#import functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="kn">as</span> <span class="nn">npl</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">utool</span>
 
 <span class="n">profile</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">profile</span>
-<span class="c">#(print, print_, printDBG, rrr, profile) = utool.inject(</span>
-<span class="c">#    __name__, &#39;[linalg]&#39;, DEBUG=False)</span>
+<span class="p">(</span><span class="k">print</span><span class="p">,</span> <span class="n">print_</span><span class="p">,</span> <span class="n">printDBG</span><span class="p">,</span> <span class="n">rrr</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span> <span class="o">=</span> <span class="n">utool</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span>
+    <span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;[linalg]&#39;</span><span class="p">,</span> <span class="n">DEBUG</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">#if CYTH</span>
 <span class="sd">cdef np.float64_t TAU = 2 * np.pi</span>
 <span class="sd">#endif</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="n">TAU</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c"># tauday.com</span>
+<span class="n">TAU</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c"># References: tauday.com</span>
 
 <span class="n">TRANSFORM_DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
 
@@ -77,10 +162,35 @@
 
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="svd"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.svd">[docs]</a><span class="k">def</span> <span class="nf">svd</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        M (ndarray): must be either float32 or float64</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (U, s, Vt)</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.linalg --test-svd</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; M = np.array([1, 2, 3], dtype=np.float32)</span>
+<span class="sd">        &gt;&gt;&gt; M = np.array([[20.5812, 0], [3.615, 17.1295]], dtype=np.float64)</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; (U, s, Vt) = svd(M)</span>
+
+<span class="sd">    Timeit::</span>
+<span class="sd">        flags = cv2.SVD_FULL_UV</span>
+<span class="sd">        %timeit cv2.SVDecomp(M, flags=flags)</span>
+<span class="sd">        %timeit npl.svd(M)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c"># V is actually Vt</span>
     <span class="n">flags</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">SVD_FULL_UV</span>
     <span class="n">S</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">SVDecomp</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="c">#U, s, Vt = npl.svd(M)</span>
     <span class="k">return</span> <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span>
 
 </div>
@@ -113,9 +223,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span>
     <span class="k">if</span> <span class="n">mu</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">])</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="n">sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
         <span class="n">det</span> <span class="o">=</span> <span class="n">npl</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
@@ -134,36 +247,29 @@
 </div>
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="rotation_mat3x3"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rotation_mat3x3">[docs]</a><span class="k">def</span> <span class="nf">rotation_mat3x3</span><span class="p">(</span><span class="n">radians</span><span class="p">):</span>
-    <span class="n">sin_</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
-    <span class="n">cos_</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="n">array</span><span class="p">(((</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">,</span>  <span class="mi">0</span><span class="p">),</span>
-               <span class="p">(</span><span class="n">sin_</span><span class="p">,</span>  <span class="n">cos_</span><span class="p">,</span>  <span class="mi">0</span><span class="p">),</span>
-               <span class="p">(</span>   <span class="mi">0</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">),))</span>
+    <span class="c"># TODO: handle array impouts</span>
+    <span class="n">sin_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
+    <span class="n">cos_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(((</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">,</span>  <span class="mi">0</span><span class="p">),</span>
+                  <span class="p">(</span><span class="n">sin_</span><span class="p">,</span>  <span class="n">cos_</span><span class="p">,</span>  <span class="mi">0</span><span class="p">),</span>
+                  <span class="p">(</span>   <span class="mi">0</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">),))</span>
     <span class="k">return</span> <span class="n">R</span>
 
 </div>
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="rotation_mat2x2"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rotation_mat2x2">[docs]</a><span class="k">def</span> <span class="nf">rotation_mat2x2</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-    <span class="n">sin_</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">cos_</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">rot_</span> <span class="o">=</span> <span class="n">array</span><span class="p">(((</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">),</span>
-                  <span class="p">(</span><span class="n">sin_</span><span class="p">,</span>  <span class="n">cos_</span><span class="p">),))</span>
+    <span class="n">sin_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">cos_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">rot_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(((</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">),</span>
+                     <span class="p">(</span><span class="n">sin_</span><span class="p">,</span>  <span class="n">cos_</span><span class="p">),))</span>
     <span class="k">return</span> <span class="n">rot_</span>
 
 </div>
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="rotation_around_mat3x3"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rotation_around_mat3x3">[docs]</a><span class="k">def</span> <span class="nf">rotation_around_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="n">sin_</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">cos_</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">tr1_</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-    <span class="n">rot_</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                  <span class="p">[</span><span class="n">sin_</span><span class="p">,</span> <span class="n">cos_</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
-                  <span class="p">[</span>   <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">]])</span>
-    <span class="n">tr2_</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">tr1_</span> <span class="o">=</span> <span class="n">translation_mat3x3</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">rot_</span> <span class="o">=</span> <span class="n">rotation_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">tr2_</span> <span class="o">=</span> <span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">rot</span> <span class="o">=</span> <span class="n">tr2_</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tr1_</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rot</span>
 
@@ -178,18 +284,18 @@
 </div>
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="translation_mat3x3"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.translation_mat3x3">[docs]</a><span class="k">def</span> <span class="nf">translation_mat3x3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">TRANSFORM_DTYPE</span><span class="p">):</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">x</span><span class="p">],</span>
-               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="n">y</span><span class="p">],</span>
-               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">x</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="n">y</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">T</span>
 
 </div>
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="scale_mat3x3"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.scale_mat3x3">[docs]</a><span class="k">def</span> <span class="nf">scale_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">TRANSFORM_DTYPE</span><span class="p">):</span>
     <span class="n">sy</span> <span class="o">=</span> <span class="n">sx</span> <span class="k">if</span> <span class="n">sy</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">sy</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="n">sx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-               <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">sx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">S</span>
 
 </div>
@@ -223,7 +329,7 @@
     <span class="c">#cdef inv_ltri(FLOAT_2D ltri, FLOAT_1D det):</span>
     <span class="sd">&quot;&quot;&quot; Lower triangular inverse &quot;&quot;&quot;</span>
     <span class="c"># PYX CDEF FLOAT_2D inv_ltri</span>
-    <span class="n">inv_ltri</span> <span class="o">=</span> <span class="n">array</span><span class="p">((</span><span class="n">ltri</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="n">ltri</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ltri</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ltri</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
+    <span class="n">inv_ltri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">ltri</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="n">ltri</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ltri</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ltri</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
     <span class="k">return</span> <span class="n">inv_ltri</span>
 
 
@@ -242,206 +348,26 @@
     <span class="n">o11</span> <span class="o">=</span> <span class="p">(</span><span class="n">m11</span> <span class="o">*</span> <span class="n">n11</span><span class="p">)</span>
     <span class="n">o21</span> <span class="o">=</span> <span class="p">(</span><span class="n">m21</span> <span class="o">*</span> <span class="n">n11</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">m22</span> <span class="o">*</span> <span class="n">n21</span><span class="p">)</span>
     <span class="n">o22</span> <span class="o">=</span> <span class="p">(</span><span class="n">m22</span> <span class="o">*</span> <span class="n">n22</span><span class="p">)</span>
-    <span class="n">ltri3</span> <span class="o">=</span> <span class="n">array</span><span class="p">((</span><span class="n">o11</span><span class="p">,</span> <span class="n">o21</span><span class="p">,</span> <span class="n">o22</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ltri1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ltri3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">o11</span><span class="p">,</span> <span class="n">o21</span><span class="p">,</span> <span class="n">o22</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ltri1</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ltri3</span>
 <span class="c"># PYX END CDEF</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="nearest_point"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.nearest_point">[docs]</a><span class="k">def</span> <span class="nf">nearest_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">pts</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;random&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; finds the nearest point(s) in pts to (x, y) &quot;&quot;&quot;</span>
-    <span class="n">dists</span> <span class="o">=</span> <span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-    <span class="n">fx</span> <span class="o">=</span> <span class="n">dists</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
-    <span class="n">mindist</span> <span class="o">=</span> <span class="n">dists</span><span class="p">[</span><span class="n">fx</span><span class="p">]</span>
-    <span class="n">other_fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mindist</span> <span class="o">==</span> <span class="n">dists</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_fx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;random&#39;</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">other_fx</span><span class="p">)</span>
-            <span class="n">fx</span> <span class="o">=</span> <span class="n">other_fx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;all&#39;</span><span class="p">:</span>
-            <span class="n">fx</span> <span class="o">=</span> <span class="n">other_fx</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;first&#39;</span><span class="p">:</span>
-            <span class="n">fx</span> <span class="o">=</span> <span class="n">fx</span>
-    <span class="k">return</span> <span class="n">fx</span><span class="p">,</span> <span class="n">mindist</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="and_lists"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.and_lists">[docs]</a><span class="k">def</span> <span class="nf">and_lists</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Like np.logical_and, but can take more than 2 arguments</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># TODO: Cython</span>
-    <span class="c"># TODO: remove reduce statement (bleh)</span>
-    <span class="k">if</span> <span class="n">six</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>
-        <span class="n">flags</span> <span class="o">=</span>  <span class="nb">reduce</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">six</span><span class="o">.</span><span class="n">PY3</span><span class="p">:</span>
-        <span class="n">flags</span> <span class="o">=</span>  <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">flags</span>
-
-</div>
-<div class="viewcode-block" id="and_3lists"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.and_3lists">[docs]</a><span class="k">def</span> <span class="nf">and_3lists</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">arr3</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    &gt;&gt;&gt; np.random.seed(53)</span>
-<span class="sd">    &gt;&gt;&gt; arr1 = (np.random.rand(1000) &gt; .5).astype(np.bool)</span>
-<span class="sd">    &gt;&gt;&gt; arr2 = (np.random.rand(1000) &gt; .5).astype(np.bool)</span>
-<span class="sd">    &gt;&gt;&gt; arr3 = (np.random.rand(1000) &gt; .5).astype(np.bool)</span>
-<span class="sd">    &gt;&gt;&gt; output = and_3lists(arr1, arr2, arr3)</span>
-<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
-<span class="sd">    prxuyy1w%ht57jaf</span>
-
-<span class="sd">    #if CYTH</span>
-<span class="sd">    #CYTH_INLINE</span>
-<span class="sd">    cdef:</span>
-<span class="sd">        np.ndarray arr1</span>
-<span class="sd">        np.ndarray arr2</span>
-<span class="sd">        np.ndarray arr3</span>
-<span class="sd">    #endif</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">),</span> <span class="n">arr3</span><span class="p">)</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="ori_distance"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.ori_distance">[docs]</a><span class="k">def</span> <span class="nf">ori_distance</span><span class="p">(</span><span class="n">ori1</span><span class="p">,</span> <span class="n">ori2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns how far off determinants are from one another</span>
-<span class="sd">    &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    &gt;&gt;&gt; np.random.seed(53)</span>
-<span class="sd">    &gt;&gt;&gt; ori1 = (np.random.rand(1000) * TAU) - np.pi</span>
-<span class="sd">    &gt;&gt;&gt; ori2 = (np.random.rand(1000) * TAU) - np.pi</span>
-<span class="sd">    &gt;&gt;&gt; output = utool.hashstr(utool.hashstr(ori_distance(ori1, ori2)))</span>
-<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
-<span class="sd">    !755pt!alrfgshiu</span>
-
-<span class="sd">    #if CYTH</span>
-<span class="sd">    #CYTH_INLINE</span>
-<span class="sd">    #CYTH_PARAM_TYPES:</span>
-<span class="sd">        np.ndarray ori1</span>
-<span class="sd">        np.ndarray ori2</span>
-<span class="sd">    #endif</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># TODO: Cython</span>
-    <span class="n">ori_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ori1</span> <span class="o">-</span> <span class="n">ori2</span><span class="p">)</span> <span class="o">%</span> <span class="n">TAU</span>
-    <span class="n">ori_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">ori_dist</span><span class="p">,</span> <span class="n">TAU</span> <span class="o">-</span> <span class="n">ori_dist</span><span class="p">)</span>
-    <span class="c">#np.minimum(ori_dist, TAU - ori_dist, ori_dist)</span>
-    <span class="k">return</span> <span class="n">ori_dist</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="det_distance"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.det_distance">[docs]</a><span class="k">def</span> <span class="nf">det_distance</span><span class="p">(</span><span class="n">det1</span><span class="p">,</span> <span class="n">det2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns how far off determinants are from one another</span>
-<span class="sd">    &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    &gt;&gt;&gt; np.random.seed(53)</span>
-<span class="sd">    &gt;&gt;&gt; det1 = np.random.rand(1000)</span>
-<span class="sd">    &gt;&gt;&gt; det2 = np.random.rand(1000)</span>
-<span class="sd">    &gt;&gt;&gt; output = det_distance(det1, det2)</span>
-<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
-<span class="sd">    pfce!exwvqz8e1n!</span>
-
-<span class="sd">    #CYTH_INLINE</span>
-<span class="sd">    #CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]</span>
-<span class="sd">    #CYTH_PARAM_TYPES:</span>
-<span class="sd">        np.ndarray[np.float64_t, ndim=1] det1</span>
-<span class="sd">        np.ndarray[np.float64_t, ndim=1] det2</span>
-<span class="sd">    #if CYTH</span>
-<span class="sd">    # TODO: Move to ktool?</span>
-<span class="sd">    cdef unsigned int nDets = det1.shape[0]</span>
-<span class="sd">    # Prealloc output</span>
-<span class="sd">    out = np.zeros((nDets,), dtype=det1.dtype)</span>
-<span class="sd">    cdef size_t ix</span>
-<span class="sd">    for ix in range(nDets):</span>
-<span class="sd">        # simple determinant: ad - bc</span>
-<span class="sd">        if det1[ix] &gt; det2[ix]:</span>
-<span class="sd">            out[ix] = det1[ix] / det2[ix]</span>
-<span class="sd">        else:</span>
-<span class="sd">            out[ix] = det2[ix] / det1[ix]</span>
-<span class="sd">    return out</span>
-<span class="sd">    #else</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># TODO: Cython</span>
-    <span class="n">det_dist</span> <span class="o">=</span> <span class="n">det1</span> <span class="o">/</span> <span class="n">det2</span>
-    <span class="c"># Flip ratios that are less than 1</span>
-    <span class="n">_flip_flag</span> <span class="o">=</span> <span class="n">det_dist</span> <span class="o">&lt;</span> <span class="mi">1</span>
-    <span class="c">#det_dist[_flip_flag] = (1.0 / det_dist[_flip_flag])</span>
-    <span class="n">det_dist</span><span class="p">[</span><span class="n">_flip_flag</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">det_dist</span><span class="p">[</span><span class="n">_flip_flag</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">det_dist</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="L1"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.L1">[docs]</a><span class="k">def</span> <span class="nf">L1</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns L1 (aka manhatten or grid) distance between two histograms &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">hist1</span> <span class="o">-</span> <span class="n">hist2</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="L2_sqrd"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.L2_sqrd">[docs]</a><span class="k">def</span> <span class="nf">L2_sqrd</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns the squared L2 distance</span>
-<span class="sd">    seealso L2</span>
-<span class="sd">    Test:</span>
-<span class="sd">    &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    &gt;&gt;&gt; np.random.seed(53)</span>
-<span class="sd">    &gt;&gt;&gt; hist1 = np.random.rand(1000, 2)</span>
-<span class="sd">    &gt;&gt;&gt; hist2 = np.random.rand(1000, 2)</span>
-<span class="sd">    &gt;&gt;&gt; output = L2_sqrd(hist1, hist2)</span>
-<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(output))</span>
-<span class="sd">    v9wc&amp;brmvjy1as!z</span>
-
-<span class="sd">    #CYTH_INLINE</span>
-<span class="sd">    #CYTH_RETURNS np.ndarray[np.float64_t, ndim=1]</span>
-<span class="sd">    #CYTH_PARAM_TYPES:</span>
-<span class="sd">        np.ndarray[np.float64_t, ndim=2] hist1</span>
-<span class="sd">        np.ndarray[np.float64_t, ndim=2] hist2</span>
-<span class="sd">    #if CYTH</span>
-<span class="sd">    cdef:</span>
-<span class="sd">        size_t cx, rx</span>
-<span class="sd">    cdef unsigned int rows = hist1.shape[0]</span>
-<span class="sd">    cdef unsigned int cols = hist1.shape[1]</span>
-<span class="sd">    # Prealloc output</span>
-<span class="sd">    cdef np.ndarray[np.float64_t, ndim=1] out = np.zeros((rows,), dtype=hist1.dtype)</span>
-<span class="sd">    for rx in range(rows):</span>
-<span class="sd">        for cx in range(cols):</span>
-<span class="sd">            out[rx] += (hist1[rx, cx] - hist2[rx, cx]) ** 2</span>
-<span class="sd">    return out</span>
-<span class="sd">    #else</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># TODO: np.ufunc</span>
-    <span class="c"># TODO: Cython</span>
-    <span class="c"># temp memory</span>
-    <span class="c">#temp = np.empty(hist1.shape, dtype=hist1.dtype)</span>
-    <span class="c">#np.subtract(hist1, hist2, temp)</span>
-    <span class="c">#np.abs(temp, temp)</span>
-    <span class="c">#np.power(temp, 2, temp)</span>
-    <span class="c">#out = temp.sum(-1)</span>
-    <span class="k">return</span> <span class="p">((</span><span class="n">hist1</span> <span class="o">-</span> <span class="n">hist2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c"># this is faster</span>
-    <span class="c">#return out</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="L2"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.L2">[docs]</a><span class="k">def</span> <span class="nf">L2</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns L2 (aka euclidean or standard) distance between two histograms &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">hist1</span> <span class="o">-</span> <span class="n">hist2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="hist_isect"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.hist_isect">[docs]</a><span class="k">def</span> <span class="nf">hist_isect</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns histogram intersection distance between two histograms &quot;&quot;&quot;</span>
-    <span class="n">numer</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">]))</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">denom</span> <span class="o">=</span> <span class="n">hist2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">hisect_dist</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hisect_dist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">hisect_dist</span> <span class="o">=</span> <span class="n">hisect_dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">hisect_dist</span>
 
 </div>
 <span class="nd">@profile</span>
 <div class="viewcode-block" id="whiten_xy_points"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.whiten_xy_points">[docs]</a><span class="k">def</span> <span class="nf">whiten_xy_points</span><span class="p">(</span><span class="n">xy_m</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    whitens points to mean=0, stddev=1 and returns transformation</span>
-<span class="sd">    &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    &gt;&gt;&gt; from vtool.tests import dummy</span>
-<span class="sd">    &gt;&gt;&gt; xy_m = dummy.get_dummy_xy()</span>
-<span class="sd">    &gt;&gt;&gt; tup = whiten_xy_points(xy_m)</span>
-<span class="sd">    &gt;&gt;&gt; xy_norm, T = tup</span>
-<span class="sd">    &gt;&gt;&gt; print(utool.hashstr(tup))</span>
-<span class="sd">    wg%mpai0hxvil4p2</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.tests import dummy</span>
+<span class="sd">        &gt;&gt;&gt; xy_m = dummy.get_dummy_xy()</span>
+<span class="sd">        &gt;&gt;&gt; tup = whiten_xy_points(xy_m)</span>
+<span class="sd">        &gt;&gt;&gt; xy_norm, T = tup</span>
+<span class="sd">        &gt;&gt;&gt; result = (utool.hashstr(tup))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        wg%mpai0hxvil4p2</span>
 
 <span class="sd">    #CYTH_INLINE</span>
 <span class="sd">    #if CYTH</span>
@@ -466,10 +392,59 @@
     <span class="k">return</span> <span class="n">xy_norm</span><span class="p">,</span> <span class="n">T</span>
 
 </div>
+<div class="viewcode-block" id="add_homogenous_coordinate"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.add_homogenous_coordinate">[docs]</a><span class="k">def</span> <span class="nf">add_homogenous_coordinate</span><span class="p">(</span><span class="n">_xys</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">_xys</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">_zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">_xys</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_xys</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">_xyzs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">_xys</span><span class="p">,</span> <span class="n">_zs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_xyzs</span>
+
+</div>
+<div class="viewcode-block" id="remove_homogenous_coordinate"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.remove_homogenous_coordinate">[docs]</a><span class="k">def</span> <span class="nf">remove_homogenous_coordinate</span><span class="p">(</span><span class="n">_xyzs</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">_xyzs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="n">_xys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">_xyzs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">_xyzs</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">_xys</span>
+
+</div>
+<div class="viewcode-block" id="transform_points_with_homography"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.transform_points_with_homography">[docs]</a><span class="k">def</span> <span class="nf">transform_points_with_homography</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">_xys</span><span class="p">):</span>
+    <span class="n">xyz</span>  <span class="o">=</span> <span class="n">add_homogenous_coordinate</span><span class="p">(</span><span class="n">_xys</span><span class="p">)</span>
+    <span class="n">xyz_t</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)</span>
+    <span class="n">xy_t</span>  <span class="o">=</span> <span class="n">remove_homogenous_coordinate</span><span class="p">(</span><span class="n">xyz_t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xy_t</span>
+
+</div>
 <div class="viewcode-block" id="homogonize"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.homogonize">[docs]</a><span class="k">def</span> <span class="nf">homogonize</span><span class="p">(</span><span class="n">_xyzs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; normalizes 3d homogonous coordinates into 2d coordinates &quot;&quot;&quot;</span>
-    <span class="n">_xs</span><span class="p">,</span> <span class="n">_ys</span><span class="p">,</span> <span class="n">_zs</span> <span class="o">=</span> <span class="n">_xyzs</span>
-    <span class="n">_xys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">_xs</span> <span class="o">/</span> <span class="n">_zs</span><span class="p">,</span> <span class="n">_ys</span> <span class="o">/</span> <span class="n">_zs</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DEPRICATE in favor of remove_homogenous_coordinate</span>
+
+<span class="sd">    normalizes 3d homogonous coordinates into 2d coordinates</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _xyzs (ndarray): of shape (3, N)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: _xys of shape (2, N)</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.linalg --test-homogonize</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; _xyzs = np.array([[ 140.,  167.,  185.,  185.,  194.],</span>
+<span class="sd">        ...                   [ 121.,  139.,  156.,  155.,  163.],</span>
+<span class="sd">        ...                   [  47.,   56.,   62.,   62.,   65.]])</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; _xys = homogonize(_xyzs)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; result = np.array_repr(_xys, precision=3)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        array([[ 2.979,  2.982,  2.984,  2.984,  2.985],</span>
+<span class="sd">               [ 2.574,  2.482,  2.516,  2.5  ,  2.508]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_xys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">_xyzs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">_xyzs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="c">#_xs, _ys, _zs = _xyzs</span>
+    <span class="c">#_xys = np.vstack((_xs / _zs, _ys / _zs))</span>
     <span class="k">return</span> <span class="n">_xys</span>
 
 </div>
@@ -487,140 +462,113 @@
     <span class="k">return</span> <span class="n">arr1_normed</span>
 
 </div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="axiswise_operation2"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.axiswise_operation2">[docs]</a><span class="k">def</span> <span class="nf">axiswise_operation2</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="normalize_vecs2d_inplace"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.normalize_vecs2d_inplace">[docs]</a><span class="k">def</span> <span class="nf">normalize_vecs2d_inplace</span><span class="p">(</span><span class="n">vecs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Apply opperation to each row</span>
+<span class="sd">    Args:</span>
+<span class="sd">        vecs (ndarray): row vectors to normalize in place</span>
 
-<span class="sd">    &gt;&gt;&gt; arr1 = (255 * np.random.rand(5, 128)).astype(np.uint8)</span>
-<span class="sd">    &gt;&gt;&gt; arr2 = vecs.mean(axis=0)</span>
-<span class="sd">    &gt;&gt;&gt; op = np.subtract</span>
-<span class="sd">    &gt;&gt;&gt; axis = 0</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.linalg --test-normalize_vecs2d_inplace</span>
 
-<span class="sd">    performs an operation between an</span>
-<span class="sd">    (N x A x B ... x Z) array with an</span>
-<span class="sd">    (N x 1) array</span>
-
-<span class="sd">    %timeit op(arr1, arr2[np.newaxis, :])</span>
-<span class="sd">    %timeit op(arr1, arr2[None, :])</span>
-<span class="sd">    %timeit op(arr1, arr2.reshape(1, arr2.shape[0]))</span>
-<span class="sd">    arr2.shape = (1, arr2.shape[0])</span>
-<span class="sd">    %timeit op(arr1, arr2)</span>
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; vecs1 = np.random.rand(1, 10)</span>
+<span class="sd">        &gt;&gt;&gt; normalize_vecs2d_inplace(vecs1)</span>
+<span class="sd">        &gt;&gt;&gt; res1 = str(vecs1)</span>
+<span class="sd">        &gt;&gt;&gt; #vecs2 = np.random.rand(10)</span>
+<span class="sd">        &gt;&gt;&gt; #normalize_vecs2d_inplace(vecs2)</span>
+<span class="sd">        &gt;&gt;&gt; #res2 = str(vecs2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Normalize residuals</span>
+    <span class="c"># this can easily be sped up by cyth</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">vecs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">norm_</span> <span class="o">=</span> <span class="n">npl</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">norm_</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">norm_</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">norm_</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">vecs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vecs</span>
+
+
+<span class="c">#try:</span>
+<span class="c">#    import cyth</span>
+<span class="c">#    if cyth.DYNAMIC:</span>
+<span class="c">#        exec(cyth.import_cyth_execstr(__name__))</span>
+<span class="c">#    else:</span>
+<span class="c">#        # &lt;AUTOGEN_CYTH&gt;</span>
+<span class="c">#        # Regen command: python -c &quot;import vtool.linalg&quot; --cyth-write</span>
+<span class="c">#        pass</span>
+<span class="c">#        # &lt;/AUTOGEN_CYTH&gt;</span>
+<span class="c">#except Exception as ex:</span>
+<span class="c">#    pass</span>
 
 </div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="rowwise_operation"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rowwise_operation">[docs]</a><span class="k">def</span> <span class="nf">rowwise_operation</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    DEPRICATE, numpy has better ways of doing this.</span>
-<span class="sd">    Is the rowwise name correct? Should it be colwise?</span>
-
-<span class="sd">    performs an operation between an</span>
-<span class="sd">    (N x A x B ... x Z) array with an</span>
-<span class="sd">    (N x 1) array</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.linalg</span>
+<span class="sd">        python -m vtool.linalg --allexamples</span>
+<span class="sd">        python -m vtool.linalg --allexamples --noface --nosrc</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># FIXME: not sure this is the correct terminology</span>
-    <span class="k">assert</span> <span class="n">arr1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">arr2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">broadcast_dimensions</span> <span class="o">=</span> <span class="n">arr1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c"># need padding for</span>
-    <span class="n">tileshape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">broadcast_dimensions</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">arr2_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">arr2</span><span class="p">,</span> <span class="n">tileshape</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">rowwise_result</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2_</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">rowwise_result</span>
-
-</div>
-<div class="viewcode-block" id="colwise_operation"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.colwise_operation">[docs]</a><span class="k">def</span> <span class="nf">colwise_operation</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-    <span class="n">arr1T</span> <span class="o">=</span> <span class="n">arr1</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">arr2T</span> <span class="o">=</span> <span class="n">arr2</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">rowwise_result</span> <span class="o">=</span> <span class="n">rowwise_operation</span><span class="p">(</span><span class="n">arr1T</span><span class="p">,</span> <span class="n">arr2T</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
-    <span class="n">colwise_result</span> <span class="o">=</span> <span class="n">rowwise_result</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">return</span> <span class="n">colwise_result</span>
-
-</div>
-<div class="viewcode-block" id="rowwise_oridist"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rowwise_oridist">[docs]</a><span class="k">def</span> <span class="nf">rowwise_oridist</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">):</span>
-    <span class="n">op</span> <span class="o">=</span> <span class="n">ori_distance</span>
-    <span class="k">return</span> <span class="n">rowwise_operation</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="rowwise_division"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rowwise_division">[docs]</a><span class="k">def</span> <span class="nf">rowwise_division</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">rowwise_operation</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">)</span>
-
-</div>
-<div class="viewcode-block" id="compare_matrix_columns"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.compare_matrix_columns">[docs]</a><span class="k">def</span> <span class="nf">compare_matrix_columns</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
-    <span class="c"># FIXME: Generalize</span>
-    <span class="c">#row_matrix = matrix.T</span>
-    <span class="c">#row_list   = columns.T</span>
-    <span class="k">return</span> <span class="n">compare_matrix_to_rows</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">columns</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-
-</div>
-<span class="nd">@profile</span>
-<div class="viewcode-block" id="compare_matrix_to_rows"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.compare_matrix_to_rows">[docs]</a><span class="k">def</span> <span class="nf">compare_matrix_to_rows</span><span class="p">(</span><span class="n">row_matrix</span><span class="p">,</span> <span class="n">row_list</span><span class="p">,</span> <span class="n">comp_op</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">,</span> <span class="n">logic_op</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">):</span>
-    <span class="c"># FIXME: Generalize</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compares each row in row_list to each row in row matrix using comp_op</span>
-<span class="sd">    Both must have the same number of columns.</span>
-<span class="sd">    Performs logic_op on the results of each individual row</span>
-
-<span class="sd">    compop   = np.equal</span>
-<span class="sd">    logic_op = np.logical_or</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">row_result_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">([</span><span class="n">comp_op</span><span class="p">(</span><span class="n">matrow</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">matrow</span> <span class="ow">in</span> <span class="n">row_matrix</span><span class="p">])</span>
-                       <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">row_list</span><span class="p">]</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">row_result_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">row_result</span> <span class="ow">in</span> <span class="n">row_result_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">logic_op</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">row_result</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">output</span>
-
-</div>
-<span class="kn">import</span> <span class="nn">cyth</span>
-<span class="k">if</span> <span class="n">cyth</span><span class="o">.</span><span class="n">DYNAMIC</span><span class="p">:</span>
-    <span class="k">exec</span><span class="p">(</span><span class="n">cyth</span><span class="o">.</span><span class="n">import_cyth_execstr</span><span class="p">(</span><span class="n">__name__</span><span class="p">))</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="c"># &lt;AUTOGEN_CYTH&gt;</span>
-    <span class="c"># Regen command: python -c &quot;import vtool.linalg&quot; --cyth-write</span>
-    <span class="k">pass</span>
-    <span class="c"># &lt;/AUTOGEN_CYTH&gt;</span>
-    <span class="k">pass</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing</span>
+    <span class="n">multiprocessing</span><span class="o">.</span><span class="n">freeze_support</span><span class="p">()</span>  <span class="c"># for win32</span>
+    <span class="kn">import</span> <span class="nn">utool</span> <span class="kn">as</span> <span class="nn">ut</span>  <span class="c"># NOQA</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">doctest_funcs</span><span class="p">()</span>
 </pre></div>
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jon Crall.
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="../../index.html">vtool 1.0.0.dev1 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2014, Jon Crall.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0.dev1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

@@ -204,7 +204,7 @@ def akmeans_plusplus_init(data, K, samples_per_iter=None, flann_params=None):
     # Choose an index and "use" it
     unusedx2_datax = np.arange(len(data), dtype=np.int32)
     chosen_unusedx = np.random.randint(0, len(unusedx2_datax))
-    center_indicies = [unusedx2_datax[chosen_unusedx]]
+    center_indices = [unusedx2_datax[chosen_unusedx]]
     unusedx2_datax = np.delete(unusedx2_datax, chosen_unusedx)
 
     if flann_params is None:
@@ -217,7 +217,7 @@ def akmeans_plusplus_init(data, K, samples_per_iter=None, flann_params=None):
         flann_params['iterations'] = 3
 
     # initalize flann index for approximate nn calculation
-    centers = data.take(center_indicies, axis=0)
+    centers = data.take(center_indices, axis=0)
     build_params = flann.build_index(np.array(centers), **flann_params)  # NOQA
     num_sample = min(samples_per_iter, len(data))
     progiter = utool.progiter(range(0, K), lbl='akmeans++ init', freq=200)
@@ -238,16 +238,16 @@ def akmeans_plusplus_init(data, K, samples_per_iter=None, flann_params=None):
         chosen_sx = np.where(sx2_prob.cumsum() >= np.random.random() * .98)[0][0]
         chosen_unusedx = sx2_unusedx[chosen_sx]
         chosen_datax = unusedx2_datax[chosen_unusedx]
-        # Remove the chosen index from unused indicies
+        # Remove the chosen index from unused indices
         unusedx2_datax = np.delete(unusedx2_datax, chosen_unusedx)
-        center_indicies.append(chosen_datax)
+        center_indices.append(chosen_datax)
         chosen_data = data.take(chosen_datax, axis=0)
         # Append new center to data and flann index
         flann.add_points(chosen_data)
-    center_indicies = np.array(center_indicies)
-    centers = data.take(center_indicies, axis=0)
-    print('len(center_indicies) = %r' % len(center_indicies))
-    print('len(set(center_indicies)) = %r' % len(set(center_indicies)))
+    center_indices = np.array(center_indices)
+    centers = data.take(center_indices, axis=0)
+    print('len(center_indices) = %r' % len(center_indices))
+    print('len(set(center_indices)) = %r' % len(set(center_indices)))
     return centers
 
 
@@ -396,10 +396,9 @@ def compute_centroids(data, centroids, datax2_centroidx):
     return centroids
 
 
-#def group_indicies2(idx2_groupid):
+#def group_indices2(idx2_groupid):
 #    """
 #    >>> idx2_groupid = np.array(np.random.randint(0, 4, size=100))
-
 #    #http://stackoverflow.com/questions/4651683/numpy-grouping-using-itertools-groupby-performance
 #    """
 #    # Sort items and idx2_groupid by groupid
@@ -417,32 +416,33 @@ def compute_centroids(data, centroids, datax2_centroidx):
 #    return groupxs
 
 
-def group_indicies_pandas(idx2_groupid):
-    """
-    >>> from vtool.clustering2 import *
-    >>> idx2_groupid = np.array(np.random.randint(0, 8000, size=1000000))
+#def group_indices_pandas(idx2_groupid):
+#    """
+#    DEPRICATED
+#    >>> from vtool.clustering2 import *
+#    >>> idx2_groupid = np.array(np.random.randint(0, 8000, size=1000000))
 
-    keys1, groupxs2 = group_indicies_pandas(idx2_groupid)
-    keys2, groupxs2 = group_indicies(idx2_groupid)
+#    keys1, groupxs2 = group_indices_pandas(idx2_groupid)
+#    keys2, groupxs2 = group_indices(idx2_groupid)
 
-    %timeit group_indicies_pandas(idx2_groupid)
-    %timeit group_indicies(idx2_groupid)
-    """
-    import pandas as pd
-    # Pandas is actually unreasonably fast here
-    #%timeit dataframe = pd.DataFrame(idx2_groupid, columns=['groupid'])  # 135 us
-    #%timeit dfgroup = dataframe.groupby('groupid')  # 33.9 us
-    #%timeit groupid2_idxs = dfgroup.indices  # 197 ns
-    series = pd.Series(idx2_groupid)  # 66 us
-    group = series.groupby(series)    # 32.9 us
-    groupid2_idxs = group.indices     # 194 ns
-    # Compute inverted index
-    groupxs = list(groupid2_idxs.values())  # 412 ns
-    keys    = list(groupid2_idxs.keys())    # 488 ns
-    return keys, groupxs
-#    # Consistency check
-#    #for wx in _wx2_idxs.keys():
-#    #    assert set(_wx2_idxs[wx]) == set(_wx2_idxs2[wx])
+#    %timeit group_indices_pandas(idx2_groupid)
+#    %timeit group_indices(idx2_groupid)
+#    """
+#    import pandas as pd
+#    # Pandas is actually unreasonably fast here
+#    #%timeit dataframe = pd.DataFrame(idx2_groupid, columns=['groupid'])  # 135 us
+#    #%timeit dfgroup = dataframe.groupby('groupid')  # 33.9 us
+#    #%timeit groupid2_idxs = dfgroup.indices  # 197 ns
+#    series = pd.Series(idx2_groupid)  # 66 us
+#    group = series.groupby(series)    # 32.9 us
+#    groupid2_idxs = group.indices     # 194 ns
+#    # Compute inverted index
+#    groupxs = list(groupid2_idxs.values())  # 412 ns
+#    keys    = list(groupid2_idxs.keys())    # 488 ns
+#    return keys, groupxs
+##    # Consistency check
+##    #for wx in _wx2_idxs.keys():
+##    #    assert set(_wx2_idxs[wx]) == set(_wx2_idxs2[wx])
 
 
 #@profile
@@ -451,21 +451,63 @@ def jagged_group(groupids_list):
     """ flattens and returns group indexes into the flattened list """
     #flatx2_itemx = np.array(utool.flatten(itemxs_iter))
     flatids = np.array(utool.flatten(groupids_list))
-    keys, groupxs = group_indicies(flatids)
+    keys, groupxs = group_indices(flatids)
     return keys, groupxs
 
 
 def apply_jagged_grouping(unflat_items, groupxs):
-    """ takes unflat_list and flat group indicies. Returns the unflat grouping """
+    """ takes unflat_list and flat group indices. Returns the unflat grouping """
     flat_items = np.array(utool.flatten(unflat_items))
     item_groups = apply_grouping(flat_items, groupxs)
     return item_groups
     #itemxs_iter = [[count] * len(idx2_groupid) for count, idx2_groupid in enumerate(groupids_list)]
 
 
-def group_indicies(idx2_groupid):
+def groupedzip(id_list, datas_list):
+    r"""
+    Function for grouping multiple lists of data (stored in ``datas_list``)
+    using ``id_list``.
+
+    Args:
+        id_list (list):
+        datas_list (list):
+
+    Returns:
+        iterator: _iter
+
+    CommandLine:
+        python -m vtool.clustering2 --test-groupedzip
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.clustering2 import *  # NOQA
+        >>> # build test data
+        >>> id_list = np.array([1, 2, 1, 2, 1, 2, 3])
+        >>> datas_list = [
+        ...     ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+        ...     ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+        ... ]
+        >>> # execute function
+        >>> groupxs, grouped_iter = groupedzip(id_list, datas_list)
+        >>> grouped_tuples = list(grouped_iter)
+        >>> # verify results
+        >>> result = str(groupxs) + '\n'
+        >>> result += '\n'.join(list(map(str, grouped_tuples)))
+        >>> print(result)
+        [1 2 3]
+        (['a', 'c', 'e'], ['A', 'C', 'E'])
+        (['b', 'd', 'f'], ['B', 'D', 'F'])
+        (['g'], ['G'])
     """
-    group_indicies
+    unique_ids, groupxs = group_indices(id_list)
+    grouped_datas_list = [apply_grouping_(data,  groupxs) for data in datas_list]
+    grouped_iter = zip(*grouped_datas_list)
+    return unique_ids, grouped_iter
+
+
+def group_indices(idx2_groupid):
+    """
+    group_indices
 
     Args:
         idx2_groupid (ndarray): numpy array of group ids (must be numeric)
@@ -474,7 +516,7 @@ def group_indicies(idx2_groupid):
         tuple (ndarray, list of ndarrays): (keys, groupxs)
 
     CommandLine:
-        python -m vtool.clustering2 --test-group_indicies
+        python -m vtool.clustering2 --test-group_indices
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -483,10 +525,23 @@ def group_indicies(idx2_groupid):
         >>> #size = 10
         >>> #idx2_groupid = np.array(np.random.randint(0, 4, size=size))
         >>> idx2_groupid = np.array([2, 1, 2, 1, 2, 1, 2, 3, 3, 3, 3])
-        >>> (keys, groupxs) = group_indicies(idx2_groupid)
+        >>> (keys, groupxs) = group_indices(idx2_groupid)
         >>> result = str((keys, groupxs))
         >>> print(result)
         (array([1, 2, 3]), [array([1, 3, 5]), array([0, 2, 4, 6]), array([ 7,  8,  9, 10])])
+
+    Example2:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.clustering2 import *  # NOQA
+        >>> idx2_groupid = np.array([[  24], [ 129], [ 659], [ 659], [ 24],
+        ...       [659], [ 659], [ 822], [ 659], [ 659], [24]])
+        >>> # 2d arrays must be flattened before coming into this function so
+        >>> # information is on the last axis
+        >>> (keys, groupxs) = group_indices(idx2_groupid.T[0])
+        >>> result = str((keys, groupxs))
+        >>> print(result)
+        (array([ 24, 129, 659, 822]), [array([ 0,  4, 10]), array([1]), array([2, 3, 5, 6, 8, 9]), array([7])])
+
 
     SeeAlso:
         apply_grouping
@@ -571,7 +626,7 @@ def apply_grouping(items, groupxs):
         list of ndarrays: grouped items
 
     SeeAlso:
-        group_indicies
+        group_indices
 
     CommandLine:
         python -m vtool.clustering2 --test-apply_grouping
@@ -585,7 +640,7 @@ def apply_grouping(items, groupxs):
         >>> #items = np.random.randint(5, 10, size=size)
         >>> idx2_groupid = np.array([2, 1, 2, 1, 2, 1, 2, 3, 3, 3, 3])
         >>> items        = np.array([1, 8, 5, 5, 8, 6, 7, 5, 3, 0, 9])
-        >>> (keys, groupxs) = group_indicies(idx2_groupid)
+        >>> (keys, groupxs) = group_indices(idx2_groupid)
         >>> grouped_items = apply_grouping(items, groupxs)
         >>> result = str(grouped_items)
         >>> print(result)
@@ -593,6 +648,55 @@ def apply_grouping(items, groupxs):
     """
     return [items.take(xs, axis=0) for xs in groupxs]
     #return [items[idxs] for idxs in groupxs]
+
+
+def apply_grouping_(items, groupxs):
+    """ non-optimized version """
+    return [ut.list_take(items, xs) for xs in groupxs]
+
+
+def invert_apply_grouping(grouped_items, groupxs):
+    r"""
+    Args:
+        grouped_items (list): of lists
+        groupxs (list): of lists
+
+    Returns:
+        list: items
+
+    CommandLine:
+        python -m vtool.clustering2 --test-invert_apply_grouping
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.clustering2 import *  # NOQA
+        >>> # build test data
+        >>> grouped_items = [[8, 5, 6], [1, 5, 8, 7], [5, 3, 0, 9]]
+        >>> groupxs = [np.array([1, 3, 5]), np.array([0, 2, 4, 6]), np.array([ 7,  8,  9, 10])]
+        >>> # execute function
+        >>> items = invert_apply_grouping(grouped_items, groupxs)
+        >>> result = items
+        >>> # verify results
+        >>> print(result)
+        [1, 8, 5, 5, 8, 6, 7, 5, 3, 0, 9]
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.clustering2 import *  # NOQA
+        >>> grouped_items, groupxs = [], []
+        >>> result = invert_apply_grouping(grouped_items, groupxs)
+        >>> print(result)
+        []
+    """
+    if len(grouped_items) == 0:
+        assert len(groupxs) == 0, 'inconsistant'
+        return []
+    maxval = max(map(max, groupxs))
+    items = [None] * (maxval + 1)  # np.full((maxval + 1,), None)
+    for itemgroup, xs in zip(grouped_items, groupxs):
+        for item, x in zip(itemgroup, xs):
+            items[x] = item
+    return items
 
 
 def apply_grouping_iter(items, groupxs):
@@ -609,7 +713,7 @@ def groupby(items, idx2_groupid):
     >>> idx2_groupid = np.array(np.random.randint(0, 4, size=100))
     >>> items = idx2_groupid
     """
-    keys, groupxs = group_indicies(idx2_groupid)
+    keys, groupxs = group_indices(idx2_groupid)
     vals = [items[idxs] for idxs in groupxs]
     return keys, vals
 
@@ -632,6 +736,8 @@ def groupby_dict(items, idx2_groupid):
 def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False):
     """
     Takes corresponding lists as input and builds a double mapping.
+
+    DEPRICATE
 
     Args:
         inner_key_list (list): each value_i is a scalar key.
@@ -678,14 +784,14 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
     outerkey2_innerkey2_items = utool.ddict(dict)
     _iter =  zip(inner_key_list, outer_keys_list, items_list)
     for inner_key, outer_keys, items in _iter:
-        group_outerkeys, groupxs = group_indicies(outer_keys)
+        group_outerkeys, groupxs = group_indices(outer_keys)
         subitem_iter = (items.take(xs, axis=0) for xs in groupxs)
         for outer_key, subitems in zip(group_outerkeys, subitem_iter):
             outerkey2_innerkey2_items[outer_key][inner_key] = subitems
     return outerkey2_innerkey2_items
     #daid2_wx2_drvecs = utool.ddict(lambda: utool.ddict(list))
     #for wx, aids, rvecs in zip(wx_sublist, aids_list, rvecs_list1):
-    #    group_aids, groupxs = clustertool.group_indicies(aids)
+    #    group_aids, groupxs = clustertool.group_indices(aids)
     #    rvecs_group = clustertool.apply_grouping(rvecs, groupxs)
     #    for aid, subrvecs in zip(group_aids, rvecs_group):
     #        daid2_wx2_drvecs[aid][wx] = subrvecs

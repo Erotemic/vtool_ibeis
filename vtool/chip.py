@@ -7,8 +7,8 @@ import numpy.linalg as npl
 from vtool import linalg as ltool
 from vtool import image as gtool
 from vtool import image_filters as gfilt_tool
-from utool import util_inject
-(print, print_, printDBG, rrr, profile) = util_inject.inject(__name__, '[chip]', DEBUG=False)
+import utool as ut
+(print, print_, printDBG, rrr, profile) = ut.inject(__name__, '[chip]', DEBUG=False)
 
 
 @profile
@@ -21,8 +21,8 @@ def _get_image_to_chip_transform(bbox, chipsz, theta):
     (x, y, w, h) = bbox
     (cw_, ch_)     = chipsz
     # Translate from bbox center to (0, 0)
-    tx1 = -(x + (w / 2))
-    ty1 = -(y + (h / 2))
+    tx1 = -(x + (w / 2.0))
+    ty1 = -(y + (h / 2.0))
     T1 = ltool.translation_mat3x3(tx1, ty1)
     # Scale to chip height
     sx = (cw_ / w)
@@ -31,8 +31,8 @@ def _get_image_to_chip_transform(bbox, chipsz, theta):
     # Rotate to chip orientation
     R  = ltool.rotation_mat3x3(-theta)
     # Translate from (0, 0) to chip center
-    tx2 = (cw_ / 2)
-    ty2 = (ch_ / 2)
+    tx2 = (cw_ / 2.0)
+    ty2 = (ch_ / 2.0)
     T2 = ltool.translation_mat3x3(tx2, ty2)
     # Merge into single transformation (operate left-to-right aka data on left)
     C = T2.dot(R.dot(S.dot(T1)))
@@ -52,15 +52,142 @@ def _get_chip_to_image_transform(bbox, chipsz, theta):
 
 
 @profile
-def _extract_chip(gfpath, bbox, theta, new_size):
-    """ Crops chip from image ; Rotates and scales; """
+def extract_chip(gfpath, bbox, theta, new_size):
+    """ Crops chip from image ; Rotates and scales;
+
+    ibs.show_annot_image(aid)[0].pt_save_and_view()
+
+    Args:
+        gfpath (str):
+        bbox (tuple):  xywh
+        theta (float):
+        new_size (tuple): wy
+
+    Returns:
+        ndarray: chipBGR
+
+    CommandLine:
+        python -m vtool.chip --test-extract_chip
+        python -m vtool.chip --test-extract_chip --show
+
+    Example:
+        >>> # ENABLE_DOCTEST
+        >>> from vtool.chip import *  # NOQA
+        >>> # build test data
+        >>> gfpath = ut.grab_test_imgpath('carl.jpg')
+        >>> bbox = (100, 3, 100, 100)
+        >>> theta = 0.0
+        >>> new_size = (58, 34)
+        >>> # execute function
+        >>> chipBGR = extract_chip(gfpath, bbox, theta, new_size)
+        >>> # verify results
+        >>> assert chipBGR.shape[0:2] == new_size[::-1], 'did not resize correctly'
+        >>> ut.quit_if_noshow()
+        >>> import plottool as pt
+        >>> pt.imshow(chipBGR)
+        >>> pt.show_if_requested()
+    """
     imgBGR = gtool.imread(gfpath)  # Read parent image
     M = _get_image_to_chip_transform(bbox, new_size, theta)  # Build transformation
     chipBGR = gtool.warpAffine(imgBGR, M, new_size)  # Rotate and scale
     return chipBGR
 
 
+def get_scaled_size_with_width(target_width, w, h):
+    """
+    Example:
+        >>> # DISABLE_DOCTEST
+        >>> from vtool.chip import *  # NOQA
+        >>> # build test data
+        >>> target_width = 128
+        >>> w = 600
+        >>> h = 400
+        >>> # execute function
+        >>> new_size = get_scaled_size_with_width(target_width, w, h)
+        >>> # verify results
+        >>> result = str(new_size)
+        >>> print(result)
+        (128, 85)
+    """
+    wt = target_width
+    sf = wt / w
+    ht = sf * h
+    new_size = (int(round(wt)), int(round(ht)))
+    return new_size
+
+
+def get_scaled_size_with_area(target_area, w, h):
+    """
+    returns new_size which scales (w, h) as close to target_area as possible and
+    maintains aspect ratio
+
+    Example:
+        >>> # DISABLE_DOCTEST
+        >>> from vtool.chip import *  # NOQA
+        >>> # build test data
+        >>> target_area = 800 ** 2
+        >>> w = 600
+        >>> h = 400
+        >>> # execute function
+        >>> new_size = get_scaled_size_with_area(target_area, w, h)
+        >>> # verify results
+        >>> result = str(new_size)
+        >>> print(result)
+        (980, 653)
+    """
+    ht = np.sqrt(target_area * h / w)
+    wt = w * ht / h
+    new_size = (int(round(wt)), int(round(ht)))
+    return new_size
+
+
+def get_scaled_sizes_with_area(target_area, size_list):
+    return [get_scaled_size_with_area(target_area, w, h) for (w, h) in size_list]
+
+
 @profile
+def compute_chip(gfpath, bbox, theta, new_size, filter_list=[]):
+    """ Extracts a chip and applies filters
+
+    Args:
+        gfpath (str):  image file path string
+        bbox (tuple):  bounding box in the format (x, y, w, h)
+        theta (float):  angle in radians
+        new_size (tuple): must maintain the same aspect ratio or else you will get weirdness
+        filter_list (list):
+
+    Returns:
+        ndarray: chipBGR -  cropped image
+
+    CommandLine:
+        python -m vtool.chip --test-compute_chip --show
+
+    Example:
+        >>> # DISABLE_DOCTEST
+        >>> from vtool.chip import *  # NOQA
+        >>> # build test data
+        >>> gfpath = ut.grab_test_imgpath('carl.jpg')
+        >>> bbox = (100, 3, 100, 100)
+        >>> TAU = 2 * np.pi
+        >>> theta = TAU / 8
+        >>> new_size = (32, 32)
+        >>> filter_list = []  # gfilt_tool.adapteq_fn]
+        >>> # execute function
+        >>> chipBGR = compute_chip(gfpath, bbox, theta, new_size, filter_list)
+        >>> # verify results
+        >>> assert chipBGR.shape[0:2] == new_size[::-1], 'did not resize correctly'
+        >>> ut.quit_if_noshow()
+        >>> import plottool as pt
+        >>> import vtool as vt
+        >>> pt.imshow(vt.draw_verts(vt.imread(gfpath), vt.scaled_verts_from_bbox(bbox, theta, 1, 1)), pnum=(1, 2, 1))
+        >>> pt.imshow(chipBGR, pnum=(1, 2, 2))
+        >>> pt.show_if_requested()
+    """
+    chipBGR = extract_chip(gfpath, bbox, theta, new_size)
+    chipBGR = _filter_chip(chipBGR, filter_list)
+    return chipBGR
+
+
 def _filter_chip(chipBGR, filter_funcs):
     """ applies a list of preprocessing filters to a chip """
     chipBGR_ = chipBGR
@@ -69,31 +196,6 @@ def _filter_chip(chipBGR, filter_funcs):
     return chipBGR_
 
 
-@profile
-def get_scaled_size_with_area(target_area, w, h):
-    """ returns new_size which scales (w, h) as close to target_area as possible
-    and maintains aspect ratio
-    """
-    ht = np.sqrt(target_area * h / w)
-    wt = w * ht / h
-    new_size = (int(round(wt)), int(round(ht)))
-    return new_size
-
-
-@profile
-def get_scaled_sizes_with_area(target_area, size_list):
-    return [get_scaled_size_with_area(target_area, w, h) for (w, h) in size_list]
-
-
-@profile
-def compute_chip(gfpath, bbox, theta, new_size, filter_list=[]):
-    """ Extracts a chip and applies filters """
-    chipBGR = _extract_chip(gfpath, bbox, theta, new_size)
-    chipBGR = _filter_chip(chipBGR, filter_list)
-    return chipBGR
-
-
-@profile
 def get_filter_list(chipcfg_dict):
     filter_list = []
     if chipcfg_dict.get('adapteq'):
@@ -109,3 +211,15 @@ def get_filter_list(chipcfg_dict):
     if chipcfg_dict.get('grabcut'):
         filter_list.append(gfilt_tool.grabcut_fn)
     return filter_list
+
+if __name__ == '__main__':
+    """
+    CommandLine:
+        python -m vtool.chip
+        python -m vtool.chip --allexamples
+        python -m vtool.chip --allexamples --noface --nosrc
+    """
+    import multiprocessing
+    multiprocessing.freeze_support()  # for win32
+    import utool as ut  # NOQA
+    ut.doctest_funcs()

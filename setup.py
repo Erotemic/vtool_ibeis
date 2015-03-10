@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, print_function
 from setuptools import setup
 from utool import util_setup
+import utool as ut
 import six
 
 #import cyth
@@ -11,9 +12,13 @@ import six
 
 
 INSTALL_REQUIRES = [
-    'Cython >= 0.20.2',
+    #'Cython >= 0.20.2',
     'numpy >= 1.8.0',
     #'cv2',  # no pipi index
+]
+
+CLUTTER_PATTERNS = [
+    'libsver.*'
 ]
 
 if six.PY2:
@@ -35,7 +40,9 @@ if __name__ == '__main__':
         author_email='erotemic@gmail.com',
         keywords='',
         install_requires=INSTALL_REQUIRES,
-        package_data={},
+        clutter_patterns=CLUTTER_PATTERNS,
+        package_data={'build': ut.get_dynamic_lib_globstrs()},
+        build_command=ut.std_build_command,
         classifiers=[],
     )
     setup(**kwargs)
