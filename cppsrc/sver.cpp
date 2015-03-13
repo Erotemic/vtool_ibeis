@@ -284,12 +284,25 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len);
         const size_t num_matches = fm_len / 2;
         int current_max_inliers = 0;
+        #define TRYPAR
+
+        #ifndef TRYPAR
+        bool serial = 1;
         bool* tmp_inliers = new bool[num_matches];
         double* tmp_errors = new double[num_matches * 3];
+        #else
+        bool serial = 0;
+        #endif
 
         {
+            #pragma omp parallel for if(!serial)
             for(size_t i1 = 0; i1 < fm_len; i1 += 2)
             {
+                //std::cout << "i1 = " << i1 << std::endl;
+                #ifdef TRYPAR
+                bool* tmp_inliers = new bool[num_matches];
+                double* tmp_errors = new double[num_matches * 3];
+                #endif
                 SETUP_invVRs(i1, i1_)
                     Matx<double, 3, 3> Aff_mat = get_Aff_mat(i1_invVR1_m, i1_invVR2_m);
                 int inliers_for_i1 = 0;
@@ -311,6 +324,7 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
                     tmp_inliers[i2 / 2] = is_inlier;
                 }
                 //printf("inliers_for_i1 %lu = %d\n", i1, inliers_for_i1);
+                #pragma omp critical(current_max_inliers)
                 if(inliers_for_i1 >= current_max_inliers)
                 {
                     current_max_inliers = inliers_for_i1;
@@ -320,9 +334,16 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
                     memcpy(out_errors,   tmp_errors, num_matches * 3 * sizeof(double));
                     memcpy(out_matrix, &Aff_mat, sizeof(Matx<double, 3, 3>));
                 }
+                #ifdef TRYPAR
+                delete [] tmp_inliers;
+                delete [] tmp_errors;
+                #endif
             }
         }
+        #ifndef TRYPAR
         delete [] tmp_inliers;
+        delete [] tmp_errors;
+        #endif
         //printf("final: %d\n", current_max_inliers);
         return current_max_inliers;
     }
