@@ -144,8 +144,9 @@ template<typename T> inline T ori_distance(const Matx<T, 3, 3>& kpt1, const Matx
 template<typename T> inline Matx<T, 3, 3> get_Aff_mat(const Matx<T, 3, 3>& invVR1_m,
         const Matx<T, 3, 3>& invVR2_m)
 {
-    const Matx<double, 3, 3> V1_m = invVR1_m.inv();
-    const Matx<double, 3, 3> Aff_mat = invVR2_m * V1_m;
+    //const Matx<double, 3, 3> V1_m = invVR1_m.inv();
+    //const Matx<double, 3, 3> Aff_mat = invVR2_m * V1_m;
+    const Matx<double, 3, 3> Aff_mat = invVR2_m * invVR1_m.inv();
     return Aff_mat;
 }
 
