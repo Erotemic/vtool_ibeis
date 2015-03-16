@@ -2,7 +2,7 @@
 #cd ~/code/vtool
 echo "[sver.unix_build] checking if build dir should be removed"
 
-python -c "import utool as ut; print('keeping build dir' if ut.get_argflag('--no-rmbuild') else ut.delete('build'))" $@
+python2.7 -c "import utool as ut; print('keeping build dir' if ut.get_argflag('--no-rmbuild') else ut.delete('build'))" $@
 
 mkdir build
 cd build
