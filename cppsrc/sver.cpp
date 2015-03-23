@@ -40,15 +40,15 @@ indices into kpts{1,2} indicating a match
 
 //#define RUNTIME_BOUNDS_CHECKING
 #ifdef RUNTIME_BOUNDS_CHECKING
-#define CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len) \
-    for(size_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2) { \
+#define CHECK_FM_BOUNDS(fm, nMatch * 2, kpts1_len, kpts2_len) \
+    for(size_t fm_ind = 0; fm_ind < nMatch * 2; fm_ind += 2) { \
         if((fm[fm_ind] >= (kpts1_len/6)) || (fm[fm_ind + 1] >= (kpts2_len/6))) { \
             puts("CHECK_FM_BOUNDS: bad fm indexes"); \
             return; \
         } \
     }
 #else
-#define CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len)
+#define CHECK_FM_BOUNDS(fm, nMatch, kpts1_len, kpts2_len)
 #endif
 
 using cv::Matx;
@@ -153,7 +153,7 @@ template<typename T> inline Matx<T, 3, 3> get_Aff_mat(const Matx<T, 3, 3>& invVR
 extern "C" {
     void get_affine_inliers(double* kpts1, size_t kpts1_len,
                             double* kpts2, size_t kpts2_len,
-                            size_t* fm, size_t fm_len,
+                            size_t* fm, double* fs, size_t nMatch,
                             double xy_thresh_sqrd, double scale_thresh_sqrd, double ori_thresh,
                             // memory is expected to by allocated by the caller (i.e. via numpy.empty)
                             bool* out_inlier_flags, double* out_errors_list, double* out_matrices_list)
@@ -161,14 +161,14 @@ extern "C" {
         printDBG_SVER("get_affine_inliers");
         printDBG_SVER(" * kpts1_len = " << kpts1_len);
         printDBG_SVER(" * kpts2_len = " << kpts2_len);
-        printDBG_SVER(" * fm_len = " << fm_len);
+        printDBG_SVER(" * nMatch = " << nMatch);
         printDBG_SVER(" * xy_thresh_sqrd = " << xy_thresh_sqrd);
         printDBG_SVER(" * scale_thresh_sqrd = " << scale_thresh_sqrd);
         printDBG_SVER(" * ori_thresh = " << ori_thresh);
         printDBG_SVER(" * sizeof(size_t) = " << sizeof(size_t));
         MARKUSED(kpts1_len);
         MARKUSED(kpts2_len);
-        CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len);
+        CHECK_FM_BOUNDS(fm, nMatch, kpts1_len, kpts2_len);
         // remove some redundancy in a possibly-ugly way
 #define SETUP_invVRs(idx, prefix) \
 double* prefix##kpt1 = &kpts1[6*fm[(idx)+0]]; \
@@ -185,20 +185,21 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         //   (less allocation == faster code)
 #define MATRIX_REF(i) (*((i)+((Matx<double, 3, 3>*)out_matrices_list)))
         //vector<vector<double> > xy_errs, scale_errs, ori_errs;
-        for(size_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2)
+        for(size_t fm_ind = 0; fm_ind < nMatch * 2; fm_ind += 2)
         {
             SETUP_invVRs(fm_ind,)
             //Aff_mats.push_back(get_Aff_mat(invVR1_m, invVR2_m));
             MATRIX_REF(fm_ind / 2) = get_Aff_mat(invVR1_m, invVR2_m);
         }
-        const size_t num_matches = fm_len / 2;
+        //const size_t num_matches = nMatch / 2;
+        const size_t num_matches = nMatch;
         for(size_t i = 0; i < num_matches; i++)
         {
             //xy_errs.push_back(vector<double>());
             //scale_errs.push_back(vector<double>());
             //ori_errs.push_back(vector<double>());
             Matx<double, 3, 3> Aff_mat = MATRIX_REF(i);
-            for(size_t fm_ind = 0; fm_ind < fm_len; fm_ind += 2)
+            for(size_t fm_ind = 0; fm_ind < nMatch * 2; fm_ind += 2)
             {
                 SETUP_invVRs(fm_ind,)
                 // _test_hypothesis_inliers
@@ -267,7 +268,7 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
 
     int get_best_affine_inliers(double* kpts1, size_t kpts1_len,
                                 double* kpts2, size_t kpts2_len,
-                                size_t* fm, size_t fm_len,
+                                size_t* fm, double* fs, size_t nMatch,
                                 double xy_thresh_sqrd, double scale_thresh_sqrd, double ori_thresh,
                                 // memory is expected to by allocated by the caller (i.e. via numpy.empty)
                                 bool* out_inliers, double* out_errors, double* out_matrix)
@@ -275,19 +276,20 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         printDBG_SVER("get_best_affine_inliers");
         printDBG_SVER(" * kpts1_len = " << kpts1_len);
         printDBG_SVER(" * kpts2_len = " << kpts2_len);
-        printDBG_SVER(" * fm_len = " << fm_len);
+        printDBG_SVER(" * nMatch = " << nMatch);
         printDBG_SVER(" * xy_thresh_sqrd = " << xy_thresh_sqrd);
         printDBG_SVER(" * scale_thresh_sqrd = " << scale_thresh_sqrd);
         printDBG_SVER(" * ori_thresh = " << ori_thresh);
         printDBG_SVER(" * sizeof(size_t) = " << sizeof(size_t));
         MARKUSED(kpts1_len);
         MARKUSED(kpts2_len);
-        CHECK_FM_BOUNDS(fm, fm_len, kpts1_len, kpts2_len);
-        const size_t num_matches = fm_len / 2;
-        int current_max_inliers = 0;
-        #define TRYPAR
+        CHECK_FM_BOUNDS(fm, nMatch, kpts1_len, kpts2_len);
+        //const size_t num_matches = nMatch / 2;
+        const size_t num_matches = nMatch;
+        int current_max_inlier_weight = 0;
+        #define USE_PAR_SVER
 
-        #ifndef TRYPAR
+        #ifndef USE_PAR_SVER
         bool serial = 1;
         bool* tmp_inliers = new bool[num_matches];
         double* tmp_errors = new double[num_matches * 3];
@@ -297,18 +299,18 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
 
         {
             #pragma omp parallel for if(!serial)
-            for(size_t i1 = 0; i1 < fm_len; i1 += 2)
+            for(size_t i1 = 0; i1 < nMatch * 2; i1 += 2)
             {
                 //std::cout << "i1 = " << i1 << std::endl;
-                #ifdef TRYPAR
+                #ifdef USE_PAR_SVER
                 bool* tmp_inliers = new bool[num_matches];
                 double* tmp_errors = new double[num_matches * 3];
                 #endif
                 SETUP_invVRs(i1, i1_)
                     Matx<double, 3, 3> Aff_mat = get_Aff_mat(i1_invVR1_m, i1_invVR2_m);
-                int inliers_for_i1 = 0;
-                //#pragma omp parallel for reduction(+:inliers_for_i1)
-                for(size_t i2 = 0; i2 < fm_len; i2 += 2)
+                double inlier_weight_for_i1 = 0;
+                //#pragma omp parallel for reduction(+:inlier_weight_for_i1)
+                for(size_t i2 = 0; i2 < nMatch * 2; i2 += 2)
                 {
                     SETUP_invVRs(i2, i2_)
                         Matx<double, 3, 3> i2_invVR1_mt = Aff_mat * i2_invVR1_m;
@@ -320,33 +322,34 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
                         (ori_err   <        ori_thresh);
                     if(is_inlier)
                     {
-                        inliers_for_i1++;
+                        //inlier_weight_for_i1++;
+                        inlier_weight_for_i1 += fs[i2 / 2];
                     }
                     tmp_inliers[i2 / 2] = is_inlier;
                 }
-                //printf("inliers_for_i1 %lu = %d\n", i1, inliers_for_i1);
-                #pragma omp critical(current_max_inliers)
-                if(inliers_for_i1 >= current_max_inliers)
+                //printf("inlier_weight_for_i1 %lu = %f\n", i1, inlier_weight_for_i1);
+                #pragma omp critical(current_max_inlier_weight)
+                if(inlier_weight_for_i1 >= current_max_inlier_weight)
                 {
-                    current_max_inliers = inliers_for_i1;
+                    current_max_inlier_weight = inlier_weight_for_i1;
                     // reuse the output space for the current maximum (since
                     //  the final "current maximum" is the intended output)
                     memcpy(out_inliers, tmp_inliers, num_matches * sizeof(bool));
                     memcpy(out_errors,   tmp_errors, num_matches * 3 * sizeof(double));
                     memcpy(out_matrix, &Aff_mat, sizeof(Matx<double, 3, 3>));
                 }
-                #ifdef TRYPAR
+                #ifdef USE_PAR_SVER
                 delete [] tmp_inliers;
                 delete [] tmp_errors;
                 #endif
             }
         }
-        #ifndef TRYPAR
+        #ifndef USE_PAR_SVER
         delete [] tmp_inliers;
         delete [] tmp_errors;
         #endif
-        //printf("final: %d\n", current_max_inliers);
-        return current_max_inliers;
+        //printf("final: %d\n", current_max_inlier_weight);
+        return current_max_inlier_weight;
     }
 #undef SETUP_invVRs
 #undef printDBG_SVER
