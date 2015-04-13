@@ -27,10 +27,6 @@ else
     make -j$NCPUS || { echo "FAILED MAKE" ; exit 1; }
 fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	cp libsver* ../vtool
-else
-	cp libsver* ../vtool --verbose
-fi
+cp -v libsver* ../vtool
 cd ..
 
