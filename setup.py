@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 from setuptools import setup
 from utool import util_setup
 import utool as ut
+from os.path import dirname
 import six
 
 #import cyth
@@ -42,7 +43,7 @@ if __name__ == '__main__':
         install_requires=INSTALL_REQUIRES,
         clutter_patterns=CLUTTER_PATTERNS,
         package_data={'build': ut.get_dynamic_lib_globstrs()},
-        build_command=ut.std_build_command,
+        build_command=lambda: ut.std_build_command(dirname(__file__)),
         classifiers=[],
     )
     setup(**kwargs)
