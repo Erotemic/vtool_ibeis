@@ -32,5 +32,5 @@ def run_tests():
 if __name__ == '__main__':
     import multiprocessing
     multiprocessing.freeze_support()
-    retcode = run_tests.run_tests()
+    retcode = run_tests()
     sys.exit(retcode)
