@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 from __future__ import absolute_import, division, print_function
+import sys
 import utool as ut
 
 
@@ -26,9 +27,10 @@ def run_tests():
     for modname in doctest_modname_list:
         exec('import ' + modname, globals(), locals())
     module_list = [sys.modules[name] for name in doctest_modname_list]
-    ut.doctest_module_list(module_list)
+    nPass, nTotal, failed_cmd_list = ut.doctest_module_list(module_list)
 
 if __name__ == '__main__':
     import multiprocessing
     multiprocessing.freeze_support()
-    run_tests()
+    retcode = run_tests.run_tests()
+    sys.exit(retcode)
