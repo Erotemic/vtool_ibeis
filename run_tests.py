@@ -28,6 +28,10 @@ def run_tests():
         exec('import ' + modname, globals(), locals())
     module_list = [sys.modules[name] for name in doctest_modname_list]
     nPass, nTotal, failed_cmd_list = ut.doctest_module_list(module_list)
+    if nPass != nTotal:
+        return 1
+    else:
+        return 0
 
 if __name__ == '__main__':
     import multiprocessing
