@@ -2,7 +2,11 @@ language: python
 python:
   - "2.7"
   #- "3.4"
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install python-opencv
+  - sudo dpkg -L python-opencv
 install:
-  - travis_retry python setup.py develop
+  - travis_retry python setup.py build develop
 script: travis_wait ./run_tests.py
 cache: apt
