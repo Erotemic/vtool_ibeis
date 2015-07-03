@@ -15,7 +15,7 @@ import six
 INSTALL_REQUIRES = [
     #'Cython >= 0.20.2',
     'numpy >= 1.9.0',
-    'sklearn >= 0.16.1'
+    'scikit-learn >= 0.16.1'
     #'cv2',  # no pipi index
 ]
 
