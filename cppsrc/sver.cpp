@@ -286,22 +286,23 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         CHECK_FM_BOUNDS(fm, nMatch, kpts1_len, kpts2_len);
         //const size_t num_matches = nMatch / 2;
         const size_t num_matches = nMatch;
-        int current_max_inlier_weight = 0;
+        double current_max_inlier_weight = 0;
         #define USE_PAR_SVER
 
         #ifndef USE_PAR_SVER
-        bool serial = 1;
+        const bool parallel = 0;
         bool* tmp_inliers = new bool[num_matches];
         double* tmp_errors = new double[num_matches * 3];
         #else
-        bool serial = 0;
+        bool parallel = 1;
         #endif
+        printDBG_SVER(" * parallel = " << parallel);
 
         {
-            #pragma omp parallel for if(!serial)
+            //(max : max_val)
+            #pragma omp parallel for if(parallel)
             for(size_t i1 = 0; i1 < nMatch * 2; i1 += 2)
             {
-                //std::cout << "i1 = " << i1 << std::endl;
                 #ifdef USE_PAR_SVER
                 bool* tmp_inliers = new bool[num_matches];
                 double* tmp_errors = new double[num_matches * 3];
@@ -309,7 +310,6 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
                 SETUP_invVRs(i1, i1_)
                     Matx<double, 3, 3> Aff_mat = get_Aff_mat(i1_invVR1_m, i1_invVR2_m);
                 double inlier_weight_for_i1 = 0;
-                //#pragma omp parallel for reduction(+:inlier_weight_for_i1)
                 for(size_t i2 = 0; i2 < nMatch * 2; i2 += 2)
                 {
                     SETUP_invVRs(i2, i2_)
@@ -318,8 +318,8 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
                     double   ori_err = tmp_errors[(1 * num_matches) + (i2 / 2)] = ori_distance(i2_invVR1_mt, i2_invVR2_m);
                     double scale_err = tmp_errors[(2 * num_matches) + (i2 / 2)] = det_distance(i2_invVR1_mt, i2_invVR2_m);
                     bool is_inlier = (xy_err    <    xy_thresh_sqrd) &&
-                        (scale_err < scale_thresh_sqrd) &&
-                        (ori_err   <        ori_thresh);
+                                     (scale_err < scale_thresh_sqrd) &&
+                                     (ori_err   <        ori_thresh);
                     if(is_inlier)
                     {
                         //inlier_weight_for_i1++;
@@ -327,16 +327,20 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
                     }
                     tmp_inliers[i2 / 2] = is_inlier;
                 }
-                //printf("inlier_weight_for_i1 %lu = %f\n", i1, inlier_weight_for_i1);
                 #pragma omp critical(current_max_inlier_weight)
-                if(inlier_weight_for_i1 >= current_max_inlier_weight)
                 {
-                    current_max_inlier_weight = inlier_weight_for_i1;
-                    // reuse the output space for the current maximum (since
-                    //  the final "current maximum" is the intended output)
-                    memcpy(out_inliers, tmp_inliers, num_matches * sizeof(bool));
-                    memcpy(out_errors,   tmp_errors, num_matches * 3 * sizeof(double));
-                    memcpy(out_matrix, &Aff_mat, sizeof(Matx<double, 3, 3>));
+                    if(inlier_weight_for_i1 >= current_max_inlier_weight)
+                    {
+                        printDBG_SVER(" * inlier_weight_for_i1 = " << inlier_weight_for_i1);
+                        printDBG_SVER(" * i1 = " << i1);
+                        printDBG_SVER(" * current_max_inlier_weight = " << current_max_inlier_weight);
+                        current_max_inlier_weight = inlier_weight_for_i1;
+                        // reuse the output space for the current maximum (since
+                        //  the final "current maximum" is the intended output)
+                        memcpy(out_inliers, tmp_inliers, num_matches * sizeof(bool));
+                        memcpy(out_errors,   tmp_errors, num_matches * 3 * sizeof(double));
+                        memcpy(out_matrix, &Aff_mat, sizeof(Matx<double, 3, 3>));
+                    }
                 }
                 #ifdef USE_PAR_SVER
                 delete [] tmp_inliers;
@@ -348,7 +352,6 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         delete [] tmp_inliers;
         delete [] tmp_errors;
         #endif
-        //printf("final: %d\n", current_max_inlier_weight);
         return current_max_inlier_weight;
     }
 #undef SETUP_invVRs
