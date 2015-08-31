@@ -1,4 +1,13 @@
 #!/usr/bin/env python2.7
+"""
+FIXME:
+    incoporate unix_build / mingw_build into this script
+    ensure libsver.so installs correctly
+
+CommandLine:
+    python -c "import utool, vtool; utool.checkpath(vtool.__file__, verbose=True)"
+    python -c "import utool, vtool; utool.checkpath(utool.unixjoin(utool.get_module_dir(vtool), 'libsver.so'), verbose=True)"
+"""
 from __future__ import absolute_import, division, print_function
 from setuptools import setup
 from utool import util_setup
