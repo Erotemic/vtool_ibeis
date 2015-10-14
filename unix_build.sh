@@ -11,6 +11,7 @@ cd build
 
 echo "$OSTYPE"
 
+export PYEXE=$(which python2.7)
 if [[ "$VIRTUAL_ENV" == ""  ]]; then
     export LOCAL_PREFIX=/usr/local
     export _SUDO="sudo"
@@ -18,6 +19,8 @@ else
     export LOCAL_PREFIX=$($PYEXE -c "import sys; print(sys.prefix)")/local
     export _SUDO=""
 fi
+
+echo "LOCAL_PREFIX = $LOCAL_PREFIX"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCAL_PREFIX -DOpenCV_DIR=$LOCAL_PREFIX/share/OpenCV ..  || $FAILCMD
@@ -39,4 +42,3 @@ fi
 
 cp -v libsver* ../vtool
 cd ..
-
