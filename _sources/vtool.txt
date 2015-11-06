@@ -11,6 +11,30 @@ Subpackages
 Submodules
 ----------
 
+vtool.__main__ module
+---------------------
+
+.. automodule:: vtool.__main__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool._grave module
+-------------------
+
+.. automodule:: vtool._grave
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.blend module
+------------------
+
+.. automodule:: vtool.blend
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vtool.chip module
 -----------------
 
@@ -35,6 +59,14 @@ vtool.clustering2 module
     :undoc-members:
     :show-inheritance:
 
+vtool.confusion module
+----------------------
+
+.. automodule:: vtool.confusion
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vtool.constrained_matching module
 ---------------------------------
 
@@ -55,6 +87,14 @@ vtool.coverage_kpts module
 --------------------------
 
 .. automodule:: vtool.coverage_kpts
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.depricated module
+-----------------------
+
+.. automodule:: vtool.depricated
     :members:
     :undoc-members:
     :show-inheritance:
@@ -187,6 +227,14 @@ vtool.quality_classifier module
     :undoc-members:
     :show-inheritance:
 
+vtool.score_normalization module
+--------------------------------
+
+.. automodule:: vtool.score_normalization
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vtool.segmentation module
 -------------------------
 
@@ -207,6 +255,14 @@ vtool.sver_c_wrapper module
 ---------------------------
 
 .. automodule:: vtool.sver_c_wrapper
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.symbolic module
+---------------------
+
+.. automodule:: vtool.symbolic
     :members:
     :undoc-members:
     :show-inheritance:
