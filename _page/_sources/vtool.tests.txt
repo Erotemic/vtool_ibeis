@@ -4,6 +4,14 @@ vtool.tests package
 Submodules
 ----------
 
+vtool.tests._olddep_test_exhaustive_ori_extract module
+------------------------------------------------------
+
+.. automodule:: vtool.tests._olddep_test_exhaustive_ori_extract
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vtool.tests.dummy module
 ------------------------
 
@@ -16,6 +24,14 @@ vtool.tests.grabdata module
 ---------------------------
 
 .. automodule:: vtool.tests.grabdata
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.tests.run_tests module
+----------------------------
+
+.. automodule:: vtool.tests.run_tests
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,14 +60,6 @@ vtool.tests.test_draw_keypoint module
     :undoc-members:
     :show-inheritance:
 
-vtool.tests.test_exhaustive_ori_extract module
-----------------------------------------------
-
-.. automodule:: vtool.tests.test_exhaustive_ori_extract
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 vtool.tests.test_pyflann module
 -------------------------------
 
@@ -72,6 +80,14 @@ vtool.tests.test_vtool module
 -----------------------------
 
 .. automodule:: vtool.tests.test_vtool
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vtool.tests.testdata_nondeterm_sver module
+------------------------------------------
+
+.. automodule:: vtool.tests.testdata_nondeterm_sver
     :members:
     :undoc-members:
     :show-inheritance:
