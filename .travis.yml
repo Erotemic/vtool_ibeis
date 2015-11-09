@@ -36,4 +36,4 @@ cache:
         - $HOME/code
         - $HOME/code/utool
         - $HOME/.pip-cache/
-    apt
+        #apt
