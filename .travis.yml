@@ -5,13 +5,13 @@ python:
 addons:
     apt:
         sources: 
-            - atlas
+            # https://github.com/travis-ci/apt-source-whitelist#source-approval-process
+            #- atlas
+            - libatlas-dev
             - opencv
         packages: 
             - python-opencv
             - cmake
-            #- opencv
-            #- atlas
             #- libatlas-dev
 before_install:
   - mkdir $HOME/code
@@ -35,5 +35,5 @@ cache:
     directories:
         - $HOME/code
         - $HOME/code/utool
-        - $HOME/.pip-cache/
+        - $HOME/.pip-cache
         #apt
