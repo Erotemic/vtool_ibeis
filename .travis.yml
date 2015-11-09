@@ -2,18 +2,20 @@ language: python
 python:
   - "2.7"
   #- "3.4"
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install python-opencv
-  - sudo dpkg -L python-opencv
-  - cd ~
-  - mkdir code
-  - cd code
+addons:
+    apt:
+        packages: 
+            - python-opencv
+before_script:
+  - mkdir ~/code
+  - cd ~/code
   - git clone -b next https://github.com/Erotemic/utool.git
-  - cd utool
+  - cd ~/code/utool
   - python setup.py develop
   - echo done
 install:
   - travis_retry python setup.py build develop
-script: travis_wait ./run_tests.py
-cache: apt
+script: 
+    - travis_wait ./run_tests.py
+#cache: 
+#    apt
