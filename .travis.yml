@@ -6,6 +6,12 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install python-opencv
   - sudo dpkg -L python-opencv
+  - cd ~
+  - mkdir code
+  - cd code
+  - git clone -b next https://github.com/Erotemic/utool.git
+  - cd utool
+  - python setup.py develop
 install:
   - travis_retry python setup.py build develop
 script: travis_wait ./run_tests.py
