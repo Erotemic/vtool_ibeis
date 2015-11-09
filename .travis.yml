@@ -1,4 +1,7 @@
 language: python
+
+sudo: false
+
 python:
   - "2.7"
   #- "3.4"
@@ -33,6 +36,7 @@ script:
 after_failure: 
   - cat failed_doctests.txt
 cache: 
+    apt: true
     directories:
         - $HOME/code
         - $HOME/code/utool
