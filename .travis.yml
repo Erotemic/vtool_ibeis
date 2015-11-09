@@ -17,6 +17,11 @@ before_install:
   - python setup.py develop
   - cd ..
   - pwd
+  - pip install numpy
+  - pip install scipy
+  - pip install cython
+  - pip install scikit-learn
+  - pip install statsmodels
 install:
   - python setup.py build develop
 script: 
