@@ -4,20 +4,22 @@ python:
   #- "3.4"
 addons:
     apt:
+        sources: 
+            - atlas
+            - opencv
         packages: 
             - python-opencv
             - cmake
-            - opencv
-            - atlas
+            #- opencv
+            #- atlas
+            #- libatlas-dev
 before_install:
-  #- mkdir ~/code
-  #- cd ~/code
+  - mkdir $HOME/code
+  - cd $HOME/code
   - git clone -b next https://github.com/Erotemic/utool.git
-  #- cd ~/code/utool
   - cd utool
   - python setup.py develop
-  - cd ..
-  - pwd
+  - cd $HOME/build/Erotemic/vtool
   - pip install numpy
   - pip install scipy
   - pip install cython
@@ -30,4 +32,8 @@ script:
 after_failure: 
   - cat failed_doctests.txt
 cache: 
-    apt
+    -apt
+    directories:
+        - $HOME/code
+        - $HOME/code/utool
+        - $HOME/.pip-cache/
