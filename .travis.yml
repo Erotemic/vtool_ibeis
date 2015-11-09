@@ -32,8 +32,8 @@ script:
 after_failure: 
   - cat failed_doctests.txt
 cache: 
-    -apt
     directories:
         - $HOME/code
         - $HOME/code/utool
         - $HOME/.pip-cache/
+    apt
