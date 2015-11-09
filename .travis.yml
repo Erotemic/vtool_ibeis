@@ -3,12 +3,12 @@ python:
   - "2.7"
   #- "3.4"
 addons:
+# https://github.com/travis-ci/apt-source-whitelist#source-approval-process
     apt:
-        sources: 
-            # https://github.com/travis-ci/apt-source-whitelist#source-approval-process
-            #- atlas
-            - libatlas-dev
-            - opencv
+        #sources: 
+        #    #- atlas
+        #    - libatlas-dev
+        #    - opencv
         packages: 
             - python-opencv
             - cmake
