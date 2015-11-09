@@ -20,6 +20,10 @@ import six
 #cyth.translate('vtool/keypoint.py')
 #cyth.translate('vtool/keypoint.py', 'vtool/spatial_verification.py')
 
+DEV_REQUIREMENTS = [
+    'atlas',
+]
+
 
 INSTALL_REQUIRES = [
     'cython >= 0.21.1',

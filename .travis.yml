@@ -8,6 +8,7 @@ addons:
             - python-opencv
             - cmake
             - opencv
+            - atlas
 before_install:
   #- mkdir ~/code
   #- cd ~/code
