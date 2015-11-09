@@ -18,6 +18,7 @@ before_install:
   - cd $HOME/code
   - git clone -b next https://github.com/Erotemic/utool.git
   - cd utool
+  - git pull
   - python setup.py develop
   - cd $HOME/build/Erotemic/vtool
   - pip install numpy
