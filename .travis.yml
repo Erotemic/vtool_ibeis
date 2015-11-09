@@ -14,7 +14,7 @@ addons:
             - cmake
             #- libatlas-dev
 before_install:
-  - mkdir $HOME/code
+  - mkdir -p $HOME/code
   - cd $HOME/code
   - git clone -b next https://github.com/Erotemic/utool.git
   - cd utool
