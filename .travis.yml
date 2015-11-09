@@ -11,7 +11,9 @@ before_install:
   #- cd ~/code
   - git clone -b next https://github.com/Erotemic/utool.git
   #- cd ~/code/utool
+  - utool
   - python setup.py develop
+  - cd ..
   - echo done
 install:
   - travis_retry python setup.py build develop
