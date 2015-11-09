@@ -6,6 +6,8 @@ addons:
     apt:
         packages: 
             - python-opencv
+            - cmake
+            - opencv
 before_install:
   #- mkdir ~/code
   #- cd ~/code
@@ -16,7 +18,7 @@ before_install:
   - cd ..
   - pwd
 install:
-  - travis_retry python setup.py build develop
+  - python setup.py build develop
 script: 
   - travis_wait ./run_tests.py
 after_failure: 
