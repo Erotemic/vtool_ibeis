@@ -22,8 +22,9 @@ import six
 
 
 INSTALL_REQUIRES = [
-    #'Cython >= 0.20.2',
+    'Cython >= 0.21.1',
     'numpy >= 1.9.0',
+    'scipy >= .15.0',
     'scikit-learn >= 0.16.1',
     'statsmodels >= 0.6.1',
     #'cv2',  # no pipi index

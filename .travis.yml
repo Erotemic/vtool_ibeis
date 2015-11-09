@@ -14,7 +14,7 @@ before_install:
   - cd utool
   - python setup.py develop
   - cd ..
-  - echo done
+  - pwd
 install:
   - travis_retry python setup.py build develop
 script: 
