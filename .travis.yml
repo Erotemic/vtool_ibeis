@@ -13,6 +13,7 @@ addons:
         #    - libatlas-dev
         #    - opencv
         packages: 
+            - libblas-dev
             - python-opencv
             - cmake
             #- libatlas-dev
