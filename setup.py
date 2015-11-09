@@ -22,7 +22,7 @@ import six
 
 
 INSTALL_REQUIRES = [
-    'Cython >= 0.21.1',
+    'cython >= 0.21.1',
     'numpy >= 1.9.0',
     'scipy >= .15.0',
     'scikit-learn >= 0.16.1',
