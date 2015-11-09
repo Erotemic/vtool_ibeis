@@ -6,7 +6,7 @@ addons:
     apt:
         packages: 
             - python-opencv
-before_script:
+before_install:
   - mkdir ~/code
   - cd ~/code
   - git clone -b next https://github.com/Erotemic/utool.git
@@ -16,6 +16,8 @@ before_script:
 install:
   - travis_retry python setup.py build develop
 script: 
-    - travis_wait ./run_tests.py
+  - travis_wait ./run_tests.py
+after_failure: 
+  - cat failed_doctests.txt
 #cache: 
 #    apt
