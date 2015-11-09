@@ -7,10 +7,10 @@ addons:
         packages: 
             - python-opencv
 before_install:
-  - mkdir ~/code
-  - cd ~/code
+  #- mkdir ~/code
+  #- cd ~/code
   - git clone -b next https://github.com/Erotemic/utool.git
-  - cd ~/code/utool
+  #- cd ~/code/utool
   - python setup.py develop
   - echo done
 install:
