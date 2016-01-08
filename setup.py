@@ -8,7 +8,7 @@ CommandLine:
     python -c "import utool, vtool; utool.checkpath(vtool.__file__, verbose=True)"
     python -c "import utool, vtool; utool.checkpath(utool.unixjoin(utool.get_module_dir(vtool), 'libsver.so'), verbose=True)"
 """
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 from setuptools import setup
 from utool import util_setup
 import utool as ut
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         keywords='',
         install_requires=INSTALL_REQUIRES,
         clutter_patterns=CLUTTER_PATTERNS,
-        package_data={'build': ut.get_dynamic_lib_globstrs()},
+        #package_data={'build': ut.get_dynamic_lib_globstrs()},
         build_command=lambda: ut.std_build_command(dirname(__file__)),
         classifiers=[],
     )
@@ -75,15 +75,15 @@ if __name__ == '__main__':
 #    Extension('vtool.linalg_cython', ['vtool/linalg_cython.pyx'],
 #              include_dirs=[np.get_include()])
 #]
-r'''
-set PATH=%HOME%\code\utool\utool\util_scripts;%PATH%
-cyth.py vtool\linalg_cython.pyx
-cd %HOME%\code\vtool
-python %HOME%/code/vtool/vtool/tests/test_linalg.py
-ls vtool/*_cython*
-python setup.py build_ext --inplace && python vtool/tests/test_linalg.py
-python
-python -c "import utool; utool.checkpath('vtool/linalg_cython.pyd', verbose=True)"
-cyth.py %HOME%/code/vtool/vtool/linalg_cython.pyx
-'''
+#r'''
+#set PATH=%HOME%\code\utool\utool\util_scripts;%PATH%
+#cyth.py vtool\linalg_cython.pyx
+#cd %HOME%\code\vtool
+#python %HOME%/code/vtool/vtool/tests/test_linalg.py
+#ls vtool/*_cython*
+#python setup.py build_ext --inplace && python vtool/tests/test_linalg.py
+#python
+#python -c "import utool; utool.checkpath('vtool/linalg_cython.pyd', verbose=True)"
+#cyth.py %HOME%/code/vtool/vtool/linalg_cython.pyx
+#'''
 #ext_modules = cythonize("vtool/linalg_cython.pyx")
