@@ -40,5 +40,7 @@ else
     make -j$NCPUS ||  $FAILCMD
 fi
 
+echo 'Fixing OSX libiomp'
+install_name_tool -change libiomp5.dylib ~/code/libomp_oss/exports/mac_32e/lib.thin/libiomp5.dylib lib*
 cp -v libsver* ../vtool
 cd ..
