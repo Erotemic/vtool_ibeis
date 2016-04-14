@@ -34,6 +34,15 @@ INSTALL_REQUIRES = [
     #'cv2',  # no pipi index
 ]
 
+TEST_APT_REQUIRES = [
+    #sudo apt-get install libjpeg-turbo8-dev
+    'lcms2-dev'  # sudo apt-get install liblcms2-dev
+]
+
+TEST_PIP_REQUIRES = [
+    'smc.freeimage',  # sudo pip install smc.freeimage
+]
+
 CLUTTER_PATTERNS = [
     'libsver.*'
 ]
