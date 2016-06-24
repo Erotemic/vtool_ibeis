@@ -24,6 +24,8 @@ echo "LOCAL_PREFIX = $LOCAL_PREFIX"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCAL_PREFIX -DOpenCV_DIR=$LOCAL_PREFIX/share/OpenCV ..  || $FAILCMD
+    echo 'Fixing OSX libiomp'
+    install_name_tool -change libiomp5.dylib ~/code/libomp_oss/exports/mac_32e/lib.thin/libiomp5.dylib lib*
 elif [[ "$OSTYPE" == "msys"* ]]; then
     echo "USE MINGW BUILD INSTEAD" ; exit 1
     export INSTALL32="c:/Program Files (x86)"
@@ -40,7 +42,5 @@ else
     make -j$NCPUS ||  $FAILCMD
 fi
 
-echo 'Fixing OSX libiomp'
-install_name_tool -change libiomp5.dylib ~/code/libomp_oss/exports/mac_32e/lib.thin/libiomp5.dylib lib*
 cp -v libsver* ../vtool
 cd ..

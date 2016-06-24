@@ -67,8 +67,9 @@ if __name__ == '__main__':
         keywords='',
         install_requires=INSTALL_REQUIRES,
         clutter_patterns=CLUTTER_PATTERNS,
-        #package_data={'build': ut.get_dynamic_lib_globstrs()},
-        build_command=lambda: ut.std_build_command(dirname(__file__)),
+        # package_data={'build': ut.get_dynamic_lib_globstrs()},
+        # build_command=lambda: ut.Repo(dirname(__file__)),
+        build_command=lambda: ut.std_build_command(),
         classifiers=[],
     )
     setup(**kwargs)
