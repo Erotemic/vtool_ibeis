@@ -30,6 +30,7 @@ logs
 # Unit test / coverage reports
 .coverage
 .tox
+htmlcov
 nosetests.xml
 
 # Translations
