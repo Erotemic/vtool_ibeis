@@ -13,9 +13,12 @@ addons:
         #    - libatlas-dev
         #    - opencv
         packages: 
-            - libblas-dev
-            - python-opencv
             - cmake
+            - python-opencv
+            - libatlas3gf-base
+            - libatlas-dev
+            - libblas-dev
+            - python-scipy
             #- libatlas-dev
 before_install:
   - mkdir -p $HOME/code
