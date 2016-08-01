@@ -29,7 +29,7 @@ before_install:
   - python setup.py develop
   - cd $HOME/build/Erotemic/vtool
   - pip install numpy
-  - pip install scipy
+  #- pip install scipy
   - pip install cython
   - pip install scikit-learn
   - pip install statsmodels
