@@ -86,3 +86,4 @@ failed_doctests.txt
 vtool/libsver.dll
 vtool/libsver.dll.a
 vtool/libsver.dylib
+timeings.txt
