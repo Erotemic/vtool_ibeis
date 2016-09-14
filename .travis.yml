@@ -5,6 +5,15 @@ sudo: false
 python:
   - "2.7"
   #- "3.4"
+  
+cache: 
+    apt: true
+    directories:
+        - $HOME/code
+        - $HOME/code/utool
+        - $HOME/.pip-cache
+        #apt
+        
 addons:
 # https://github.com/travis-ci/apt-source-whitelist#source-approval-process
     apt:
@@ -20,29 +29,21 @@ addons:
             - libblas-dev
             - python-scipy
             #- libatlas-dev
+
 before_install:
-  - mkdir -p $HOME/code
-  - cd $HOME/code
-  - git clone -b next https://github.com/Erotemic/utool.git
-  - cd utool
-  - git pull
-  - python setup.py develop
-  - cd $HOME/build/Erotemic/vtool
+  - pip install git+https://github.com/Erotemic/utool
   - pip install numpy
-  #- pip install scipy
   - pip install cython
+  #- pip install scipy
+  - pip install pandas
   - pip install scikit-learn
   - pip install statsmodels
+
 install:
   - python setup.py build develop
+
 script: 
   - travis_wait ./run_tests.py
+
 after_failure: 
   - cat failed_doctests.txt
-cache: 
-    apt: true
-    directories:
-        - $HOME/code
-        - $HOME/code/utool
-        - $HOME/.pip-cache
-        #apt
