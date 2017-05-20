@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from setuptools import setup
 from utool import util_setup
 import utool as ut
-from os.path import dirname
+from os.path import dirname  # NOQA
 import six
 
 #import cyth
