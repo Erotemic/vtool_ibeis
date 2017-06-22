@@ -35,10 +35,11 @@ else
     export OPENCV_DIR=$LOCAL_PREFIX/share/OpenCV
 fi
 
-if [[ ! -d $OPENCV_DIR ]]; then
-    { echo "FAILED OPENCV DIR DOES NOT EXIST" ; exit 1; }
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    if [[ ! -d $OPENCV_DIR ]]; then
+        { echo "FAILED OPENCV DIR DOES NOT EXIST" ; exit 1; }
+    fi
 fi
-
 
 echo 'Configuring with cmake'
 if [[ '$OSTYPE' == 'darwin'* ]]; then
