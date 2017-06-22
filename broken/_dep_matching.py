@@ -25,7 +25,7 @@ def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
         >>> # execute function
         >>> (fm_both, fs_both) = marge_matches(fm_A, fm_B, fsv_A, fsv_B)
         >>> # verify results
-        >>> result = ut.list_str((fm_both, fs_both), precision=3)
+        >>> result = ut.repr2((fm_both, fs_both), precision=3)
         >>> print(result)
         (
             np.array([[ 15,  17],
@@ -812,7 +812,7 @@ def param_interaction():
             simp.visualize(vizkey, fnum=fnum)
         tried_configs.append(cfgdict.copy())
         print('Current Config = ')
-        print(ut.dict_str(cfgdict))
+        print(ut.repr2(cfgdict))
         pt.present()
         pt.update()
 
@@ -1336,7 +1336,7 @@ def assign_spatially_constrained_matches(chip2_dlen_sqrd, kpts1, kpts2, H,
         >>>     chip2_dlen_sqrd, kpts1, kpts2, H, fx2_to_fx1, fx2_to_dist,
         >>>     match_xy_thresh, norm_xy_bounds)
         >>> fm, fx1_norm, match_dist, norm_dist = assigntup
-        >>> result = ut.list_str(assigntup, precision=3, nobr=True)
+        >>> result = ut.repr2(assigntup, precision=3, nobr=True)
         >>> print(result)
         np.array([[2, 0],
                   [0, 1],
