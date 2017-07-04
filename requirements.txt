@@ -1,0 +1,4 @@
+setuptools>=34.1.0
+six>=1.10.0
+numpy>=1.11.1
+opencv-python
