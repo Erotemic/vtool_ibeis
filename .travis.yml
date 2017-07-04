@@ -31,7 +31,7 @@ addons:
             #- libatlas-dev
 
 before_install:
-  - pip install git+https://github.com/Erotemic/utool
+  - pip install utool
   - pip install numpy
   - pip install cython
   #- pip install scipy

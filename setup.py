@@ -20,6 +20,27 @@ import six
 #cyth.translate('vtool/keypoint.py')
 #cyth.translate('vtool/keypoint.py', 'vtool/spatial_verification.py')
 
+
+def parse_version():
+    """ Statically parse the version number from __init__.py """
+    from os.path import dirname, join  # NOQA
+    import ast
+    init_fpath = join(dirname(__file__), 'vtool', '__init__.py')
+    with open(init_fpath) as file_:
+        sourcecode = file_.read()
+    pt = ast.parse(sourcecode)
+    class VersionVisitor(ast.NodeVisitor):
+        def visit_Assign(self, node):
+            for target in node.targets:
+                try:
+                    if target.id == '__version__':
+                        self.version = node.value.s
+                except AttributeError:
+                    pass
+    visitor = VersionVisitor()
+    visitor.visit(pt)
+    return visitor.version
+
 DEV_REQUIREMENTS = [
     'atlas',
 ]
@@ -55,7 +76,7 @@ if __name__ == '__main__':
         setup_fpath=__file__,
         name='vtool',
         packages=util_setup.find_packages(),
-        version=util_setup.parse_package_for_version('vtool'),
+        version=parse_version(),
         license=util_setup.read_license('LICENSE'),
         long_description=util_setup.parse_readme('README.md'),
         ext_modules=util_setup.find_ext_modules(),
