@@ -31,10 +31,10 @@ addons:
             #- libatlas-dev
 
 before_install:
+  - pip install --upgrade pip setuptools wheel
+  - pip install --only-binary=numpy,scipy numpy scipy
   - pip install utool
-  - pip install numpy
   - pip install cython
-  #- pip install scipy
   - pip install pandas
   - pip install scikit-learn
   - pip install statsmodels
