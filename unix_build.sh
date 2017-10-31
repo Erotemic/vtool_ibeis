@@ -39,12 +39,18 @@ else
     export OPENCV_DIR=$LOCAL_PREFIX/share/OpenCV
 fi
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-    if [[ ! -d $OPENCV_DIR ]]; then
-        echo $OPENCV_DIR
-        { echo "FAILED OPENCV DIR DOES NOT EXIST" ; exit 1; }
-    fi
+if [ -d "$LOCAL_PREFIX/share/OpenCV" ]; then
+    OPENCV_ARGS="-DOpenCV_DIR=$LOCAL_PREFIX/share/OpenCV"
+else
+    OPENCV_ARGS=""
 fi
+
+#if [[ "$OSTYPE" != "darwin"* ]]; then
+#    if [[ ! -d $OPENCV_DIR ]]; then
+#        echo $OPENCV_DIR
+#        { echo "FAILED OPENCV DIR DOES NOT EXIST" ; exit 1; }
+#    fi
+#fi
 
 echo 'Configuring with cmake'
 if [[ '$OSTYPE' == 'darwin'* ]]; then
@@ -53,18 +59,18 @@ if [[ '$OSTYPE' == 'darwin'* ]]; then
         -DCMAKE_C_COMPILER=clang2 \
         -DCMAKE_CXX_COMPILER=clang2++ \
         -DCMAKE_INSTALL_PREFIX=$LOCAL_PREFIX \
-        -DOpenCV_DIR=$OPENCV_DIR \
+        $OPENCV_ARGS \
         ..
 elif [[ "$OSTYPE" == "msys"* ]]; then
     echo "USE MINGW BUILD INSTEAD" ; exit 1
     cmake -G "MSYS Makefiles" \
         -DCMAKE_INSTALL_PREFIX="$INSTALL32/Hesaff" \
-        -DOpenCV_DIR=$OPENCV_DIR \
+        $OPENCV_ARGS \
         ..
 else
     cmake -G "Unix Makefiles" \
         -DCMAKE_INSTALL_PREFIX=$LOCAL_PREFIX \
-        -DOpenCV_DIR=$OPENCV_DIR \
+        $OPENCV_ARGS \
         ..
 fi
 
