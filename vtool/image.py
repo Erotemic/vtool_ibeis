@@ -45,7 +45,10 @@ if cv2 is not None:
         'borderMode': cv2.BORDER_CONSTANT
     }
 
-    IMREAD_COLOR = cv2.IMREAD_COLOR if cv2.__version__[0] == '3' else cv2.CV_LOAD_IMAGE_COLOR
+    if int(cv2.__version__[0]) >= 3:
+        IMREAD_COLOR = cv2.IMREAD_COLOR
+    elif int(cv2.__version__[0]) == 2:
+        IMREAD_COLOR = cv2.CV_LOAD_IMAGE_COLOR
 else:
     # Hacks
     cv2 = ut.DynStruct()
