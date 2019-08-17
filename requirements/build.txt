@@ -1,4 +1,5 @@
 setuptools>=34.1.0
+wheel
 scikit-build
 cmake
 ninja

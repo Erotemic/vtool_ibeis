@@ -85,7 +85,8 @@ ubuntu_configure_docker_data_directory(){
 
     # <DOCKER_CONFIG>
     # MOVE DOCKER DATA DIRECTORY TO EXTERNAL DRIVE
-    DOCKER_DIR="/data/docker"
+    #DOCKER_DIR="/data/docker"
+    DOCKER_DIR="/media/joncrall/raid/docker"
     #Ubuntu/Debian: edit your /etc/default/docker file with the -g option: 
     sudo sed -ie "s|^#* *DOCKER_OPTS.*|DOCKER_OPTS=\"-g ${DOCKER_DIR}\"|g" /etc/default/docker
     sudo sed -ie "s|^#* *export DOCKER_TMPDIR.*|export DOCKER_TMPDIR=${DOCKER_DIR}-tmp|g" /etc/default/docker
@@ -130,6 +131,21 @@ nameserver 10.0.0.10
     sudo systemctl daemon-reload
     sudo systemctl restart docker
     sudo systemctl status docker
+}
+
+
+fix_dns_issue(){
+    # Reference: https://bugs.launchpad.net/ubuntu/+source/dnsmasq/+bug/1639776
+    # Reference: https://askubuntu.com/questions/233222/how-can-i-disable-the-dns-that-network-manager-uses
+    #There is a workaround for the openvpn issue on ubuntu
+    #16.04. After connecting to the vpn, run:
+    sudo pkill dnsmasq
+    sudo sed -i 's/^\(dns=dnsmasq\)/#\1/g' /etc/NetworkManager/NetworkManager.conf 
+    sudo systemctl daemon-reload
+    sudo systemctl restart network-manager
+
+    cat /etc/resolv.conf
+    cat /etc/NetworkManager/NetworkManager.conf 
 }
 
 ubuntu_docker_install(){
@@ -195,6 +211,8 @@ __docker_test__(){
 
     docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash
     docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash 
+
+    docker pull quay.io/skvark/manylinux1_x86_64
 }
 
 

@@ -19,8 +19,8 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]];
     then export ARCH_FLAGS=" "; 
 fi
 
-source ${__THIS_DIR}/multibuild/common_utils.sh
-source ${__THIS_DIR}/multibuild/travis_steps.sh
+source $MULTIBUILD_DPATH/common_utils.sh
+source $MULTIBUILD_DPATH/travis_steps.sh
 
 
 # I have no idea what this does

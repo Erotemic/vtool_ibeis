@@ -1,6 +1,6 @@
 #!/bin/bash
 __heredoc__="""
-Script to publish a new version of pyhesaff on PyPI
+Script to publish a new version of this library on PyPI
 
 TODO:
     - [ ] Do a digital signature of release
@@ -16,7 +16,7 @@ Usage:
     cd <YOUR REPO>
 
     git fetch --all
-    git checkout master
+    git checkout release
     git pull 
 
     gitk --all
@@ -33,42 +33,83 @@ fi
 VERSION=$(python -c "import setup; print(setup.parse_version())")
 BRANCH=${TRAVIS_BRANCH:=$(git branch | grep \* | cut -d ' ' -f2)}
 DEPLOY_BRANCH=release
+ANS=$1
+USE_GPG="True"
 
-echo "=== PYPI PUBLISHING SCRIPT =="
-echo "BRANCH = $BRANCH"
-echo "VERSION = '$VERSION'"
-echo "GITHUB_USERNAME = $GITHUB_USERNAME"
 
-if [[ "$BRANCH" != "$DEPLOY_BRANCH" ]]; then
-    echo "WARNING: you are running publish on a non-deploy branch '${DEPLOY_BRANCH}'"
+echo "
+=== PYPI BUILDING SCRIPT ==
+BRANCH = $BRANCH
+DEPLOY_BRANCH = $DEPLOY_BRANCH
+VERSION = '$VERSION'
+GITHUB_USERNAME = $GITHUB_USERNAME
+"
+
+echo "LIVE BUILDING"
+# Build wheel and source distribution
+python setup.py bdist_wheel --universal
+python setup.py sdist 
+
+BDIST_WHEEL_PATH=$(ls dist/*-$VERSION-*.whl)
+SDIST_PATH=$(dir dist/*-$VERSION*.tar.gz)
+echo "
+SDIST_PATH=$SDIST_PATH
+BDIST_WHEEL_PATH=$BDIST_WHEEL_PATH
+"
+
+if [ "$USE_GPG" == "True" ]; then
+    echo "
+    === GPG SIGN ===
+    "
+    # https://stackoverflow.com/questions/45188811/how-to-gpg-sign-a-file-that-is-built-by-travis-ci
+    # secure gpg --export-secret-keys > all.gpg
+    rm dist/*.asc
+    gpg --detach-sign -a $BDIST_WHEEL_PATH
+    gpg --detach-sign -a $SDIST_PATH
+
+    twine check $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH
+    twine check $SDIST_PATH.asc $SDIST_PATH
+
+    gpg --verify $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH 
+    gpg --verify $SDIST_PATH.asc $SDIST_PATH 
 fi
 
+
+echo "
+=== PYPI PUBLISHING SCRIPT ==
+BRANCH = $BRANCH
+DEPLOY_BRANCH = $DEPLOY_BRANCH
+VERSION = '$VERSION'
+GITHUB_USERNAME = $GITHUB_USERNAME
+"
+
 # Verify that we want to publish
-read -p "Are you ready to publish version=$VERSION on branch=$BRANCH? (input 'yes' to confirm)" ANS
-echo "ANS = $ANS"
+if [[ "$ANS" != "yes" ]]; then
+    read -p "Are you ready to publish version=$VERSION on branch=$BRANCH? (input 'yes' to confirm)" ANS
+    echo "ANS = $ANS"
+else
+    echo "publishing version=$VERSION on branch=$BRANCH" 
+fi
 
 if [[ "$ANS" == "yes" ]]; then
-    echo "Live run"
 
-    git tag $VERSION -m "tarball tag $VERSION"
-    git push --tags origin $DEPLOY_BRANCH
-
-    pip install twine -U
-
-    # Build wheel or source distribution
-    python setup.py bdist_wheel --universal
-    WHEEL_PATH=$(ls dist/*-$VERSION-*.whl)
-    echo "WHEEL_PATH = $WHEEL_PATH"
-
-    if [ "$USE_GPG" == "True" ]; then
-        # https://stackoverflow.com/questions/45188811/how-to-gpg-sign-a-file-that-is-built-by-travis-ci
-        gpg --detach-sign -a $WHEEL_PATH
-        gpg --verify $WHEEL_PATH.asc $WHEEL_PATH 
-        twine check $WHEEL_PATH.asc $WHEEL_PATH
-        gpg --verify $WHEEL_PATH.asc $WHEEL_PATH 
-        twine upload --username $GITHUB_USERNAME --password=$TWINE_PASSWORD --sign $WHEEL_PATH.asc $WHEEL_PATH
+    if [[ "$BRANCH" == "$DEPLOY_BRANCH" ]]; then
+        echo "BRANCH = $BRANCH"
+        git tag $VERSION -m "tarball tag $VERSION"
+        git push --tags origin $DEPLOY_BRANCH
+        if [ "$USE_GPG" == "True" ]; then
+            twine upload --username $GITHUB_USERNAME --password=$TWINE_PASSWORD --sign $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH
+            twine upload --username $GITHUB_USERNAME --password=$TWINE_PASSWORD --sign $SDIST_PATH.asc $SDIST_PATH
+        else
+            twine upload --username $GITHUB_USERNAME --password=$TWINE_PASSWORD $BDIST_WHEEL_PATH 
+            twine upload --username $GITHUB_USERNAME --password=$TWINE_PASSWORD $SDIST_PATH 
+        fi
     else
-        twine upload --username $GITHUB_USERNAME --password=$TWINE_PASSWORD $WHEEL_PATH
+        echo "ONLY ABLE TO PUBLISH ON DEPLOY BRANCH
+
+        BRANCH = $BRANCH
+        DEPLOY_BRANCH = $DEPLOY_BRANCH
+        "
     fi
 
     __notes__="""
