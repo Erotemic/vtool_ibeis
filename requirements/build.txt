@@ -1,0 +1,6 @@
+setuptools>=34.1.0
+scikit-build
+cmake
+ninja
+
+# Also a dev install of OpenCV

@@ -87,3 +87,7 @@ vtool/libsver.dll
 vtool/libsver.dll.a
 vtool/libsver.dylib
 timeings.txt
+
+Dockerfile*
+_skbuild/*
+opencv-docker-tag.txt
