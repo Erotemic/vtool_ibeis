@@ -1,3 +1,19 @@
+error() {
+	echo $@ >&2
+	exit 255
+}
+
+
+ubuntu_main(){
+    __heredoc__="""
+    source ~/code/vtool/dev/install_docker.sh
+    """
+    ubuntu_docker_requires
+    ubuntu_install_docker
+    ubuntu_configure_docker_data_directory
+}
+
+
 ubuntu_docker_requires()
 {
     __heredoc__="""
@@ -13,8 +29,14 @@ ubuntu_docker_requires()
         # NEED TO LOGOUT / LOGIN to revaluate groups
         su - $USER  # or we can do this
     fi
+
     # Install base dependencies
-    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+    sudo apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg-agent
+
+    if [ "$(groups $USER | grep docker)" = "" ]; then
+        error "ERROR: MUST BE IN THE DOCKER GROUP"
+    fi
+
 }
 
 
@@ -24,37 +46,32 @@ ubuntu_install_docker(){
         https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#set-up-the-repository
         https://github.com/NVIDIA/nvidia-docker
         https://docs.docker.com/install/linux/docker-ce/ubuntu/
-
-    Notes:
-        sudo ln -s /media/joncrall/4bf557b1-cbf7-414c-abde-a09a25e351a6/ /data
-        mkdir -p /data/docker
-
     """
     # Add GPG keys for docker and nvidia
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+
 
     # Verify GPG keys
     sudo apt-key fingerprint 0EBFCD88 
     sudo apt-key fingerprint F796ECB0
 
     # Setup stable docker repository
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" 
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     # Setup apt sources for nvidia-docker
-    curl -s -L https://nvidia.github.io/nvidia-docker/ubuntu16.04/amd64/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-
-    # Install nvidia-docker2 and reload the Docker daemon configuration
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
     sudo apt update -y
 
     # Install docker
     sudo apt install -y docker-ce docker-ce-cli containerd.io
 
     # Install nvidia-docker runtime
-    sudo apt install -y nvidia-docker2
+    sudo apt-get install -y nvidia-container-toolkit
 }
 
 
-ubuntu_configure_docker(){
+ubuntu_configure_docker_data_directory(){
     __heredoc__="""
     Configure docker to use a different data directory
     """
@@ -91,6 +108,37 @@ EOF'
     sudo service docker start
 }
 
+
+ubuntu_configure_docker_network_issue(){
+    # https://github.com/moby/moby/issues/32270#issuecomment-336772916
+
+    # Do we still get bad auth?
+    curl https://registry-1.docker.io/v2/ 
+
+
+    # Try hacking resolv.conf
+    sudo cp /etc/resolv.conf ~/tmp/backup_resolv.conf
+    sudo sh -c 'cat > /etc/resolv.conf << EOF
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+nameserver 10.0.0.10
+'
+    sudo sh -c 'cat ~/tmp/backup_resolv.conf >> /etc/resolv.conf'
+    cat /etc/resolv.conf
+
+    # Reload
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+    sudo systemctl status docker
+}
+
+ubuntu_docker_install(){
+    ubuntu_docker_requires
+    ubuntu_install_docker
+    ubuntu_configure_docker
+
+}
+
 __check_important_things__(){
     cat /etc/default/docker
     cat /lib/systemd/system/docker.service
@@ -122,7 +170,14 @@ __check_important_things__(){
 
     sudo systemctl daemon-reload
     sudo systemctl restart docker.service
-    
+
+    source ~/code/erotemic/safe/secrets
+    echo """
+    DOCKERHUB_USERNAME = $DOCKERHUB_USERNAME
+    DOCKERHUB_PASSWORD = $DOCKERHUB_PASSWORD
+    """
+    docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+    docker pull hello-world
 }
 
 __docker_test__(){
@@ -132,7 +187,20 @@ __docker_test__(){
         echo $@ >&2 
         exit 255
     fi
+
+    docker pull hello-world
     docker run hello-world
 
     sudo docker run hello-world
+
+    docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash
+    docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash 
+}
+
+
+ubuntu_uninstall_docker(){
+    sudo service docker stop
+
+    sudo apt-get remove --purge docker docker-engine docker.io nvidia-docker2 docker-ce-cli nvidia-container-runtime docker-ce
+    sudo rm -rf /data/docker
 }
