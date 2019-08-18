@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, division, print_function
-import utool
+import utool as ut
 import vtool.spatial_verification as sver
 from plottool import draw_sv
 from plottool import draw_func2 as df2
 import numpy as np
-import vtool.tests.dummy as dummy
+import vtool.demodata as demodata
 import vtool.keypoint as ktool  # NOQA
 import vtool.linalg as ltool  # NOQA
-from  vtool.keypoint import *  # NOQA
-from  vtool.spatial_verification import *  # NOQA
-(print, print_, printDBG, rrr, profile) = utool.inject(__name__, '[tets_sv]', DEBUG=False)
 
 
 xy_thresh = ktool.KPTS_DTYPE(.009)
@@ -41,7 +38,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> import plottool as pt
         >>> from vtool.tests.test_spatial_verification import *  # NOQA
         >>> # build test data
-        >>> nShow = utool.get_argval('--nShow', int, 1)
+        >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
         >>> # execute function
         >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
@@ -54,7 +51,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> import plottool as pt
         >>> from vtool.tests.test_spatial_verification import *  # NOQA
         >>> # build test data
-        >>> nShow = utool.get_argval('--nShow', int, 1)
+        >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars1()
         >>> # execute function
         >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
@@ -68,8 +65,8 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     def pack_errors(xy_err, scale_err, ori_err):
         """ makes human readable errors """
         def _pack(bits, errs, thresh):
-            return utool.indentjoin(['%5s %f < %f' % (bit, err, thresh) for
-                                     (bit, err) in zip(bits, errs)])
+            return ut.indentjoin(['%5s %f < %f' % (bit, err, thresh) for
+                                  (bit, err) in zip(bits, errs)])
         xy_flag = xy_err < xy_thresh_sqrd
         scale_flag = scale_err < scale_thresh_sqrd
         ori_flag = ori_err < ori_thresh
@@ -96,9 +93,9 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     for fnum, mx in enumerate(best_mxs[0:min(len(best_mxs), nShow)]):
         Aff = Aff_mats[mx]
         aff_inliers = inliers_list[mx]
-        if utool.get_argflag('--print-error'):
+        if ut.get_argflag('--print-error'):
             errors = pack_errors(*errors_list[mx])  # NOQA
-            print(utool.repr2(errors, strvals=True))
+            print(ut.repr2(errors, strvals=True))
 
         homog_inliers, homog_errors, H = sver.get_homography_inliers(kpts1,
                                                                      kpts2, fm,
@@ -124,14 +121,14 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
 
 def get_dummy_test_vars():
-    kpts1 = dummy.perterbed_grid_kpts(seed=12, damping=1.2, dtype=np.float64)
-    kpts2 = dummy.perterbed_grid_kpts(seed=24, damping=1.6, dtype=np.float64)
+    kpts1 = demodata.perterbed_grid_kpts(seed=12, damping=1.2, dtype=np.float64)
+    kpts2 = demodata.perterbed_grid_kpts(seed=24, damping=1.6, dtype=np.float64)
     assert kpts1.dtype == np.float64
     assert kpts2.dtype == np.float64
-    chip1 = dummy.get_kpts_dummy_img(kpts1)
-    chip2 = dummy.get_kpts_dummy_img(kpts2)
+    chip1 = demodata.get_kpts_dummy_img(kpts1)
+    chip2 = demodata.get_kpts_dummy_img(kpts2)
     #kpts2 = ktool.get_grid_kpts()
-    fm = dummy.make_dummy_fm(len(kpts1))
+    fm = demodata.make_dummy_fm(len(kpts1))
     return chip1, chip2, kpts1, kpts2, fm
 
 
@@ -185,28 +182,10 @@ def get_stashed_test_vars():
     return chip1, chip2, kpts1, kpts2, fm
 
 
-#if __name__ == '__main__':
-#    """
-#    CommandLine:
-#        python -m vtool.tests.test_spatial_verification
-#    """
-#    np.set_printoptions(precision=4, suppress=True)
-#    utool.util_inject.inject_colored_exceptions()
-#    nShow = utool.get_argval('--nShow', int, 1)
-#    chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
-#    #chip1, chip2, kpts1, kpts2, fm = get_stashed_test_vars()
-#    test_locals = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=nShow)
-#    exec(utool.execstr_dict(test_locals, 'test_locals'))
-#    exec(df2.present())
-
 if __name__ == '__main__':
     """
     CommandLine:
-        python -m vtool.tests.test_spatial_verification
-        python -m vtool.tests.test_spatial_verification --allexamples
-        python -m vtool.tests.test_spatial_verification --allexamples --noface --nosrc
+        xdoctest -m tests.test_spatial_verification
     """
-    import multiprocessing
-    multiprocessing.freeze_support()  # for win32
-    import utool as ut  # NOQA
-    ut.doctest_funcs()
+    import xdoctest
+    xdoctest.doctest_module(__file__)
