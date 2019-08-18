@@ -98,7 +98,7 @@ def akmeans_iterations(data, centroids, max_iters, flann_params,
         >>> centroids, hist = akmeans_iterations(data, centroids, max_iters,
         >>>                                      flann_params, ave_unchanged_thresh,
         >>>                                      ave_unchanged_iterwin, monitor=True)
-        >>> ut.quit_if_noshow()
+        >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool as pt
         >>> ut.qtensure()
         >>> pt.multi_plot('epoch_num', hist, fnum=2)
