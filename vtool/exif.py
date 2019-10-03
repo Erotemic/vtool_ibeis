@@ -272,7 +272,7 @@ def get_lat_lon(exif_dict, default=(-1, -1)):
                 gps_latitude = gps_info[GPSLATITUDE_CODE]
                 gps_latitude_ref = gps_info[GPSLATITUDEREF_CODE]
                 gps_longitude = gps_info[GPSLONGITUDE_CODE]
-                gps_longitude_ref = gps_info[GPSLONGITUDEREF_CODE]
+               gps_longitude_ref = gps_info[GPSLONGITUDEREF_CODE]
                 try:
                     lat = convert_degrees(gps_latitude)
                     if gps_latitude_ref != 'N':
