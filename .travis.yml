@@ -43,7 +43,7 @@ install:
   - python setup.py build develop
 
 script: 
-  - travis_wait ./run_tests.py
+  - travis_wait ./run_doctests.py
 
 after_failure: 
   - cat failed_doctests.txt

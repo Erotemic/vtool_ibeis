@@ -176,7 +176,7 @@ KWARGS = dict(
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         skb.utils.CLASSIFIER_STATUS_OPTIONS['beta'],
-        skb.utils.CLASSIFIER_LICENSE_OPTIONS['apache'], # Interpret as Apache License v2.0
+        skb.utils.CLASSIFIER_LICENSE_OPTIONS['apache'],  # Interpret as Apache License v2.0
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
@@ -252,7 +252,6 @@ if __name__ == '__main__':
     ))
 
     skb.setup(**KWARGS)
-
 
 
 # DEV_REQUIREMENTS = [
