@@ -8,6 +8,7 @@ but, lets say, there's still a lot of room for improvement.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import skbuild as skb
+from os.path import dirname  # NOQA
 
 
 def parse_version(package):
@@ -17,7 +18,7 @@ def parse_version(package):
     CommandLine:
         python -c "import setup; print(setup.parse_version('vtool'))"
     """
-    from os.path import dirname, join, exists
+    from os.path import join, exists
     import ast
 
     # Check if the package is a single-file or multi-file package
@@ -44,6 +45,29 @@ def parse_version(package):
     visitor = VersionVisitor()
     visitor.visit(pt)
     return visitor.version
+
+
+def native_mb_python_tag():
+    import sys
+    import platform
+    major = sys.version_info[0]
+    minor = sys.version_info[1]
+    ver = '{}{}'.format(major, minor)
+    if platform.python_implementation() == 'CPython':
+        # TODO: get if cp27m or cp27mu
+        impl = 'cp'
+        if ver == '27':
+            IS_27_BUILT_WITH_UNICODE = True  # how to determine this?
+            if IS_27_BUILT_WITH_UNICODE:
+                abi = 'mu'
+            else:
+                abi = 'm'
+        else:
+            abi = 'm'
+    else:
+        raise NotImplementedError(impl)
+    mb_tag = '{impl}{ver}-{impl}{ver}{abi}'.format(**locals())
+    return mb_tag
 
 
 def parse_requirements(fname='requirements.txt'):
@@ -162,6 +186,10 @@ AUTHORS = [
 ]
 
 
+NAME = 'vtool'
+MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
+# VERSION = parse_version()
+
 KWARGS = dict(
     name='vtool',
     version=VERSION,
@@ -176,7 +204,7 @@ KWARGS = dict(
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         skb.utils.CLASSIFIER_STATUS_OPTIONS['beta'],
-        skb.utils.CLASSIFIER_LICENSE_OPTIONS['apache'], # Interpret as Apache License v2.0
+        skb.utils.CLASSIFIER_LICENSE_OPTIONS['apache'],  # Interpret as Apache License v2.0
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
@@ -203,13 +231,13 @@ try:
 except Exception:
     raise RuntimeError('FAILED TO ADD BUILD CONSTRUCTS')
 
+
 if __name__ == '__main__':
     """
     CommandLine:
         xdoctest -m setup
     """
     skb.setup(**KWARGS)
-
 
 
 # DEV_REQUIREMENTS = [
