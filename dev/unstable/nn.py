@@ -412,7 +412,6 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     """
     raise NotImplementedError('use sklearn or opencv')
     return kmeans_plusplus_sklearn(data, K)
-    # # import pyflann
     # # import six
 
     # # rng = ut.ensure_rng(rng)
@@ -651,13 +650,14 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
 
 
 def approximate_distances(centroids, data, K, flann_params):
-    import pyflann
+    from vtool._pyflann_backend import pyflann
+    # import pyflann
     (_, qdist2_sdist) = pyflann.FLANN().nn(centroids, data, K, **flann_params)
     return qdist2_sdist
 
 
 def approximate_assignments(seachedvecs, queryvecs, K, flann_params):
-    import pyflann
+    from vtool._pyflann_backend import pyflann
     (qx2_sx, qdist2_sdist) = pyflann.FLANN().nn(seachedvecs, queryvecs, K, **flann_params)
     return qx2_sx, qdist2_sdist
 

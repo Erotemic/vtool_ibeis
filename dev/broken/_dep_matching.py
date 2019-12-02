@@ -104,7 +104,7 @@ from vtool import matching
 
 def assign_nearest_neighbors(vecs1, vecs2, K=2):
     import vtool as vt
-    import pyflann
+    from vtool._pyflann_backend import pyflann
     checks = 800
     flann_params = {
         'algorithm': 'kdtree',

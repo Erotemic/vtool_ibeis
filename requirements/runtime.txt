@@ -13,6 +13,8 @@ Pillow
 
 statsmodels
 
+pyflann_ibeis >= 2.0.0
+
 #jaraco.windows >= 3.9.1;platform_system=="Windows"
 
 # utool

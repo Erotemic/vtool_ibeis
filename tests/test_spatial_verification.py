@@ -155,7 +155,7 @@ def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
     #pseudo_max_dist_sqrd = (np.sqrt(2) * 512) ** 2
     pseudo_max_dist_sqrd = 2 * (512 ** 2)
     flann = vt.flann_cache(vecs1, flann_params=flann_params)
-    import pyflann
+    from vtool._pyflann_backend import pyflann
     try:
         fx2_to_fx1, _fx2_to_dist = flann.nn_index(vecs2, num_neighbors=2, checks=checks)
     except pyflann.FLANNException:
@@ -177,7 +177,8 @@ def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
 
 
 def get_stashed_test_vars():
-    chip1, chip2, kpts1, kpts2, fm, homog_tup, aff_tup = utool.load_testdata(
+    import utool as ut
+    chip1, chip2, kpts1, kpts2, fm, homog_tup, aff_tup = ut.load_testdata(
         'chip1', 'chip2', 'kpts1', 'kpts2', 'fm', 'homog_tup', 'aff_tup')
     return chip1, chip2, kpts1, kpts2, fm
 
