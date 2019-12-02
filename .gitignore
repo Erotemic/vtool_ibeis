@@ -30,6 +30,7 @@ logs
 # Unit test / coverage reports
 .coverage
 .tox
+htmlcov
 nosetests.xml
 
 # Translations
@@ -85,3 +86,8 @@ failed_doctests.txt
 vtool/libsver.dll
 vtool/libsver.dll.a
 vtool/libsver.dylib
+timeings.txt
+
+Dockerfile*
+_skbuild/*
+opencv-docker-tag.txt

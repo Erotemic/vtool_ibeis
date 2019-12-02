@@ -20,7 +20,7 @@ indices into kpts{1,2} indicating a match
 #include <vector>
 #include <iostream>
 
- 
+
 //#if WIN32
 //typedef unsigned __int64 size_t;
 //#else
@@ -290,17 +290,17 @@ Matx<double, 3, 3> prefix##invVR2_m = get_invV_mat( \
         #define USE_PAR_SVER
 
         #ifndef USE_PAR_SVER
-        const bool parallel = 0;
+        const bool parallel_flag = 0;
         bool* tmp_inliers = new bool[num_matches];
         double* tmp_errors = new double[num_matches * 3];
         #else
-        bool parallel = 1;
+        const bool parallel_flag = 1;
         #endif
-        printDBG_SVER(" * parallel = " << parallel);
+        printDBG_SVER(" * parallel_flag = " << parallel_flag);
 
         {
             //(max : max_val)
-            #pragma omp parallel for if(parallel)
+            #pragma omp parallel for if(parallel_flag)
             for(size_t i1 = 0; i1 < nMatch * 2; i1 += 2)
             {
                 #ifdef USE_PAR_SVER
