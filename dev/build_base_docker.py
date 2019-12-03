@@ -227,7 +227,7 @@ def main():
     BASE_REPO = 'quay.io/skvark'
 
     # do we need the unicode width in this tag?
-    DOCKER_TAG = '{}-opencv{}-v2'.format(PLAT, OPENCV_VERSION)
+    DOCKER_TAG = '{}-opencv{}-v3'.format(PLAT, OPENCV_VERSION)
     DOCKER_URI = '{QUAY_REPO}:{DOCKER_TAG}'.format(**locals())
 
     if not exists(join(dpath, 'opencv-' + OPENCV_VERSION)):
@@ -277,7 +277,8 @@ def main():
         parts.append(ub.codeblock(
             f'''
             RUN MB_PYTHON_TAG={MB_PYTHON_TAG} && \
-                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv scikit-build cmake ninja ubelt numpy wheel -U && \
+                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install pip && \
+                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv scikit-build cmake ninja ubelt numpy wheel && \
                 /opt/python/$MB_PYTHON_TAG/bin/python -m virtualenv /root/venv-$MB_PYTHON_TAG
             '''))
 
@@ -306,10 +307,6 @@ def main():
         parts.append(ub.codeblock(
             f'''
             RUN MB_PYTHON_TAG={MB_PYTHON_TAG} && \
-                PYTHON_ROOT=/opt/python/{MB_PYTHON_TAG}/ \
-                PYTHONPATH=/opt/python/{MB_PYTHON_TAG}/lib/python{PY_VER}/site-packages/ \
-                PATH=/opt/python/{MB_PYTHON_TAG}/bin:$PATH \
-                PYTHON_EXE=/opt/python/{MB_PYTHON_TAG}/bin/python \
                 source /root/venv-$MB_PYTHON_TAG/bin/activate && \
                 mkdir -p /root/code/opencv/build_{MB_PYTHON_TAG} && \
                 cd /root/code/opencv/build_{MB_PYTHON_TAG} && \
@@ -321,6 +318,10 @@ def main():
             '''))
 
     # cmake {CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=/root/venv-$MB_PYTHON_TAG /root/code/opencv && \
+    # PYTHON_ROOT=/opt/python/{MB_PYTHON_TAG}/ \
+    # PYTHONPATH=/opt/python/{MB_PYTHON_TAG}/lib/python{PY_VER}/site-packages/ \
+    # PATH=/opt/python/{MB_PYTHON_TAG}/bin:$PATH \
+    # PYTHON_EXE=/opt/python/{MB_PYTHON_TAG}/bin/python \
     docker_code = '\n\n'.join(parts)
 
     try:
