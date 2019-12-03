@@ -4,7 +4,7 @@ import ubelt as ub
 # import utool
 import numpy as np
 from numpy.random import randint
-from vtool.clustering2 import FLANN_CLS
+from vtool._pyflann_backend import FLANN_CLS
 
 """
 remove_points does not currently have bindings
@@ -114,18 +114,8 @@ def test_pyflann_hkmeans():
         If dtype is None (the default), the array returned is the same
         type as pts.  Otherwise, the returned array is of type dtype.
 
-        #>>> from vtool.tests.test_pyflann import * # NOQA
         #>>> test_pyflann_hkmeans()  #doctest: +ELLIPSIS
         #HKmeans...
-
-    CommandLine:
-        python -m vtool.tests.test_pyflann --test-test_pyflann_hkmeans
-
-    Example:
-        >>> # ENABLE_DOCTEST
-        >>> from vtool.tests.test_pyflann import *  # NOQA
-        >>> result = test_pyflann_hkmeans()
-        >>> print(result)
     """
 
     # Test parameters
@@ -156,15 +146,6 @@ def test_pyflann_kmeans():
         default is to run until convergence.
         If dtype is None (the default), the array returned is the same
         type as pts.  Otherwise, the returned array is of type dtype.
-
-    CommandLine:
-        python -m vtool.tests.test_pyflann --test-test_pyflann_kmeans
-
-    Example:
-        >>> # ENABLE_DOCTEST
-        >>> from vtool.tests.test_pyflann import *  # NOQA
-        >>> result = test_pyflann_kmeans()
-        >>> print(result)
     """
     print('Kmeans')
     flann = FLANN_CLS()
@@ -181,14 +162,6 @@ def test_pyflann_kmeans():
 
 def test_pyflann_add_point():
     """
-    CommandLine:
-        python -m vtool.tests.test_pyflann --test-test_pyflann_add_point
-
-    Example:
-        >>> # ENABLE_DOCTEST
-        >>> from vtool.tests.test_pyflann import *  # NOQA
-        >>> result = test_pyflann_add_point()
-        >>> print(result)
     """
     # Test parameters
     num_neighbors = 3
@@ -219,14 +192,6 @@ def test_pyflann_add_point():
 
 def test_pyflann_searches():
     """
-    CommandLine:
-        python -m vtool.tests.test_pyflann --test-test_pyflann_searches
-
-    Example:
-        >>> # ENABLE_DOCTEST
-        >>> from vtool.tests.test_pyflann import *  # NOQA
-        >>> result = test_pyflann_searches()
-        >>> print(result)
     """
     try:
         num_neighbors = 3
@@ -259,7 +224,8 @@ def test_pyflann_searches():
 
         assert np.all(dists3 < radius)
     except Exception as ex:
-        utool.printex(ex, key_list=[
+        import utool as ut
+        ut.printex(ex, key_list=[
             'query',
             'query.shape',
             'pts.shape',
@@ -275,7 +241,6 @@ def test_pyflann_tune():
 
     Example:
         >>> # ENABLE_DOCTEST
-        >>> from vtool.tests.test_pyflann import *  # NOQA
         >>> result = test_pyflann_tune()
         >>> print(result)
     """
@@ -317,7 +282,6 @@ def test_pyflann_io():
 
     Example:
         >>> # ENABLE_DOCTEST
-        >>> from vtool.tests.test_pyflann import *  # NOQA
         >>> result = test_pyflann_io()
         >>> print(result)
     """
@@ -370,6 +334,7 @@ if __name__ == '__main__':
     """
     CommandLine:
         python ~/code/vtool/vtool/tests/test_pyflann.py all
+        xdoctest ~/code/vtool/tests/test_pyflann.py zero
     """
     import xdoctest
     xdoctest.doctest_module(__file__)
