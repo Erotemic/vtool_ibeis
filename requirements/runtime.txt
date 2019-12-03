@@ -7,7 +7,8 @@ pyflann_ibeis >= 0.2.0
 pyhesaff >= 2.0.1 
 scipy
 six >= 1.10.0
-skimage
+scikit-image
+scikit-learn
 statsmodels
 ubelt 
 utool 
