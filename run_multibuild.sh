@@ -42,29 +42,6 @@ docker pull quay.io/erotemic/manylinux-opencv:manylinux1_i686-opencv4.1.0-py3.6
 """
 
 
-get_native_mb_python_tag(){
-    __heredoc__='''
-    Get the MB tag for the current version of python running
-    
-    https://stackoverflow.com/questions/53409511/what-is-the-difference-between-cpython-27m-and-27mu?noredirect=1&lq=1
-    '''
-    python -c "
-import sys
-import platform
-major = sys.version_info[0]
-minor = sys.version_info[1]
-ver = '{}{}'.format(major, minor)
-if platform.python_implementation() == 'CPython':
-    impl = 'cp'
-    abi = 'm'
-else:
-    raise NotImplementedError(impl)
-mb_tag = '{impl}{ver}-{impl}{ver}{abi}'.format(**locals())
-print(mb_tag)
-"
-}
-
-
 DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-for:x86_64-opencv4.1.0-v2"}
 # Valid multibuild python versions are:
 # cp27-cp27m  cp27-cp27mu  cp34-cp34m  cp35-cp35m  cp36-cp36m  cp37-cp37m
@@ -109,16 +86,8 @@ else
     set -e
 
     VENV_DIR=$HOME/venv-$MB_PYTHON_TAG
-    #PY_VER=$(python -c "print('$MB_PYTHON_TAG'[2:4])")
-    #PYTHON_ROOT=/opt/python/$MB_PYTHON_TAG
-    #PYTHONPATH=/opt/python/$MB_PYTHON_TAG/lib/python{PY_VER}/site-packages
-    #PATH=/opt/python/$MB_PYTHON_TAG/bin:$PATH 
-    #PYTHON_EXE=/opt/python/$MB_PYTHON_TAG/bin/python 
-
     source $VENV_DIR/bin/activate 
     pip install scikit-build cmake ninja
-    #pip install auditwheel 
-    #pip install auditwheel==1.0.0
 
     cd /io
     python setup.py bdist_wheel

@@ -26,6 +26,7 @@ python:
 before_install:
   - pip install pip -U
   - pip install -r requirements.txt 
+  - docker pull quay.io/erotemic/manylinux-for:x86_64-opencv4.1.0-v2
 
 install:
   - | 
