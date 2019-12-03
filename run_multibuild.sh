@@ -96,6 +96,7 @@ else
     chmod -R o+rw dist
 
     /opt/python/cp37-cp37m/bin/python -m pip install auditwheel
+    /opt/python/cp37-cp37m/bin/python -m auditwheel show dist/$NAME-$VERSION-$MB_PYTHON_TAG*.whl
     /opt/python/cp37-cp37m/bin/python -m auditwheel repair dist/$NAME-$VERSION-$MB_PYTHON_TAG*.whl
     chmod -R o+rw wheelhouse
     chmod -R o+rw $NAME.egg-info

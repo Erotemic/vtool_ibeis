@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.1.0)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -39,8 +39,8 @@ if(APPLE AND CLANG2)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++")
 else()
     # TODO: this is gcc only, fix for clang
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++11")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++11")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -107,10 +107,10 @@ add_library(sver MODULE ${SOURCE_FILES})
 
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    # Set the DLLEXPORT variable to export symbols
-    target_compile_definitions(sver PRIVATE HESAFF_WIN_EXPORT)
-endif()
+#if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+#    # Set the DLLEXPORT variable to export symbols
+#    target_compile_definitions(sver PRIVATE HESAFF_WIN_EXPORT)
+#endif()
 
 target_include_directories(sver PRIVATE ${OpenCV_INCLUDE_DIR})
 
@@ -120,5 +120,5 @@ target_link_libraries(sver PRIVATE ${OpenCV_LIBRARIES})
 # https://github.com/scikit-build/scikit-build/issues/434
 # Note: if the target is not referenced by package_data in setup.py then the
 # lib will be installed as a data file and not a package file.
-install(TARGETS sver LIBRARY DESTINATION "vtool")
-#install(TARGETS sver LIBRARY DESTINATION vtool/lib)
+#install(TARGETS sver LIBRARY DESTINATION "vtool")
+install(TARGETS sver DESTINATION vtool/lib)
