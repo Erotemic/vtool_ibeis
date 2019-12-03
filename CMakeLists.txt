@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
+
+set(CMAKE_CXX_STANDARD 11)
 
 #######################################
 # Clang2 = Clang + OpenMP built for OSX Mavericks
@@ -68,3 +70,4 @@ add_library(sver SHARED ${SOURCE_FILES})
 #######################################
 target_link_libraries(sver ${OpenCV_LIBS})
 
+install (TARGETS sver DESTINATION vtool/lib)

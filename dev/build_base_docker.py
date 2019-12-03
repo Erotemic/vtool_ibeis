@@ -227,7 +227,7 @@ def main():
     BASE_REPO = 'quay.io/skvark'
 
     # do we need the unicode width in this tag?
-    DOCKER_TAG = '{}-opencv{}'.format(BASE, OPENCV_VERSION)
+    DOCKER_TAG = '{}-opencv{}-v2'.format(PLAT, OPENCV_VERSION)
     DOCKER_URI = '{QUAY_REPO}:{DOCKER_TAG}'.format(**locals())
 
     if not exists(join(dpath, 'opencv-' + OPENCV_VERSION)):
@@ -265,9 +265,9 @@ def main():
         ''')
 
     MB_PYTHON_TAGS = [
-        'cp35-cp35m',
-        'cp36-cp36m',
         'cp37-cp37m',
+        'cp36-cp36m',
+        'cp35-cp35m',
         'cp27-cp27mu',
     ]
 
@@ -277,12 +277,12 @@ def main():
         parts.append(ub.codeblock(
             f'''
             RUN MB_PYTHON_TAG={MB_PYTHON_TAG} && \
-                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv -U && \
-                /opt/python/$MB_PYTHON_TAG/bin/python -m virtualenv /root/venv-$MB_PYTHON_TAG && \
-                source /root/venv-$MB_PYTHON_TAG/bin/activate && \
-                pip install -q --no-cache-dir scikit-build cmake ninja ubelt numpy wheel
+                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv scikit-build cmake ninja ubelt numpy wheel -U && \
+                /opt/python/$MB_PYTHON_TAG/bin/python -m virtualenv /root/venv-$MB_PYTHON_TAG
             '''))
 
+    # only do this once
+    MB_PYTHON_TAGS = MB_PYTHON_TAGS[0:1]
     for MB_PYTHON_TAG in MB_PYTHON_TAGS:
         major, minor = MB_PYTHON_TAG.replace('cp', '')[0:2]
         PY_VER = '{}.{}'.format(major, minor)
@@ -291,10 +291,11 @@ def main():
             'is_64bit': PLAT in {'x86_64'},
             'build_contrib': False,
             'build_headless': True,
-            'python_args': {
-                'py_ver': PY_VER,
-                'py_executable': PY_VER,
-            },
+            'python_args': None,
+            # 'python_args': {
+            #     'py_ver': PY_VER,
+            #     'py_executable': PY_VER,
+            # },
             'linux_jpeg_args': {
                 'jpeg_include_dir': '${JPEG_INCLUDE_DIR}',
                 'jpeg_library': '${JPEG_LIBRARY}',
@@ -305,7 +306,6 @@ def main():
         parts.append(ub.codeblock(
             f'''
             RUN MB_PYTHON_TAG={MB_PYTHON_TAG} && \
-                PYTHON_VERSION={PY_VER} \
                 PYTHON_ROOT=/opt/python/{MB_PYTHON_TAG}/ \
                 PYTHONPATH=/opt/python/{MB_PYTHON_TAG}/lib/python{PY_VER}/site-packages/ \
                 PATH=/opt/python/{MB_PYTHON_TAG}/bin:$PATH \
@@ -313,13 +313,14 @@ def main():
                 source /root/venv-$MB_PYTHON_TAG/bin/activate && \
                 mkdir -p /root/code/opencv/build_{MB_PYTHON_TAG} && \
                 cd /root/code/opencv/build_{MB_PYTHON_TAG} && \
-                cmake {CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=/root/venv-$MB_PYTHON_TAG /root/code/opencv && \
+                cmake {CMAKE_ARGS} /root/code/opencv && \
                 cd /root/code/opencv/build_{MB_PYTHON_TAG} && \
                 make -j{MAKE_CPUS} && \
                 make install && \
                 rm -rf /root/code/opencv/build_{MB_PYTHON_TAG}
             '''))
 
+    # cmake {CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=/root/venv-$MB_PYTHON_TAG /root/code/opencv && \
     docker_code = '\n\n'.join(parts)
 
     try:

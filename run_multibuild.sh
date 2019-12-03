@@ -65,18 +65,17 @@ print(mb_tag)
 }
 
 
-#DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/pypa/manylinux2010_x86_64"}
-#DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-opencv"}
-DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-for:manylinux1_x86_64-opencv4.1.0"}
+DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-for:x86_64-opencv4.1.0-v2"}
 # Valid multibuild python versions are:
 # cp27-cp27m  cp27-cp27mu  cp34-cp34m  cp35-cp35m  cp36-cp36m  cp37-cp37m
 MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")}
 NAME=${NAME:=$(python -c "import setup; print(setup.NAME)")}
-VERSION=$(python -c "import setup; print(setup.VERSION)")
+VERSION=${VERSION:=$(python -c "import setup; print(setup.VERSION)")}
 echo "
 MB_PYTHON_TAG = $MB_PYTHON_TAG
 DOCKER_IMAGE = $DOCKER_IMAGE
 VERSION = $VERSION
+NAME = $NAME
 "
 
 if [ "$_INSIDE_DOCKER" != "YES" ]; then
@@ -86,6 +85,8 @@ if [ "$_INSIDE_DOCKER" != "YES" ]; then
         -v $PWD:/io \
         -e _INSIDE_DOCKER="YES" \
         -e MB_PYTHON_TAG="$MB_PYTHON_TAG" \
+        -e NAME="$NAME" \
+        -e VERSION="$VERSION" \
         $DOCKER_IMAGE bash -c 'cd /io && ./run_multibuild.sh'
 
     __interactive__='''
@@ -93,6 +94,8 @@ if [ "$_INSIDE_DOCKER" != "YES" ]; then
         -v $PWD:/io \
         -e _INSIDE_DOCKER="YES" \
         -e MB_PYTHON_TAG="$MB_PYTHON_TAG" \
+        -e NAME="$NAME" \
+        -e VERSION="$VERSION" \
         -it $DOCKER_IMAGE bash
 
     set +e
@@ -102,42 +105,27 @@ if [ "$_INSIDE_DOCKER" != "YES" ]; then
     BDIST_WHEEL_PATH=$(ls wheelhouse/$NAME-$VERSION-$MB_PYTHON_TAG*.whl)
     echo "BDIST_WHEEL_PATH = $BDIST_WHEEL_PATH"
 else
-
     set -x
     set -e
 
     VENV_DIR=$HOME/venv-$MB_PYTHON_TAG
+    #PY_VER=$(python -c "print('$MB_PYTHON_TAG'[2:4])")
+    #PYTHON_ROOT=/opt/python/$MB_PYTHON_TAG
+    #PYTHONPATH=/opt/python/$MB_PYTHON_TAG/lib/python{PY_VER}/site-packages
+    #PATH=/opt/python/$MB_PYTHON_TAG/bin:$PATH 
+    #PYTHON_EXE=/opt/python/$MB_PYTHON_TAG/bin/python 
 
-    /opt/python/$MB_PYTHON_TAG/bin/python -m pip install setuptools pip virtualenv -U 
-    /opt/python/$MB_PYTHON_TAG/bin/python -m virtualenv $VENV_DIR
     source $VENV_DIR/bin/activate 
     pip install scikit-build cmake ninja
+    pip install auditwheel 
 
-    ls /
-    echo "VENV_DIR = $VENV_DIR"
-
-    set +x
-    echo "activate virtualenv"
-    source $VENV_DIR/bin/activate
-    echo "activated virtualenv"
-    set -x
-
-    #export PIP_CACHE_DIR="$MB_WORKDIR/cache_pip"
-    #pip install pip -U
-    #pip install pip setuptools -U
-    #pip install -r requirements.txt
-    # we only need build requirements to make the wheel
-    #pip install -r requirements/build.txt
-
-    #chmod -R o+rw $VENV_DIR
-
+    cd /io
     python setup.py bdist_wheel
 
     chmod -R o+rw _skbuild
     chmod -R o+rw dist
 
-    auditwheel repair dist/$NAME-$VERSION-$MB_PYTHON_TAG-*.whl
+    auditwheel repair dist/$NAME-$VERSION-$MB_PYTHON_TAG*.whl
     chmod -R o+rw wheelhouse
-
-    chmod -R o+rw pyflann_ibeis.egg-info
+    chmod -R o+rw $NAME.egg-info
 fi
