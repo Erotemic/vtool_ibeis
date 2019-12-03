@@ -5,16 +5,16 @@ import numpy as np
 def testdata_nondeterm_sver():
     r"""
     varstr_list = [
-         ut.hz_str('kpts1 = ', ut.repr2(kpts1, threshold=10000)),
-         ut.hz_str('kpts2 = ', ut.repr2(kpts2, threshold=10000)),
-         ut.hz_str('fm = ', ut.repr2(fm, threshold=10000)),
-         ut.hz_str('match_weights = ', ut.repr2(match_weights, threshold=10000)),
-         ut.hz_str('xy_thresh = ', xy_thresh),
-         ut.hz_str('scale_thresh = ', scale_thresh),
-         ut.hz_str('ori_thresh = ', ori_thresh),
-         ut.hz_str('min_nInliers = ', min_nInliers),
-         ut.hz_str('dlen_sqrd2 = ', dlen_sqrd2),
-         ut.hz_str('full_homog_checks = ', full_homog_checks),
+         ub.hzcat('kpts1 = ', ub.repr2(kpts1, threshold=10000)),
+         ub.hzcat('kpts2 = ', ub.repr2(kpts2, threshold=10000)),
+         ub.hzcat('fm = ', ub.repr2(fm, threshold=10000)),
+         ub.hzcat('match_weights = ', ub.repr2(match_weights, threshold=10000)),
+         ub.hzcat('xy_thresh = ', xy_thresh),
+         ub.hzcat('scale_thresh = ', scale_thresh),
+         ub.hzcat('ori_thresh = ', ori_thresh),
+         ub.hzcat('min_nInliers = ', min_nInliers),
+         ub.hzcat('dlen_sqrd2 = ', dlen_sqrd2),
+         ub.hzcat('full_homog_checks = ', full_homog_checks),
          'return kpts1, kpts2, fm, xy_thresh, scale_thresh, ori_thresh, dlen_sqrd2, min_nInliers, match_weights, full_homog_checks'
     ]
     ut.copy_text_to_clipboard(ut.indent('\n'.join(varstr_list)))

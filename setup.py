@@ -1,39 +1,24 @@
 #!/usr/bin/env python
-"""
-An Ode to Python Packaging:
-
-Oh Python Packaging, when will you get better?
-You've already improved so much...
-but, lets say, there's still a lot of room for improvement.
-"""
-from __future__ import absolute_import, division, print_function, unicode_literals
-import skbuild as skb
+from __future__ import absolute_import, division, print_function
+from os.path import dirname
+from os.path import join
+from os.path import sys
+from os.path import exists
+from setuptools import find_packages
 
 
-def parse_version(package):
+def parse_version(fpath):
     """
-    Statically parse the version number from __init__.py
-
-    CommandLine:
-        python -c "import setup; print(setup.parse_version('vtool'))"
+    Statically parse the version number from a python file
     """
-    from os.path import dirname, join, exists
     import ast
-
-    # Check if the package is a single-file or multi-file package
-    _candiates = [
-        join(dirname(__file__), package + '.py'),
-        join(dirname(__file__), package, '__init__.py'),
-    ]
-    _found = [init_fpath for init_fpath in _candiates if exists(init_fpath)]
-    if len(_found) > 0:
-        init_fpath = _found[0]
-    elif len(_found) > 1:
-        raise Exception('parse_version found multiple init files')
-    elif len(_found) == 0:
-        raise Exception('Cannot find package init file')
-
-    with open(init_fpath) as file_:
+    if not exists(fpath):
+        try2 = join(dirname(__file__), fpath)
+        if exists(try2):
+            fpath = try2
+        else:
+            raise ValueError('fpath={!r} does not exist'.format(fpath))
+    with open(fpath, 'r') as file_:
         sourcecode = file_.read()
     pt = ast.parse(sourcecode)
     class VersionVisitor(ast.NodeVisitor):
@@ -46,20 +31,65 @@ def parse_version(package):
     return visitor.version
 
 
-def parse_requirements(fname='requirements.txt'):
-    """
-    Parse the package dependencies listed in a requirements file but
-    strips specific versioning information.
+def native_mb_python_tag():
+    import sys
+    import platform
+    major = sys.version_info[0]
+    minor = sys.version_info[1]
+    ver = '{}{}'.format(major, minor)
+    if platform.python_implementation() == 'CPython':
+        # TODO: get if cp27m or cp27mu
+        impl = 'cp'
+        if ver == '27':
+            IS_27_BUILT_WITH_UNICODE = True  # how to determine this?
+            if IS_27_BUILT_WITH_UNICODE:
+                abi = 'mu'
+            else:
+                abi = 'm'
+        else:
+            abi = 'm'
+    else:
+        raise NotImplementedError(impl)
+    mb_tag = '{impl}{ver}-{impl}{ver}{abi}'.format(**locals())
+    return mb_tag
 
-    TODO:
-        perhaps use https://github.com/davidfischer/requirements-parser instead
+
+def parse_description():
+    """
+    Parse the description in the README file
+
+    CommandLine:
+        pandoc --from=markdown --to=rst --output=README.rst README.md
+        python -c "import setup; print(setup.parse_description())"
+    """
+    from os.path import dirname, join, exists
+    readme_fpath = join(dirname(__file__), 'README.rst')
+    # This breaks on pip install, so check that it exists.
+    if exists(readme_fpath):
+        with open(readme_fpath, 'r') as f:
+            text = f.read()
+        return text
+    return ''
+
+
+def parse_requirements(fname='requirements.txt', with_version=False):
+    """
+    Parse the package dependencies listed in a requirements file but strips
+    specific versioning information.
+
+    Args:
+        fname (str): path to requirements file
+        with_version (bool, default=False): if true include version specs
+
+    Returns:
+        List[str]: list of requirements items
 
     CommandLine:
         python -c "import setup; print(setup.parse_requirements())"
+        python -c "import setup; print(chr(10).join(setup.parse_requirements(with_version=True)))"
     """
     from os.path import exists
     import re
-    import sys
     require_fpath = fname
 
     def parse_line(line):
@@ -71,28 +101,27 @@ def parse_requirements(fname='requirements.txt'):
             target = line.split(' ')[1]
             for info in parse_require_file(target):
                 yield info
-        elif line.startswith('-e '):
-            info = {}
-            info['package'] = line.split('#egg=')[1]
-            yield info
         else:
-            # Remove versioning from the package
-            pat = '(' + '|'.join(['>=', '==', '>']) + ')'
-            parts = re.split(pat, line, maxsplit=1)
-            parts = [p.strip() for p in parts]
+            info = {'line': line}
+            if line.startswith('-e '):
+                info['package'] = line.split('#egg=')[1]
+            else:
+                # Remove versioning from the package
+                pat = '(' + '|'.join(['>=', '==', '>']) + ')'
+                parts = re.split(pat, line, maxsplit=1)
+                parts = [p.strip() for p in parts]
 
-            info = {}
-            info['package'] = parts[0]
-            if len(parts) > 1:
-                op, rest = parts[1:]
-                if ';' in rest:
-                    # Handle platform specific dependencies
-                    # http://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific-dependencies
-                    version, platform_deps = map(str.strip, rest.split(';'))
-                    info['platform_deps'] = platform_deps
-                else:
-                    version = rest  # NOQA
-                info['version'] = (op, version)
+                info['package'] = parts[0]
+                if len(parts) > 1:
+                    op, rest = parts[1:]
+                    if ';' in rest:
+                        # Handle platform specific dependencies
+                        # http://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific-dependencies
+                        version, platform_deps = map(str.strip, rest.split(';'))
+                        info['platform_deps'] = platform_deps
+                    else:
+                        version = rest  # NOQA
+                    info['version'] = (op, version)
             yield info
 
     def parse_require_file(fpath):
@@ -103,50 +132,22 @@ def parse_requirements(fname='requirements.txt'):
                     for info in parse_line(line):
                         yield info
 
-    # This breaks on pip install, so check that it exists.
-    packages = []
-    if exists(require_fpath):
-        for info in parse_require_file(require_fpath):
-            package = info['package']
-            if not sys.version.startswith('3.4'):
-                # apparently package_deps are broken in 3.4
-                platform_deps = info.get('platform_deps')
-                if platform_deps is not None:
-                    package += ';' + platform_deps
-            packages.append(package)
+    def gen_packages_items():
+        if exists(require_fpath):
+            for info in parse_require_file(require_fpath):
+                parts = [info['package']]
+                if with_version and 'version' in info:
+                    parts.extend(info['version'])
+                if not sys.version.startswith('3.4'):
+                    # apparently package_deps are broken in 3.4
+                    platform_deps = info.get('platform_deps')
+                    if platform_deps is not None:
+                        parts.append(';' + platform_deps)
+                item = ''.join(parts)
+                yield item
+
+    packages = list(gen_packages_items())
     return packages
-
-# TODO: Push for merger of PR adding templatable utilities to skb.utils
-from setuptools import find_packages
-skb.utils.find_packages = find_packages
-skb.utils.parse_version = parse_version
-skb.utils.parse_requirements = parse_requirements
-_ = skb.utils.CLASSIFIER_STATUS_OPTIONS = {
-    '1': 'Development Status :: 1 - Planning',
-    '2': 'Development Status :: 2 - Pre-Alpha',
-    '3': 'Development Status :: 3 - Alpha',
-    '4': 'Development Status :: 4 - Beta',
-    '5': 'Development Status :: 5 - Production/Stable',
-    '6': 'Development Status :: 6 - Mature',
-    '7': 'Development Status :: 7 - Inactive',
-}
-_.update({
-    'planning': _['1'],
-    'pre-alpha': _['2'],
-    'alpha': _['3'],
-    'beta': _['4'],
-    'stable': _['5'],
-    'mature': _['6'],
-    'inactive': _['7'],
-})
-
-_ = skb.utils.CLASSIFIER_LICENSE_OPTIONS = {
-    'apache': 'License :: OSI Approved :: Apache Software License',
-}
-del _
-
-
-VERSION = parse_version('vtool')
 
 """
 TODO: automate with some modified version of: git shortlog -s | cut -c8-
@@ -162,12 +163,16 @@ AUTHORS = [
 ]
 
 
+NAME = 'vtool'
+MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
+VERSION = parse_version('vtool/__init__.py')
+
 KWARGS = dict(
     name='vtool',
     version=VERSION,
     author=', '.join(AUTHORS),
     description='vision tools',
-    # long_description=parse_description(),
+    long_description=parse_description(),
     long_description_content_type='text/x-rst',
     author_email='erotemic@gmail.com',
     url='https://github.com/Erotemic/vtool',
@@ -175,8 +180,8 @@ KWARGS = dict(
     # List of classifiers available at:
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        skb.utils.CLASSIFIER_STATUS_OPTIONS['beta'],
-        skb.utils.CLASSIFIER_LICENSE_OPTIONS['apache'], # Interpret as Apache License v2.0
+        'Development Status :: 4 - Beta',
+        'License :: OSI Approved :: Apache Software License',  # Interpret as Apache License v2.0
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
@@ -192,7 +197,7 @@ KWARGS = dict(
         'build': parse_requirements('requirements/build.txt'),
         'runtime': parse_requirements('requirements/runtime.txt'),
     },
-    packages=skb.utils.find_packages(),
+    packages=find_packages(),
 )
 
 
@@ -203,54 +208,48 @@ try:
 except Exception:
     raise RuntimeError('FAILED TO ADD BUILD CONSTRUCTS')
 
+
 if __name__ == '__main__':
     """
     CommandLine:
         xdoctest -m setup
     """
+    import sysconfig
+    import os
+    try:
+        soconfig = sysconfig.get_config_var('EXT_SUFFIX')
+    except Exception:
+        soconfig = sysconfig.get_config_var('SO')
+
+    def get_lib_ext():
+        if sys.platform.startswith('win32'):
+            ext = '.dll'
+        elif sys.platform.startswith('darwin'):
+            ext = '.dylib'
+        elif sys.platform.startswith('linux'):
+            ext = '.so'
+        else:
+            raise Exception('Unknown operating system: %s' % sys.platform)
+        return ext
+
+    libext = get_lib_ext()
+    _pyver = '{}.{}'.format(sys.version_info.major, sys.version_info.minor)
+    hack_libconfig = '-{}{}'.format(_pyver, libext)
+
+    PACKAGE_DATA = (
+            ['*%s' % soconfig] +
+            ['*%s' % hack_libconfig] +
+            ['*%s' % libext] +
+            (['*.dll'] if os.name == 'nt' else []) +
+            (['Release\\*.dll'] if os.name == 'nt' else [])
+            # ["LICENSE.txt", "LICENSE-3RD-PARTY.txt", "LICENSE.SIFT"]
+    )
+    KWARGS.update(dict(
+        ext_modules=EmptyListWithLength(),  # hack for including ctypes bins
+        include_package_data=True,
+        package_data={
+            KWARGS['name']: PACKAGE_DATA,
+        },
+    ))
+    import skbuild as skb
     skb.setup(**KWARGS)
-
-
-
-# DEV_REQUIREMENTS = [
-#     'atlas',
-# ]
-
-# TEST_APT_REQUIRES = [
-#     #sudo apt-get install libjpeg-turbo8-dev
-#     'lcms2-dev'  # sudo apt-get install liblcms2-dev
-# ]
-
-# TEST_PIP_REQUIRES = [
-#     'smc.freeimage',  # sudo pip install smc.freeimage
-# ]
-
-# CLUTTER_PATTERNS = [
-#     'libsver.*'
-# ]
-
-# if six.PY2:
-#     INSTALL_REQUIRES += ['functools32 >= 3.2.3-1']
-
-# kwargs = util_setup.setuptools_setup(
-#     setup_fpath=__file__,
-#     name='vtool',
-#     packages=util_setup.find_packages(),
-#     version=parse_version(),
-#     license=util_setup.read_license('LICENSE'),
-#     long_description=util_setup.parse_readme('README.md'),
-#     ext_modules=util_setup.find_ext_modules(),
-#     cmdclass=util_setup.get_cmdclass(),
-#     description=('Vision tools - tools for computer vision'),
-#     url='https://github.com/Erotemic/vtool',
-#     author='Jon Crall',
-#     author_email='erotemic@gmail.com',
-#     keywords='',
-#     install_requires=INSTALL_REQUIRES,
-#     clutter_patterns=CLUTTER_PATTERNS,
-#     # package_data={'build': ut.get_dynamic_lib_globstrs()},
-#     # build_command=lambda: ut.Repo(dirname(__file__)),
-#     build_command=lambda: ut.std_build_command(),
-#     classifiers=[],
-# )
-# setup(**kwargs)

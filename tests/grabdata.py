@@ -7,7 +7,6 @@ import six
 from os.path import join, realpath
 from itertools import cycle
 from six.moves import range
-print, rrr, profile = utool.inject2(__name__)
 
 
 def get_testdata_dir(ensure=True, key='testdb1'):

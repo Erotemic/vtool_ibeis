@@ -1,49 +1,131 @@
-language: python
 
+env:
+    global:
+        - secure: "Y4l6ix0OSH1E8s6D2vLNFBvromv84Vl16O+4nFh+VLcZddSEWTsgkUBRWMAZ+UYCGpvpH8kyZl60WkcbcTfLQZFzTipuyQ3ifHJHrCV32ttuZndhEAUnAY+8GPqbDMei8jXo0MYQit84q7vqUBiW/Rgh6eMvnPuq2mj1wvW8hqipBoqDAssxCiQwRTKnXJm7u/8siU2eM+YuPW7O7jkWPLZaYNj52HVORCLeqfeIk3dEt7aBhyj9IkPXvnaqIoY1qf7Wb1Xu+8oRqZx7pJyLHqgqG1BFVvxhBphRnb2BGIECOpdb176/8y4KBwtfoAk4yIwT9xhruq7Y1E7zZBXN+wJvJJE6iqn9H7EObm98Q7ddg7wORR5vQ35CnJiQmQgd82/8ZN39ataBMSyI4dVKhGW7oiSJRKz5O2Uu2wpiC22wZuVLlGBNW0irhF9GskezZolestTPyuHbyO4R3PnhXMWlfHqpjhQ9b6QoLAO7duRLRa3zj+Y0F8grrqceG9RDHkQIrkUlnxnakt7UQWixwvqPV5WoNkNqK4FF+s4l27H/NKU0Xi4pK79ZSvoHWgIH3uM947i+cM4sJ5vOSFhtG2EmNMUDZOn5wRWeaZGR0pg95j+djnwAbPQHZcsOTjGXausaljfhklpSiK0GSLeEPxImaQ8CtM/16rWoNeMspLg="
+
+        - secure: "KfbOmhq9oV6DY1n930pUhVccs2poVHoIvgci/bygnoLB57zYRE3aeeDwamBH393yNZI5DWmMXoSJZXHq+p+miyf4swn1Q7M/kQTbZwUfSgj2RCp/Pg8eK4OwfPV4QTnCpPHiKdeg77alifi/VpIfNMUC3BejcLvG2ovOik4HQryei9n27v5JvS9brFZR4UjlCQYtU1P8X7VUZKcK92yoyH1i+wjxNa1q00XcfR0YX+KioctybBbMw5ypNzsdXUKxH1avy8ITRt1bnXBh6NWIhGRnYkl94EquP8P6K+Jh8XV8c3OhIM/lbvsolys0GgCHkc1nMmdrS9R3oQqHgaUwGN7NOS321OdD9KEletc4DEwelMUUDm+3+vcm/FTHyy51N902+xqg258r4nyK2EA2ey1ZtCwA/O6Ib6eC7wLgCCXkeqMCxRiGUv6g/YE0q1T4FCgbi4197v+BuBKD7XmM0micFVAcHI/M/MCPeQiy1T5GxfBi/6aMNBOschZDVXm5Fyj/nUdZ3K3HaVnf3QHHKIFKZfkarnIcnHebCQPFhnimNjnLAPJ8P5ox464DGVon94+/i4tatLm+IlbF06YDO5JMnK/PsZ5kl8s7za8PwdqoqWHMj4HOadDYUNlmO05Io0msv6ABr+aAPfUrdUDir4BR/w8GdZOFr6rsj80lnIo="
+
+        - secure: "FYStGLatrKJZADAMpIh3A8h2t7/RmKWPU2eDLkWQVkcN8DbCe6wyzb4vvu4GohvdAtVrrMNNjKfk5DBmLHGtbRSZ65GGdxSoPfC3BTYyWkbYPSvPqsTFxUpJgdnwqxXw/Zuh69gFNXrA1B6Wm8dQSU+gXgWyVP61NC+7Y68B0E0JbR+PPknqQjggumQ675CeEOZZrhjOtYgBRRZNb5wP1oIHHMVjObUJbrEFcMF9/l2mblClaYPjEpfAbVOdAKVNme7gHuTkJDXRLTYP19PvVsVGozjEHUBg4nj6EVRlXr/27BcO8AJDn8u9Dt0uUJJl8Hh/dqUWUjfX2pNiCoG852SU9MgWV0+w50SiBaINtp7pmJOAe23zZ736FDb2VKDfaLeEI7/gA2CPYKUAJcHk3YAU99UC7FDfjeqo74gwf9eVfFM8XnZJy33QJHT1wyddqkrFURzi1s0XB1x21FI6uRJr7yuC6tTR+0oectE8uhJLfKODxRJ6oz1CjIPeFPjs3UGW/4QEaZT2lMmObpEtwxxeAgYPRNZuEndnCfKL01FaqIp1BNph5LXnQMvwPOFdvnxMTedAwLeFIY+VutLGaR+a15Z+d29MJcN6OxpcNvvxgYp5pw3YapEQX/iBXfd6aQQn8TNWlBJ3dy9NEpp+Y+6X5BG8jrA72/ckcmEseds="
+
+
+dist: trusty
+language: python
 sudo: false
+
+cache:
+  apt: true
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/download
 
 python:
   - "2.7"
-  #- "3.4"
-  
+  - "3.5"
+  - "3.6"
+  #
+before_install:
+  - pip install pip -U
+  - pip install -r requirements.txt 
+  - docker pull quay.io/erotemic/manylinux-for:x86_64-opencv4.1.0-v2
+
+install:
+  - | 
+      MB_PYTHON_TAG=$(python -c "import setup; print(setup.MB_PYTHON_TAG)") 
+      VERSION=$(python -c "import setup; print(setup.VERSION)") 
+      echo "VERSION = $VERSION"
+      echo "MB_PYTHON_TAG = $MB_PYTHON_TAG"
+  - MB_PYTHON_TAG=$MB_PYTHON_TAG ./run_multibuild.sh
+  - |
+      BDIST_WHEEL_PATH=$(ls dist/*-$VERSION-$MB_PYTHON_TAG*.whl)
+      echo "BDIST_WHEEL_PATH = $BDIST_WHEEL_PATH"
+  - pip install $BDIST_WHEEL_PATH
+    
+script: 
+  - travis_wait ./run_doctests.sh
+
+after_success: 
+    - codecov 
+    - gpg --version
+    - gpg2 --version
+    - export GPG_EXECUTABLE=gpg2
+    - openssl version
+    - | 
+        __heredoc__='''
+        # Load or generate secrets
+        source $(secret_loader.sh)
+        echo $TWINE_USERNAME
+        echo $TWINE_PASSWORD
+        echo $CI_GITHUB_SECRET
+
+        # encrypt relevant travis variables
+        travis encrypt TWINE_USERNAME=$TWINE_USERNAME 
+        travis encrypt TWINE_PASSWORD=$TWINE_PASSWORD  
+        travis encrypt CI_GITHUB_SECRET=$CI_GITHUB_SECRET
+
+        # HOW TO ENCRYPT YOUR SECRET GPG KEY
+        IDENTIFIER="travis-ci-Erotemic"
+        KEYID=$(gpg --list-keys --keyid-format LONG "$IDENTIFIER" | head -n 2 | tail -n 1 | awk '{print $1}' | tail -c 9)
+        echo "KEYID = $KEYID"
+
+        # Export plaintext gpg public keys, private keys, and trust info
+        mkdir -p dev
+        gpg --armor --export-secret-keys $KEYID > dev/travis_secret_gpg_key.pgp
+        gpg --armor --export $KEYID > dev/travis_public_gpg_key.pgp
+        gpg --export-ownertrust > dev/gpg_owner_trust
+
+        # Encrypt gpg keys and trust with travis secret
+        TSP=$CI_GITHUB_SECRET openssl enc -aes-256-cbc -md MD5 -pass env:TSP -e -a -in dev/travis_public_gpg_key.pgp > dev/travis_public_gpg_key.pgp.enc
+        TSP=$CI_GITHUB_SECRET openssl enc -aes-256-cbc -md MD5 -pass env:TSP -e -a -in dev/travis_secret_gpg_key.pgp > dev/travis_secret_gpg_key.pgp.enc
+        TSP=$CI_GITHUB_SECRET openssl enc -aes-256-cbc -md MD5 -pass env:TSP -e -a -in dev/gpg_owner_trust > dev/gpg_owner_trust.enc
+
+        source $(secret_unloader.sh)
+
+        # Look at what we did, clean up, and add it to git
+        ls dev/*.enc
+        rm dev/gpg_owner_trust dev/*.pgp
+        git status
+        git add dev/*.enc
+
+        '''  # <hack vim "regex" parser> '
+    # Decrypt and import GPG Keys / trust
+    - $GPG_EXECUTABLE --version
+    - openssl version
+    - $GPG_EXECUTABLE --list-keys
+    - TSP=$CI_GITHUB_SECRET openssl enc -aes-256-cbc -md MD5 -pass env:TSP -d -a -in dev/travis_public_gpg_key.pgp.enc | $GPG_EXECUTABLE --import 
+    - TSP=$CI_GITHUB_SECRET openssl enc -aes-256-cbc -md MD5 -pass env:TSP -d -a -in dev/gpg_owner_trust.enc | $GPG_EXECUTABLE --import-ownertrust
+    - TSP=$CI_GITHUB_SECRET openssl enc -aes-256-cbc -md MD5 -pass env:TSP -d -a -in dev/travis_secret_gpg_key.pgp.enc | $GPG_EXECUTABLE --import 
+    - $GPG_EXECUTABLE --list-keys
+    - MB_PYTHON_TAG=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")
+    - VERSION=$(python -c "import setup; print(setup.VERSION)") 
+    - |
+        pip install twine
+        if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+          pip install six pyopenssl ndg-httpsclient pyasn1 -U --user
+          pip install requests[security] twine --user
+        elfi
+        if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+          pip install six twine
+          pip install --upgrade pyOpenSSL
+        fi
+    # Package and publish to pypi (if on release)
+    - |
+        echo "TRAVIS_BRANCH = $TRAVIS_BRANCH"
+        if [[ "$TRAVIS_BRANCH" == "release" ]]; then
+            # use set +x to log all intermediate commands 
+            set +x
+            export CURRENT_BRANCH=$TRAVIS_BRANCH
+            # TODO: reliable and secure gpg keys
+            # Relies on a specific environmenmt being available 
+            git config --global user.signingkey D297D757
+            git config --local user.signingkey D297D757
+            # git config --global gpg.program
+            MB_PYTHON_TAG=$MB_PYTHON_TAG GPG_KEYID=D297D757 CURRENT_BRANCH=$TRAVIS_BRANCH TWINE_PASSWORD=$TWINE_PASSWORD TWINE_USERNAME=$TWINE_USERNAME GPG_EXECUTABLE=$GPG_EXECUTABLE USE_GPG=True DEPLOY_BRANCH=release TAG_AND_UPLOAD=yes ./publish.sh
+            set -x
+        else
+            MB_PYTHON_TAG=$MB_PYTHON_TAG GPG_KEYID=D297D757 CURRENT_BRANCH=$TRAVIS_BRANCH TWINE_PASSWORD=$TWINE_PASSWORD TWINE_USERNAME=$TWINE_USERNAME GPG_EXECUTABLE=$GPG_EXECUTABLE USE_GPG=True DEPLOY_BRANCH=release TAG_AND_UPLOAD=no ./publish.sh
+        fi
+
 cache: 
     apt: true
     directories:
-        - $HOME/code
-        - $HOME/code/utool
         - $HOME/.pip-cache
-        #apt
-        
-addons:
-# https://github.com/travis-ci/apt-source-whitelist#source-approval-process
-    apt:
-        #sources: 
-        #    #- atlas
-        #    - libatlas-dev
-        #    - opencv
-        packages: 
-            - cmake
-            - python-opencv
-            - libatlas3gf-base
-            - libatlas-dev
-            - libblas-dev
-            - python-scipy
-            #- libatlas-dev
-
-before_install:
-  - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy scipy
-  - pip install utool
-  - pip install cython
-  - pip install pandas
-  - pip install scikit-learn
-  - pip install statsmodels
-
-install:
-  - python setup.py build develop
-
-script: 
-  - travis_wait ./run_tests.py
-
-after_failure: 
-  - cat failed_doctests.txt

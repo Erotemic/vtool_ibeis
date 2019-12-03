@@ -171,17 +171,17 @@ function run_tests {
     pip install --quiet xdoctest
 
     # Install opencv-python for a working cv2 module. 
-    python -m xdoctest pyhesaff list
+    python -m xdoctest vtool list
 
     # TODO: more tests
     set -e
     echo "Execute real doctests"
-    python -m xdoctest pyhesaff 
+    python -m xdoctest vtool 
 
     #ls
     #ls wheelhouse
-    #ls /Users/travis/build/Erotemic/hesaff/venv/lib/python2.7/site-packages/pyhesaff/
-    # contains libhesaff.macosx-10.12-x86_64-2.7.dylib
+    #ls /Users/travis/build/Erotemic/vtool/venv/lib/python2.7/site-packages/vtool/
+    # contains libvtool.macosx-10.12-x86_64-2.7.dylib
 
     if [ -n "$IS_OSX" ]; then
       echo "Running for OS X"

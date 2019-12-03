@@ -5,7 +5,11 @@ echo "=== START OF STAGE MULTIBUILD ==="
 TEST_DEPENDS="numpy ubelt"
 BUILD_DEPENDS="numpy ubelt scikit-build ninja cmake"
 #$PYTHON -m pip install git+https://github.com/Erotemic/xdoctest.git@master
-CONFIG_PATH="multibuild_config.sh"
+CONFIG_PATH="factory/multibuild_config.sh"
+
+#MULTIBUILD_DPATH="factory/multibuild"
+MULTIBUILD_DPATH="multibuild"
+
 #BDIST_PARAMS=${BDIST_PARAMS:""}
 
 USE_CCACHE=${USE_CCACHE:=1}
@@ -95,7 +99,7 @@ setup_staging_helper(){
             #docker pull $DOCKER_IMAGE
         else
             # Patch multibuild so we can start from a local docker image  
-            find $_STAGED_REPO/multibuild -iname "*.sh" -type f -exec sed -i 's/ retry docker pull/ #retry docker pull/g' {} +
+            find $_STAGED_REPO/factory/multibuild -iname "*.sh" -type f -exec sed -i 's/ retry docker pull/ #retry docker pull/g' {} +
             # Ensure that the manylinux1_x86_64-opencv4.1.0-py3.6 docker image exists
             python factory/build_opencv_docker.py --dpath=$_STAGEING_DPATH --no-exec
             # Ensure that the manylinux1_x86_64-opencv4.1.0-py3.6 docker image exists

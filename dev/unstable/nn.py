@@ -98,7 +98,7 @@ def akmeans_iterations(data, centroids, max_iters, flann_params,
         >>> centroids, hist = akmeans_iterations(data, centroids, max_iters,
         >>>                                      flann_params, ave_unchanged_thresh,
         >>>                                      ave_unchanged_iterwin, monitor=True)
-        >>> ut.quit_if_noshow()
+        >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool as pt
         >>> ut.qtensure()
         >>> pt.multi_plot('epoch_num', hist, fnum=2)
@@ -412,7 +412,6 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     """
     raise NotImplementedError('use sklearn or opencv')
     return kmeans_plusplus_sklearn(data, K)
-    # # import pyflann
     # # import six
 
     # # rng = ut.ensure_rng(rng)
@@ -651,13 +650,14 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
 
 
 def approximate_distances(centroids, data, K, flann_params):
-    import pyflann
+    from vtool._pyflann_backend import pyflann
+    # import pyflann
     (_, qdist2_sdist) = pyflann.FLANN().nn(centroids, data, K, **flann_params)
     return qdist2_sdist
 
 
 def approximate_assignments(seachedvecs, queryvecs, K, flann_params):
-    import pyflann
+    from vtool._pyflann_backend import pyflann
     (qx2_sx, qdist2_sdist) = pyflann.FLANN().nn(seachedvecs, queryvecs, K, **flann_params)
     return qx2_sx, qdist2_sdist
 
@@ -728,7 +728,7 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
         >>> items_list = [[1, 2, 3], [4], [5, 6], [7]]
         >>> ensure_numpy = True
         >>> outerkey2_innerkey2_items = double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy)
-        >>> print(ut.repr2(outerkey2_innerkey2_items))
+        >>> print(ub.repr2(outerkey2_innerkey2_items))
         {
             10: {300: array([6]), 100: array([1])},
             20: {400: array([7]), 100: array([2, 3])},
@@ -745,8 +745,8 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
         >>> items_list = [np.array([incrementer() for _ in range(nOuter_)]) for nOuter_ in nOuterList]
         >>> ensure_numpy = False
         >>> outerkey2_innerkey2_items = double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy)
-        >>> print(ut.repr2(outerkey2_innerkey2_items))
-        >>> print(ut.repr2(outerkey2_innerkey2_items[0]))
+        >>> print(ub.repr2(outerkey2_innerkey2_items))
+        >>> print(ub.repr2(outerkey2_innerkey2_items[0]))
 
     Timeit:
         %timeit double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy)
