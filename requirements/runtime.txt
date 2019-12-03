@@ -4,6 +4,8 @@ opencv-python >= 4.1.0.25
 pyhesaff >= 2.0.1 
 scipy
 
+Pillow >= 5.2.0
+
 utool 
 ubelt 
 
