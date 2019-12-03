@@ -236,9 +236,6 @@ def test_pyflann_searches():
 
 def test_pyflann_tune():
     """
-    CommandLine:
-        python -m vtool.tests.test_pyflann --test-test_pyflann_tune
-
     Example:
         >>> # ENABLE_DOCTEST
         >>> result = test_pyflann_tune()
@@ -277,9 +274,6 @@ def test_pyflann_tune():
 
 def test_pyflann_io():
     """
-    CommandLine:
-        python -m vtool.tests.test_pyflann --test-test_pyflann_io
-
     Example:
         >>> # ENABLE_DOCTEST
         >>> result = test_pyflann_io()

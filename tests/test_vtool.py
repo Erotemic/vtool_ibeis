@@ -39,8 +39,4 @@ def test_get_invR_mats_orientation():
 
 
 if __name__ == '__main__':
-    """
-    CommandLine:
-        python -m vtool.tests.test_vtool
-    """
     test_get_invR_mats_orientation()

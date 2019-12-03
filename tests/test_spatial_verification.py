@@ -26,17 +26,9 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         fm (list):  list of feature matches as tuples (qfx, dfx)
         nShow (int):
 
-    Returns:
-        ?:
-
-    CommandLine:
-        python -m vtool.tests.test_spatial_verification --test-test_sver:0 --show
-        python -m vtool.tests.test_spatial_verification --test-test_sver:1 --show
-
     Example0:
         >>> # DISABLE_DOCTEST
         >>> import plottool as pt
-        >>> from vtool.tests.test_spatial_verification import *  # NOQA
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
@@ -49,7 +41,6 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     Example1:
         >>> # DISABLE_DOCTEST
         >>> import plottool as pt
-        >>> from vtool.tests.test_spatial_verification import *  # NOQA
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars1()
