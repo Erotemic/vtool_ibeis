@@ -214,5 +214,42 @@ if __name__ == '__main__':
     CommandLine:
         xdoctest -m setup
     """
+    import sysconfig
+    import os
+    try:
+        soconfig = sysconfig.get_config_var('EXT_SUFFIX')
+    except Exception:
+        soconfig = sysconfig.get_config_var('SO')
+
+    def get_lib_ext():
+        if sys.platform.startswith('win32'):
+            ext = '.dll'
+        elif sys.platform.startswith('darwin'):
+            ext = '.dylib'
+        elif sys.platform.startswith('linux'):
+            ext = '.so'
+        else:
+            raise Exception('Unknown operating system: %s' % sys.platform)
+        return ext
+
+    libext = get_lib_ext()
+    _pyver = '{}.{}'.format(sys.version_info.major, sys.version_info.minor)
+    hack_libconfig = '-{}{}'.format(_pyver, libext)
+
+    PACKAGE_DATA = (
+            ['*%s' % soconfig] +
+            ['*%s' % hack_libconfig] +
+            ['*%s' % libext] +
+            (['*.dll'] if os.name == 'nt' else []) +
+            (['Release\\*.dll'] if os.name == 'nt' else [])
+            # ["LICENSE.txt", "LICENSE-3RD-PARTY.txt", "LICENSE.SIFT"]
+    )
+    KWARGS.update(dict(
+        ext_modules=EmptyListWithLength(),  # hack for including ctypes bins
+        include_package_data=True,
+        package_data={
+            KWARGS['name']: PACKAGE_DATA,
+        },
+    ))
     import skbuild as skb
     skb.setup(**KWARGS)

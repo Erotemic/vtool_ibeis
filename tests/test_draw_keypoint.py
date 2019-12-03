@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib as mpl  # NOQA
 from itertools import product as iprod
 import vtool  # NOQA
-import utool
+import ubelt as ub
 
 TAU = 2 * np.pi  # References: tauday.com
 
@@ -102,14 +102,14 @@ def pnum_(px=None):
         px = px_
     return (nRows, nCols, px)
 
-MIN_ORI = utool.get_argval('--min-ori', float, DOWN)
-MAX_ORI = utool.get_argval('--max-ori', float, DOWN + TAU - .2)
+MIN_ORI = float(utool.argval('--min-ori', default=DOWN))
+MAX_ORI = float(utool.argval('--max-ori', default=DOWN + TAU - .2))
 
 MIN_X = .5
 MAX_X = 2
 
-MIN_SWEW = utool.get_argval('--min-skew', float, 0)
-MAX_SKEW = utool.get_argval('--max-skew', float, 1)
+MIN_SWEW = float(ub.argval('--min-skew', default=0))
+MAX_SKEW = float(ub.argval('--max-skew', default=1))
 
 MIN_Y = .5
 MAX_Y = 2

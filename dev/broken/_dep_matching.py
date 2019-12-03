@@ -25,7 +25,7 @@ def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
         >>> # execute function
         >>> (fm_both, fs_both) = marge_matches(fm_A, fm_B, fsv_A, fsv_B)
         >>> # verify results
-        >>> result = ut.repr2((fm_both, fs_both), precision=3)
+        >>> result = ub.repr2((fm_both, fs_both), precision=3)
         >>> print(result)
         (
             np.array([[ 15,  17],
@@ -104,7 +104,7 @@ from vtool import matching
 
 def assign_nearest_neighbors(vecs1, vecs2, K=2):
     import vtool as vt
-    import pyflann
+    from vtool._pyflann_backend import pyflann
     checks = 800
     flann_params = {
         'algorithm': 'kdtree',
@@ -812,7 +812,7 @@ def param_interaction():
             simp.visualize(vizkey, fnum=fnum)
         tried_configs.append(cfgdict.copy())
         print('Current Config = ')
-        print(ut.repr2(cfgdict))
+        print(ub.repr2(cfgdict))
         pt.present()
         pt.update()
 
@@ -1336,7 +1336,7 @@ def assign_spatially_constrained_matches(chip2_dlen_sqrd, kpts1, kpts2, H,
         >>>     chip2_dlen_sqrd, kpts1, kpts2, H, fx2_to_fx1, fx2_to_dist,
         >>>     match_xy_thresh, norm_xy_bounds)
         >>> fm, fx1_norm, match_dist, norm_dist = assigntup
-        >>> result = ut.repr2(assigntup, precision=3, nobr=True)
+        >>> result = ub.repr2(assigntup, precision=3, nobr=True)
         >>> print(result)
         np.array([[2, 0],
                   [0, 1],

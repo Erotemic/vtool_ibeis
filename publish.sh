@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 __heredoc__='''
 Script to publish a new version of this library on PyPI
 
@@ -50,7 +50,7 @@ check_variable(){
 CURRENT_BRANCH=${CURRENT_BRANCH:=$(git branch | grep \* | cut -d ' ' -f2)}
 DEPLOY_BRANCH=${DEPLOY_BRANCH:=release}
 DEPLOY_REMOTE=${DEPLOY_REMOTE:=origin}
-VERSION=$(python -c "import setup; print(setup.VERSION)")
+VERSION=$(python -c "import setup; print(setup.version)")
 MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")}
 
 check_variable CURRENT_BRANCH
@@ -97,7 +97,6 @@ DEPLOY_BRANCH='$DEPLOY_BRANCH'
 VERSION='$VERSION'
 TWINE_USERNAME='$TWINE_USERNAME'
 GPG_KEYID = '$GPG_KEYID'
-MB_PYTHON_TAG = '$MB_PYTHON_TAG'
 "
 
 
@@ -194,10 +193,10 @@ if [[ "$TAG_AND_UPLOAD" == "yes" ]]; then
 
     if [ "$USE_GPG" == "True" ]; then
         twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH
-        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $SDIST_PATH.asc $SDIST_PATH
+        #twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $SDIST_PATH.asc $SDIST_PATH
     else
         twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $BDIST_WHEEL_PATH 
-        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $SDIST_PATH 
+        #twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $SDIST_PATH 
     fi
     echo """
         !!! FINISH: LIVE RUN !!!
@@ -212,8 +211,6 @@ else
         CURRENT_BRANCH = '$CURRENT_BRANCH'
         DEPLOY_BRANCH = '$DEPLOY_BRANCH'
         TAG_AND_UPLOAD = '$TAG_AND_UPLOAD'
-        MB_PYTHON_TAG = '$MB_PYTHON_TAG'
-        BDIST_WHEEL_PATH = '$BDIST_WHEEL_PATH'
 
         To do live run set TAG_AND_UPLOAD=yes and ensure deploy and current branch are the same
 

@@ -44,7 +44,7 @@ def test_akmeans(full_test=False, plot_test=False, num_pca_dims=2, data_dim=2,
 
     if False:
         # other test (development)
-        import pyflann
+        from vtool._pyflann_backend import pyflann
         flann_lib_inst = pyflann.flann
         flann_class_inst = pyflann.FLANN()
         flann_class_inst.build_index(data)

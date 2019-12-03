@@ -4,12 +4,7 @@ import ubelt as ub
 # import utool
 import numpy as np
 from numpy.random import randint
-try:
-    import pyflann
-except ImportError:
-    pass
-# (print, print_, printDBG, rrr, profile) = utool.inject(
-#     __name__, '[test_pyflann]', DEBUG=False)
+from vtool.clustering2 import FLANN_CLS
 
 """
 remove_points does not currently have bindings
@@ -134,7 +129,7 @@ def test_pyflann_hkmeans():
     """
 
     # Test parameters
-    flann = pyflann.FLANN()
+    flann = FLANN_CLS()
 
     branch_size = 5
     num_branches = 7
@@ -172,7 +167,7 @@ def test_pyflann_kmeans():
         >>> print(result)
     """
     print('Kmeans')
-    flann = pyflann.FLANN()
+    flann = FLANN_CLS()
     num_clusters = 7
     pts = testdata_points(nPts=1009)
     kmeans_centroids = flann.kmeans(pts, num_clusters, max_iterations=None,
@@ -203,7 +198,7 @@ def test_pyflann_add_point():
 
     # build index
     print('Build Index')
-    flann = pyflann.FLANN()
+    flann = FLANN_CLS()
     _build_params = flann.build_index(pts)
     print(_build_params)
 
@@ -241,7 +236,7 @@ def test_pyflann_searches():
         # sample a radius
         radius = vt.L2(pts[0:1], qpts[0:1])[0] * 2 + 1
 
-        flann = pyflann.FLANN()
+        flann = FLANN_CLS()
 
         print('NN_OnTheFly')
         # build nn_index on the fly
@@ -291,7 +286,7 @@ def test_pyflann_tune():
     #num_data = len(data)
     # untuned query
 
-    flann = pyflann.FLANN()
+    flann = FLANN_CLS()
     index_untuned, dist_untuned = flann.nn(pts, qpts, num_neighbors)
 
     # tuned query
@@ -302,7 +297,7 @@ def test_pyflann_tune():
         memory_weight=0.0,
         sample_fraction=0.001
     )
-    flann_tuned = pyflann.FLANN()
+    flann_tuned = FLANN_CLS()
     tuned_params = flann_tuned.build_index(pts, **flannkw)
     index_tuned, dist_tuned = flann_tuned.nn_index(qpts, num_neighbors=num_neighbors)
 
@@ -336,7 +331,7 @@ def test_pyflann_io():
 
     # Create flann object
     print('Create flann object')
-    flann = pyflann.FLANN()
+    flann = FLANN_CLS()
 
     # Build kd-tree index over the data
     print('Build the kd tree')
@@ -358,7 +353,7 @@ def test_pyflann_io():
     flann.delete_index()
 
     print('Reload the data')
-    flann2 = pyflann.FLANN()
+    flann2 = FLANN_CLS()
     flann2.load_index('test_pyflann_index.flann', pts2)
     indices2, dists2 = flann2.nn_index(qpts, num_neighbors=num_neighbors)
     #print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
