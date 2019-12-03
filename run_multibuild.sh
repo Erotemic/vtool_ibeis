@@ -117,7 +117,8 @@ else
 
     source $VENV_DIR/bin/activate 
     pip install scikit-build cmake ninja
-    pip install auditwheel 
+    #pip install auditwheel 
+    #pip install auditwheel==1.0.0
 
     cd /io
     python setup.py bdist_wheel
@@ -125,7 +126,8 @@ else
     chmod -R o+rw _skbuild
     chmod -R o+rw dist
 
-    auditwheel repair dist/$NAME-$VERSION-$MB_PYTHON_TAG*.whl
+    /opt/python/cp37-cp37m/bin/python -m pip install auditwheel
+    /opt/python/cp37-cp37m/bin/python -m auditwheel repair dist/$NAME-$VERSION-$MB_PYTHON_TAG*.whl
     chmod -R o+rw wheelhouse
     chmod -R o+rw $NAME.egg-info
 fi

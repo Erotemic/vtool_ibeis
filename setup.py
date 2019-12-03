@@ -150,9 +150,6 @@ def parse_requirements(fname='requirements.txt', with_version=False):
     packages = list(gen_packages_items())
     return packages
 
-
-VERSION = parse_version('vtool/__init__.py')
-
 """
 TODO: automate with some modified version of: git shortlog -s | cut -c8-
 TODO: maintain contributors file
@@ -169,6 +166,7 @@ AUTHORS = [
 
 NAME = 'vtool'
 MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
+VERSION = parse_version('vtool/__init__.py')
 
 KWARGS = dict(
     name='vtool',
