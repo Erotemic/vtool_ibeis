@@ -2,7 +2,8 @@
 
 
 rm -rf _skbuild
-#rm -rf vtool/lib
+rm -rf vtool/lib
+rm -rf vtool/*.so
 rm -rf dist
 rm -rf build
 rm -rf vtool.egg-info
