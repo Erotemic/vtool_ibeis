@@ -4,7 +4,6 @@ from os.path import dirname
 from os.path import join
 from os.path import sys
 from os.path import exists
-import skbuild as skb
 from setuptools import find_packages
 
 
@@ -215,4 +214,5 @@ if __name__ == '__main__':
     CommandLine:
         xdoctest -m setup
     """
+    import skbuild as skb
     skb.setup(**KWARGS)
