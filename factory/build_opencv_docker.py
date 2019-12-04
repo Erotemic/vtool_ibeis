@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Setup the base image containing the opencv deps that vtool needs to build
+Setup the base image containing the opencv deps that vtool_ibeis needs to build
 
 References:
     https://github.com/skvark/opencv-python
@@ -143,9 +143,9 @@ def build_opencv_cmake_args(config):
 def main():
     """
     Usage:
-        cd ~/code/vtool/factory
-        python ~/code/vtool/factory/build_opencv_docker.py --publish --no-exec
-        python ~/code/vtool/factory/build_opencv_docker.py --publish
+        cd ~/code/vtool_ibeis/factory
+        python ~/code/vtool_ibeis/factory/build_opencv_docker.py --publish --no-exec
+        python ~/code/vtool_ibeis/factory/build_opencv_docker.py --publish
     """
     import multiprocessing
 
@@ -336,7 +336,7 @@ def build(DPATH, MAKE_CPUS, UNICODE_WIDTH, PLAT, PY_VER, EXEC=True):
 if __name__ == '__main__':
     """
     CommandLine:
-        python ~/code/vtool/factory/build_opencv_docker.py --no-exec
+        python ~/code/vtool_ibeis/factory/build_opencv_docker.py --no-exec
 
         docker login quay.io
 

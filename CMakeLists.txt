@@ -120,5 +120,5 @@ target_link_libraries(sver PRIVATE ${OpenCV_LIBRARIES})
 # https://github.com/scikit-build/scikit-build/issues/434
 # Note: if the target is not referenced by package_data in setup.py then the
 # lib will be installed as a data file and not a package file.
-#install(TARGETS sver LIBRARY DESTINATION "vtool")
-install(TARGETS sver DESTINATION vtool/lib)
+#install(TARGETS sver LIBRARY DESTINATION "vtool_ibeis")
+install(TARGETS sver DESTINATION vtool_ibeis/lib)

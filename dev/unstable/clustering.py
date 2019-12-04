@@ -9,7 +9,7 @@ import utool as ut
 import sys
 import numpy as np
 import scipy.sparse as spsparse
-import vtool.nearest_neighbors as nn
+import vtool_ibeis.nearest_neighbors as nn
 (print, rrr, profile) = ut.inject2(__name__)
 
 
