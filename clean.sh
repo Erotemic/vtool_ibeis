@@ -2,11 +2,11 @@
 
 
 rm -rf _skbuild
-rm -rf vtool/lib
-rm -rf vtool/*.so
+rm -rf vtool_ibeis/lib
+rm -rf vtool_ibeis/*.so
 rm -rf dist
 rm -rf build
-rm -rf vtool.egg-info
+rm -rf vtool_ibeis.egg-info
 
 rm -rf mb_work
 rm -rf wheelhouse

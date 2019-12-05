@@ -163,19 +163,19 @@ AUTHORS = [
 ]
 
 
-NAME = 'vtool'
+NAME = 'vtool_ibeis'
 MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
-VERSION = parse_version('vtool/__init__.py')
+VERSION = parse_version('vtool_ibeis/__init__.py')
 
 KWARGS = dict(
-    name='vtool',
+    name='vtool_ibeis',
     version=VERSION,
     author=', '.join(AUTHORS),
     description='vision tools',
     long_description=parse_description(),
     long_description_content_type='text/x-rst',
     author_email='erotemic@gmail.com',
-    url='https://github.com/Erotemic/vtool',
+    url='https://github.com/Erotemic/vtool_ibeis',
     license='Apache 2',
     # List of classifiers available at:
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers

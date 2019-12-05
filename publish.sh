@@ -33,7 +33,7 @@ Usage:
 
     echo "MB_PYTHON_TAG = $MB_PYTHON_TAG"
     MB_PYTHON_TAG=$MB_PYTHON_TAG ./run_multibuild.sh
-    DEPLOY_REMOTE=ibeis MB_PYTHON_TAG=$MB_PYTHON_TAG ./publish.sh yes
+    DEPLOY_BRANCH=master DEPLOY_REMOTE=ibeis MB_PYTHON_TAG=$MB_PYTHON_TAG ./publish.sh yes
 '''
 
 check_variable(){
@@ -50,7 +50,7 @@ check_variable(){
 CURRENT_BRANCH=${CURRENT_BRANCH:=$(git branch | grep \* | cut -d ' ' -f2)}
 DEPLOY_BRANCH=${DEPLOY_BRANCH:=release}
 DEPLOY_REMOTE=${DEPLOY_REMOTE:=origin}
-VERSION=$(python -c "import setup; print(setup.version)")
+VERSION=$(python -c "import setup; print(setup.VERSION)")
 MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")}
 
 check_variable CURRENT_BRANCH
@@ -188,8 +188,8 @@ if [[ "$TAG_AND_UPLOAD" == "yes" ]]; then
     check_variable TWINE_USERNAME
     check_variable TWINE_PASSWORD
 
-    git tag $VERSION -m "tarball tag $VERSION"
-    git push --tags $DEPLOY_REMOTE $DEPLOY_BRANCH
+    #git tag $VERSION -m "tarball tag $VERSION"
+    #git push --tags $DEPLOY_REMOTE $DEPLOY_BRANCH
 
     if [ "$USE_GPG" == "True" ]; then
         twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH

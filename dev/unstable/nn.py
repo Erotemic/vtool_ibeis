@@ -41,7 +41,7 @@ def refine_akmeans(data, centroids, max_iters=5,
     """
     print('[akmeans.precompute] refining:')
     if cache_dir == 'default':
-        cache_dir = ut.get_app_resource_dir('vtool')
+        cache_dir = ut.get_app_resource_dir('vtool_ibeis')
         ut.ensuredir(cache_dir)
     if akmeans_cfgstr is None:
         akmeans_cfgstr = nntool.get_flann_cfgstr(
@@ -54,12 +54,12 @@ def refine_akmeans(data, centroids, max_iters=5,
 #def test_hdbscan():
 #    r"""
 #    CommandLine:
-#        python -m vtool.clustering2 --exec-test_hdbscan
+#        python -m vtool_ibeis.clustering2 --exec-test_hdbscan
 
 #    Example:
 #        >>> # SCRIPT
-#        >>> from vtool.clustering2 import *  # NOQA
-#        >>> from vtool.clustering2 import *  # NOQA
+#        >>> from vtool_ibeis.clustering2 import *  # NOQA
+#        >>> from vtool_ibeis.clustering2 import *  # NOQA
 #        >>> import numpy as np
 #        >>> rng = np.random.RandomState(42)
 #        >>> data = rng.randn(1000000, 128)
@@ -81,11 +81,11 @@ def akmeans_iterations(data, centroids, max_iters, flann_params,
         argmin_{S} sum(sum(L2(x, u[i]) for x in S_i) for i in range(k))
 
     CommandLine:
-        python -m vtool.clustering2 akmeans_iterations --show
+        python -m vtool_ibeis.clustering2 akmeans_iterations --show
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> from vtool.clustering2 import *  # NOQA
+        >>> from vtool_ibeis.clustering2 import *  # NOQA
         >>> import numpy as np
         >>> rng = np.random.RandomState(42)
         >>> data = rng.randn(100, 2)
@@ -305,7 +305,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     Example:
         >>> # SLOW_DOCTEST
         >>> # xdoctest: +SKIP
-        >>> from vtool.clustering2 import *  # NOQA
+        >>> from vtool_ibeis.clustering2 import *  # NOQA
         >>> import utool as ut
         >>> import numpy as np
         >>> rng = np.random.RandomState(42)
@@ -320,7 +320,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     Example:
         >>> # SLOW_DOCTEST
         >>> # xdoctest: +SKIP
-        >>> from vtool.clustering2 import *  # NOQA
+        >>> from vtool_ibeis.clustering2 import *  # NOQA
         >>> import sklearn.cluster
         >>> from sklearn.cluster import *
         >>> from sklearn.utils import check_array
@@ -347,7 +347,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     Example2:
         >>> # SLOW_DOCTEST
         >>> # xdoctest: +SKIP
-        >>> from vtool.clustering2 import *  # NOQA
+        >>> from vtool_ibeis.clustering2 import *  # NOQA
         >>> import ibeis
         >>> ibs = ibeis.opendb('PZ_MTEST')
         >>> data = np.vstack(ibs.get_annot_vecs(ibs.get_valid_aids()))
@@ -358,12 +358,12 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
         >>>                                         flann_params)
 
     CommandLine:
-        python -m vtool akmeans_plusplus_init:0
-        python -m vtool akmeans_plusplus_init:1
-        python -m vtool akmeans_plusplus_init:0 --profile
+        python -m vtool_ibeis akmeans_plusplus_init:0
+        python -m vtool_ibeis akmeans_plusplus_init:1
+        python -m vtool_ibeis akmeans_plusplus_init:0 --profile
 
         vt
-        cd vtool
+        cd vtool_ibeis
         wget https://gist.githubusercontent.com/dwf/2200359/raw/aa3c79c6f432ad630cc6e01f1ba2dfbef238bfeb/kmeans.pyx
         wget https://gist.githubusercontent.com/dwf/2200359/raw/aa3c79c6f432ad630cc6e01f1ba2dfbef238bfeb/setup.py
 
@@ -400,7 +400,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
         export CFLAGS="$CFLAGS -I/home/joncrall/venv2/lib/python2.7/site-packages/numpy/core/include/"
         pip install git+https://github.com/argriffing/pyvqcore.git
 
-        python ~/code/vtool/vtool/clustering2.py --test-akmeans_plusplus_init
+        python ~/code/vtool_ibeis/vtool_ibeis/clustering2.py --test-akmeans_plusplus_init
 
         python -m plottool.draw_func2 --exec-plot_func --show --range=0,64000 \
                 --func="lambda K: 64 / K "
@@ -462,7 +462,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
 
     # # flann = None
 
-    # # import vtool as vt
+    # # import vtool_ibeis as vt
     # # try:
     #     # for count in _iter:
 
@@ -554,7 +554,7 @@ def assert_centroids(centroids, data, nCentroids, clip_centroids):
 def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
                    cache_dir='default', force_recomp=False, use_data_hash=True,
                    cfgstr='', refine=False, akmeans_cfgstr=None, use_cache=True,
-                   appname='vtool',  initmethod='akmeans++', clip_centroids=True):
+                   appname='vtool_ibeis',  initmethod='akmeans++', clip_centroids=True):
     """ precompute aproximate kmeans with builtin caching
 
     Example:
@@ -568,7 +568,7 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
         >>> data = np.array(np.random.randint(0, 255, (nump, dims)), dtype=dtype)
 
     Timeit:
-        import vtool.clustering2 as clustertool
+        import vtool_ibeis.clustering2 as clustertool
         max_iters = 300
         flann = p yflann.FLANN()
         centroids1 = flann.kmeans(data, nCentroids, max_iterations=max_iters, dtype=np.uint8)
@@ -650,14 +650,14 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
 
 
 def approximate_distances(centroids, data, K, flann_params):
-    from vtool._pyflann_backend import pyflann
+    from vtool_ibeis._pyflann_backend import pyflann
     # import pyflann
     (_, qdist2_sdist) = pyflann.FLANN().nn(centroids, data, K, **flann_params)
     return qdist2_sdist
 
 
 def approximate_assignments(seachedvecs, queryvecs, K, flann_params):
-    from vtool._pyflann_backend import pyflann
+    from vtool_ibeis._pyflann_backend import pyflann
     (qx2_sx, qdist2_sdist) = pyflann.FLANN().nn(seachedvecs, queryvecs, K, **flann_params)
     return qx2_sx, qdist2_sdist
 
@@ -667,7 +667,7 @@ def compute_centroids(data, centroids, datax2_centroidx):
     Computes centroids given datax assignments
     TODO: maybe use the grouping code instad of the LR algorithm
 
-    >>> from vtool.clustering2 import *  # NOQA
+    >>> from vtool_ibeis.clustering2 import *  # NOQA
     >>> import numpy as np
     >>> rng = np.random.RandomState(42)
     >>> data = rng.randn(100, 2)
@@ -722,7 +722,7 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
         ut.ddict of dicts: outerkey2_innerkey2_items
 
     Examples:
-        >>> from vtool.clustering2 import *  # NOQA
+        >>> from vtool_ibeis.clustering2 import *  # NOQA
         >>> inner_key_list = [100, 200, 300, 400]
         >>> outer_keys_list = [[10, 20, 20], [30], [30, 10], [20]]
         >>> items_list = [[1, 2, 3], [4], [5, 6], [7]]
@@ -735,7 +735,7 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
             30: {200: array([4]), 300: array([5])},
         }
 
-        >>> from vtool.clustering2 import *  # NOQA
+        >>> from vtool_ibeis.clustering2 import *  # NOQA
         >>> len_ = 3000
         >>> incrementer = ut.make_incrementer()
         >>> nOuterList = [np.random.randint(300) for _ in range(len_)]

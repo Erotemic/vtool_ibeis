@@ -185,7 +185,7 @@ def main():
     # ROOT = '.'
     os.chdir(ROOT)
 
-    # NAME = 'vtool'
+    # NAME = 'vtool_ibeis'
     # VERSION = '0.1.0'
     # DOCKER_TAG = '{}-{}'.format(NAME, VERSION )
 
@@ -206,10 +206,10 @@ def main():
         return ub.argval(clikey, default=default)
 
     # DPATH = argval('--dpath', None, default=os.getcwd())
-    DPATH = argval('--dpath', None, default=ub.expandpath('~/code/vtool/dev/docker'))
+    DPATH = argval('--dpath', None, default=ub.expandpath('~/code/vtool_ibeis/dev/docker'))
 
     # DEFAULT_MB_PYTHON_TAG = '{}{}'.format(sys.version_info.major, sys.version_info.minor)
-    # DEFAULT_MB_PYTHON_TAG = ub.import_module_from_path(ub.expandpath('~/code/vtool/setup.py'), 0).MB_PYTHON_TAG
+    # DEFAULT_MB_PYTHON_TAG = ub.import_module_from_path(ub.expandpath('~/code/vtool_ibeis/setup.py'), 0).MB_PYTHON_TAG
     # DEFAULT_MB_PYTHON_TAG = None
     # MB_PYTHON_TAG = argval('--mb_python_tag', 'MB_PYTHON_TAG', default=DEFAULT_MB_PYTHON_TAG)
 
@@ -246,7 +246,7 @@ def main():
     """
     Notes:
         docker run --rm -it quay.io/pypa/manylinux2010_x86_64 /bin/bash
-        docker run -v $HOME/code/vtool/dev/docker:/root/vmnt --rm -it quay.io/skvark/manylinux1_x86_64 /bin/bash
+        docker run -v $HOME/code/vtool_ibeis/dev/docker:/root/vmnt --rm -it quay.io/skvark/manylinux1_x86_64 /bin/bash
     """
     docker_header = ub.codeblock(
         f'''
@@ -392,6 +392,6 @@ def main():
 if __name__ == '__main__':
     """
     CommandLine:
-        python ~/code/vtool/dev/build_base_docker.py
+        python ~/code/vtool_ibeis/dev/build_base_docker.py
     """
     main()

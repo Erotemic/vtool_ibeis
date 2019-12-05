@@ -2,18 +2,18 @@
 #     r"""
 #     Example:
 #         >>> # ENABLE_DOCTEST
-#         >>> from vtool.sver_c_wrapper import *  # NOQA
+#         >>> from vtool_ibeis.sver_c_wrapper import *  # NOQA
 #         >>> result = test_sver_wrapper2()
 #         >>> print(result)
 #     """
-#     import vtool
-#     import vtool.tests.testdata_nondeterm_sver
-#     kpts1, kpts2, fm, xy_thresh, scale_thresh, ori_thresh, dlen_sqrd2, min_nInliers, match_weights, full_homog_checks = vtool.tests.testdata_nondeterm_sver.testdata_nondeterm_sver()
+#     import vtool_ibeis
+#     import vtool_ibeis.tests.testdata_nondeterm_sver
+#     kpts1, kpts2, fm, xy_thresh, scale_thresh, ori_thresh, dlen_sqrd2, min_nInliers, match_weights, full_homog_checks = vtool_ibeis.tests.testdata_nondeterm_sver.testdata_nondeterm_sver()
 #     inliers_list = []
 #     homog_inliers_list = []
 
 #     for x in range(10):
-#         sv_tup = vtool.spatially_verify_kpts(
+#         sv_tup = vtool_ibeis.spatially_verify_kpts(
 #             kpts1, kpts2, fm, xy_thresh, scale_thresh, ori_thresh,
 #             dlen_sqrd2, min_nInliers, match_weights=match_weights,
 #             full_homog_checks=full_homog_checks, returnAff=True)
@@ -33,15 +33,15 @@
 
 #     Example:
 #         >>> # ENABLE_DOCTEST
-#         >>> from vtool.sver_c_wrapper import *  # NOQA
+#         >>> from vtool_ibeis.sver_c_wrapper import *  # NOQA
 #         >>> test_sver_wrapper()
 
 #     Ignore:
 #         %timeit call_python_version(*args)
 #         %timeit get_affine_inliers_cpp(*args)
 #     """
-#     import vtool.spatial_verification as sver
-#     import vtool.demodata as demodata
+#     import vtool_ibeis.spatial_verification as sver
+#     import vtool_ibeis.demodata as demodata
 #     xy_thresh_sqrd    = ktool.KPTS_DTYPE(.4)
 #     scale_thresh_sqrd = ktool.KPTS_DTYPE(2.0)
 #     ori_thresh        = ktool.KPTS_DTYPE(TAU / 4.0)
@@ -64,7 +64,7 @@
 #         (kpts1, kpts2, fm_input, fs_input, rchip1, rchip2) = testtup
 
 #     # pack up call to aff hypothesis
-#     import vtool as vt
+#     import vtool_ibeis as vt
 #     import scipy.stats.mstats
 #     scales1 = vt.get_scales(kpts1.take(fm_input.T[0], axis=0))
 #     scales2 = vt.get_scales(kpts2.take(fm_input.T[1], axis=0))
