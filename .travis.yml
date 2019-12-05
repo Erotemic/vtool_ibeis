@@ -94,6 +94,9 @@ after_success:
         export LD_LIBRARY_PATH=$GPG_INSTALL_PREFIX/lib:$LD_LIBRARY_PATH
         export PATH=$GPG_INSTALL_PREFIX/bin:$PATH
         export CPATH=$GPG_INSTALL_PREFIX/include:$CPATH
+        export GPG_EXECUTABLE=$GPG_INSTALL_PREFIX/bin/gpg
+        ls $GPG_INSTALL_PREFIX
+        ls $GPG_INSTALL_PREFIX/bin || echo "no bin"
         if [[ ! -f "$GPG_INSTALL_PREFIX/bin/gpg" ]]; then
             # try and have travis cache this
             mkdir -p $GPG_INSTALL_PREFIX
@@ -115,8 +118,8 @@ after_success:
                 hash_prefix='60179bfd109b7b4fd8d2b30a3216540f03f5a13620d9a5b63f1f95',
                 dpath=ub.ensuredir('$HOME/.pip-cache'), verbose=0))")
             ASSUAN_FPATH=$(python -c "import ubelt as ub; print(ub.grabdata(
-                'https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.5.tar.bz2',
-                hash_prefix='b55e16e838d1b1208e7673366971ae7c0f9c1c79e042f41c03d14e',
+                'https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.3.tar.bz2',
+                hash_prefix='e7ccb651ea75b07b2e687d48d86d0ab83cba8e2af7f30da2aec',
                 dpath=ub.ensuredir('$HOME/.pip-cache'), verbose=0))")
             NTBLTLS_FPATH=$(python -c "import ubelt as ub; print(ub.grabdata(
                 'https://gnupg.org/ftp/gcrypt/ntbtls/ntbtls-0.1.2.tar.bz2',
@@ -145,9 +148,7 @@ after_success:
             (cd ntbtls-0.1.2 && ./configure --prefix=$GPG_INSTALL_PREFIX && make install)
             (cd npth-1.6 && ./configure --prefix=$GPG_INSTALL_PREFIX && make install)
             (cd gnupg-2.2.17 && ./configure --prefix=$GPG_INSTALL_PREFIX && make install)
-            export GPG_EXECUTABLE=$GPG_INSTALL_PREFIX/bin/gpg
             echo "GPG_EXECUTABLE = '$GPG_EXECUTABLE'"
-            cd $OLD
         fi
     # Decrypt and import GPG Keys / trust
     - $GPG_EXECUTABLE --version
