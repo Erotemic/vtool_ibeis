@@ -149,6 +149,7 @@ after_success:
             (cd npth-1.6 && ./configure --prefix=$GPG_INSTALL_PREFIX && make install)
             (cd gnupg-2.2.17 && ./configure --prefix=$GPG_INSTALL_PREFIX && make install)
             echo "GPG_EXECUTABLE = '$GPG_EXECUTABLE'"
+            cd $OLD
         fi
     # Decrypt and import GPG Keys / trust
     - $GPG_EXECUTABLE --version
@@ -193,3 +194,5 @@ cache:
     directories:
         - $HOME/.pip-cache
         - $HOME/gpg_install_prefix
+        - $HOME/.cache/pip
+        - $HOME/download
