@@ -1,4 +1,4 @@
-vtool
+vtool_ibeis
 =====
 
 |ReadTheDocs| |Pypi| |Downloads| |Codecov| |CircleCI| |Travis| |Appveyor| 
@@ -14,9 +14,9 @@ Vision Tools - tools for computer vision. Part of the WildMe / IBEIS Project.
    :target: https://ci.appveyor.com/project/Erotemic/vtool/branch/master
 .. |Codecov| image:: https://codecov.io/github/Erotemic/vtool/badge.svg?branch=master&service=github
    :target: https://codecov.io/github/Erotemic/vtool?branch=master
-.. |Pypi| image:: https://img.shields.io/pypi/v/vtool.svg
-   :target: https://pypi.python.org/pypi/vtool
-.. |Downloads| image:: https://img.shields.io/pypi/dm/vtool.svg
-   :target: https://pypistats.org/packages/vtool
-.. |ReadTheDocs| image:: https://readthedocs.org/projects/vtool/badge/?version=latest
-    :target: http://vtool.readthedocs.io/en/latest/
+.. |Pypi| image:: https://img.shields.io/pypi/v/vtool_ibeis.svg
+   :target: https://pypi.python.org/pypi/vtool_ibeis
+.. |Downloads| image:: https://img.shields.io/pypi/dm/vtool_ibeis.svg
+   :target: https://pypistats.org/packages/vtool_ibeis
+.. |ReadTheDocs| image:: https://readthedocs.org/projects/vtool_ibeis/badge/?version=latest
+    :target: http://vtool_ibeis.readthedocs.io/en/latest/
