@@ -1,5 +1,5 @@
 vtool_ibeis
-=====
+===========
 
 |ReadTheDocs| |Pypi| |Downloads| |Codecov| |CircleCI| |Travis| |Appveyor| 
 
