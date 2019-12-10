@@ -95,16 +95,33 @@ echo "
 echo "LIVE BUILDING"
 # Build wheel and source distribution
 
-MODE=${MODE:=sdist}
+MODE=${MODE:=all}
+
+WHEEL_PATHS=()
 
 if [[ "$MODE" == "sdist" ]]; then
     python setup.py sdist 
     WHEEL_PATH=$(ls dist/$NAME-$VERSION*.tar.gz)
+    WHEEL_PATHS+=($WHEEL_PATH)
 elif [[ "$MODE" == "universal" ]]; then
     python setup.py bdist_wheel --universal
     WHEEL_PATH=$(ls dist/*-$VERSION-$MB_PYTHON_TAG*.whl)
+    WHEEL_PATHS+=($WHEEL_PATH)
 elif [[ "$MODE" == "bdist" ]]; then
+    echo "Assume wheel has already been built"
     WHEEL_PATH=$(ls wheelhouse/*-$VERSION-$MB_PYTHON_TAG*.whl)
+    WHEEL_PATHS+=($WHEEL_PATH)
+elif [[ "$MODE" == "all" ]]; then
+    python setup.py sdist 
+    WHEEL_PATH=$(ls dist/$NAME-$VERSION*.tar.gz)
+    WHEEL_PATHS+=($WHEEL_PATH)
+
+    python setup.py bdist_wheel --universal
+    WHEEL_PATH=$(ls dist/*-$VERSION-$MB_PYTHON_TAG*.whl)
+    WHEEL_PATHS+=($WHEEL_PATH)
+
+    WHEEL_PATH=$(ls wheelhouse/*-$VERSION-$MB_PYTHON_TAG*.whl)
+    WHEEL_PATHS+=($WHEEL_PATH)
 else
     echo "bad mode"
     exit 1
@@ -113,10 +130,8 @@ fi
 echo "
 MODE=$MODE
 VERSION='$VERSION'
-WHEEL_PATH='$WHEEL_PATH'
+WHEEL_PATHS='$WHEEL_PATHS'
 "
-
-check_variable WHEEL_PATH
 
 echo "
 === <END BUILD WHEEL> ===
@@ -125,28 +140,35 @@ echo "
 echo "
 === <GPG SIGN> ===
 "
-if [ "$USE_GPG" == "True" ]; then
-    # https://stackoverflow.com/questions/45188811/how-to-gpg-sign-a-file-that-is-built-by-travis-ci
-    # secure gpg --export-secret-keys > all.gpg
 
-    # REQUIRES GPG >= 2.2
-    check_variable GPG_EXECUTABLE
-    check_variable GPG_KEYID
 
-    echo "Signing wheels"
-    GPG_SIGN_CMD="$GPG_EXECUTABLE --batch --yes --detach-sign --armor --local-user $GPG_KEYID"
-    ls wheelhouse
-    echo "GPG_SIGN_CMD = $GPG_SIGN_CMD"
-    $GPG_SIGN_CMD --output $WHEEL_PATH.asc $WHEEL_PATH
+for WHEEL_PATH in "${WHEEL_PATHS[@]}"
+do
+    echo "WHEEL_PATH = $WHEEL_PATH"
+    check_variable WHEEL_PATH
+    if [ "$USE_GPG" == "True" ]; then
+        # https://stackoverflow.com/questions/45188811/how-to-gpg-sign-a-file-that-is-built-by-travis-ci
+        # secure gpg --export-secret-keys > all.gpg
 
-    echo "Checking wheels"
-    twine check $WHEEL_PATH.asc $WHEEL_PATH
+        # REQUIRES GPG >= 2.2
+        check_variable GPG_EXECUTABLE
+        check_variable GPG_KEYID
 
-    echo "Verifying wheels"
-    $GPG_EXECUTABLE --verify $WHEEL_PATH.asc $WHEEL_PATH 
-else
-    echo "USE_GPG=False, Skipping GPG sign"
-fi
+        echo "Signing wheels"
+        GPG_SIGN_CMD="$GPG_EXECUTABLE --batch --yes --detach-sign --armor --local-user $GPG_KEYID"
+        ls wheelhouse
+        echo "GPG_SIGN_CMD = $GPG_SIGN_CMD"
+        $GPG_SIGN_CMD --output $WHEEL_PATH.asc $WHEEL_PATH
+
+        echo "Checking wheels"
+        twine check $WHEEL_PATH.asc $WHEEL_PATH
+
+        echo "Verifying wheels"
+        $GPG_EXECUTABLE --verify $WHEEL_PATH.asc $WHEEL_PATH 
+    else
+        echo "USE_GPG=False, Skipping GPG sign"
+    fi
+done
 echo "
 === <END GPG SIGN> ===
 "
@@ -178,11 +200,14 @@ if [[ "$TAG_AND_UPLOAD" == "yes" ]]; then
     #git tag $VERSION -m "tarball tag $VERSION"
     #git push --tags $DEPLOY_REMOTE $DEPLOY_BRANCH
 
-    if [ "$USE_GPG" == "True" ]; then
-        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $WHEEL_PATH.asc $WHEEL_PATH
-    else
-        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $WHEEL_PATH 
-    fi
+    for WHEEL_PATH in "${WHEEL_PATHS[@]}"
+    do
+        if [ "$USE_GPG" == "True" ]; then
+            twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $WHEEL_PATH.asc $WHEEL_PATH
+        else
+            twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $WHEEL_PATH 
+        fi
+    done
     echo """
         !!! FINISH: LIVE RUN !!!
     """
@@ -197,6 +222,7 @@ else
         DEPLOY_BRANCH = '$DEPLOY_BRANCH'
         TAG_AND_UPLOAD = '$TAG_AND_UPLOAD'
         WHEEL_PATH = '$WHEEL_PATH'
+        WHEEL_PATHS = '$WHEEL_PATHS'
 
         To do live run set TAG_AND_UPLOAD=yes and ensure deploy and current branch are the same
 
