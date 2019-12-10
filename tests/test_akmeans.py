@@ -62,7 +62,7 @@ if __name__ == '__main__':
     test_locals = utool.run_test(test_akmeans, **testkw)
     exec(utool.execstr_dict(test_locals, 'test_locals'))
     if testkw['plot_test']:
-        from plottool import draw_func2 as df2
+        from plottool_ibeis import draw_func2 as df2
         exec(df2.present())
     else:
         exec(utool.ipython_execstr())

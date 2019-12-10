@@ -135,7 +135,7 @@ def baseline_vsone_ratio_matcher(testtup, cfgdict={}):
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> import plottool as pt
+        >>> import plottool_ibeis as pt
         >>> from vtool_ibeis.constrained_matching import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> testtup = testdata_matcher()
@@ -157,7 +157,7 @@ def spatially_constrianed_matcher(testtup, basetup, cfgdict={}):
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> import plottool as pt
+        >>> import plottool_ibeis as pt
         >>> from vtool_ibeis.constrained_matching import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> testtup = testdata_matcher()
@@ -183,7 +183,7 @@ def baseline_vsone_ratio_matcher_(kpts1, vecs1, kpts2, vecs2, dlen_sqrd2, cfgdic
 
     Ignore:
         %pylab qt4
-        import plottool as pt
+        import plottool_ibeis as pt
         pt.imshow(rchip1)
         pt.draw_kpts2(kpts1)
 
@@ -419,16 +419,16 @@ class Annot(object):
         annot.load()
 
     def show(annot):
-        import plottool as pt
+        import plottool_ibeis as pt
         pt.imshow(annot.rchip)
         pt.draw_kpts2(annot.kpts)
 
     def show_dstncvs_mask(annot, title='wd', update=True, **kwargs):
-        import plottool as pt
+        import plottool_ibeis as pt
         pt.imshow(annot.dstncvs_mask * 255.0, update=update, title=title, **kwargs)
 
     def show_fgweight_mask(annot, title='fg', update=True, **kwargs):
-        import plottool as pt
+        import plottool_ibeis as pt
         pt.imshow(annot.fgweight_mask * 255.0, update=update, title=title, **kwargs)
 
     def load(annot):
@@ -641,8 +641,8 @@ class AnnotMatch(object):
         print(msg)
 
     def show_matches(match, fnum=None, pnum=None, update=True):
-        import plottool as pt
-        from plottool import plot_helpers as ph
+        import plottool_ibeis as pt
+        from plottool_ibeis import plot_helpers as ph
         # hack keys out of namespace
         keys = ['rchip', 'kpts']
         rchip1, kpts1 = ut.dict_take(match.annot1.__dict__, keys)
@@ -666,8 +666,8 @@ class AnnotMatch(object):
         return ax, xywh1, xywh2
 
     def show_normalizers(match, fnum=None, pnum=None, update=True):
-        import plottool as pt
-        from plottool import plot_helpers as ph
+        import plottool_ibeis as pt
+        from plottool_ibeis import plot_helpers as ph
         # hack keys out of namespace
         keys = ['rchip', 'kpts']
         rchip1, kpts1 = ut.dict_take(match.annot1.__dict__, keys)
@@ -770,7 +770,7 @@ def param_interaction():
         >>> result = str(testtup)
         >>> print(result)
     """
-    import plottool as pt
+    import plottool_ibeis as pt
     USE_IBEIS = False and ut.is_developer()
     if USE_IBEIS:
         from ibeis.algo.hots import devcases
@@ -930,7 +930,7 @@ class SimpleMatcher(object):
         return visualize_method(**kwargs)
 
     def start_new_viz(simp, nRows, nCols, fnum=None):
-        import plottool as pt
+        import plottool_ibeis as pt
         rchip1, rchip2, kpts1, vecs1, kpts2, vecs2, dlen_sqrd2  = simp.testtup
         fm_ORIG, fs_ORIG, fm_RAT, fs_RAT, fm_SV, fs_SV, H_RAT   = simp.basetup
         fm_SC, fs_SC, fm_SCR, fs_SCR, fm_SCRSV, fs_SCRSV, H_SCR = simp.nexttup
@@ -963,7 +963,7 @@ class SimpleMatcher(object):
             fnum = pt.next_fnum()
         INTERACTIVE = True
         if INTERACTIVE:
-            from plottool import interact_helpers as ih
+            from plottool_ibeis import interact_helpers as ih
             fig = ih.begin_interaction('qres', fnum)
             ih.connect_callback(fig, 'button_press_event', on_single_match_clicked)
         else:
@@ -1005,7 +1005,7 @@ class SimpleMatcher(object):
         Example:
             >>> # DISABLE_DOCTEST
             >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-            >>> import plottool as pt
+            >>> import plottool_ibeis as pt
             >>> simp = SimpleMatcher(testdata_matcher())
             >>> simp.run_matching()
             >>> result = simp.visualize_matches()
@@ -1030,7 +1030,7 @@ class SimpleMatcher(object):
         Example:
             >>> # DISABLE_DOCTEST
             >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-            >>> import plottool as pt
+            >>> import plottool_ibeis as pt
             >>> simp = SimpleMatcher(testdata_matcher())
             >>> simp.run_matching()
             >>> result = simp.visualize_normalizers()
@@ -1060,7 +1060,7 @@ class SimpleMatcher(object):
         Example:
             >>> # DISABLE_DOCTEST
             >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-            >>> import plottool as pt
+            >>> import plottool_ibeis as pt
             >>> simp = SimpleMatcher(testdata_matcher())
             >>> simp.run_matching()
             >>> result = simp.visualize_coverage()
@@ -1079,8 +1079,8 @@ class SimpleMatcher(object):
 def show_matches(fm, fs, fnum=1, pnum=None, title='', key=None, simp=None,
                  cmap='hot', draw_lines=True, **locals_):
     #locals_ = locals()
-    import plottool as pt
-    from plottool import plot_helpers as ph
+    import plottool_ibeis as pt
+    from plottool_ibeis import plot_helpers as ph
     # hack keys out of namespace
     keys = 'rchip1, rchip2, kpts1, kpts2'.split(', ')
     rchip1, rchip2, kpts1, kpts2 = ut.dict_take(locals_, keys)
@@ -1103,8 +1103,8 @@ def show_matches(fm, fs, fnum=1, pnum=None, title='', key=None, simp=None,
 #def ishow_matches(fm, fs, fnum=1, pnum=None, title='', cmap='hot', **locals_):
 #    # TODO make things clickable
 def on_single_match_clicked(event):
-    from plottool import interact_helpers as ih
-    from plottool import plot_helpers as ph
+    from plottool_ibeis import interact_helpers as ih
+    from plottool_ibeis import plot_helpers as ph
     """ result interaction mpl event callback slot """
     print('[viz] clicked result')
     if ih.clicked_outside_axis(event):
@@ -1141,7 +1141,7 @@ def show_example():
     Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-        >>> import plottool as pt
+        >>> import plottool_ibeis as pt
         >>> # build test data
         >>> # execute function
         >>> result = show_example()

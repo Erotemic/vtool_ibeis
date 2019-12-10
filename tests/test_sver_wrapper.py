@@ -114,7 +114,7 @@
 #     ##best_inliers_py = out_inliers_py[best_argx]
 #     #best_inliers_c = out_inliers_c[best_argx]
 #     if ut.show_was_requested():
-#         import plottool as pt
+#         import plottool_ibeis as pt
 #         fm_output = fm_input.take(bestinliers, axis=0)
 #         fnum = pt.next_fnum()
 #         pt.figure(fnum=fnum, doclf=True, docla=True)
