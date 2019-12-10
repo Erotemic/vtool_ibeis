@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 __heredoc__='''
 Script to publish a new version of this library on PyPI
 
@@ -50,6 +50,7 @@ check_variable(){
 CURRENT_BRANCH=${CURRENT_BRANCH:=$(git branch | grep \* | cut -d ' ' -f2)}
 DEPLOY_BRANCH=${DEPLOY_BRANCH:=release}
 DEPLOY_REMOTE=${DEPLOY_REMOTE:=origin}
+NAME=${NAME:=$(python -c "import setup; print(setup.NAME)")}
 VERSION=$(python -c "import setup; print(setup.VERSION)")
 MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")}
 
@@ -70,22 +71,6 @@ else
     GPG_EXECUTABLE=${GPG_EXECUTABLE:=gpg}
 fi
 
-#__note___='''
-#GPG_IDENTIFIER=Erotemic
-#KEYID=$(gpg --list-keys --keyid-format LONG "$GPG_IDENTIFIER" | head -n 2 | tail -n 1 | awk '{print $1}' | tail -c 9)
-#echo "KEYID = '$KEYID'"
-
-## https://help.github.com/en/articles/signing-commits
-#git config --local commit.gpgsign true
-## Note the GPG key needs to match the email
-#git config --local user.email $UserEmail
-## Tell git which key to sign
-#git config --local user.signingkey $KEYID
-#git config --local -l
-
-#GPG_KEYID=297D757
-#'''
-
 GPG_KEYID=${GPG_KEYID:=$(git config --local user.signingkey)}
 GPG_KEYID=${GPG_KEYID:=$(git config --global user.signingkey)}
 
@@ -104,22 +89,34 @@ MB_PYTHON_TAG = '$MB_PYTHON_TAG'
 echo "
 === <BUILD WHEEL> ===
 "
+
+
+
 echo "LIVE BUILDING"
 # Build wheel and source distribution
-#python setup.py bdist_wheel --universal
-#python setup.py sdist 
 
-BDIST_WHEEL_PATH=$(ls wheelhouse/*-$VERSION-$MB_PYTHON_TAG*.whl)
-echo "BDIST_WHEEL_PATH = $BDIST_WHEEL_PATH"
-#SDIST_PATH=$(dir wheelhouse/*-$VERSION*.tar.gz)
+MODE=${MODE:=sdist}
+
+if [[ "$MODE" == "sdist" ]]; then
+    python setup.py sdist 
+    WHEEL_PATH=$(ls dist/$NAME-$VERSION*.tar.gz)
+elif [[ "$MODE" == "universal" ]]; then
+    python setup.py bdist_wheel --universal
+    WHEEL_PATH=$(ls dist/*-$VERSION-$MB_PYTHON_TAG*.whl)
+elif [[ "$MODE" == "bdist" ]]; then
+    WHEEL_PATH=$(ls wheelhouse/*-$VERSION-$MB_PYTHON_TAG*.whl)
+else
+    echo "bad mode"
+    exit 1
+fi
+
 echo "
-echo "VERSION='$VERSION'"
-BDIST_WHEEL_PATH='$BDIST_WHEEL_PATH'
+MODE=$MODE
+VERSION='$VERSION'
+WHEEL_PATH='$WHEEL_PATH'
 "
-#SDIST_PATH='$SDIST_PATH'
 
-check_variable BDIST_WHEEL_PATH
-#check_variable SDIST_PATH 
+check_variable WHEEL_PATH
 
 echo "
 === <END BUILD WHEEL> ===
@@ -136,28 +133,17 @@ if [ "$USE_GPG" == "True" ]; then
     check_variable GPG_EXECUTABLE
     check_variable GPG_KEYID
 
-    #OLD_SIGS=$(ls wheelhouse/*.asc)
-    #if [[ "$OLD_SIGS" == "" ]]; then
-    #    echo "Removing old signatures"
-    #    rm $OLD_SIGS
-    #else
-    #    echo "wheelhouse dir is clearn"
-    #fi
-
     echo "Signing wheels"
     GPG_SIGN_CMD="$GPG_EXECUTABLE --batch --yes --detach-sign --armor --local-user $GPG_KEYID"
     ls wheelhouse
     echo "GPG_SIGN_CMD = $GPG_SIGN_CMD"
-    $GPG_SIGN_CMD --output $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH
-    #$GPG_SIGN_CMD --output $SDIST_PATH.asc $SDIST_PATH
+    $GPG_SIGN_CMD --output $WHEEL_PATH.asc $WHEEL_PATH
 
     echo "Checking wheels"
-    twine check $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH
-    #twine check $SDIST_PATH.asc $SDIST_PATH
+    twine check $WHEEL_PATH.asc $WHEEL_PATH
 
     echo "Verifying wheels"
-    $GPG_EXECUTABLE --verify $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH 
-    #$GPG_EXECUTABLE --verify $SDIST_PATH.asc $SDIST_PATH 
+    $GPG_EXECUTABLE --verify $WHEEL_PATH.asc $WHEEL_PATH 
 else
     echo "USE_GPG=False, Skipping GPG sign"
 fi
@@ -193,11 +179,9 @@ if [[ "$TAG_AND_UPLOAD" == "yes" ]]; then
     #git push --tags $DEPLOY_REMOTE $DEPLOY_BRANCH
 
     if [ "$USE_GPG" == "True" ]; then
-        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $BDIST_WHEEL_PATH.asc $BDIST_WHEEL_PATH
-        #twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $SDIST_PATH.asc $SDIST_PATH
+        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD --sign $WHEEL_PATH.asc $WHEEL_PATH
     else
-        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $BDIST_WHEEL_PATH 
-        #twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $SDIST_PATH 
+        twine upload --username $TWINE_USERNAME --password=$TWINE_PASSWORD $WHEEL_PATH 
     fi
     echo """
         !!! FINISH: LIVE RUN !!!
@@ -212,6 +196,7 @@ else
         CURRENT_BRANCH = '$CURRENT_BRANCH'
         DEPLOY_BRANCH = '$DEPLOY_BRANCH'
         TAG_AND_UPLOAD = '$TAG_AND_UPLOAD'
+        WHEEL_PATH = '$WHEEL_PATH'
 
         To do live run set TAG_AND_UPLOAD=yes and ensure deploy and current branch are the same
 
