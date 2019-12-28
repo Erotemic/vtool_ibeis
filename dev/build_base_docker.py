@@ -248,6 +248,10 @@ def main():
 
     # Create a virtual environment for each supported python version
     for MB_PYTHON_TAG in MB_PYTHON_TAGS:
+        if PLAT == 'x86_64':
+            pip_pkgs = 'cmake ubelt numpy wheel'
+        else:
+            pip_pkgs = 'ubelt numpy wheel'
         parts.append(ub.codeblock(
             fr'''
             RUN /opt/python/{MB_PYTHON_TAG}/bin/python -m pip -q --no-cache-dir install pip -U && \
@@ -255,7 +259,7 @@ def main():
                 /opt/python/{MB_PYTHON_TAG}/bin/python -m virtualenv /root/venv-{MB_PYTHON_TAG} && \
                 source /root/venv-{MB_PYTHON_TAG}/bin/activate && \
                 python -m pip -q --no-cache-dir install scikit-build ninja && \
-                python -m pip -q --no-cache-dir install cmake ubelt numpy wheel
+                python -m pip -q --no-cache-dir install {pip_pkgs}
             '''))
 
     # we don't need opencv to build with python so only do this once
