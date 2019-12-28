@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
 """
 Create a base docker image for building pyflann_ibeis
 
@@ -7,6 +6,7 @@ References:
     https://github.com/skvark/opencv-python
 """
 from __future__ import absolute_import, division, print_function
+from os.path import basename
 from os.path import exists
 from os.path import join
 from os.path import realpath
@@ -142,56 +142,9 @@ def build_opencv_cmake_args(config):
     return cmake_args
 
 
-# def main():
-#     """
-#     Usage:
-#         cd ~/code/hesaff/factory
-#         python ~/code/hesaff/factory/build_opencv_docker.py --publish --no-exec
-#         python ~/code/hesaff/factory/build_opencv_docker.py --publish
-#     """
-#     import multiprocessing
-
-#     def argval(clikey, envkey=None, default=ub.NoParam):
-#         if envkey is not None:
-#             envval = os.environ.get(envkey)
-#             if envval:
-#                 default = envval
-#         return ub.argval(clikey, default=default)
-
-#     DEFAULT_PY_VER = '{}.{}'.format(sys.version_info.major, sys.version_info.minor)
-#     DPATH = argval('--dpath', None, default=os.getcwd())
-#     MAKE_CPUS = argval('--make_cpus', 'MAKE_CPUS', multiprocessing.cpu_count() + 1)
-#     UNICODE_WIDTH = argval('--unicode_width', 'UNICODE_WIDTH', '32')
-#     EXEC = not ub.argflag('--no-exec')
-
-#     if ub.argflag('--publish'):
-#         fpaths = []
-#         plat = ['i686', 'x86_64']
-#         pyver = ['2.7', '3.4', '3.5', '3.6', '3.7']
-#         for PLAT in plat:
-#             for PY_VER in pyver:
-#                 fpaths += [build(DPATH, MAKE_CPUS, UNICODE_WIDTH, PLAT, PY_VER, EXEC=EXEC)]
-
-#         print("WROTE TO: ")
-#         print('\n'.join(fpaths))
-#     else:
-#         PY_VER = argval('--pyver', 'MB_PYTHON_VERSION', default=DEFAULT_PY_VER)
-#         PLAT = argval('--plat', 'PLAT', default='x86_64')
-#         build(DPATH, MAKE_CPUS, UNICODE_WIDTH, PLAT, PY_VER, EXEC=EXEC)
-
-
 def main():
-    ROOT = join(os.getcwd())
-    # ROOT = '.'
-    os.chdir(ROOT)
-
-    # NAME = 'vtool_ibeis'
-    # VERSION = '0.1.0'
-    # DOCKER_TAG = '{}-{}'.format(NAME, VERSION )
-
     QUAY_REPO = 'quay.io/erotemic/manylinux-for'
 
-    # dockerfile_fpath = join(ROOT, 'Dockerfile')
     # This docker code is very specific for building linux binaries.
     # We will need to do a bit of refactoring to handle OSX and windows.
     # But the goal is to get at least one OS working end-to-end.
@@ -205,29 +158,32 @@ def main():
                 default = envval
         return ub.argval(clikey, default=default)
 
-    # DPATH = argval('--dpath', None, default=os.getcwd())
-    DPATH = argval('--dpath', None, default=ub.expandpath('~/code/vtool_ibeis/dev/docker'))
-
-    # DEFAULT_MB_PYTHON_TAG = '{}{}'.format(sys.version_info.major, sys.version_info.minor)
-    # DEFAULT_MB_PYTHON_TAG = ub.import_module_from_path(ub.expandpath('~/code/vtool_ibeis/setup.py'), 0).MB_PYTHON_TAG
-    # DEFAULT_MB_PYTHON_TAG = None
-    # MB_PYTHON_TAG = argval('--mb_python_tag', 'MB_PYTHON_TAG', default=DEFAULT_MB_PYTHON_TAG)
+    default_dpath = ub.get_app_cache_dir('erotemic/manylinux-for/staging')
+    DPATH = argval('--dpath', None, default=default_dpath)
 
     MAKE_CPUS = argval('--make_cpus', 'MAKE_CPUS', multiprocessing.cpu_count() + 1)
-    UNICODE_WIDTH = argval('--unicode_width', 'UNICODE_WIDTH', '32')
+
     PLAT = argval('--plat', 'PLAT', default='x86_64')
 
     OPENCV_VERSION = '4.1.0'
+
+    DRY = ub.argflag('--dry')
 
     dpath = realpath(ub.expandpath(DPATH))
     dpath = ub.ensuredir(dpath)
     os.chdir(dpath)
 
-    BASE = 'manylinux1_{}'.format(PLAT)
-    BASE_REPO = 'quay.io/skvark'
+    # BASE_REPO = 'quay.io/skvark'
+    # BASE = 'manylinux1_{}'.format(PLAT)
+
+    BASE_REPO = 'quay.io/pypa'
+    BASE = 'manylinux2010_{}'.format(PLAT)
+
+    if PLAT in ['aarch64', 's390x', 'ppc64le']:
+        BASE = 'manylinux2014_{}'.format(PLAT)
 
     # do we need the unicode width in this tag?
-    DOCKER_TAG = '{}-opencv{}-v3'.format(PLAT, OPENCV_VERSION)
+    DOCKER_TAG = '{}-opencv{}-v4'.format(PLAT, OPENCV_VERSION)
     DOCKER_URI = '{QUAY_REPO}:{DOCKER_TAG}'.format(**locals())
 
     if not exists(join(dpath, 'opencv-' + OPENCV_VERSION)):
@@ -243,17 +199,13 @@ def main():
 
     dockerfile_fpath = join(dpath, 'Dockerfile_' + DOCKER_TAG)
 
-    """
-    Notes:
-        docker run --rm -it quay.io/pypa/manylinux2010_x86_64 /bin/bash
-        docker run -v $HOME/code/vtool_ibeis/dev/docker:/root/vmnt --rm -it quay.io/skvark/manylinux1_x86_64 /bin/bash
-    """
+    PARENT_IMAGE = f'{BASE_REPO}/{BASE}'
+
     docker_header = ub.codeblock(
         f'''
-        FROM {BASE_REPO}/{BASE}
-        # FROM quay.io/pypa/manylinux2010_x86_64
-        # FROM quay.io/skvark/manylinux1_x86_64
-        # RUN yum install lz4-devel -y
+        FROM {PARENT_IMAGE}
+
+        RUN yum install lz4-devel -y
 
         RUN mkdir -p /root/code
         COPY opencv-{OPENCV_VERSION} /root/code/opencv
@@ -261,10 +213,10 @@ def main():
         ENV _MY_DOCKER_TAG={DOCKER_TAG}
         ENV HOME=/root
         ENV PLAT={PLAT}
-        ENV UNICODE_WIDTH={UNICODE_WIDTH}
         ''')
 
     MB_PYTHON_TAGS = [
+        'cp38-cp38',
         'cp37-cp37m',
         'cp36-cp36m',
         'cp35-cp35m',
@@ -273,16 +225,40 @@ def main():
 
     parts = [docker_header]
 
-    for MB_PYTHON_TAG in MB_PYTHON_TAGS:
+    if PLAT != 'x86_64':
+        # For architectures other than x86_64 we have to build cmake ourselves
+        fpath = ub.grabdata(
+            'https://github.com/Kitware/CMake/releases/download/v3.15.6/cmake-3.15.6.tar.gz',
+            dpath=dpath, hash_prefix='3210cbf4644a7cb8d08ad752a0b550d864666b0',
+            hasher='sha512', verbose=3
+        )
+        cmake_tar_fname = basename(fpath)
         parts.append(ub.codeblock(
-            f'''
-            RUN MB_PYTHON_TAG={MB_PYTHON_TAG} && \
-                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install pip && \
-                /opt/python/$MB_PYTHON_TAG/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv scikit-build cmake ninja ubelt numpy wheel && \
-                /opt/python/$MB_PYTHON_TAG/bin/python -m virtualenv /root/venv-$MB_PYTHON_TAG
+            fr'''
+            COPY {cmake_tar_fname} /root/code/
+            RUN \
+                mkdir -p /root/code/ && \
+                cd /root/code/ && \
+                tar -xf cmake-3.15.6.tar.gz && \
+                cd cmake-3.15.6 && \
+                ./configure && \
+                gmake -j{MAKE_CPUS} && \
+                gmake install
             '''))
 
-    # only do this once
+    # Create a virtual environment for each supported python version
+    for MB_PYTHON_TAG in MB_PYTHON_TAGS:
+        parts.append(ub.codeblock(
+            fr'''
+            RUN /opt/python/{MB_PYTHON_TAG}/bin/python -m pip -q --no-cache-dir install pip -U && \
+                /opt/python/{MB_PYTHON_TAG}/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv && \
+                /opt/python/{MB_PYTHON_TAG}/bin/python -m virtualenv /root/venv-{MB_PYTHON_TAG} && \
+                source /root/venv-{MB_PYTHON_TAG}/bin/activate && \
+                python -m pip -q --no-cache-dir install scikit-build ninja && \
+                python -m pip -q --no-cache-dir install cmake ubelt numpy wheel
+            '''))
+
+    # we don't need opencv to build with python so only do this once
     MB_PYTHON_TAGS = MB_PYTHON_TAGS[0:1]
     for MB_PYTHON_TAG in MB_PYTHON_TAGS:
         major, minor = MB_PYTHON_TAG.replace('cp', '')[0:2]
@@ -293,6 +269,7 @@ def main():
             'build_contrib': False,
             'build_headless': True,
             'python_args': None,
+            # We actually dont need python
             # 'python_args': {
             #     'py_ver': PY_VER,
             #     'py_executable': PY_VER,
@@ -302,26 +279,23 @@ def main():
                 'jpeg_library': '${JPEG_LIBRARY}',
             }
         }
-        CMAKE_ARGS = ' \\\n                '.join(build_opencv_cmake_args(config))
+        sepstr = ' \\\n                '
+        CMAKE_ARGS = sepstr.join(build_opencv_cmake_args(config))
 
+        # Note we activate a python venv so we get the pip version of cmake.
         parts.append(ub.codeblock(
-            f'''
-            RUN MB_PYTHON_TAG={MB_PYTHON_TAG} && \
-                source /root/venv-$MB_PYTHON_TAG/bin/activate && \
-                mkdir -p /root/code/opencv/build_{MB_PYTHON_TAG} && \
-                cd /root/code/opencv/build_{MB_PYTHON_TAG} && \
+            fr'''
+            RUN source /root/venv-{MB_PYTHON_TAG}/bin/activate && \
+                mkdir -p /root/code/opencv/build && \
+                cd /root/code/opencv/build && \
+                cmake --version && \
                 cmake {CMAKE_ARGS} /root/code/opencv && \
-                cd /root/code/opencv/build_{MB_PYTHON_TAG} && \
+                cd /root/code/opencv/build && \
                 make -j{MAKE_CPUS} && \
                 make install && \
-                rm -rf /root/code/opencv/build_{MB_PYTHON_TAG}
+                rm -rf /root/code/opencv/build
             '''))
 
-    # cmake {CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=/root/venv-$MB_PYTHON_TAG /root/code/opencv && \
-    # PYTHON_ROOT=/opt/python/{MB_PYTHON_TAG}/ \
-    # PYTHONPATH=/opt/python/{MB_PYTHON_TAG}/lib/python{PY_VER}/site-packages/ \
-    # PATH=/opt/python/{MB_PYTHON_TAG}/bin:$PATH \
-    # PYTHON_EXE=/opt/python/{MB_PYTHON_TAG}/bin/python \
     docker_code = '\n\n'.join(parts)
 
     try:
@@ -341,7 +315,12 @@ def main():
     ])
     print('docker_build_cli = {!r}'.format(docker_build_cli))
 
-    if 1:
+    if DRY:
+        print('DRY RUN: Would run')
+        print(f'docker pull {PARENT_IMAGE}')
+        print(docker_build_cli)
+    else:
+        ub.cmd(f'docker pull {PARENT_IMAGE}')
         info = ub.cmd(docker_build_cli, verbose=3, shell=True)
 
         if info['ret'] != 0:
@@ -349,7 +328,6 @@ def main():
             print('Failed command:')
             print(info['command'])
             print(info['err'])
-            print('NOTE: sometimes reruning the command manually works')
             raise Exception('Building docker failed with exit code {}'.format(info['ret']))
         else:
             print(ub.color_text('\n--- SUCCESS ---', 'green'))
@@ -363,7 +341,7 @@ def main():
             # Test that we can get a bash terminal
             docker run -it {DOCKER_TAG} bash
 
-            docker save -o ${ROOT}/{DOCKER_TAG}.docker.tar {DOCKER_TAG}
+            docker save -o {DOCKER_TAG}.docker.tar {DOCKER_TAG}
 
             # To publish to quay
 
@@ -375,9 +353,6 @@ def main():
             docker push {DOCKER_URI}
 
             '''), 'bash'))
-        # push_cmd = 'docker push quay.io/erotemic/manylinux-opencv:manylinux1_x86_64-opencv4.1.0-py3.6'
-        # print('push_cmd = {!r}'.format(push_cmd))
-        # print(push_cmd)
 
     PUBLISH = 0
     if PUBLISH:
@@ -392,6 +367,18 @@ def main():
 if __name__ == '__main__':
     """
     CommandLine:
-        python ~/code/vtool_ibeis/dev/build_base_docker.py
+
+        # Pull the standard manylinux base images
+        docker pull quay.io/pypa/manylinux2010_i686
+        docker pull quay.io/pypa/manylinux2010_x86_64
+        docker pull quay.io/pypa/manylinux2014_i686
+        docker pull quay.io/pypa/manylinux2014_x86_64
+        docker pull quay.io/pypa/manylinux2014_aarch64
+
+
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --dry
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=x86_64
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=i686
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=aarch64 --dry
     """
     main()
