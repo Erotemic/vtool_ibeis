@@ -242,9 +242,18 @@ def main():
         #manylinux1 provides curl-devel equivalent and libcurl statically linked
         # against the same newer OpenSSL as other source-built tools
         # (1.0.2s as of this writing)
+
+        # Alternate way to grab data and check the sha512sum
+        # curl -O -L https://github.com/Kitware/CMake/releases/download/v3.15.6/cmake-3.15.6.tar.gz
+        # sha512sum cmake-3.15.6.tar.gz | grep '^3210cbf4644a7cb8d08ad752'
+
         parts.append(ub.codeblock(
             fr'''
+
+            RUN yum install curl-devel -y
+
             COPY {cmake_tar_fname} /root/code/
+
             RUN \
                 mkdir -p /root/code/ && \
                 cd /root/code/ && \
@@ -258,20 +267,21 @@ def main():
                 rm -rf cmake-*
             '''))
 
+    # note: perl build scripts does a lot of redundant work
+    # if running "make install" separately
     parts.append(ub.codeblock(
         r'''
         RUN yum install freetype-devel bzip2-devel zlib-devel -y && \
             mkdir -p ~/ffmpeg_sources
 
         # Newer openssl configure requires newer perl
-        RUN curl -O -L https://www.cpan.org/src/5.0/perl-5.20.1.tar.gz && \
+        RUN cd ~/ffmpeg_sources && \
+            curl -O -L https://www.cpan.org/src/5.0/perl-5.20.1.tar.gz && \
             tar -xf perl-5.20.1.tar.gz && \
-            cd perl-5.20.1 && \
+            cd ~/ffmpeg_sources/perl-5.20.1 && \
             ./Configure -des -Dprefix="$HOME/openssl_build" && \
-            #perl build scripts do much redundant work
-            # if running "make install" separately
             make install -j$(getconf _NPROCESSORS_ONLN) && \
-            cd .. && \
+            cd ~/ffmpeg_sources && \
             rm -rf perl-5.20.1*
         '''))
 
@@ -281,12 +291,11 @@ def main():
             RUN cd ~/ffmpeg_sources && \
                 curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
                 tar -xf OpenSSL_1_1_1c.tar.gz && \
-                cd openssl-OpenSSL_1_1_1c && \
+                cd ~/ffmpeg_sources/openssl-OpenSSL_1_1_1c && \
                 #in i686, ./config detects x64 in i686 container without linux32
                 # when run from "docker build"
                 PERL="$HOME/openssl_build/bin/perl" linux32 ./config --prefix="$HOME/ffmpeg_build" --openssldir="$HOME/ffmpeg_build" shared zlib && \
                 make -j$(getconf _NPROCESSORS_ONLN) && \
-                #skip installing documentation
                 make install_sw && \
                 rm -rf ~/openssl_build
             '''))
@@ -296,10 +305,9 @@ def main():
             RUN cd ~/ffmpeg_sources && \
                 curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
                 tar -xf OpenSSL_1_1_1c.tar.gz && \
-                cd openssl-OpenSSL_1_1_1c && \
+                cd ~/ffmpeg_sources/openssl-OpenSSL_1_1_1c && \
                 PERL="$HOME/openssl_build/bin/perl" ./config --prefix="$HOME/ffmpeg_build" --openssldir="$HOME/ffmpeg_build" shared zlib && \
                 make -j$(getconf _NPROCESSORS_ONLN) && \
-                #skip installing documentation
                 make install_sw && \
                 rm -rf ~/openssl_build
             '''))
@@ -307,8 +315,8 @@ def main():
     parts.append(ub.codeblock(
         r'''
         RUN cd ~/ffmpeg_sources && \
-            curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.13.02/nasm-2.13.02.tar.bz2 && \
-            tar -xf nasm-2.13.02.tar.bz2 && cd nasm-2.13.02 && ./autogen.sh && \
+            curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.14.01/nasm-2.14.01.tar.bz2 && \
+            tar -xf nasm-2.14.01.tar.bz2 && cd nasm-2.14.01 && ./autogen.sh && \
             ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" && \
             make -j$(getconf _NPROCESSORS_ONLN) && \
             make install
@@ -489,6 +497,8 @@ def main():
 if __name__ == '__main__':
     """
     CommandLine:
+
+        docker run --rm -it quay.io/pypa/manylinux2010_x86_64 /bin/bash
 
         # Pull the standard manylinux base images
         docker pull quay.io/pypa/manylinux2010_i686
