@@ -4,6 +4,10 @@ Create a base docker image for building pyflann_ibeis
 
 References:
     https://github.com/skvark/opencv-python
+
+    # Files skvark uses to make his base opencv docker image
+    https://github.com/skvark/opencv-python/blob/master/docker/Dockerfile_i686
+    https://github.com/skvark/opencv-python/blob/master/docker/Dockerfile_x86_64
 """
 from __future__ import absolute_import, division, print_function
 from os.path import basename
@@ -205,7 +209,7 @@ def main():
         f'''
         FROM {PARENT_IMAGE}
 
-        RUN yum install lz4-devel -y
+        RUN yum install lz4-devel zlib-devel -y
 
         RUN mkdir -p /root/code
         COPY opencv-{OPENCV_VERSION} /root/code/opencv
@@ -225,7 +229,8 @@ def main():
 
     parts = [docker_header]
 
-    if PLAT != 'x86_64':
+    # if PLAT != 'x86_64':
+    if True:
         # For architectures other than x86_64 we have to build cmake ourselves
         fpath = ub.grabdata(
             'https://github.com/Kitware/CMake/releases/download/v3.15.6/cmake-3.15.6.tar.gz',
@@ -233,6 +238,10 @@ def main():
             hasher='sha512', verbose=3
         )
         cmake_tar_fname = basename(fpath)
+
+        #manylinux1 provides curl-devel equivalent and libcurl statically linked
+        # against the same newer OpenSSL as other source-built tools
+        # (1.0.2s as of this writing)
         parts.append(ub.codeblock(
             fr'''
             COPY {cmake_tar_fname} /root/code/
@@ -241,10 +250,119 @@ def main():
                 cd /root/code/ && \
                 tar -xf cmake-3.15.6.tar.gz && \
                 cd cmake-3.15.6 && \
-                ./configure && \
-                gmake -j{MAKE_CPUS} && \
-                gmake install
+                export MAKEFLAGS=-j$(getconf _NPROCESSORS_ONLN) && \
+                ./configure --system-curl && \
+                make && \
+                make install && \
+                cd .. && \
+                rm -rf cmake-*
             '''))
+
+    parts.append(ub.codeblock(
+        r'''
+        RUN yum install freetype-devel bzip2-devel zlib-devel -y && \
+            mkdir -p ~/ffmpeg_sources
+
+        # Newer openssl configure requires newer perl
+        RUN curl -O -L https://www.cpan.org/src/5.0/perl-5.20.1.tar.gz && \
+            tar -xf perl-5.20.1.tar.gz && \
+            cd perl-5.20.1 && \
+            ./Configure -des -Dprefix="$HOME/openssl_build" && \
+            #perl build scripts do much redundant work
+            # if running "make install" separately
+            make install -j$(getconf _NPROCESSORS_ONLN) && \
+            cd .. && \
+            rm -rf perl-5.20.1*
+        '''))
+
+    if PLAT == 'i686':
+        parts.append(ub.codeblock(
+            r'''
+            RUN cd ~/ffmpeg_sources && \
+                curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
+                tar -xf OpenSSL_1_1_1c.tar.gz && \
+                cd openssl-OpenSSL_1_1_1c && \
+                #in i686, ./config detects x64 in i686 container without linux32
+                # when run from "docker build"
+                PERL="$HOME/openssl_build/bin/perl" linux32 ./config --prefix="$HOME/ffmpeg_build" --openssldir="$HOME/ffmpeg_build" shared zlib && \
+                make -j$(getconf _NPROCESSORS_ONLN) && \
+                #skip installing documentation
+                make install_sw && \
+                rm -rf ~/openssl_build
+            '''))
+    else:
+        parts.append(ub.codeblock(
+            r'''
+            RUN cd ~/ffmpeg_sources && \
+                curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
+                tar -xf OpenSSL_1_1_1c.tar.gz && \
+                cd openssl-OpenSSL_1_1_1c && \
+                PERL="$HOME/openssl_build/bin/perl" ./config --prefix="$HOME/ffmpeg_build" --openssldir="$HOME/ffmpeg_build" shared zlib && \
+                make -j$(getconf _NPROCESSORS_ONLN) && \
+                #skip installing documentation
+                make install_sw && \
+                rm -rf ~/openssl_build
+            '''))
+
+    parts.append(ub.codeblock(
+        r'''
+        RUN cd ~/ffmpeg_sources && \
+            curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.13.02/nasm-2.13.02.tar.bz2 && \
+            tar -xf nasm-2.13.02.tar.bz2 && cd nasm-2.13.02 && ./autogen.sh && \
+            ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" && \
+            make -j$(getconf _NPROCESSORS_ONLN) && \
+            make install
+
+        RUN cd ~/ffmpeg_sources && \
+            curl -O -L http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz && \
+            tar -xf yasm-1.3.0.tar.gz && \
+            cd yasm-1.3.0 && \
+            ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" && \
+            make -j$(getconf _NPROCESSORS_ONLN) && \
+            make install
+
+        RUN cd ~/ffmpeg_sources && \
+            git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
+            cd libvpx && \
+            ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm --enable-pic --enable-shared && \
+            make -j$(getconf _NPROCESSORS_ONLN) && \
+            make install
+
+        RUN cd ~/ffmpeg_sources && \
+            curl -O -L https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 && \
+            tar -xf ffmpeg-snapshot.tar.bz2 && \
+            cd ffmpeg && \
+            PATH=~/bin:$PATH && \
+            PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --extra-cflags="-I$HOME/ffmpeg_build/include" --extra-ldflags="-L$HOME/ffmpeg_build/lib" --enable-openssl --enable-libvpx --enable-shared --enable-pic --bindir="$HOME/bin" && \
+            make -j$(getconf _NPROCESSORS_ONLN) && \
+            make install && \
+            echo "/root/ffmpeg_build/lib/" >> /etc/ld.so.conf && \
+            ldconfig && \
+            rm -rf ~/ffmpeg_sources
+
+        ENV PKG_CONFIG_PATH /usr/local/lib/pkgconfig:/root/ffmpeg_build/lib/pkgconfig
+        ENV LDFLAGS -L/root/ffmpeg_build/lib
+
+        RUN curl -O https://raw.githubusercontent.com/torvalds/linux/v4.14/include/uapi/linux/videodev2.h && \
+            curl -O https://raw.githubusercontent.com/torvalds/linux/v4.14/include/uapi/linux/v4l2-common.h && \
+            curl -O https://raw.githubusercontent.com/torvalds/linux/v4.14/include/uapi/linux/v4l2-controls.h && \
+            curl -O https://raw.githubusercontent.com/torvalds/linux/v4.14/include/linux/compiler.h && \
+            mv videodev2.h v4l2-common.h v4l2-controls.h compiler.h /usr/include/linux
+        '''))
+
+    if PLAT == 'i686':
+        parts.append(ub.codeblock(
+            r'''
+            #in i686, yum metadata ends up with slightly wrong timestamps
+            #which inhibits its update
+            #https://github.com/skvark/opencv-python/issues/148
+            RUN yum clean all
+            '''))
+
+    parts.append(ub.codeblock(
+        r'''
+        ENV PATH "$HOME/bin:$PATH"
+        '''))
 
     # Create a virtual environment for each supported python version
     for MB_PYTHON_TAG in MB_PYTHON_TAGS:

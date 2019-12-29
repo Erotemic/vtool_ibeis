@@ -2,38 +2,14 @@
 __heredoc__="""
 
 
-notes:
 
-    # TODO: use dind as the base image,
-    # Then run the multibuild in docker followed by a test in a different
-    # docker container
+MB_PYTHON_TAG=cp38-cp38 ./run_manylinux_build.sh
+PLAT=i686 MB_PYTHON_TAG=cp38-cp38 ./run_manylinux_build.sh
 
-    # BETTER TODO: 
-    # Use a build stage to build in the multilinux environment and then
-    # use a test stage with a different image to test and deploy the wheel
-    docker run --rm -it --entrypoint="" docker:dind sh
-    docker run --rm -it --entrypoint="" docker:latest sh
-    docker run --rm -v $PWD:/io -it --entrypoint="" docker:latest sh
-
-    docker run --rm -v $PWD:/io -it python:2.7 bash
-     
-        cd /io
-        pip install -r requirements.txt
-        pip install pygments
-        pip install wheelhouse/pyflann_ibeis-0.5.0-cp27-cp27mu-manylinux1_x86_64.whl
-
-        cd /
-        xdoctest pyflann_ibeis
-        pytest io/tests
-
-        cd /io
-        python run_tests.py
-
-
-MB_PYTHON_TAG=cp37-cp37m ./run_multibuild.sh
-MB_PYTHON_TAG=cp36-cp36m ./run_multibuild.sh
-MB_PYTHON_TAG=cp35-cp35m ./run_multibuild.sh
-MB_PYTHON_TAG=cp27-cp27m ./run_multibuild.sh
+MB_PYTHON_TAG=cp37-cp37m ./run_manylinux_build.sh
+MB_PYTHON_TAG=cp36-cp36m ./run_manylinux_build.sh
+MB_PYTHON_TAG=cp35-cp35m ./run_manylinux_build.sh
+MB_PYTHON_TAG=cp27-cp27m ./run_manylinux_build.sh
 
 # MB_PYTHON_TAG=cp27-cp27mu ./run_nmultibuild.sh
 
@@ -41,11 +17,11 @@ docker pull quay.io/erotemic/manylinux-opencv:manylinux1_i686-opencv4.1.0-py3.6
 
 """
 
-
-DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-for:x86_64-opencv4.1.0-v2"}
+PLAT=${PLAT:=x86_64}
+DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-for:$PLAT-opencv4.1.0-v4"}
 # Valid multibuild python versions are:
 # cp27-cp27m  cp27-cp27mu  cp34-cp34m  cp35-cp35m  cp36-cp36m  cp37-cp37m
-MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")}
+MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.native_mb_python_tag())")}
 NAME=${NAME:=$(python -c "import setup; print(setup.NAME)")}
 VERSION=${VERSION:=$(python -c "import setup; print(setup.VERSION)")}
 echo "
@@ -64,14 +40,14 @@ if [ "$_INSIDE_DOCKER" != "YES" ]; then
         -e MB_PYTHON_TAG="$MB_PYTHON_TAG" \
         -e NAME="$NAME" \
         -e VERSION="$VERSION" \
-        $DOCKER_IMAGE bash -c 'cd /io && ./run_multibuild.sh'
+        $DOCKER_IMAGE bash -c 'cd /io && ./run_manylinux_build.sh'
 
     __interactive__='''
     docker run --rm \
         -v $PWD:/io \
         -e _INSIDE_DOCKER="YES" \
         -e MB_PYTHON_TAG="$MB_PYTHON_TAG" \
-        -e NAME="$NAME" \
+        -e NAME="$NAME" 
         -e VERSION="$VERSION" \
         -it $DOCKER_IMAGE bash
 
