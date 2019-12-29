@@ -44,7 +44,9 @@ install:
   - pip install $BDIST_WHEEL_PATH
     
 script: 
-  - travis_wait ./run_doctests.sh
+  #- travis_wait ./run_doctests.sh
+  - travis_wait coverage run --source vtool_ibeis -m xdoctest vtool_ibeis --style=google all
+  - coverage report
 
 after_success: 
     - codecov 
