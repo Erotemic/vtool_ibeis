@@ -1,9 +1,28 @@
 vtool_ibeis
 ===========
 
-|ReadTheDocs| |Pypi| |Downloads| |Codecov| |CircleCI| |Travis| |Appveyor| 
+|Pypi| |Downloads| |Codecov| |Travis| |Appveyor| 
 
 Vision Tools - tools for computer vision. Part of the WildMe / IBEIS Project.
+
+
+Repos relevant to the ibeis project:
+
+* https://github.com/Erotemic/plottool_ibeis
+
+* https://github.com/Erotemic/guitool_ibeis
+
+* https://github.com/Erotemic/dtool_ibeis
+
+* https://github.com/Erotemic/vtool_ibeis
+
+* https://github.com/Erotemic/pyflann_ibeis
+
+* https://github.com/Erotemic/pyhesaff
+
+* https://github.com/Erotemic/utool
+
+* https://github.com/Erotemic/ibeis
 
 
 .. |CircleCI| image:: https://circleci.com/gh/Erotemic/vtool.svg?style=svg
