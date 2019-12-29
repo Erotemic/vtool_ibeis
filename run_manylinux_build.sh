@@ -1,6 +1,8 @@
 #!/bin/bash
 __heredoc__="""
 
+This script is used to build manylinux wheels, which can then be installed or
+uploaded to pypi.
 
 
 MB_PYTHON_TAG=cp38-cp38 ./run_manylinux_build.sh
