@@ -32,7 +32,7 @@ Usage:
     MB_PYTHON_TAG=cp27-cp27mu
 
     echo "MB_PYTHON_TAG = $MB_PYTHON_TAG"
-    MB_PYTHON_TAG=$MB_PYTHON_TAG ./run_multibuild.sh
+    MB_PYTHON_TAG=$MB_PYTHON_TAG ./run_manylinux_build.sh
     DEPLOY_BRANCH=master DEPLOY_REMOTE=ibeis MB_PYTHON_TAG=$MB_PYTHON_TAG ./publish.sh yes
 '''
 
