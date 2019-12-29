@@ -15,7 +15,9 @@ Requirements:
 
 Notes:
     # NEW API TO UPLOAD TO PYPI
+    # https://docs.travis-ci.com/user/deployment/pypi/
     # https://packaging.python.org/tutorials/distributing-packages/
+    # https://stackoverflow.com/questions/45188811/how-to-gpg-sign-a-file-that-is-built-by-travis-ci
 
 Usage:
     cd <YOUR REPO>
@@ -26,13 +28,14 @@ Usage:
 
     source $(secret_loader.sh)
 
+    MB_PYTHON_TAG=cp38-cp38m 
     MB_PYTHON_TAG=cp37-cp37m 
     MB_PYTHON_TAG=cp36-cp36m 
     MB_PYTHON_TAG=cp35-cp35m 
     MB_PYTHON_TAG=cp27-cp27mu
 
     echo "MB_PYTHON_TAG = $MB_PYTHON_TAG"
-    MB_PYTHON_TAG=$MB_PYTHON_TAG ./run_manylinux_build.sh
+    MB_PYTHON_TAG=$MB_PYTHON_TAG ./run_multibuild.sh
     DEPLOY_BRANCH=master DEPLOY_REMOTE=ibeis MB_PYTHON_TAG=$MB_PYTHON_TAG ./publish.sh yes
 '''
 
@@ -52,7 +55,7 @@ DEPLOY_BRANCH=${DEPLOY_BRANCH:=release}
 DEPLOY_REMOTE=${DEPLOY_REMOTE:=origin}
 NAME=${NAME:=$(python -c "import setup; print(setup.NAME)")}
 VERSION=$(python -c "import setup; print(setup.VERSION)")
-MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.MB_PYTHON_TAG)")}
+MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.native_mb_python_tag())")}
 
 check_variable CURRENT_BRANCH
 check_variable DEPLOY_BRANCH
@@ -97,40 +100,46 @@ echo "LIVE BUILDING"
 
 MODE=${MODE:=all}
 
-WHEEL_PATHS=()
-
-if [[ "$MODE" == "sdist" ]]; then
-    python setup.py sdist 
-    WHEEL_PATH=$(ls dist/$NAME-$VERSION*.tar.gz)
-    WHEEL_PATHS+=($WHEEL_PATH)
-elif [[ "$MODE" == "universal" ]]; then
-    python setup.py bdist_wheel --universal
-    WHEEL_PATH=$(ls dist/*-$VERSION-$MB_PYTHON_TAG*.whl)
-    WHEEL_PATHS+=($WHEEL_PATH)
-elif [[ "$MODE" == "bdist" ]]; then
-    echo "Assume wheel has already been built"
-    WHEEL_PATH=$(ls wheelhouse/*-$VERSION-$MB_PYTHON_TAG*.whl)
-    WHEEL_PATHS+=($WHEEL_PATH)
-elif [[ "$MODE" == "all" ]]; then
-    python setup.py sdist 
-    WHEEL_PATH=$(ls dist/$NAME-$VERSION*.tar.gz)
-    WHEEL_PATHS+=($WHEEL_PATH)
-
-    python setup.py bdist_wheel --universal
-    WHEEL_PATH=$(ls dist/*-$VERSION-$MB_PYTHON_TAG*.whl)
-    WHEEL_PATHS+=($WHEEL_PATH)
-
-    WHEEL_PATH=$(ls wheelhouse/*-$VERSION-$MB_PYTHON_TAG*.whl)
-    WHEEL_PATHS+=($WHEEL_PATH)
+if [[ "$MODE" == "all" ]]; then
+    # The default should change depending on the application
+    #MODE_LIST=("sdist" "universal" "bdist")
+    #MODE_LIST=("sdist" "universal")
+    MODE_LIST=("sdist" "bdist")
 else
-    echo "bad mode"
-    exit 1
+    MODE_LIST=("$MODE")
 fi
+
+MODE_LIST_STR=$(printf '"%s" ' "${MODE_LIST[@]}")
+
+WHEEL_PATHS=()
+for _MODE in "${MODE_LIST[@]}"
+do
+    echo "_MODE = $_MODE"
+    if [[ "$_MODE" == "sdist" ]]; then
+        python setup.py sdist 
+        WHEEL_PATH=$(ls dist/$NAME-$VERSION*.tar.gz)
+        WHEEL_PATHS+=($WHEEL_PATH)
+    elif [[ "$_MODE" == "universal" ]]; then
+        python setup.py bdist_wheel --universal
+        WHEEL_PATH=$(ls dist/$NAME-$VERSION-$MB_PYTHON_TAG*.whl)
+        WHEEL_PATHS+=($WHEEL_PATH)
+    elif [[ "$_MODE" == "bdist" ]]; then
+        echo "Assume wheel has already been built"
+        WHEEL_PATH=$(ls wheelhouse/$NAME-$VERSION-$MB_PYTHON_TAG*.whl)
+        WHEEL_PATHS+=($WHEEL_PATH)
+    else
+        echo "bad mode"
+        exit 1
+    fi
+    echo "WHEEL_PATH = $WHEEL_PATH"
+done
+
+WHEEL_PATHS_STR=$(printf '"%s" ' "${WHEEL_PATHS[@]}")
 
 echo "
 MODE=$MODE
 VERSION='$VERSION'
-WHEEL_PATHS='$WHEEL_PATHS'
+WHEEL_PATHS='$WHEEL_PATHS_STR'
 "
 
 echo "
@@ -222,7 +231,8 @@ else
         DEPLOY_BRANCH = '$DEPLOY_BRANCH'
         TAG_AND_UPLOAD = '$TAG_AND_UPLOAD'
         WHEEL_PATH = '$WHEEL_PATH'
-        WHEEL_PATHS = '$WHEEL_PATHS'
+        WHEEL_PATHS_STR = '$WHEEL_PATHS_STR'
+        MODE_LIST_STR = '$MODE_LIST_STR'
 
         To do live run set TAG_AND_UPLOAD=yes and ensure deploy and current branch are the same
 
