@@ -11,8 +11,12 @@ pip install -r requirements.txt
 # new pep makes this not always work
 # pip install -e .
 
+./clean.sh
+
+python setup.py clean
 python setup.py build_ext --inplace
 python setup.py develop
+pip install -e .
 
 # Point to custom opencv
 _note="""

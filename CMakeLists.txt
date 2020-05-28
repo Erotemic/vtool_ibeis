@@ -4,6 +4,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
+    cmake_policy(SET CMP0042 NEW)
 endif(COMMAND cmake_policy)
 
 project(vtool_ibeis LANGUAGES C CXX)
@@ -39,6 +40,8 @@ if (OS_IS_MACOS)
 
     include_directories(/opt/local/include)
     link_directories(/opt/local/lib)
+
+    set(CMAKE_INSTALL_RPATH "/opt/local/lib")
 
     # Add flags to support clang2
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
