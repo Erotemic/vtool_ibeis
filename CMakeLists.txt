@@ -27,9 +27,9 @@ ${cmd}\"\"\"")
   string(STRIP "${_output}" _output)
   set(${outvar} "${_output}" PARENT_SCOPE)
 endfunction()
-_pycmd(VTOOL_IBEIS_VERSION "import setup; print(setup.version)")
+_pycmd(VTOOL_VERSION "import setup; print(setup.version)")
 
-message(STATUS "VTOOL_IBEIS_VERSION = ${VTOOL_IBEIS_VERSION}")
+message(STATUS "VTOOL_VERSION = ${VTOOL_VERSION}")
 
 DISSECT_VERSION()
 GET_OS_INFO()
@@ -128,8 +128,8 @@ set(namespace "vtool::")
 
 if (SKBUILD)
   # Override output paths when using scikit-build
-  set(VTOOL_LIB_INSTALL_DIR "vtool_ibeis/lib")
-  set(VTOOL_INCLUDE_INSTALL_DIR "vtool_ibeis/include")
+  set(SVER_LIB_INSTALL_DIR "vtool_ibeis/lib")
+  set(SVER_INCLUDE_INSTALL_DIR "vtool_ibeis/include")
 endif()
 
 if (NOT SKBUILD)
@@ -145,10 +145,10 @@ endif (BUILD_TESTS)
 include(CMakePackageConfigHelpers)
 
 # Configure 'vtool-config-version.cmake'
-# Note: VTOOL_IBEIS_VERSION is used as a VERSION
+# Note: VTOOL_VERSION is used as a VERSION
 write_basic_package_version_file(
     "${version_config}"
-    VERSION ${VTOOL_IBEIS_VERSION}
+    VERSION ${VTOOL_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
@@ -210,10 +210,10 @@ set(CPACK_SET_DESTDIR ON)
 include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_CONTACT "Marius Muja")
 set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-SET(CPACK_PACKAGE_VERSION ${VTOOL_IBEIS_VERSION})
-SET(CPACK_PACKAGE_VERSION_MAJOR ${VTOOL_IBEIS_VERSION_MAJOR})
-SET(CPACK_PACKAGE_VERSION_MINOR ${VTOOL_IBEIS_VERSION_MINOR})
-SET(CPACK_PACKAGE_VERSION_PATCH ${VTOOL_IBEIS_VERSION_PATCH})
+SET(CPACK_PACKAGE_VERSION ${VTOOL_VERSION})
+SET(CPACK_PACKAGE_VERSION_MAJOR ${VTOOL_VERSION_MAJOR})
+SET(CPACK_PACKAGE_VERSION_MINOR ${VTOOL_VERSION_MINOR})
+SET(CPACK_PACKAGE_VERSION_PATCH ${VTOOL_VERSION_PATCH})
 include(CPack)
 
 

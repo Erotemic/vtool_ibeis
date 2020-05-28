@@ -1,5 +1,5 @@
 ###############################################################################
-# Find Flann
+# Find Vtool
 #
 # This sets the following variables:
 # VTOOL_FOUND - True if vtool was found.
@@ -21,7 +21,7 @@ set(VTOOL_INCLUDE_DIRS ${VTOOL_INCLUDE_DIR})
 set(VTOOL_LIBRARIES ${VTOOL_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Flann DEFAULT_MSG
+find_package_handle_standard_args(Vtool DEFAULT_MSG
     VTOOL_LIBRARY VTOOL_INCLUDE_DIR)
 
 mark_as_advanced(VTOOL_LIBRARY VTOOL_INCLUDE_DIR)
