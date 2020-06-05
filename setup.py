@@ -161,7 +161,7 @@ except Exception:
     raise RuntimeError('FAILED TO ADD BUILD CONSTRUCTS')
 
 
-NAME = 'vtool_ibeis'
+NAME = 'wbia-vtool'
 
 
 MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
