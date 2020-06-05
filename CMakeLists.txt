@@ -7,7 +7,7 @@ if(COMMAND cmake_policy)
     cmake_policy(SET CMP0042 NEW)
 endif(COMMAND cmake_policy)
 
-project(vtool_ibeis LANGUAGES C CXX)
+project(vtool LANGUAGES C CXX)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 include(${PROJECT_SOURCE_DIR}/CMake/vtool_utils.cmake)
@@ -131,8 +131,8 @@ set(namespace "vtool::")
 
 if (SKBUILD)
   # Override output paths when using scikit-build
-  set(SVER_LIB_INSTALL_DIR "vtool_ibeis/lib")
-  set(SVER_INCLUDE_INSTALL_DIR "vtool_ibeis/include")
+  set(SVER_LIB_INSTALL_DIR "vtool/lib")
+  set(SVER_INCLUDE_INSTALL_DIR "vtool/include")
 endif()
 
 if (NOT SKBUILD)

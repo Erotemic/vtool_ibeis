@@ -13,11 +13,11 @@ def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
         tuple: (fm_both, fs_both)
 
     CommandLine:
-        python -m vtool_ibeis.matching --test-marge_matches
+        python -m vtool.matching --test-marge_matches
 
     Example:
         >>> # ENABLE_DOCTEST
-        >>> from vtool_ibeis.matching import *  # NOQA
+        >>> from vtool.matching import *  # NOQA
         >>> fm_A  = np.array([[ 15, 17], [ 54, 29], [ 95, 111], [ 25, 125], [ 97, 125]], dtype=np.int32)
         >>> fm_B  = np.array([[ 11, 21], [ 15, 17], [ 25, 125], [ 30,  32]], dtype=np.int32)
         >>> fsv_A = np.array([[ .1, .2], [1.0, .9], [.8,  .2],  [.1, .1], [1.0, .9]], dtype=np.float32)
@@ -46,7 +46,7 @@ def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
     """
     # Flag rows found in both fmA and fmB
     # that are intersecting (both) or unique (only)
-    import vtool_ibeis as vt
+    import vtool as vt
     flags_both_A, flags_both_B = vt.intersect2d_flags(fm_A, fm_B)
     flags_only_A = np.logical_not(flags_both_A)
     flags_only_B = np.logical_not(flags_both_B)
@@ -89,22 +89,22 @@ from __future__ import absolute_import, division, print_function
 import utool as ut
 import six  # NOQA
 import numpy as np
-#from vtool_ibeis import keypoint as ktool
-from vtool_ibeis import coverage_kpts
-from vtool_ibeis import spatial_verification as sver
-from vtool_ibeis import matching
+#from vtool import keypoint as ktool
+from vtool import coverage_kpts
+from vtool import spatial_verification as sver
+from vtool import matching
 #import numpy.linalg as npl
 #import scipy.sparse as sps
 #import scipy.sparse.linalg as spsl
 #from numpy.core.umath_tests import matrix_multiply
-#import vtool_ibeis.keypoint as ktool
-#import vtool_ibeis.linalg as ltool
+#import vtool.keypoint as ktool
+#import vtool.linalg as ltool
 #profile = ut.profile
 
 
 def assign_nearest_neighbors(vecs1, vecs2, K=2):
-    import vtool_ibeis as vt
-    from vtool_ibeis._pyflann_backend import pyflann
+    import vtool as vt
+    from vtool._pyflann_backend import pyflann
     checks = 800
     flann_params = {
         'algorithm': 'kdtree',
@@ -131,13 +131,13 @@ def baseline_vsone_ratio_matcher(testtup, cfgdict={}):
     spatially constrained ratio matching
 
     CommandLine:
-        python -m vtool_ibeis.constrained_matching --test-spatially_constrianed_matcher
+        python -m vtool.constrained_matching --test-spatially_constrianed_matcher
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> import plottool_ibeis as pt
-        >>> from vtool_ibeis.constrained_matching import *  # NOQA
-        >>> import vtool_ibeis as vt
+        >>> import wbia.plottool as pt
+        >>> from vtool.constrained_matching import *  # NOQA
+        >>> import vtool as vt
         >>> testtup = testdata_matcher()
         >>> # execute function
         >>> basetup, base_meta = baseline_vsone_ratio_matcher(testtup)
@@ -153,13 +153,13 @@ def spatially_constrianed_matcher(testtup, basetup, cfgdict={}):
     spatially constrained ratio matching
 
     CommandLine:
-        python -m vtool_ibeis.constrained_matching --test-spatially_constrianed_matcher
+        python -m vtool.constrained_matching --test-spatially_constrianed_matcher
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> import plottool_ibeis as pt
-        >>> from vtool_ibeis.constrained_matching import *  # NOQA
-        >>> import vtool_ibeis as vt
+        >>> import wbia.plottool as pt
+        >>> from vtool.constrained_matching import *  # NOQA
+        >>> import vtool as vt
         >>> testtup = testdata_matcher()
         >>> basetup, base_meta = baseline_vsone_ratio_matcher(testtup)
         >>> # execute function
@@ -183,14 +183,14 @@ def baseline_vsone_ratio_matcher_(kpts1, vecs1, kpts2, vecs2, dlen_sqrd2, cfgdic
 
     Ignore:
         %pylab qt4
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         pt.imshow(rchip1)
         pt.draw_kpts2(kpts1)
 
         pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)
         pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)
     """
-    #import vtool_ibeis as vt
+    #import vtool as vt
     sver_xy_thresh = cfgdict.get('sver_xy_thresh', .01)
     ratio_thresh =  cfgdict.get('ratio_thresh', .625)
     #ratio_thresh =  .99
@@ -222,7 +222,7 @@ def baseline_vsone_ratio_matcher_(kpts1, vecs1, kpts2, vecs2, dlen_sqrd2, cfgdic
 
 def spatially_constrianed_matcher_(kpts1, vecs1, kpts2, vecs2, dlen_sqrd2,
                                    H_RAT, cfgdict={}):
-    #import vtool_ibeis as vt
+    #import vtool as vt
 
     #match_xy_thresh = .1
     #sver_xy_thresh = .01
@@ -352,7 +352,7 @@ def compute_forgroundness(fpath1, kpts1, species='zebra_plains'):
     hack in foregroundness
     """
     import pyrf
-    import vtool_ibeis as vt
+    import vtool as vt
     from os.path import exists
     # hack for getting a model (not entirely ibeis independent)
     trees_path = ut.get_app_resource_dir('ibeis', 'detectmodels', 'rf', species)
@@ -388,7 +388,7 @@ def compute_distinctivness(vecs_list, species='zebra_plains'):
     """
     hack in distinctivness
     """
-    from ibeis.algo.hots import distinctiveness_normalizer
+    from wbia.algo.hots import distinctiveness_normalizer
     cachedir = ut.get_app_resource_dir('ibeis', 'distinctiveness_model')
     dstcnvs_normer = distinctiveness_normalizer.DistinctivnessNormalizer(species, cachedir=cachedir)
     dstcnvs_normer.load(cachedir)
@@ -419,21 +419,21 @@ class Annot(object):
         annot.load()
 
     def show(annot):
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         pt.imshow(annot.rchip)
         pt.draw_kpts2(annot.kpts)
 
     def show_dstncvs_mask(annot, title='wd', update=True, **kwargs):
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         pt.imshow(annot.dstncvs_mask * 255.0, update=update, title=title, **kwargs)
 
     def show_fgweight_mask(annot, title='fg', update=True, **kwargs):
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         pt.imshow(annot.fgweight_mask * 255.0, update=update, title=title, **kwargs)
 
     def load(annot):
-        from vtool_ibeis import image as gtool
-        from vtool_ibeis import features as feattool
+        from vtool import image as gtool
+        from vtool import features as feattool
         kpts, vecs = feattool.extract_features(annot.fpath)
         annot.kpts      = kpts
         annot.vecs      = vecs
@@ -506,7 +506,7 @@ class AnnotMatch(object):
     r"""
 
     Example1:
-        >>> from vtool_ibeis.constrained_matching import *  # NOQA
+        >>> from vtool.constrained_matching import *  # NOQA
         >>> fname1, fname2 = 'easy1.png', 'easy2.png'
         >>> fpath1 = ut.grab_test_imgpath(fname1)
         >>> fpath2 = ut.grab_test_imgpath(fname2)
@@ -570,7 +570,7 @@ class AnnotMatch(object):
 
     def compute_weighte_average_score(match):
         """ old scoring measure """
-        import vtool_ibeis as vt
+        import vtool as vt
         # Get distinctivness and forground of matching points
         fx1_list, fx2_list = match.fm.T
         annot1 = match.annot1
@@ -641,8 +641,8 @@ class AnnotMatch(object):
         print(msg)
 
     def show_matches(match, fnum=None, pnum=None, update=True):
-        import plottool_ibeis as pt
-        from plottool_ibeis import plot_helpers as ph
+        import wbia.plottool as pt
+        from wbia.plottool import plot_helpers as ph
         # hack keys out of namespace
         keys = ['rchip', 'kpts']
         rchip1, kpts1 = ut.dict_take(match.annot1.__dict__, keys)
@@ -666,8 +666,8 @@ class AnnotMatch(object):
         return ax, xywh1, xywh2
 
     def show_normalizers(match, fnum=None, pnum=None, update=True):
-        import plottool_ibeis as pt
-        from plottool_ibeis import plot_helpers as ph
+        import wbia.plottool as pt
+        from wbia.plottool import plot_helpers as ph
         # hack keys out of namespace
         keys = ['rchip', 'kpts']
         rchip1, kpts1 = ut.dict_take(match.annot1.__dict__, keys)
@@ -700,8 +700,8 @@ def testdata_matcher(fname1='easy1.png', fname2='easy2.png'):
     annot2 = Annot(fpath2)
     """
     import utool as ut
-    from vtool_ibeis import image as gtool
-    from vtool_ibeis import features as feattool
+    from vtool import image as gtool
+    from vtool import features as feattool
     fpath1 = ut.grab_test_imgpath(fname1)
     fpath2 = ut.grab_test_imgpath(fname2)
     kpts1, vecs1 = feattool.extract_features(fpath1)
@@ -719,9 +719,9 @@ def testdata_matcher(fname1='easy1.png', fname2='easy2.png'):
 if __name__ == '__main__':
     """
     CommandLine:
-        python -m vtool_ibeis.constrained_matching
-        python -m vtool_ibeis.constrained_matching --allexamples
-        python -m vtool_ibeis.constrained_matching --allexamples --noface --nosrc
+        python -m vtool.constrained_matching
+        python -m vtool.constrained_matching --allexamples
+        python -m vtool.constrained_matching --allexamples --noface --nosrc
     """
     import multiprocessing
     multiprocessing.freeze_support()  # for win32
@@ -733,9 +733,9 @@ from __future__ import absolute_import, division, print_function
 import utool as ut
 import six  # NOQA
 import numpy as np  # NOQA
-from vtool_ibeis import keypoint as ktool  # NOQA
-from vtool_ibeis import spatial_verification as sver  # NOQA
-from vtool_ibeis import constrained_matching
+from vtool import keypoint as ktool  # NOQA
+from vtool import spatial_verification as sver  # NOQA
+from vtool import constrained_matching
 """
 Todo tomorrow:
 
@@ -748,10 +748,10 @@ add spatially constrained matching as option to IBEIS
 def param_interaction():
     r"""
     CommandLine:
-        python -m vtool_ibeis.test_constrained_matching --test-param_interaction
+        python -m vtool.test_constrained_matching --test-param_interaction
 
     Notes:
-        python -m vtool_ibeis.test_constrained_matching --test-param_interaction
+        python -m vtool.test_constrained_matching --test-param_interaction
         setparam normalizer_mode=nearby
         setparam normalizer_mode=far
         setparam ratio_thresh=.625
@@ -762,7 +762,7 @@ def param_interaction():
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
+        >>> from vtool.test_constrained_matching import *  # NOQA
         >>> # build test data
         >>> # execute function
         >>> testtup = param_interaction()
@@ -770,10 +770,10 @@ def param_interaction():
         >>> result = str(testtup)
         >>> print(result)
     """
-    import plottool_ibeis as pt
+    import wbia.plottool as pt
     USE_IBEIS = False and ut.is_developer()
     if USE_IBEIS:
-        from ibeis.algo.hots import devcases
+        from wbia.algo.hots import devcases
         index = 2
         fpath1, fpath2, fpath3 = devcases.get_dev_test_fpaths(index)
         testtup1 = testdata_matcher(fpath1, fpath2)
@@ -857,7 +857,7 @@ def testdata_matcher(fname1='easy1.png', fname2='easy2.png'):
     fname1 = 'easy1.png'
     fname2 = 'hard3.png'
 
-    python -m vtool_ibeis.test_constrained_matching --test-visualize_matches --show
+    python -m vtool.test_constrained_matching --test-visualize_matches --show
 
     Args:
         fname1 (str): (default = 'easy1.png')
@@ -867,11 +867,11 @@ def testdata_matcher(fname1='easy1.png', fname2='easy2.png'):
         ?: testtup
 
     CommandLine:
-        python -m vtool_ibeis.test_constrained_matching --test-testdata_matcher
+        python -m vtool.test_constrained_matching --test-testdata_matcher
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
+        >>> from vtool.test_constrained_matching import *  # NOQA
         >>> fname1 = 'easy1.png'
         >>> fname2 = 'easy2.png'
         >>> testtup = testdata_matcher(fname1, fname2)
@@ -879,9 +879,9 @@ def testdata_matcher(fname1='easy1.png', fname2='easy2.png'):
         >>> print(result)
     """
     import utool as ut
-    #import vtool_ibeis as vt
-    from vtool_ibeis import image as gtool
-    from vtool_ibeis import features as feattool
+    #import vtool as vt
+    from vtool import image as gtool
+    from vtool import features as feattool
     fpath1 = ut.grab_test_imgpath(fname1)
     fpath2 = ut.grab_test_imgpath(fname2)
     featkw = dict(rotation_invariance=True)
@@ -930,7 +930,7 @@ class SimpleMatcher(object):
         return visualize_method(**kwargs)
 
     def start_new_viz(simp, nRows, nCols, fnum=None):
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         rchip1, rchip2, kpts1, vecs1, kpts2, vecs2, dlen_sqrd2  = simp.testtup
         fm_ORIG, fs_ORIG, fm_RAT, fs_RAT, fm_SV, fs_SV, H_RAT   = simp.basetup
         fm_SC, fs_SC, fm_SCR, fs_SCR, fm_SCRSV, fs_SCRSV, H_SCR = simp.nexttup
@@ -963,7 +963,7 @@ class SimpleMatcher(object):
             fnum = pt.next_fnum()
         INTERACTIVE = True
         if INTERACTIVE:
-            from plottool_ibeis import interact_helpers as ih
+            from wbia.plottool import interact_helpers as ih
             fig = ih.begin_interaction('qres', fnum)
             ih.connect_callback(fig, 'button_press_event', on_single_match_clicked)
         else:
@@ -979,7 +979,7 @@ class SimpleMatcher(object):
             _fm, _fs = matchtup_dict[key]
             title = keytitle_dict[key]
             if kwargs.get('coverage'):
-                from vtool_ibeis import coverage_kpts
+                from vtool import coverage_kpts
                 kpts2, rchip2 = ut.dict_get(locals_, ('kpts2', 'rchip2'))
                 kpts2_m = kpts2.take(_fm.T[1], axis=0)
                 chipshape2 = rchip2.shape
@@ -1000,12 +1000,12 @@ class SimpleMatcher(object):
     def visualize_matches(simp, **kwargs):
         r"""
         CommandLine:
-            python -m vtool_ibeis.test_constrained_matching --test-visualize_matches --show
+            python -m vtool.test_constrained_matching --test-visualize_matches --show
 
         Example:
             >>> # DISABLE_DOCTEST
-            >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-            >>> import plottool_ibeis as pt
+            >>> from vtool.test_constrained_matching import *  # NOQA
+            >>> import wbia.plottool as pt
             >>> simp = SimpleMatcher(testdata_matcher())
             >>> simp.run_matching()
             >>> result = simp.visualize_matches()
@@ -1025,12 +1025,12 @@ class SimpleMatcher(object):
     def visualize_normalizers(simp, **kwargs):
         """
         CommandLine:
-            python -m vtool_ibeis.test_constrained_matching --test-visualize_normalizers --show
+            python -m vtool.test_constrained_matching --test-visualize_normalizers --show
 
         Example:
             >>> # DISABLE_DOCTEST
-            >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-            >>> import plottool_ibeis as pt
+            >>> from vtool.test_constrained_matching import *  # NOQA
+            >>> import wbia.plottool as pt
             >>> simp = SimpleMatcher(testdata_matcher())
             >>> simp.run_matching()
             >>> result = simp.visualize_normalizers()
@@ -1055,12 +1055,12 @@ class SimpleMatcher(object):
     def visualize_coverage(simp, **kwargs):
         """
         CommandLine:
-            python -m vtool_ibeis.test_constrained_matching --test-visualize_coverage --show
+            python -m vtool.test_constrained_matching --test-visualize_coverage --show
 
         Example:
             >>> # DISABLE_DOCTEST
-            >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-            >>> import plottool_ibeis as pt
+            >>> from vtool.test_constrained_matching import *  # NOQA
+            >>> import wbia.plottool as pt
             >>> simp = SimpleMatcher(testdata_matcher())
             >>> simp.run_matching()
             >>> result = simp.visualize_coverage()
@@ -1079,8 +1079,8 @@ class SimpleMatcher(object):
 def show_matches(fm, fs, fnum=1, pnum=None, title='', key=None, simp=None,
                  cmap='hot', draw_lines=True, **locals_):
     #locals_ = locals()
-    import plottool_ibeis as pt
-    from plottool_ibeis import plot_helpers as ph
+    import wbia.plottool as pt
+    from wbia.plottool import plot_helpers as ph
     # hack keys out of namespace
     keys = 'rchip1, rchip2, kpts1, kpts2'.split(', ')
     rchip1, rchip2, kpts1, kpts2 = ut.dict_take(locals_, keys)
@@ -1103,8 +1103,8 @@ def show_matches(fm, fs, fnum=1, pnum=None, title='', key=None, simp=None,
 #def ishow_matches(fm, fs, fnum=1, pnum=None, title='', cmap='hot', **locals_):
 #    # TODO make things clickable
 def on_single_match_clicked(event):
-    from plottool_ibeis import interact_helpers as ih
-    from plottool_ibeis import plot_helpers as ph
+    from wbia.plottool import interact_helpers as ih
+    from wbia.plottool import plot_helpers as ph
     """ result interaction mpl event callback slot """
     print('[viz] clicked result')
     if ih.clicked_outside_axis(event):
@@ -1136,12 +1136,12 @@ def on_single_match_clicked(event):
 def show_example():
     r"""
     CommandLine:
-        python -m vtool_ibeis.test_constrained_matching --test-show_example --show
+        python -m vtool.test_constrained_matching --test-show_example --show
 
     Example:
         >>> # DISABLE_DOCTEST
-        >>> from vtool_ibeis.test_constrained_matching import *  # NOQA
-        >>> import plottool_ibeis as pt
+        >>> from vtool.test_constrained_matching import *  # NOQA
+        >>> import wbia.plottool as pt
         >>> # build test data
         >>> # execute function
         >>> result = show_example()
@@ -1167,9 +1167,9 @@ def show_example():
 if __name__ == '__main__':
     """
     CommandLine:
-        python -m vtool_ibeis.test_constrained_matching
-        python -m vtool_ibeis.test_constrained_matching --allexamples
-        python -m vtool_ibeis.test_constrained_matching --allexamples --noface --nosrc
+        python -m vtool.test_constrained_matching
+        python -m vtool.test_constrained_matching --allexamples
+        python -m vtool.test_constrained_matching --allexamples --noface --nosrc
     """
     import multiprocessing
     multiprocessing.freeze_support()  # for win32
@@ -1221,11 +1221,11 @@ def ratio_test(fm, fx1_norm, match_dist, norm_dist,
         tuple: (fm_RAT, fs_RAT, fm_norm_RAT)
 
     CommandLine:
-        python -m vtool_ibeis.matching --test-ratio_test
+        python -m vtool.matching --test-ratio_test
 
     Example:
         >>> # ENABLE_DOCTEST
-        >>> from vtool_ibeis.matching import *  # NOQA
+        >>> from vtool.matching import *  # NOQA
         >>> fx2_match  = np.array([0, 1, 2, 3, 4, 5], dtype=np.int32)
         >>> fx1_match  = np.array([77, 116, 122, 1075, 530, 45], dtype=np.int32)
         >>> fm = np.vstack((fx1_match, fx2_match)).T
@@ -1262,7 +1262,7 @@ def unconstrained_ratio_match(flann, vecs2, unc_ratio_thresh=.625,
                               fm_dtype=np.int32, fs_dtype=np.float32):
     """ Lowes ratio matching
 
-    from vtool_ibeis.matching import *  # NOQA
+    from vtool.matching import *  # NOQA
     fs_dtype = rat_kwargs.get('fs_dtype', np.float32)
     fm_dtype = rat_kwargs.get('fm_dtype', np.int32)
     unc_ratio_thresh = rat_kwargs.get('unc_ratio_thresh', .625)
@@ -1308,11 +1308,11 @@ def assign_spatially_constrained_matches(chip2_dlen_sqrd, kpts1, kpts2, H,
             )
 
     CommandLine:
-        python -m vtool_ibeis.matching assign_spatially_constrained_matches
+        python -m vtool.matching assign_spatially_constrained_matches
 
     Example:
         >>> # ENABLE_DOCTEST
-        >>> from vtool_ibeis.matching import *  # NOQA
+        >>> from vtool.matching import *  # NOQA
         >>> kpts1 = np.array([[  6.,   4.,   15.84,    4.66,    7.24,    0.  ],
         ...                   [  9.,   3.,   20.09,    5.76,    6.2 ,    0.  ],
         ...                   [  1.,   1.,   12.96,    1.73,    8.77,    0.  ],])
@@ -1345,7 +1345,7 @@ def assign_spatially_constrained_matches(chip2_dlen_sqrd, kpts1, kpts2, H,
         np.array([ 0.4,  0.3,  0.8], dtype=np.float32),
         np.array([ 0.8,  0.5,  0.9], dtype=np.float32),
     """
-    import vtool_ibeis as vt
+    import vtool as vt
     index_dtype = fx2_to_fx1.dtype
     # Find spatial errors of keypoints under current homography
     # (kpts1 mapped into image2 space)

@@ -45,7 +45,7 @@ install:
     
 script: 
   #- travis_wait ./run_doctests.sh
-  - travis_wait coverage run --source vtool_ibeis -m xdoctest vtool_ibeis --style=google all
+  - travis_wait coverage run --source vtool -m xdoctest vtool --style=google all
   - coverage report
 
 after_success: 

@@ -5,7 +5,7 @@ import utool
 def test_akmeans(full_test=False, plot_test=False, num_pca_dims=2, data_dim=2,
                  nump=1000):
     import numpy as np
-    from vtool_ibeis import clustering
+    from vtool import clustering
     nump = nump
     dims = data_dim  # 128
     dtype = np.uint8
@@ -20,7 +20,7 @@ def test_akmeans(full_test=False, plot_test=False, num_pca_dims=2, data_dim=2,
     ave_unchanged_iterwin = 10
     flann_params = {}
 
-    cache_dir = utool.get_app_resource_dir('vtool_ibeis', 'test_cache')
+    cache_dir = utool.get_app_resource_dir('vtool', 'test_cache')
     utool.ensuredir(cache_dir)
 
     # Test precomputing
@@ -44,7 +44,7 @@ def test_akmeans(full_test=False, plot_test=False, num_pca_dims=2, data_dim=2,
 
     if False:
         # other test (development)
-        from vtool_ibeis._pyflann_backend import pyflann
+        from vtool._pyflann_backend import pyflann
         flann_lib_inst = pyflann.flann
         flann_class_inst = pyflann.FLANN()
         flann_class_inst.build_index(data)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     test_locals = utool.run_test(test_akmeans, **testkw)
     exec(utool.execstr_dict(test_locals, 'test_locals'))
     if testkw['plot_test']:
-        from plottool_ibeis import draw_func2 as df2
+        from wbia.plottool import draw_func2 as df2
         exec(df2.present())
     else:
         exec(utool.ipython_execstr())

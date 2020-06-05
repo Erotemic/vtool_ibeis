@@ -49,7 +49,7 @@ def native_mb_python_tag(plat_impl=None, version_info=None):
     return mb_tag
 
 
-def parse_version(fpath='vtool_ibeis/__init__.py'):
+def parse_version(fpath='vtool/__init__.py'):
     """
     Statically parse the version number from a python file
 
@@ -161,11 +161,11 @@ except Exception:
     raise RuntimeError('FAILED TO ADD BUILD CONSTRUCTS')
 
 
-NAME = 'vtool_ibeis'
+NAME = 'wbia-vtool'
 
 
 MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
-VERSION = version = parse_version('vtool_ibeis/__init__.py')  # must be global for git tags
+VERSION = version = parse_version('vtool/__init__.py')  # must be global for git tags
 
 AUTHORS = [
     'Avi Weinstock',
@@ -176,7 +176,7 @@ AUTHORS = [
     'Zackary Rutfield'
 ]
 AUTHOR_EMAIL = 'erotemic@gmail.com'
-URL = 'https://github.com/Erotemic/vtool_ibeis'
+URL = 'https://github.com/Erotemic/vtool'
 LICENSE = 'BSD'
 DESCRIPTION = 'Vtool - Image Tools for Wildbook IA'
 
@@ -204,15 +204,15 @@ KWARGS = OrderedDict(
     # know that the cmake installed files belong in the vtool module and
     # not the data directory.
     packages=[
-        'vtool_ibeis',
+        'vtool',
         # These are generated modules that will be created via build
-        'vtool_ibeis.lib',
+        'vtool.lib',
     ],
     package_dir={
-        'vtool_ibeis': 'vtool_ibeis',
+        'vtool': 'vtool',
         # Note: this requires that VTOOL_LIB_INSTALL_DIR is set to vtool/lib
         # in the src/cpp/CMakeLists.txt
-        'vtool_ibeis.lib': 'vtool_ibeis/lib',
+        'vtool.lib': 'vtool/lib',
     },
     include_package_data=False,
     # List of classifiers available at:
@@ -242,7 +242,7 @@ KWARGS = OrderedDict(
 
 if __name__ == '__main__':
     """
-    python -c "import vtool_ibeis; print(vtool_ibeis.__file__)"
+    python -c "import vtool; print(vtool.__file__)"
     """
     import skbuild
     skbuild.setup(**KWARGS)

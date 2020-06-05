@@ -2,16 +2,16 @@
 # This tests cython stuff not linalg stuff :P
 from __future__ import absolute_import, division, print_function
 import utool
-import vtool_ibeis
-from vtool_ibeis import keypoint as ktool
-from vtool_ibeis import linalg
+import vtool
+from vtool import keypoint as ktool
+from vtool import linalg
 import numpy as np
 from utool._internal.meta_util_six import get_funcname
 
 GLOBAL_SETUP = '''
 import numpy as np
 import numpy.linalg as npl
-import vtool_ibeis
+import vtool
 '''
 
 
@@ -40,8 +40,8 @@ def test_L2_sqrd():
     hist2 = np.random.rand(4, 2).astype(np.float64)
 
     target = ((hist1 - hist2) ** 2).sum(-1)
-    dist1 = vtool_ibeis.linalg.L2_sqrd(hist1, hist2)
-    dist2 = vtool_ibeis.linalg.L2_sqrd_cython(hist1, hist2)
+    dist1 = vtool.linalg.L2_sqrd(hist1, hist2)
+    dist2 = vtool.linalg.L2_sqrd_cython(hist1, hist2)
 
     print('target = %r' % (target,))
     print('dist1 = %r' % (dist1,))
@@ -86,8 +86,8 @@ def benchmark_det_dist():
         det2 = np.random.rand(100).astype(np.float64)
         ''')
     func_list = [
-        'vtool_ibeis.linalg.det_distance',
-        'vtool_ibeis.linalg.det_distance_cython',
+        'vtool.linalg.det_distance',
+        'vtool.linalg.det_distance_cython',
     ]
     argstr = '(det1, det2)'
     return _run_benchmark(setup, func_list, argstr)
@@ -98,12 +98,12 @@ def benchmark_invVR_sqrd_scale():
         '''
         import numpy as np
         import numpy.linalg as npl
-        import vtool_ibeis
+        import vtool
         invVRs = np.random.rand(100, 3, 3).astype(np.float64)
         ''')
     func_list = [
-        'vtool_ibeis.keypoint.get_invVR_mats_sqrd_scale',
-        'vtool_ibeis.keypoint.get_invVR_mats_sqrd_scale_cython',
+        'vtool.keypoint.get_invVR_mats_sqrd_scale',
+        'vtool.keypoint.get_invVR_mats_sqrd_scale_cython',
     ]
     argstr = '(invVRs)'
     return _run_benchmark(setup, func_list, argstr)
@@ -116,8 +116,8 @@ def benchmark_L2_dist():
         hist2 = np.random.rand(100, 128).astype(np.float64)
         ''')
     func_list = [
-        'vtool_ibeis.linalg.L2_sqrd',
-        'vtool_ibeis.linalg.L2_sqrd_cython',
+        'vtool.linalg.L2_sqrd',
+        'vtool.linalg.L2_sqrd_cython',
     ]
     argstr = '(hist1, hist2)'
     return _run_benchmark(setup, func_list, argstr)
@@ -125,13 +125,13 @@ def benchmark_L2_dist():
 
 if __name__ == '__main__':
     try:
-        from vtool_ibeis import linalg_cython  # NOQA
-        print('[vtool_ibeis] cython is on')
+        from vtool import linalg_cython  # NOQA
+        print('[vtool] cython is on')
     except ImportError as ex:
         utool.printex(ex, iswarning=True)
-        print('[vtool_ibeis] cython is off')
+        print('[vtool] cython is off')
         # raise
-    #from vtool_ibeis import linalg
+    #from vtool import linalg
     test_locals1, error_report1 = utool.run_test(test_L2_sqrd)
     test_locals2, error_report2 = utool.run_test(test_invVR_sqrd_scale)
     test_locals3, error_report3 = utool.run_test(test_det_dist)

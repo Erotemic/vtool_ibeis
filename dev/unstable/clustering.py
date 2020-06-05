@@ -9,7 +9,7 @@ import utool as ut
 import sys
 import numpy as np
 import scipy.sparse as spsparse
-import vtool_ibeis.nearest_neighbors as nn
+import vtool.nearest_neighbors as nn
 (print, rrr, profile) = ut.inject2(__name__)
 
 
@@ -228,7 +228,7 @@ def plot_clusters(data, datax2_clusterx, centroids, num_pca_dims=3,
     to the <num_pca_dims> principal components
     """
     # http://www.janeriksolem.net/2012/03/isomap-with-scikit-learn.html
-    from plottool_ibeis import draw_func2 as df2
+    from wbia.plottool import draw_func2 as df2
     data_dims = data.shape[1]
     show_dims = min(num_pca_dims, data_dims)
     if data_dims != show_dims:
