@@ -78,14 +78,14 @@ def demo_grabcut(bgr_img):
         python -m vtool.segmentation --test-demo_grabcut --show
 
     SeeAlso:
-        python -m ibeis.algo.preproc.preproc_probchip --test-postprocess_dev
+        python -m wbia.algo.preproc.preproc_probchip --test-postprocess_dev
 
     Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.segmentation import *  # NOQA
         >>> # build test data
         >>> import utool as ut
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> import vtool as vt
         >>> img_fpath = ut.grab_test_imgpath('easy1.png')
         >>> bgr_img = vt.imread(img_fpath)
@@ -97,8 +97,8 @@ def demo_grabcut(bgr_img):
         >>> ## xdoctest: +REQUIRES(--show)
         >>> pt.show_if_requested()
     """
-    import plottool_ibeis as pt
-    from plottool_ibeis import interact_impaint
+    import wbia.plottool as pt
+    from wbia.plottool import interact_impaint
     label_colors = [       255,           170,            50,          0]
     label_values = [cv2.GC_FGD, cv2.GC_PR_FGD, cv2.GC_PR_BGD, cv2.GC_BGD]
     h, w = bgr_img.shape[0:2]

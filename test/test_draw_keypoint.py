@@ -2,9 +2,9 @@
 if False:
     from __future__ import absolute_import, division, print_function
     from six.moves import range
-    from plottool_ibeis import draw_func2 as df2
-    from plottool_ibeis import mpl_keypoint
-    from plottool_ibeis import mpl_sift  # NOQA
+    from wbia.plottool import draw_func2 as df2
+    from wbia.plottool import mpl_keypoint
+    from wbia.plottool import mpl_sift  # NOQA
     import vtool.keypoint as ktool  # NOQA
     import numpy as np
     import matplotlib as mpl  # NOQA

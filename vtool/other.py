@@ -98,7 +98,7 @@ def argsort_groups(scores_list, reverse=False, rng=np.random, randomize_levels=T
         rng (module):  random number generator(default = numpy.random)
 
     CommandLine:
-        python -m ibeis.init.filter_annots --exec-argsort_groups
+        python -m wbia.init.filter_annots --exec-argsort_groups
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -1508,7 +1508,7 @@ def compare_matrix_to_rows(row_matrix, row_list, comp_op=np.equal, logic_op=np.l
     Performs logic_op on the results of each individual row
 
     SeeAlso:
-        ibeis.algo.hots.nn_weights.mark_name_valid_normalizers
+        wbia.algo.hots.nn_weights.mark_name_valid_normalizers
 
     compop   = np.equal
     logic_op = np.logical_or
@@ -1624,7 +1624,7 @@ def grab_webcam_image():
         >>> import vtool as vt
         >>> img = grab_webcam_image()
         >>> # xdoctest: +REQUIRES(--show)
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> pt.imshow(img)
         >>> vt.imwrite('webcap.jpg', img)
         >>> ut.show_if_requested()
@@ -2219,7 +2219,7 @@ def find_elbow_point(curve):
         >>> print(result)
         >>> assert tradeoff_idx == 76
         >>> # xdoctest: +REQUIRES(--show)
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> import vtool as vt
         >>> point = [tradeoff_idx, curve[tradeoff_idx]]
         >>> segment = np.array([[0, len(curve) - 1], [curve[0], curve[-1]]])

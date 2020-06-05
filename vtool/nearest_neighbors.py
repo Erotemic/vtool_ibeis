@@ -102,7 +102,7 @@ def test_cv2_flann():
     """
     import cv2
     from vtool import demodata
-    import plottool_ibeis as pt
+    import wbia.plottool as pt
     import vtool as vt
     img1 = vt.imread(ut.grab_test_imgpath('easy1.png'))
     img2 = vt.imread(ut.grab_test_imgpath('easy2.png'))
@@ -717,7 +717,7 @@ def flann_index_time_experiment():
 
     data_list16, params16 = get_buildtime_data(trees=16)
 
-    import plottool_ibeis as pt
+    import wbia.plottool as pt
 
     def plotdata(data_list):
         count_arr = ut.get_list_column(data_list, 1)

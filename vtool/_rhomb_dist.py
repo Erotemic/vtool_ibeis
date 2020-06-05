@@ -265,7 +265,7 @@ def RhombicuboctahedronDistanceDemo():
     # print(ub.repr2(z, nl=2, si=True))
 
     # if False:
-    #     from ibeis import constants as const
+    #     from wbia import constants as const
     #     VIEW = const.VIEW
     #     viewint_dist_lookup = {
     #         (VIEW.CODE_TO_INT[f1], VIEW.CODE_TO_INT[f2]): d
@@ -292,7 +292,7 @@ def RhombicuboctahedronDistanceDemo():
         node_to_label = {f: ''.join(ut.take_column(f, 0)).upper() for f in faces}
         nx.set_node_attributes(G, name='label', values=node_to_label)
 
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         pt.qt4ensure()
         pt.show_nx(G, prog='neato', groupby='groupid')
 

@@ -2,8 +2,8 @@
 from __future__ import absolute_import, division, print_function
 import utool as ut
 import vtool.spatial_verification as sver
-from plottool_ibeis import draw_sv
-from plottool_ibeis import draw_func2 as df2
+from wbia.plottool import draw_sv
+from wbia.plottool import draw_func2 as df2
 import numpy as np
 import vtool.demodata as demodata
 import vtool.keypoint as ktool  # NOQA
@@ -28,7 +28,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
     Example0:
         >>> # DISABLE_DOCTEST
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
@@ -40,7 +40,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
     Example1:
         >>> # DISABLE_DOCTEST
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars1()

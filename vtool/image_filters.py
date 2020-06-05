@@ -25,7 +25,7 @@ class IntensityPreproc(object):
         >>> self = IntensityPreproc()
         >>> chipBGR2 = self.preprocess(chipBGR, filter_list)
         >>> # xdoctest: +REQUIRES(--show)
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> pt.imshow(chipBGR, pnum=(1, 2, 1), fnum=1)
         >>> pt.imshow(chipBGR2, pnum=(1, 2, 2), fnum=1)
         >>> ut.show_if_requested()
@@ -71,9 +71,9 @@ def manta_matcher_filters(chipBGR):
         http://onlinelibrary.wiley.com/doi/10.1002/ece3.587/full
 
     Ignore:
-        >>> from ibeis.core_annots import *  # NOQA
-        >>> import ibeis
-        >>> ibs = ibeis.opendb('Mantas')
+        >>> from wbia.core_annots import *  # NOQA
+        >>> import wbia
+        >>> ibs = wbia.opendb('Mantas')
         >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
     """
     chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
@@ -105,7 +105,7 @@ def adapteq_fn(chipBGR):
         >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
         >>> chip2 = adapteq_fn(chipBGR)
         >>> # xdoctest: +REQUIRES(--show)
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> pt.imshow(chipBGR, pnum=(1, 2, 1), fnum=1)
         >>> pt.imshow(chip2, pnum=(1, 2, 2), fnum=1)
         >>> ut.show_if_requested()
@@ -130,7 +130,7 @@ def medianfilter_fn(chipBGR):
         >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
         >>> chip2 = adapteq_fn(chipBGR)
         >>> # xdoctest: +REQUIRES(--show)
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> pt.imshow(chipBGR, pnum=(1, 2, 1), fnum=1)
         >>> pt.imshow(chip2, pnum=(1, 2, 2), fnum=1)
         >>> ut.show_if_requested()

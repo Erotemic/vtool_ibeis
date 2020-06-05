@@ -8,11 +8,11 @@ Vision Tools - tools for computer vision. Part of the WildMe / IBEIS Project.
 
 Repos relevant to the ibeis project:
 
-* https://github.com/Erotemic/plottool_ibeis
+* https://github.com/Erotemic/plottool
 
-* https://github.com/Erotemic/guitool_ibeis
+* https://github.com/Erotemic/guitool
 
-* https://github.com/Erotemic/dtool_ibeis
+* https://github.com/Erotemic/dtool
 
 * https://github.com/Erotemic/vtool
 

@@ -99,7 +99,7 @@ def akmeans_iterations(data, centroids, max_iters, flann_params,
         >>>                                      flann_params, ave_unchanged_thresh,
         >>>                                      ave_unchanged_iterwin, monitor=True)
         >>> # xdoctest: +REQUIRES(--show)
-        >>> import plottool_ibeis as pt
+        >>> import wbia.plottool as pt
         >>> ut.qtensure()
         >>> pt.multi_plot('epoch_num', hist, fnum=2)
         >>> plot_centroids(data, centroids)
@@ -141,7 +141,7 @@ def akmeans_iterations(data, centroids, max_iters, flann_params,
             history['epoch_num'].append(count + 1)
             history['loss'].append(loss)
             history['ave_unchanged'].append(ave_unchanged)
-            # import plottool_ibeis as pt
+            # import wbia.plottool as pt
             # pt.multi_plot('epoch_num', history, fnum=1)
             # pt.update()
         if ave_unchanged < ave_unchanged_thresh:
@@ -348,8 +348,8 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
         >>> # SLOW_DOCTEST
         >>> # xdoctest: +SKIP
         >>> from vtool.clustering2 import *  # NOQA
-        >>> import ibeis
-        >>> ibs = ibeis.opendb('PZ_MTEST')
+        >>> import wbia
+        >>> ibs = wbia.opendb('PZ_MTEST')
         >>> data = np.vstack(ibs.get_annot_vecs(ibs.get_valid_aids()))
         >>> flann_params = None
         >>> num_samples = 1000
@@ -402,10 +402,10 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
 
         python ~/code/vtool/vtool/clustering2.py --test-akmeans_plusplus_init
 
-        python -m plottool_ibeis.draw_func2 --exec-plot_func --show --range=0,64000 \
+        python -m wbia.plottool.draw_func2 --exec-plot_func --show --range=0,64000 \
                 --func="lambda K: 64 / K "
 
-        python -m plottool_ibeis.draw_func2 --exec-plot_func --show --range=0,1E7 \
+        python -m wbia.plottool.draw_func2 --exec-plot_func --show --range=0,1E7 \
                 --func="lambda N: N * (64 / 65000) "
 
 

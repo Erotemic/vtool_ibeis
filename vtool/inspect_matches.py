@@ -3,8 +3,8 @@ from __future__ import absolute_import, division, print_function
 import utool as ut
 import ubelt as ub
 try:
-    import guitool_ibeis as gt
-    from guitool_ibeis import mpl_widget
+    import wbia.guitool as gt
+    from wbia.guitool import mpl_widget
     INSPECT_BASE = gt.GuitoolWidget
     MatplotlibWidget = mpl_widget.MatplotlibWidget
 except ImportError:
@@ -30,7 +30,7 @@ def lazy_test_annot(key):
     return annot
 
 try:
-    import dtool_ibeis as dt
+    import wbia.dtool as dt
 
     MatchDisplayConfig = dt.from_param_info_list([
         ut.ParamInfo('overlay', True),
@@ -84,10 +84,10 @@ class MatchInspector(INSPECT_BASE):
         >>> # SCRIPT
         >>> from vtool.inspect_matches import *  # NOQA
         >>> import vtool as vt
-        >>> import ibeis
+        >>> import wbia
         >>> gt.ensure_qapp()
         >>> ut.qtensure()
-        >>> ibs = ibeis.opendb(defaultdb='PZ_MTEST')
+        >>> ibs = wbia.opendb(defaultdb='PZ_MTEST')
         >>> aids = ub.argval('--aids', default=[1, 2])
         >>> print('aids = %r' % (aids,))
         >>> annots = ibs.annots(aids)
@@ -127,8 +127,8 @@ class MatchInspector(INSPECT_BASE):
 
     def initialize(self, match=None, on_context=None, autoupdate=True,
                    info_text=None, cfgdict=None):
-        from plottool_ibeis import abstract_interaction
-        from guitool_ibeis.__PYQT__ import QtCore
+        from wbia.plottool import abstract_interaction
+        from wbia.guitool.__PYQT__ import QtCore
         self.set_match(match, on_context, info_text)
         self._setup_configs(cfgdict=cfgdict)
         self._setup_layout(autoupdate=autoupdate)
@@ -144,7 +144,7 @@ class MatchInspector(INSPECT_BASE):
         gt.popup_menu(self, qpoint, options)
 
     def screenshot(self):
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         with pt.RenderingContext() as render:
             self.match.show(**self.disp_config)
         fpaths = gt.newFileDialog('.', mode='save', exec_=True)
@@ -161,27 +161,27 @@ class MatchInspector(INSPECT_BASE):
         utool.embed()
 
     def _new_config_widget(self, cfg, changed=None):
-        from guitool_ibeis import PrefWidget2
+        from wbia.guitool import PrefWidget2
         user_mode = 0
         cfg_widget = PrefWidget2.EditConfigWidget(
             config=cfg, user_mode=user_mode, parent=self, changed=changed)
         return cfg_widget
 
     def closeEvent(self, event):
-        from plottool_ibeis import abstract_interaction
+        from wbia.plottool import abstract_interaction
         abstract_interaction.unregister_interaction(self)
         super(MatchInspector, self).closeEvent(event)
 
     def _setup_configs(self, cfgdict=None):
         from vtool import matching
-        import dtool_ibeis
+        import wbia.dtool
         # import pyhesaff
 
         # default_dict = pyhesaff.get_hesaff_default_params()
         # default_dict = vt.get_extract_features_default_params()
-        TmpFeatConfig = dtool_ibeis.from_param_info_list(matching.VSONE_FEAT_CONFIG)
+        TmpFeatConfig = dtool.from_param_info_list(matching.VSONE_FEAT_CONFIG)
 
-        TmpNChipConfig = dtool_ibeis.from_param_info_list(matching.NORM_CHIP_CONFIG)
+        TmpNChipConfig = dtool.from_param_info_list(matching.NORM_CHIP_CONFIG)
         # [
         #     ut.ParamInfo(key, val) for key, val in default_dict.items()
         #     # ut.ParamInfo('affine_invariance', True),
@@ -191,7 +191,7 @@ class MatchInspector(INSPECT_BASE):
         self.featconfig = TmpFeatConfig()
         self.chipconfig = TmpNChipConfig()
 
-        TmpVsOneConfig = dtool_ibeis.from_param_info_list(
+        TmpVsOneConfig = dtool.from_param_info_list(
             matching.VSONE_DEFAULT_CONFIG)
         self.config = TmpVsOneConfig()
         self.disp_config = MatchDisplayConfig()
@@ -214,7 +214,7 @@ class MatchInspector(INSPECT_BASE):
             self.disp_config, changed=self.on_cfg_changed)
 
     def _setup_layout(self, autoupdate=True):
-        from guitool_ibeis.__PYQT__ import QtWidgets
+        from wbia.guitool.__PYQT__ import QtWidgets
         self.menubar = gt.newMenubar(self)
         self.menuFile = self.menubar.newMenu('Dev')
         self.menuFile.newAction(triggered=self.embed)
@@ -321,8 +321,8 @@ class MatchInspector(INSPECT_BASE):
 
 
 def make_match_interaction(matches, metadata, type_='RAT+SV', **kwargs):
-    import plottool_ibeis.interact_matches
-    #import plottool_ibeis as pt
+    import wbia.plottool.interact_matches
+    #import wbia.plottool as pt
     fm, fs = matches[type_][0:2]
     try:
         H1 = metadata['H_' + type_.split('+')[0]]
@@ -335,7 +335,7 @@ def make_match_interaction(matches, metadata, type_='RAT+SV', **kwargs):
     rchip2, kpts2, vecs2 = ub.dict_take(annot2, ['nchip', 'kpts', 'vecs'])
     #pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)
     fsv = fs[:, None]
-    interact = plottool_ibeis.interact_matches.MatchInteraction2(
+    interact = plottool.interact_matches.MatchInteraction2(
         rchip1, rchip2, kpts1, kpts2, fm, fs, fsv, vecs1, vecs2, H1=H1,
         **kwargs)
     return interact

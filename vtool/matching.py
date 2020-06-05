@@ -158,7 +158,7 @@ class PairwiseMatch(ub.NiceRepr):
         >>> kwplot.imshow(imgL, pnum=(2, 1, 1))
         >>> kwplot.imshow(imgR_warp, pnum=(2, 1, 2))
         >>> # xdoctest: +REQUIRES(--gui)
-        >>> import guitool_ibeis as gt
+        >>> import wbia.guitool as gt
         >>> gt.ensure_qapp()
         >>> match.ishow()
         >>> from vtool.matching import *  # NOQA
@@ -179,7 +179,7 @@ class PairwiseMatch(ub.NiceRepr):
         >>> kwplot.imshow(imgL, pnum=(2, 1, 1))
         >>> kwplot.imshow(imgR_warp, pnum=(2, 1, 2))
         >>> # xdoctest: +REQUIRES(--gui)
-        >>> import guitool_ibeis as gt
+        >>> import wbia.guitool as gt
         >>> gt.ensure_qapp()
         >>> match.ishow()
     """
@@ -277,7 +277,7 @@ class PairwiseMatch(ub.NiceRepr):
         if match.verbose:
             print('[match] show')
 
-        import plottool_ibeis as pt
+        import wbia.plottool as pt
         annot1 = match.annot1
         annot2 = match.annot2
         try:
@@ -337,7 +337,7 @@ class PairwiseMatch(ub.NiceRepr):
             >>> # SCRIPT
             >>> from vtool.matching import *  # NOQA
             >>> import vtool as vt
-            >>> import guitool_ibeis as gt
+            >>> import wbia.guitool as gt
             >>> gt.ensure_qapp()
             >>> match = demodata_match(use_cache=False)
             >>> self = match.ishow()
