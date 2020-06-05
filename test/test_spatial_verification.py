@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, division, print_function
 import utool as ut
-import vtool_ibeis.spatial_verification as sver
+import vtool.spatial_verification as sver
 from plottool_ibeis import draw_sv
 from plottool_ibeis import draw_func2 as df2
 import numpy as np
-import vtool_ibeis.demodata as demodata
-import vtool_ibeis.keypoint as ktool  # NOQA
-import vtool_ibeis.linalg as ltool  # NOQA
+import vtool.demodata as demodata
+import vtool.keypoint as ktool  # NOQA
+import vtool.linalg as ltool  # NOQA
 
 
 xy_thresh = ktool.KPTS_DTYPE(.009)
@@ -125,8 +125,8 @@ def get_dummy_test_vars():
 
 def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
     import utool as ut
-    from vtool_ibeis import image as gtool
-    from vtool_ibeis import features as feattool
+    from vtool import image as gtool
+    from vtool import features as feattool
     fpath1 = ut.grab_test_imgpath(fname1)
     fpath2 = ut.grab_test_imgpath(fname2)
     kpts1, vecs1 = feattool.extract_features(fpath1)
@@ -137,7 +137,7 @@ def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
     #chip2_shape = gtool.open_image_size(fpath2)
     #dlen_sqrd2 = chip2_shape[0] ** 2 + chip2_shape[1]
     #testtup = (rchip1, rchip2, kpts1, vecs1, kpts2, vecs2, dlen_sqrd2)
-    import vtool_ibeis as vt
+    import vtool as vt
     checks = 800
     flann_params = {
         'algorithm': 'kdtree',
@@ -146,7 +146,7 @@ def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
     #pseudo_max_dist_sqrd = (np.sqrt(2) * 512) ** 2
     pseudo_max_dist_sqrd = 2 * (512 ** 2)
     flann = vt.flann_cache(vecs1, flann_params=flann_params)
-    from vtool_ibeis._pyflann_backend import pyflann
+    from vtool._pyflann_backend import pyflann
     try:
         fx2_to_fx1, _fx2_to_dist = flann.nn_index(vecs2, num_neighbors=2, checks=checks)
     except pyflann.FLANNException:

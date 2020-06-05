@@ -1,11 +1,11 @@
 from __future__ import absolute_import, division, print_function
 from six.moves import range
-import vtool_ibeis.keypoint as ktool
-import vtool_ibeis.linalg as ltool
+import vtool.keypoint as ktool
+import vtool.linalg as ltool
 import numpy as np
 import utool as ut
-from vtool_ibeis import demodata
-from vtool_ibeis.util_math import TAU
+from vtool import demodata
+from vtool.util_math import TAU
 
 
 def test_get_invR_mats_orientation():

@@ -49,7 +49,7 @@ nosetests.xml
 *.prof
 
 # Test data
-#vtool_ibeis/tests/testdata*
+#vtool/tests/testdata*
 test_data*.shelf
 ibeis/model/detect/rf
 tmp.py
@@ -57,7 +57,7 @@ tmp.py
 *.flann
 *.npz
 
-vtool_ibeis/*_cython.c
+vtool/*_cython.c
 
 _test_times.txt
 
@@ -83,9 +83,9 @@ _doc
 test_times.txt
 
 failed_doctests.txt
-vtool_ibeis/libsver.dll
-vtool_ibeis/libsver.dll.a
-vtool_ibeis/libsver.dylib
+vtool/libsver.dll
+vtool/libsver.dll.a
+vtool/libsver.dylib
 timeings.txt
 
 Dockerfile*

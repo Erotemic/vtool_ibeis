@@ -5,11 +5,11 @@ if False:
     from plottool_ibeis import draw_func2 as df2
     from plottool_ibeis import mpl_keypoint
     from plottool_ibeis import mpl_sift  # NOQA
-    import vtool_ibeis.keypoint as ktool  # NOQA
+    import vtool.keypoint as ktool  # NOQA
     import numpy as np
     import matplotlib as mpl  # NOQA
     from itertools import product as iprod
-    import vtool_ibeis  # NOQA
+    import vtool  # NOQA
     import ubelt as ub
 
     TAU = 2 * np.pi  # References: tauday.com

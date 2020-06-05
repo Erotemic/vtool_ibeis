@@ -508,9 +508,9 @@ if __name__ == '__main__':
         docker pull quay.io/pypa/manylinux2014_aarch64
 
 
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --dry
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=x86_64
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=i686
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=aarch64 --dry
+        python ~/code/vtool/dev/build_base_docker.py --dry
+        python ~/code/vtool/dev/build_base_docker.py --plat=x86_64
+        python ~/code/vtool/dev/build_base_docker.py --plat=i686
+        python ~/code/vtool/dev/build_base_docker.py --plat=aarch64 --dry
     """
     main()

@@ -3,7 +3,7 @@
 if __name__ == '__main__':
     import pytest
     import sys
-    package_name = 'vtool_ibeis'
+    package_name = 'vtool'
     pytest_args = [
         '--cov-config', '.coveragerc',
         '--cov-report', 'html',

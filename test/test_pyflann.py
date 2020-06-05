@@ -4,7 +4,7 @@ import ubelt as ub
 # import utool
 import numpy as np
 from numpy.random import randint
-from vtool_ibeis._pyflann_backend import FLANN_CLS
+from vtool._pyflann_backend import FLANN_CLS
 
 """
 remove_points does not currently have bindings
@@ -197,7 +197,7 @@ def test_pyflann_searches():
         num_neighbors = 3
         pts = testdata_points(nPts=5743, nDims=2)
         qpts = testdata_points(nPts=7, nDims=2)
-        import vtool_ibeis as vt
+        import vtool as vt
         # sample a radius
         radius = vt.L2(pts[0:1], qpts[0:1])[0] * 2 + 1
 
@@ -327,8 +327,8 @@ def test_pyflann_io():
 if __name__ == '__main__':
     """
     CommandLine:
-        python ~/code/vtool_ibeis/vtool_ibeis/tests/test_pyflann.py all
-        xdoctest ~/code/vtool_ibeis/tests/test_pyflann.py zero
+        python ~/code/vtool/vtool/tests/test_pyflann.py all
+        xdoctest ~/code/vtool/tests/test_pyflann.py zero
     """
     import xdoctest
     xdoctest.doctest_module(__file__)
