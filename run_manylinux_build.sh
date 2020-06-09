@@ -24,7 +24,7 @@ DOCKER_IMAGE=${DOCKER_IMAGE:="quay.io/erotemic/manylinux-for:$PLAT-opencv4.1.0-v
 # Valid multibuild python versions are:
 # cp27-cp27m  cp27-cp27mu  cp34-cp34m  cp35-cp35m  cp36-cp36m  cp37-cp37m
 MB_PYTHON_TAG=${MB_PYTHON_TAG:=$(python -c "import setup; print(setup.native_mb_python_tag())")}
-NAME=${NAME:=$(python -c "import setup; print(setup.NAME)")}
+NAME=${NAME:=$(python -c "import setup; print(setup.NAME.replace('-', '_'))")}
 VERSION=${VERSION:=$(python -c "import setup; print(setup.VERSION)")}
 echo "
 MB_PYTHON_TAG = $MB_PYTHON_TAG
