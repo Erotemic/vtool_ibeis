@@ -8,13 +8,13 @@ import os
 
 __all__ = ['pyflann', 'FLANN_CLS']
 
-FORCE_PYFLANN_IBEIS = os.environ.get('FORCE_PYFLANN_IBEIS', 'TRUE')
+FORCE_PYFLANN_IBEIS = os.environ.get('FORCE_PYFLANN_IBEIS', 'FALSE')
 
 
 try:
     import pyflann_ibeis as pyflann
     FLANN_CLS = pyflann.FLANN
-except ImportError:
+except (ModuleNotFoundError, ImportError):
     if FORCE_PYFLANN_IBEIS == 'TRUE':
         raise
     try:

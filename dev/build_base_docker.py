@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Create a base docker image for building pyflann_ibeis
+Create a base docker image for building pyflann
 
 References:
     https://github.com/skvark/opencv-python
