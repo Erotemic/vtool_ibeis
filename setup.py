@@ -175,8 +175,8 @@ AUTHORS = [
     'Jon Crall'
     'Zackary Rutfield'
 ]
-AUTHOR_EMAIL = 'erotemic@gmail.com'
-URL = 'https://github.com/Erotemic/vtool'
+AUTHOR_EMAIL = 'dev@wildme.org'
+URL = 'https://github.com/WildbookOrg/wbia-vtool'
 LICENSE = 'BSD'
 DESCRIPTION = 'Vtool - Image Tools for Wildbook IA'
 

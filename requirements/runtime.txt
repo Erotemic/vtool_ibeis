@@ -1,14 +1,13 @@
-Pillow >= 5.2.0
-functools32 >= 3.2.3-1;python_version < '3.0'
 networkx
 numpy >= 1.11.1
 opencv-python >= 4.1.0.25
-pyflann_ibeis >= 2.0.0
-pyhesaff >= 2.0.1 
+Pillow >= 5.2.0
 scipy
 six >= 1.10.0
 scikit-image
 scikit-learn
 statsmodels
 ubelt 
-utool >= 2.0.0
+wbia-pyflann
+wbia-pyhesaff
+wbia-utool

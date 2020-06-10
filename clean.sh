@@ -5,7 +5,7 @@ rm -rf _skbuild
 rm -rf vtool/lib
 rm -rf dist
 rm -rf build
-rm -rf vtool.egg-info
+rm -rf *.egg-info
 
 rm -rf mb_work
 rm -rf wheelhouse

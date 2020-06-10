@@ -23,6 +23,7 @@ endif()
 set_property(TARGET sver_s PROPERTY COMPILE_DEFINITIONS SVER_STATIC)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_COMPILER_IS_GNUCC)
+    add_library(sver ${CPP_SOURCES})
     set_target_properties(sver PROPERTIES LINKER_LANGUAGE CXX)
     target_link_libraries(sver -Wl,-whole-archive sver_s -Wl,-no-whole-archive)
 else()
