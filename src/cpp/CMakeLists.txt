@@ -27,21 +27,16 @@ add_library(sver SHARED "${CMAKE_CURRENT_SOURCE_DIR}/sver/sver.h")
 
 if (OS_IS_LINUX)
     set_target_properties(sver PROPERTIES LINKER_LANGUAGE CXX)
-    set_target_properties(sver PROPERTIES
-        LINK_FLAGS "-Wl,--whole-archive"
-    )
+    set(LINK_FLAG_PREFIX "-Wl,--whole-archive")
+    set(LINK_FLAG_POSTFIX "-Wl,--no-whole-archive")
 elseif (OS_IS_MACOS)
-    set_target_properties(sver PROPERTIES
-        LINK_FLAGS "-Wl,-all_load"
-    )
+    set(LINK_FLAG_PREFIX "-Wl,-all_load")
 else ()
     set_target_properties(sver PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
-    set_target_properties(sver PROPERTIES
-        LINK_FLAGS "/WHOLEARCHIVE"
-    )
+    set(LINK_FLAG_PREFIX "/WHOLEARCHIVE")
 endif ()
 
-target_link_libraries(sver sver_s)
+target_link_libraries(sver ${LINK_FLAG_PREFIX} sver_s ${LINK_FLAG_POSTFIX})
 
 set_target_properties(sver PROPERTIES
     VERSION ${VTOOL_VERSION}
