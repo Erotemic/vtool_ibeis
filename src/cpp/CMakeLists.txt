@@ -14,27 +14,34 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sver/config.h.in ${CMAKE_CURRENT_SOUR
 
 file(GLOB_RECURSE CPP_SOURCES sver.cpp)
 
-set(FAKE_C_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/sver/sver.h")
-set(FAKE_CU_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/sver/sver.h")
-set(FAKE_CPP_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/sver/sver.h")
-
 add_library(sver_s STATIC ${CPP_SOURCES})
 target_link_libraries(sver_s ${OpenCV_LIBRARIES})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
     set_target_properties(sver_s PROPERTIES COMPILE_FLAGS -fPIC)
 endif()
+
 set_property(TARGET sver_s PROPERTY COMPILE_DEFINITIONS SVER_STATIC)
 
-if(OS_IS_LINUX OR OS_IS_MACOS)
-    add_library(sver SHARED ${FAKE_CPP_SOURCES})
+add_library(sver SHARED "${CMAKE_CURRENT_SOURCE_DIR}/sver/sver.h")
+
+if (OS_IS_LINUX)
     set_target_properties(sver PROPERTIES LINKER_LANGUAGE CXX)
-    target_link_libraries(sver sver_s)
-else()
-    add_library(sver SHARED ${CPP_SOURCES})
-    target_link_libraries(sver -W ${OpenCV_LIBRARIES} -W)
+    set_target_properties(sver PROPERTIES
+        LINK_FLAGS "-Wl,--whole-archive"
+    )
+elseif (OS_IS_MACOS)
+    set_target_properties(sver PROPERTIES
+        LINK_FLAGS "-Wl,-all_load"
+    )
+else ()
     set_target_properties(sver PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
-endif()
+    set_target_properties(sver PROPERTIES
+        LINK_FLAGS "/WHOLEARCHIVE"
+    )
+endif ()
+
+target_link_libraries(sver sver_s)
 
 set_target_properties(sver PROPERTIES
     VERSION ${VTOOL_VERSION}
