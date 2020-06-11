@@ -58,6 +58,7 @@ tmp.py
 *.npz
 
 vtool/*_cython.c
+src/cpp/sver/config.h
 
 _test_times.txt
 
