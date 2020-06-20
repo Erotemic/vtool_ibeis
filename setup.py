@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import sys
 from os.path import exists
 from collections import OrderedDict
+from setuptools import find_packages
 
 
 def native_mb_python_tag(plat_impl=None, version_info=None):
@@ -203,11 +204,12 @@ KWARGS = OrderedDict(
     # The combination of packages and package_dir is how scikit-build will
     # know that the cmake installed files belong in the vtool module and
     # not the data directory.
-    packages=[
-        'vtool',
-        # These are generated modules that will be created via build
-        'vtool.lib',
-    ],
+    # packages=[
+    #     'vtool',
+    #     # These are generated modules that will be created via build
+    #     'vtool.lib',
+    # ],
+    packages=find_packages(),
     package_dir={
         'vtool': 'vtool',
         # Note: this requires that VTOOL_LIB_INSTALL_DIR is set to vtool/lib
