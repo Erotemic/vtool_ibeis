@@ -24,6 +24,20 @@ jobs:
         run: |
           python -m pip install cibuildwheel==1.4.2
 
+      - name: Cache OpenCV dependency for macOS
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-opencv
+        with:
+          path: |
+            /opt/opencv
+            ~/opencv
+            ~/opencv_contrib
+          # The key based on the file hash of the build script
+          # i.e. changing OPENCV_VERSION within the script will invalidate the cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
+
       - name: Build wheels
         env:
           CIBW_MANYLINUX_X86_64_IMAGE: wildme/manylinux:latest
