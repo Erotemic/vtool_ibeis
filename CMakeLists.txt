@@ -42,6 +42,8 @@ if(OS_IS_MACOS)
   include_directories(/opt/local/include)
   link_directories(/opt/local/lib)
 
+  find_package(Eigen3 3 REQUIRED NO_MODULE)
+
   set(CMAKE_INSTALL_RPATH "/opt/local/lib")
 
   # Add flags to support clang2
