@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 abstract which pyflann implementation is used
 

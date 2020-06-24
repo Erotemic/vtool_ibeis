@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
     """ combines feature matches from two matching algorithms
 

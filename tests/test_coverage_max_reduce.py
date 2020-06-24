@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Is it possible to use numpy.ufunc.reduce over an iterator of ndarrays?
 
 # I have a generator function that yields ndarrays (all of the same shape and dtype) and I would like to find the maximum value at each index.

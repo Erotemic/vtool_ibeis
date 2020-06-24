@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function
 import sys
 from os.path import exists
@@ -244,7 +245,7 @@ KWARGS = OrderedDict(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Topic :: Scientific/Engineering :: Image Recognition',
     ],
-    cmake_args=['-DBUILD_TESTS=OFF', '-DBUILD_DOC=OFF',],
+    cmake_args=['-DBUILD_TESTS=OFF', '-DBUILD_DOC=OFF'],
     ext_modules=EmptyListWithLength(),  # hack for including ctypes bins
 )
 

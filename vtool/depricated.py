@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class ThumbnailCacheContext(object):
     """ Lazy computation of of images as thumbnails.
 

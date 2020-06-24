@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # def vsone_matching(metadata, cfgdict={}, verbose=None):
 #     """
 #     DEPRICATE in favor of PairwiseMatch

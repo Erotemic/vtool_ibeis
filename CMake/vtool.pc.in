@@ -10,4 +10,3 @@ Version: @VTOOL_VERISON@
 Requires: @PKG_EXTERNAL_DEPS@
 Libs: -L${libdir} -lsver
 Cflags: -I${includedir}
-

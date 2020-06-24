@@ -16,7 +16,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sver/config.h.in
 file(GLOB_RECURSE CPP_SOURCES sver.cpp)
 
 add_library(sver_s STATIC ${CPP_SOURCES})
-target_link_libraries(sver_s ${OpenCV_LIBS})
+target_link_libraries(sver_s ${OpenCV_LIBS} ${GFLAGS_LIBRARIES})
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
   set_target_properties(sver_s PROPERTIES COMPILE_FLAGS -fPIC)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 @six.add_metaclass(ut.ReloadingMetaclass)
 class ScoreNormalizerUnsupervised(object):
     def __init__(encoder, X=None, **kwargs):

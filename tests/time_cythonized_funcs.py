@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # This tests cython stuff not linalg stuff :P
 from __future__ import absolute_import, division, print_function
 import utool
@@ -82,10 +83,10 @@ def test_det_dist():
 
 def benchmark_det_dist():
     setup = utool.unindent(
-        """
+        '''
         det1 = np.random.rand(100).astype(np.float64)
         det2 = np.random.rand(100).astype(np.float64)
-        """
+        '''
     )
     func_list = [
         'vtool.linalg.det_distance',
@@ -97,12 +98,12 @@ def benchmark_det_dist():
 
 def benchmark_invVR_sqrd_scale():
     setup = utool.unindent(
-        """
+        '''
         import numpy as np
         import numpy.linalg as npl
         import vtool
         invVRs = np.random.rand(100, 3, 3).astype(np.float64)
-        """
+        '''
     )
     func_list = [
         'vtool.keypoint.get_invVR_mats_sqrd_scale',
@@ -117,7 +118,7 @@ def benchmark_L2_dist():
         """
         hist1 = np.random.rand(100, 128).astype(np.float64)
         hist2 = np.random.rand(100, 128).astype(np.float64)
-        """
+        '''
     )
     func_list = [
         'vtool.linalg.L2_sqrd',

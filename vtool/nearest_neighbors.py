@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Wrapper around flann (with caching)
 
@@ -8,6 +9,7 @@ from os.path import exists, normpath, join
 import utool as ut
 import ubelt as ub
 import numpy as np
+import annoy as ann
 from vtool._pyflann_backend import FLANN_CLS, pyflann
 
 
@@ -51,7 +53,7 @@ def test_annoy():
 
     qvecs = demodata.testdata_dummy_sift(2 * 1000)
     dvecs = demodata.testdata_dummy_sift(100 * 1000)
-    dim = dpts.shape[1]
+    dim = dvecs.shape[1]
 
     checks = 200
     num_neighbs = 10
@@ -528,7 +530,7 @@ def get_flann_params(algorithm='kdtree', **kwargs):
         )
     elif algorithm == 'lsh':
         flann_params.update(
-            {'table_number_': 12, 'key_size_': 20, 'multi_probe_level_': 2,}
+            {'table_number_': 12, 'key_size_': 20, 'multi_probe_level_': 2}
         )
 
     flann_params = ut.update_existing(flann_params, kwargs, assert_exists=True)
@@ -630,9 +632,9 @@ def tune_flann(
             # ---
             kdtree=['trees'],
             # ---
-            kmeans=['branching', 'iterations', 'centers_init', 'cb_index',],
+            kmeans=['branching', 'iterations', 'centers_init', 'cb_index'],
             # ---
-            lsh=['table_number', 'key_size', 'multi_probe_level',],
+            lsh=['table_number', 'key_size', 'multi_probe_level'],
         )
         relevant_params_dict['composite'] = (
             relevant_params_dict['kmeans']

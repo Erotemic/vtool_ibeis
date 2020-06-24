@@ -478,7 +478,7 @@ class ConfusionMetrics(ub.NiceRepr):
         assert len(indicies) > 0, 'no recall at target level'
         func = scipy.interpolate.interp1d(self.recall, self.fpr)
         interp_fpr = func(target_recall)
-        ## interpolate to target recall
+        # # interpolate to target recall
         # right_index  = indicies[0]
         # right_recall = self.recall[right_index]
         # left_index   = right_index - 1

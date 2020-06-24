@@ -1,3 +1,4 @@
+brunette  # A less pretentious fork of Black
 cmake
 ninja
 scikit-build

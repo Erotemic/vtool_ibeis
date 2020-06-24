@@ -19,8 +19,5 @@ python setup.py develop
 pip install -e .
 
 # Point to custom opencv
-_note="""
-python setup.py build_ext --inplace -- -DOpenCV_DIR=$HOME/code/opencv/build
-python setup.py develop -- -DOpenCV_DIR=$HOME/code/opencv/build
-"""
-#fi
+# python setup.py build_ext --inplace -- -DOpenCV_DIR=$HOME/code/opencv/build
+# python setup.py develop -- -DOpenCV_DIR=$HOME/code/opencv/build

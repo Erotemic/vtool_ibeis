@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 References:
     % Single-image noise level estimation for blind denoising.

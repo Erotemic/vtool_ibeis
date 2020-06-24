@@ -1,21 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
-
-  - repo: local
-    hooks:
-      - id: brunette
-        name: brunette
-        description: Run Brunette on Python code (fork of Black).
-        entry: brunette --config=setup.cfg
-        language: system
-        types: [python]
-
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
-    hooks:
-      - id: flake8
-
   - repo: https://github.com/iconmaster5326/cmake-format-pre-commit-hook
     rev: master
     hooks:
@@ -24,7 +9,31 @@ repos:
           (?x)^(
               .*.cmake.in
           )$
-
+  # - repo: https://github.com/psf/black
+  #   rev: stable
+  #   hooks:
+  #     - id: black
+  #       language_version: python3.6
+  - repo: local
+    hooks:
+      - id: brunette
+        name: brunette
+        description: Run Brunette on Python code (fork of Black).
+        entry: brunette --config=setup.cfg
+        language: system
+        types: [python]
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+  - repo: https://github.com/iconmaster5326/cmake-format-pre-commit-hook
+    rev: master
+    hooks:
+      - id: cmake-format
+        exclude: >
+          (?x)^(
+              .*.cmake.in
+          )$
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.1.0
     hooks:

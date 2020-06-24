@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 OLD MODULE, needs reimplemenetation of select features and deprication
 
