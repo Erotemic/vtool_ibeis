@@ -37,9 +37,9 @@ def lazy_test_annot(key):
 
 
 try:
-    import wbia.dtool as dt
+    import wbia.dtool
 
-    MatchDisplayConfig = dt.from_param_info_list(
+    MatchDisplayConfig = wbia.dtool.from_param_info_list(
         [
             ut.ParamInfo('overlay', True),
             ut.ParamInfo('show_all_kpts', False),
@@ -196,9 +196,9 @@ class MatchInspector(INSPECT_BASE):
 
         # default_dict = pyhesaff.get_hesaff_default_params()
         # default_dict = vt.get_extract_features_default_params()
-        TmpFeatConfig = dtool.from_param_info_list(matching.VSONE_FEAT_CONFIG)
+        TmpFeatConfig = wbia.dtool.from_param_info_list(matching.VSONE_FEAT_CONFIG)
 
-        TmpNChipConfig = dtool.from_param_info_list(matching.NORM_CHIP_CONFIG)
+        TmpNChipConfig = wbia.dtool.from_param_info_list(matching.NORM_CHIP_CONFIG)
         # [
         #     ut.ParamInfo(key, val) for key, val in default_dict.items()
         #     # ut.ParamInfo('affine_invariance', True),
@@ -208,7 +208,7 @@ class MatchInspector(INSPECT_BASE):
         self.featconfig = TmpFeatConfig()
         self.chipconfig = TmpNChipConfig()
 
-        TmpVsOneConfig = dtool.from_param_info_list(matching.VSONE_DEFAULT_CONFIG)
+        TmpVsOneConfig = wbia.dtool.from_param_info_list(matching.VSONE_DEFAULT_CONFIG)
         self.config = TmpVsOneConfig()
         self.disp_config = MatchDisplayConfig()
 
@@ -358,7 +358,7 @@ def make_match_interaction(matches, metadata, type_='RAT+SV', **kwargs):
     rchip2, kpts2, vecs2 = ub.dict_take(annot2, ['nchip', 'kpts', 'vecs'])
     # pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)
     fsv = fs[:, None]
-    interact = plottool.interact_matches.MatchInteraction2(
+    interact = wbia.plottool.interact_matches.MatchInteraction2(
         rchip1, rchip2, kpts1, kpts2, fm, fs, fsv, vecs1, vecs2, H1=H1, **kwargs
     )
     return interact

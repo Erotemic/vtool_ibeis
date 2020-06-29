@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+from vtool.inspect_matches import lazy_test_annot
+import utool as ut
+import numpy as np
+import six
+
+
 @six.add_metaclass(ut.ReloadingMetaclass)
 class ScoreNormalizerUnsupervised(object):
     def __init__(encoder, X=None, **kwargs):

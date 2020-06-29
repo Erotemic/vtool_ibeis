@@ -1,4 +1,38 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, print_function
+
+# from six.moves import range
+import utool as ut
+import ubelt as ub
+import six  # NOQA
+import numpy as np
+
+# from vtool import keypoint as ktool
+from vtool import coverage_kpts
+from vtool import spatial_verification as sver
+from vtool import matching
+
+# import numpy.linalg as npl
+# import scipy.sparse as sps
+# import scipy.sparse.linalg as spsl
+# from numpy.core.umath_tests import matrix_multiply
+# import vtool.keypoint as ktool
+# import vtool.linalg as ltool
+# profile = ut.profile
+
+from vtool import keypoint as ktool  # NOQA
+from vtool import spatial_verification as sver  # NOQA
+from vtool import constrained_matching
+
+"""
+Todo tomorrow:
+
+add coverage as option to IBEIS
+add spatially constrained matching as option to IBEIS
+
+"""
+
+
 def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
     """ combines feature matches from two matching algorithms
 
@@ -81,27 +115,6 @@ def marge_matches(fm_A, fm_B, fsv_A, fsv_B):
 def ensure_fsv_list(fsv_list):
     """ ensure fs is at least Nx1 """
     return [fsv[:, None] if len(fsv.shape) == 1 else fsv for fsv in fsv_list]
-
-
-from __future__ import absolute_import, division, print_function
-
-# from six.moves import range
-import utool as ut
-import six  # NOQA
-import numpy as np
-
-# from vtool import keypoint as ktool
-from vtool import coverage_kpts
-from vtool import spatial_verification as sver
-from vtool import matching
-
-# import numpy.linalg as npl
-# import scipy.sparse as sps
-# import scipy.sparse.linalg as spsl
-# from numpy.core.umath_tests import matrix_multiply
-# import vtool.keypoint as ktool
-# import vtool.linalg as ltool
-# profile = ut.profile
 
 
 def assign_nearest_neighbors(vecs1, vecs2, K=2):
@@ -781,64 +794,6 @@ class AnnotMatch(object):
         return ax, xywh1, xywh2
 
 
-def testdata_matcher(fname1='easy1.png', fname2='easy2.png'):
-    """"
-    fname1 = 'easy1.png'
-    fname2 = 'hard3.png'
-
-    annot1 = Annot(fpath1)
-    annot2 = Annot(fpath2)
-    """
-    import utool as ut
-    from vtool import image as gtool
-    from vtool import features as feattool
-
-    fpath1 = ut.grab_test_imgpath(fname1)
-    fpath2 = ut.grab_test_imgpath(fname2)
-    kpts1, vecs1 = feattool.extract_features(fpath1)
-    kpts2, vecs2 = feattool.extract_features(fpath2)
-    rchip1 = gtool.imread(fpath1)
-    rchip2 = gtool.imread(fpath2)
-    # chip1_shape = vt.gtool.open_image_size(fpath1)
-    chip2_shape = gtool.open_image_size(fpath2)
-    dlen_sqrd2 = chip2_shape[0] ** 2 + chip2_shape[1] ** 2
-    testtup = (rchip1, rchip2, kpts1, vecs1, kpts2, vecs2, dlen_sqrd2)
-
-    return testtup
-
-
-if __name__ == '__main__':
-    """
-    CommandLine:
-        python -m vtool.constrained_matching
-        python -m vtool.constrained_matching --allexamples
-        python -m vtool.constrained_matching --allexamples --noface --nosrc
-    """
-    import multiprocessing
-
-    multiprocessing.freeze_support()  # for win32
-    import utool as ut  # NOQA
-
-    ut.doctest_funcs()
-
-
-from __future__ import absolute_import, division, print_function
-import utool as ut
-import six  # NOQA
-import numpy as np  # NOQA
-from vtool import keypoint as ktool  # NOQA
-from vtool import spatial_verification as sver  # NOQA
-from vtool import constrained_matching
-
-"""
-Todo tomorrow:
-
-add coverage as option to IBEIS
-add spatially constrained matching as option to IBEIS
-
-"""
-
-
 def param_interaction():
     r"""
     CommandLine:
@@ -1314,21 +1269,6 @@ def show_example():
     # simp1.param_interaction()
 
 
-if __name__ == '__main__':
-    """
-    CommandLine:
-        python -m vtool.test_constrained_matching
-        python -m vtool.test_constrained_matching --allexamples
-        python -m vtool.test_constrained_matching --allexamples --noface --nosrc
-    """
-    import multiprocessing
-
-    multiprocessing.freeze_support()  # for win32
-    import utool as ut  # NOQA
-
-    ut.doctest_funcs()
-
-
 def spatially_constrained_ratio_match(
     flann,
     vecs2,
@@ -1350,6 +1290,8 @@ def spatially_constrained_ratio_match(
     H - a homography H that maps image1 space into image2 space
     H should map from query to database chip (1 to 2)
     """
+    from vtool.matching import normalized_nearest_neighbors
+
     assert H.shape == (3, 3)
     # Find several of image2's features nearest matches in image1
     fx2_to_fx1, fx2_to_dist = normalized_nearest_neighbors(
@@ -1446,14 +1388,19 @@ def ratio_test(
 def unconstrained_ratio_match(
     flann, vecs2, unc_ratio_thresh=0.625, fm_dtype=np.int32, fs_dtype=np.float32
 ):
-    """ Lowes ratio matching
+    """
+    Lowes ratio matching
 
     from vtool.matching import *  # NOQA
     fs_dtype = rat_kwargs.get('fs_dtype', np.float32)
     fm_dtype = rat_kwargs.get('fm_dtype', np.int32)
     unc_ratio_thresh = rat_kwargs.get('unc_ratio_thresh', .625)
-
     """
+    from vtool.matching import (
+        normalized_nearest_neighbors,
+        assign_unconstrained_matches,
+    )
+
     fx2_to_fx1, fx2_to_dist = normalized_nearest_neighbors(flann, vecs2, K=2, checks=800)
     # ut.embed()
     assigntup = assign_unconstrained_matches(fx2_to_fx1, fx2_to_dist, 1)
@@ -1611,3 +1558,18 @@ def gridsearch_match_operation(matches, op_name, basis):
     if len(basis) == 1:
         # interpolate along basis
         pass
+
+
+if __name__ == '__main__':
+    """
+    CommandLine:
+        python -m vtool.constrained_matching
+        python -m vtool.constrained_matching --allexamples
+        python -m vtool.constrained_matching --allexamples --noface --nosrc
+    """
+    import multiprocessing
+
+    multiprocessing.freeze_support()  # for win32
+    import utool as ut  # NOQA
+
+    ut.doctest_funcs()

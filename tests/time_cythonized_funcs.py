@@ -115,7 +115,7 @@ def benchmark_invVR_sqrd_scale():
 
 def benchmark_L2_dist():
     setup = utool.unindent(
-        """
+        '''
         hist1 = np.random.rand(100, 128).astype(np.float64)
         hist2 = np.random.rand(100, 128).astype(np.float64)
         '''

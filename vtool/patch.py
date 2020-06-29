@@ -10,12 +10,11 @@ from vtool import linalg as ltool
 from vtool import image as gtool
 from vtool import trig
 import utool as ut
-import ubelt as ub
 from .util_math import TAU
 
 try:
     import cv2
-except ImportError as ex:
+except ImportError:
     print('ERROR: import cv2 is failing!')
     cv2 = ut.DynStruct()
     cv2.INTER_LANCZOS4 = None
@@ -676,7 +675,7 @@ def get_warped_patches(
             warped_patch, wkp = intern_warp_single_patch(
                 img, x, y, ori, V, patch_size, flags=flags, borderMode=borderMode
             )
-            ## Build warped keypoints
+            # # Build warped keypoints
             # wkp = np.array((patch_size / 2, patch_size / 2, ss, 0., ss, 0))
             warped_patches.append(warped_patch)
             warped_subkpts.append(wkp)
@@ -1098,7 +1097,6 @@ def find_kpts_direction(imgBGR, kpts, DEBUG_ROTINVAR=False):
     CommandLine:
         python -m vtool.patch --test-find_kpts_direction
     """
-
     ori_list = []
     # gravity_ori = ktool.GRAVITY_THETA
     for kp in kpts:

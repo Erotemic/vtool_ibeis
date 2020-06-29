@@ -474,14 +474,14 @@ def get_invV_mats3x3(kpts):
     # nKpts = len(kpts)
     invV_mats2x2 = get_invV_mats2x2(kpts)
     invV_mats3x3 = augment_2x2_with_translation(kpts, invV_mats2x2)
-    ## Unpack shape components
+    # # Unpack shape components
     # _iv11s = invV_mats2x2.T[0, 0]
     # _iv12s = invV_mats2x2.T[1, 0]
     # _iv21s = invV_mats2x2.T[0, 1]
     # _iv22s = invV_mats2x2.T[1, 1]
-    ## Get translation components
+    # # Get translation components
     # _iv13s, _iv23s = get_xys(kpts)
-    ## Use homogenous coordinates
+    # # Use homogenous coordinates
     # _zeros = np.zeros(nKpts)
     # _ones = np.ones(nKpts)
     # invV_arrs3x3 =  np.array([[_iv11s, _iv12s, _iv13s],
@@ -543,9 +543,9 @@ def get_invVR_mats3x3(kpts):
     # _iv12s = invVR_mats2x2.T[1, 0]
     # _iv21s = invVR_mats2x2.T[0, 1]
     # _iv22s = invVR_mats2x2.T[1, 1]
-    ## Get translation components
+    # # Get translation components
     # _iv13s, _iv23s = get_xys(kpts)
-    ## Use homogenous coordinates
+    # # Use homogenous coordinates
     # _zeros = np.zeros(nKpts)
     # _ones = np.ones(nKpts)
     # invVR_arrs =  np.array([[_iv11s, _iv12s, _iv13s],
@@ -704,7 +704,8 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
 
 
 def transform_kpts_to_imgspace(kpts, bbox, bbox_theta, chipsz):
-    """ Transforms keypoints so they are plotable in imagespace
+    """
+    Transforms keypoints so they are plotable in imagespace
         kpts   - xyacdo keypoints
         bbox   - chip bounding boxes in image space
         theta  - chip rotationsinvC

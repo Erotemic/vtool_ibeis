@@ -305,9 +305,9 @@ def find_best_undirected_edge_indexes(directed_edges, score_arr=None):
     import vtool as vt
 
     # assert len(directed_edges.shape) == 2 and directed_edges.shape[1] == 2
-    ##flipped = qaid_arr < daid_arr
+    # # flipped = qaid_arr < daid_arr
     # flipped = directed_edges.T[0] < directed_edges.T[1]
-    ## standardize edge order
+    # # standardize edge order
     # edges_dupl = directed_edges.copy()
     # edges_dupl[flipped, 0:2] = edges_dupl[flipped, 0:2][:, ::-1]
     # edgeid_list = vt.compute_unique_data_ids(edges_dupl)
@@ -399,6 +399,7 @@ def compute_ndarray_unique_rowids_unsafe(arr):
 
 def nonunique_row_flags(arr):
     import vtool as vt
+    from vtool.numpy_utils import unique_row_indexes
 
     unique_rowx = unique_row_indexes(arr)
     unique_flags = vt.index_to_boolmask(unique_rowx, len(arr))
@@ -1734,7 +1735,6 @@ def find_k_true_indicies(flags_list, k):
         >>> print(result)
         [array([2]), None, array([1, 2]), array([0, 1])]
     """
-
     if False:
         import vtool as vt
 

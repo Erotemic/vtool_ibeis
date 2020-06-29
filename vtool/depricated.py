@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import utool as ut
+from os.path import join, exists
+
+
 class ThumbnailCacheContext(object):
     """ Lazy computation of of images as thumbnails.
 
