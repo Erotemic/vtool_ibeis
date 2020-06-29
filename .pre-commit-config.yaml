@@ -24,3 +24,21 @@ repos:
           (?x)^(
               .*.cmake.in
           )$
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.1.0
+    hooks:
+      - id: requirements-txt-fixer
+      - id: check-toml
+      # - id: check-json
+      # - id: check-yaml
+      # - id: check-ast
+      # - id: check-executables-have-shebangs
+      # - id: check-docstring-first
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: double-quote-string-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: end-of-file-fixer
+      - id: fix-encoding-pragma
