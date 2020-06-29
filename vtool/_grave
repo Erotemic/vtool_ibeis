@@ -60,4 +60,3 @@ C:\MinGW\bin\gcc.exe -w -Wall -m32 -lpython27 -IC:\Python27\Lib\site-packages\nu
 
 python -c "import vtool"
 """
-
