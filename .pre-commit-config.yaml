@@ -1,14 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
-  - repo: https://github.com/iconmaster5326/cmake-format-pre-commit-hook
-    rev: master
-    hooks:
-      - id: cmake-format
-        exclude: >
-          (?x)^(
-              .*.cmake.in
-          )$
   # - repo: https://github.com/psf/black
   #   rev: stable
   #   hooks:
