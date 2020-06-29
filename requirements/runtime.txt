@@ -2,12 +2,12 @@ networkx
 numpy >= 1.11.1
 opencv-python >= 4.1.0.25
 Pillow >= 5.2.0
-scipy
-six >= 1.10.0
 scikit-image
 scikit-learn
+scipy
+six >= 1.10.0
 statsmodels
-ubelt 
+ubelt
 wbia-pyflann
 wbia-pyhesaff
 wbia-utool
