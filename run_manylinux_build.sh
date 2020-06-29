@@ -49,7 +49,7 @@ if [ "$_INSIDE_DOCKER" != "YES" ]; then
         -v $PWD:/io \
         -e _INSIDE_DOCKER="YES" \
         -e MB_PYTHON_TAG="$MB_PYTHON_TAG" \
-        -e NAME="$NAME" 
+        -e NAME="$NAME"
         -e VERSION="$VERSION" \
         -it $DOCKER_IMAGE bash
 
@@ -64,7 +64,7 @@ else
     set -e
 
     VENV_DIR=$HOME/venv-$MB_PYTHON_TAG
-    source $VENV_DIR/bin/activate 
+    source $VENV_DIR/bin/activate
     pip install scikit-build cmake ninja
 
     cd /io

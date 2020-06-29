@@ -2,7 +2,7 @@
 Wildbook IA - vtool
 ===================
 
-|Pypi| |ReadTheDocs| 
+|Pypi| |ReadTheDocs|
 
 Vision Tools - tools for computer vision. Part of the WildMe / Wildbook IA Project.
 

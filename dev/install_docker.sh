@@ -53,7 +53,7 @@ ubuntu_install_docker(){
 
 
     # Verify GPG keys
-    sudo apt-key fingerprint 0EBFCD88 
+    sudo apt-key fingerprint 0EBFCD88
     sudo apt-key fingerprint F796ECB0
 
     # Setup stable docker repository
@@ -87,7 +87,7 @@ ubuntu_configure_docker_data_directory(){
     # MOVE DOCKER DATA DIRECTORY TO EXTERNAL DRIVE
     #DOCKER_DIR="/data/docker"
     DOCKER_DIR="/media/joncrall/raid/docker"
-    #Ubuntu/Debian: edit your /etc/default/docker file with the -g option: 
+    #Ubuntu/Debian: edit your /etc/default/docker file with the -g option:
     sudo sed -ie "s|^#* *DOCKER_OPTS.*|DOCKER_OPTS=\"-g ${DOCKER_DIR}\"|g" /etc/default/docker
     sudo sed -ie "s|^#* *export DOCKER_TMPDIR.*|export DOCKER_TMPDIR=${DOCKER_DIR}-tmp|g" /etc/default/docker
     # We need to point the systemctl docker serivce to this file
@@ -114,7 +114,7 @@ ubuntu_configure_docker_network_issue(){
     # https://github.com/moby/moby/issues/32270#issuecomment-336772916
 
     # Do we still get bad auth?
-    curl https://registry-1.docker.io/v2/ 
+    curl https://registry-1.docker.io/v2/
 
 
     # Try hacking resolv.conf
@@ -140,12 +140,12 @@ fix_dns_issue(){
     #There is a workaround for the openvpn issue on ubuntu
     #16.04. After connecting to the vpn, run:
     sudo pkill dnsmasq
-    sudo sed -i 's/^\(dns=dnsmasq\)/#\1/g' /etc/NetworkManager/NetworkManager.conf 
+    sudo sed -i 's/^\(dns=dnsmasq\)/#\1/g' /etc/NetworkManager/NetworkManager.conf
     sudo systemctl daemon-reload
     sudo systemctl restart network-manager
 
     cat /etc/resolv.conf
-    cat /etc/NetworkManager/NetworkManager.conf 
+    cat /etc/NetworkManager/NetworkManager.conf
 }
 
 ubuntu_docker_install(){
@@ -165,7 +165,7 @@ __check_important_things__(){
 
     cat /etc/default/docker | grep DOCKER_OPTS
     cat /etc/default/docker | grep DOCKER_TMPDIR
- 
+
     service docker status
     service docker start
 
@@ -200,7 +200,7 @@ __docker_test__(){
     # TEST:
 
     if [ "$(groups $USER | grep docker)" = "" ]; then
-        echo $@ >&2 
+        echo $@ >&2
         exit 255
     fi
 
@@ -210,7 +210,7 @@ __docker_test__(){
     sudo docker run hello-world
 
     docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash
-    docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash 
+    docker run --runtime=nvidia --rm -it nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04 bash
 
     docker pull quay.io/skvark/manylinux1_x86_64
 }
