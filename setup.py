@@ -180,7 +180,11 @@ VERSION = version = parse_version('vtool/__init__.py')  # must be global for git
 AUTHORS = [
     'Avi Weinstock',
     'Chuck Stewart',
-    'Hendrik Weideman' 'Jason Parham' 'Jon Crall' 'Zackary Rutfield',
+    'Hendrik Weideman',
+    'Jason Parham',
+    'Jon Crall',
+    'Zackary Rutfield',
+    'WildMe Developers',
 ]
 AUTHOR_EMAIL = 'dev@wildme.org'
 URL = 'https://github.com/WildbookOrg/wbia-vtool'
