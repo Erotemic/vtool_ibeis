@@ -47,23 +47,32 @@ VSONE_ASSIGN_CONFIG = [
 ]
 
 VSONE_RATIO_CONFIG = [
-    ut.ParamInfo('ratio_thresh', .625, min_=0.0, max_=1.0),
+    ut.ParamInfo('ratio_thresh', 0.625, min_=0.0, max_=1.0),
 ]
 
 
 VSONE_SVER_CONFIG = [
     ut.ParamInfo('sv_on', True),
-    ut.ParamInfo('thresh_bins', tuple(), type_=eval,
-                 hideif=lambda cfg: not cfg['sv_on']),
-    ut.ParamInfo('refine_method', 'homog', valid_values=['homog', 'affine'],
-                 hideif=lambda cfg: not cfg['sv_on']),
-    ut.ParamInfo('sver_xy_thresh', .01, min_=0.0, max_=None,
-                 hideif=lambda cfg: not cfg['sv_on']),
-    ut.ParamInfo('sver_ori_thresh', TAU / 4.0, min_=0.0, max_=TAU,
-                 hideif=lambda cfg: not cfg['sv_on']),
-    ut.ParamInfo('sver_scale_thresh', 2.0, min_=1.0, max_=None,
-                 hideif=lambda cfg: not cfg['sv_on']),
-
+    ut.ParamInfo('thresh_bins', tuple(), type_=eval, hideif=lambda cfg: not cfg['sv_on']),
+    ut.ParamInfo(
+        'refine_method',
+        'homog',
+        valid_values=['homog', 'affine'],
+        hideif=lambda cfg: not cfg['sv_on'],
+    ),
+    ut.ParamInfo(
+        'sver_xy_thresh', 0.01, min_=0.0, max_=None, hideif=lambda cfg: not cfg['sv_on']
+    ),
+    ut.ParamInfo(
+        'sver_ori_thresh',
+        TAU / 4.0,
+        min_=0.0,
+        max_=TAU,
+        hideif=lambda cfg: not cfg['sv_on'],
+    ),
+    ut.ParamInfo(
+        'sver_scale_thresh', 2.0, min_=1.0, max_=None, hideif=lambda cfg: not cfg['sv_on']
+    ),
 ]
 
 
@@ -83,18 +92,15 @@ NORM_CHIP_CONFIG = [
 ]
 
 
-VSONE_DEFAULT_CONFIG = (
-    VSONE_ASSIGN_CONFIG + VSONE_RATIO_CONFIG + VSONE_SVER_CONFIG
-)
+VSONE_DEFAULT_CONFIG = VSONE_ASSIGN_CONFIG + VSONE_RATIO_CONFIG + VSONE_SVER_CONFIG
 
-VSONE_PI_DICT = {
-    pi.varname: pi for pi in VSONE_DEFAULT_CONFIG
-}
+VSONE_PI_DICT = {pi.varname: pi for pi in VSONE_DEFAULT_CONFIG}
 
 
 def demodata_match(cfgdict={}, apply=True, use_cache=True, recompute=False):
     import vtool as vt
     from vtool.inspect_matches import lazy_test_annot
+
     # hashid based on the state of the code
     if not apply:
         use_cache = False
@@ -102,12 +108,7 @@ def demodata_match(cfgdict={}, apply=True, use_cache=True, recompute=False):
     hashid = ut.hash_data(function_sig)
     ub.util_hash._HASHABLE_EXTENSIONS._register_agressive_extensions()
     cfgstr = ub.hash_data(cfgdict) + hashid
-    cacher = ub.Cacher(
-        'test_match_v5',
-        cfgstr=cfgstr,
-        appname='vtool',
-        enabled=use_cache
-    )
+    cacher = ub.Cacher('test_match_v5', cfgstr=cfgstr, appname='vtool', enabled=use_cache)
     match = cacher.tryload()
     annot1 = lazy_test_annot('easy1.png')
     annot2 = lazy_test_annot('easy2.png')
@@ -183,6 +184,7 @@ class PairwiseMatch(ub.NiceRepr):
         >>> gt.ensure_qapp()
         >>> match.ishow()
     """
+
     def __init__(match, annot1=None, annot2=None):
         if not isinstance(annot1, ut.LazyDict):
             annot1 = ut.LazyDict(annot1)
@@ -224,8 +226,7 @@ class PairwiseMatch(ub.NiceRepr):
             aid2 = match.annot2['aid']
             vsstr = '%s-vs-%s' % (aid1, aid2)
             parts.append(vsstr)
-        parts.append('None' if match.fm is None else
-                     six.text_type(len(match.fm)))
+        parts.append('None' if match.fm is None else six.text_type(len(match.fm)))
         return ' '.join(parts)
 
     def __len__(match):
@@ -241,6 +242,7 @@ class PairwiseMatch(ub.NiceRepr):
         This means that if you need properties of annots, you must reapply
         them after you load a PairwiseMatch object.
         """
+
         def _prepare_annot(annot):
             if isinstance(annot, ut.LazyDict):
                 _annot = {}
@@ -268,16 +270,32 @@ class PairwiseMatch(ub.NiceRepr):
         match.__dict__.update(state)
         match.verbose = False
 
-    def show(match, ax=None, show_homog=False, show_ori=False, show_ell=True,
-             show_pts=False, show_lines=True, show_rect=False, show_eig=False,
-             show_all_kpts=False, mask_blend=0, ell_alpha=.6, line_alpha=.35,
-             modifysize=False, vert=None, overlay=True, heatmask=False,
-             line_lw=1.4):
+    def show(
+        match,
+        ax=None,
+        show_homog=False,
+        show_ori=False,
+        show_ell=True,
+        show_pts=False,
+        show_lines=True,
+        show_rect=False,
+        show_eig=False,
+        show_all_kpts=False,
+        mask_blend=0,
+        ell_alpha=0.6,
+        line_alpha=0.35,
+        modifysize=False,
+        vert=None,
+        overlay=True,
+        heatmask=False,
+        line_lw=1.4,
+    ):
 
         if match.verbose:
             print('[match] show')
 
         import wbia.plottool as pt
+
         annot1 = match.annot1
         annot2 = match.annot2
         try:
@@ -305,6 +323,7 @@ class PairwiseMatch(ub.NiceRepr):
 
         if mask_blend:
             import vtool as vt
+
             mask1 = vt.resize(annot1['probchip_img'], vt.get_size(rchip1))
             mask2 = vt.resize(annot2['probchip_img'], vt.get_size(rchip2))
             # vt.blend_images_average(vt.mask1, 1.0, alpha=mask_blend)
@@ -317,13 +336,27 @@ class PairwiseMatch(ub.NiceRepr):
         # H2 = match.H_21 if show_homog else None
 
         ax, xywh1, xywh2 = pt.show_chipmatch2(
-            rchip1, rchip2, kpts1, kpts2, fm, fs, colorbar_=False,
-            H1=H1, ax=ax,
+            rchip1,
+            rchip2,
+            kpts1,
+            kpts2,
+            fm,
+            fs,
+            colorbar_=False,
+            H1=H1,
+            ax=ax,
             modifysize=modifysize,
-            ori=show_ori, rect=show_rect, eig=show_eig, ell=show_ell,
-            pts=show_pts, draw_lines=show_lines,
-            all_kpts=show_all_kpts, line_alpha=line_alpha,
-            ell_alpha=ell_alpha, vert=vert, heatmask=heatmask,
+            ori=show_ori,
+            rect=show_rect,
+            eig=show_eig,
+            ell=show_ell,
+            pts=show_pts,
+            draw_lines=show_lines,
+            all_kpts=show_all_kpts,
+            line_alpha=line_alpha,
+            ell_alpha=ell_alpha,
+            vert=vert,
+            heatmask=heatmask,
             line_lw=line_lw,
         )
         return ax, xywh1, xywh2
@@ -347,17 +380,18 @@ class PairwiseMatch(ub.NiceRepr):
             >>> gt.qtapp_loop(qwin=self, freq=10)
         """
         from vtool.inspect_matches import MatchInspector
+
         self = MatchInspector(match=match)
         self.show()
         return self
 
     def add_global_measures(match, global_keys):
         for key in global_keys:
-            match.global_measures[key] = (match.annot1[key],
-                                          match.annot2[key])
+            match.global_measures[key] = (match.annot1[key], match.annot2[key])
 
     def add_local_measures(match, xy=True, scale=True):
         import vtool as vt
+
         if xy:
             key_ = 'norm_xys'
             norm_xy1 = match.annot1[key_].take(match.fm.T[0], axis=1)
@@ -397,8 +431,7 @@ class PairwiseMatch(ub.NiceRepr):
         if match.fm is not None:
             match_.fm = match.fm.copy()
             match_.fs = match.fs.copy()
-        match_.local_measures = ub.map_vals(
-                lambda a: a.copy(), match.local_measures)
+        match_.local_measures = ub.map_vals(lambda a: a.copy(), match.local_measures)
         return match_
 
     def compress(match, flags, inplace=None):
@@ -408,7 +441,8 @@ class PairwiseMatch(ub.NiceRepr):
         match_.fm = match.fm.compress(flags, axis=0)
         match_.fs = match.fs.compress(flags, axis=0)
         match_.local_measures = ub.map_vals(
-                lambda a: a.compress(flags), match.local_measures)
+            lambda a: a.compress(flags), match.local_measures
+        )
         return match_
 
     def take(match, indicies, inplace=None):
@@ -416,7 +450,8 @@ class PairwiseMatch(ub.NiceRepr):
         match_.fm = match.fm.take(indicies, axis=0)
         match_.fs = match.fs.take(indicies, axis=0)
         match_.local_measures = ub.map_vals(
-                lambda a: a.take(indicies), match.local_measures)
+            lambda a: a.take(indicies), match.local_measures
+        )
         return match_
 
     def assign(match, cfgdict={}, verbose=None):
@@ -440,8 +475,9 @@ class PairwiseMatch(ub.NiceRepr):
                 match = demodata_match(cfgdict, apply=False)
                 match.assign()
         """
-        params = match._take_params(cfgdict, ['K', 'Knorm', 'symmetric',
-                                              'checks', 'weight'])
+        params = match._take_params(
+            cfgdict, ['K', 'Knorm', 'symmetric', 'checks', 'weight']
+        )
         params = list(params)
         K, Knorm, symmetric, checks, weight_key = params
         annot1 = match.annot1
@@ -457,20 +493,21 @@ class PairwiseMatch(ub.NiceRepr):
 
         # Search for nearest neighbors
         if symmetric:
-            tup = symmetric_correspondence(annot1, annot2, K, Knorm, checks,
-                                           allow_shrink)
+            tup = symmetric_correspondence(annot1, annot2, K, Knorm, checks, allow_shrink)
         else:
-            tup = asymmetric_correspondence(annot1, annot2, K, Knorm, checks,
-                                            allow_shrink)
+            tup = asymmetric_correspondence(
+                annot1, annot2, K, Knorm, checks, allow_shrink
+            )
         fm, match_dist, norm_dist, fx1_norm, fx2_norm = tup
 
         ratio = np.divide(match_dist, norm_dist)
         # convert so bigger is better
-        ratio_score = (1.0 - ratio)
+        ratio_score = 1.0 - ratio
 
         # remove local measure that can no longer apply
-        match.local_measures = ub.dict_diff(match.local_measures, [
-            'sver_err_xy', 'sver_err_scale', 'sver_err_ori'])
+        match.local_measures = ub.dict_diff(
+            match.local_measures, ['sver_err_xy', 'sver_err_scale', 'sver_err_ori']
+        )
 
         match.local_measures['match_dist'] = match_dist
         match.local_measures['norm_dist'] = norm_dist
@@ -501,7 +538,7 @@ class PairwiseMatch(ub.NiceRepr):
         return match
 
     def ratio_test_flags(match, cfgdict={}):
-        ratio_thresh, = match._take_params(cfgdict, ['ratio_thresh'])
+        (ratio_thresh,) = match._take_params(cfgdict, ['ratio_thresh'])
         if match.verbose:
             print('[match] apply_ratio_test')
             print('[match] ratio_thresh = {!r}'.format(ratio_thresh))
@@ -527,29 +564,41 @@ class PairwiseMatch(ub.NiceRepr):
 
         def _run_sver(kpts1, kpts2, fm, match_weights, **sver_kw):
             svtup = sver.spatially_verify_kpts(
-                kpts1, kpts2, fm, match_weights=match_weights, **sver_kw)
+                kpts1, kpts2, fm, match_weights=match_weights, **sver_kw
+            )
             if svtup is None:
                 errors = [np.empty(0), np.empty(0), np.empty(0)]
                 inliers = []
-                H_12 =  np.eye(3)
+                H_12 = np.eye(3)
             else:
                 (inliers, errors, H_12) = svtup[0:3]
             svtup = (inliers, errors, H_12)
             return svtup
 
-        (sver_xy_thresh, sver_ori_thresh,
-         sver_scale_thresh, refine_method, thresh_bins) = match._take_params(
-             cfgdict, [
-                 'sver_xy_thresh', 'sver_ori_thresh', 'sver_scale_thresh',
-                 'refine_method', 'thresh_bins'
-             ])
+        (
+            sver_xy_thresh,
+            sver_ori_thresh,
+            sver_scale_thresh,
+            refine_method,
+            thresh_bins,
+        ) = match._take_params(
+            cfgdict,
+            [
+                'sver_xy_thresh',
+                'sver_ori_thresh',
+                'sver_scale_thresh',
+                'refine_method',
+                'thresh_bins',
+            ],
+        )
 
         kpts1 = match.annot1['kpts']
         kpts2 = match.annot2['kpts']
         dlen_sqrd2 = match.annot2['dlen_sqrd']
 
         sver_kw = dict(
-            xy_thresh=sver_xy_thresh, ori_thresh=sver_ori_thresh,
+            xy_thresh=sver_xy_thresh,
+            ori_thresh=sver_ori_thresh,
             scale_thresh=sver_scale_thresh,
             refine_method=refine_method,
             dlen_sqrd2=dlen_sqrd2,
@@ -589,8 +638,7 @@ class PairwiseMatch(ub.NiceRepr):
                 (inliers, errors, H_12) = svtup
                 n_inliers = len(inliers)
 
-                if agg_H_12 is None or (n_inliers < 100 and
-                                        n_inliers > prev_best):
+                if agg_H_12 is None or (n_inliers < 100 and n_inliers > prev_best):
                     # pick a homography from a lower ratio threshold if
                     # possible. TODO: check for H_12 = np.eye
                     agg_H_12 = H_12
@@ -638,7 +686,7 @@ class PairwiseMatch(ub.NiceRepr):
         match.local_measures = ut.odict([])
         match.assign(cfgdict)
         match.apply_ratio_test(cfgdict, inplace=True)
-        sv_on, = match._take_params(cfgdict, ['sv_on'])
+        (sv_on,) = match._take_params(cfgdict, ['sv_on'])
 
         if sv_on:
             match.apply_sver(cfgdict, inplace=True)
@@ -661,8 +709,7 @@ class PairwiseMatch(ub.NiceRepr):
         """
         if match.verbose:
             print('[match] apply_sver')
-        flags, errors, H_12 = match.sver_flags(cfgdict,
-                                               return_extra=True)
+        flags, errors, H_12 = match.sver_flags(cfgdict, return_extra=True)
         match_ = match.compress(flags, inplace=inplace)
         errors_ = [e.compress(flags) for e in errors]
         match_.local_measures['sver_err_xy'] = errors_[0]
@@ -674,6 +721,7 @@ class PairwiseMatch(ub.NiceRepr):
     def _make_global_feature_vector(match, global_keys=None):
         """ Global annotation properties and deltas """
         import vtool as vt
+
         feat = ut.odict([])
 
         if global_keys is None:
@@ -731,9 +779,9 @@ class PairwiseMatch(ub.NiceRepr):
                 feat['global(speed)'] = km_delta / hour_delta
         return feat
 
-    def _make_local_summary_feature_vector(match, local_keys=None,
-                                           summary_ops=None, bin_key=None,
-                                           bins=None):
+    def _make_local_summary_feature_vector(
+        match, local_keys=None, summary_ops=None, bin_key=None, bins=None
+    ):
         r"""
         Summary statistics of local features
 
@@ -790,18 +838,14 @@ class PairwiseMatch(ub.NiceRepr):
                 fxs = np.where(bin_ids <= binid)[0]
                 if 'len' in summary_ops:
                     dimkey = dimkey_fmt.format(
-                        opname='len', measure='matches',
-                        bin_key=bin_key,
-                        binval=binval,
+                        opname='len', measure='matches', bin_key=bin_key, binval=binval,
                     )
                     feat[dimkey] = len(fxs)
                 for opname in sorted(summary_ops - {'len'}):
                     op = SUM_OPS[opname]
                     for k, vs in local_measures.items():
                         dimkey = dimkey_fmt.format(
-                            opname=opname, measure=k,
-                            bin_key=bin_key,
-                            binval=binval,
+                            opname=opname, measure=k, bin_key=bin_key, binval=binval,
                         )
                         feat[dimkey] = op(vs[fxs])
 
@@ -834,8 +878,9 @@ class PairwiseMatch(ub.NiceRepr):
                         feat['med(%s)' % (k,)] = np.median(vs)
         return feat
 
-    def _make_local_top_feature_vector(match, local_keys=None, sorters='ratio',
-                                       indices=3):
+    def _make_local_top_feature_vector(
+        match, local_keys=None, sorters='ratio', indices=3
+    ):
         """ Selected subsets of top features """
         if local_keys is None:
             local_measures = match.local_measures
@@ -854,21 +899,29 @@ class PairwiseMatch(ub.NiceRepr):
         # TODO: some sorters might want descending orders
         sorters = ut.ensure_iterable(sorters)
         chosen_xs = [
-            match.local_measures[sorter].argsort()[::-1][indices]
-            for sorter in sorters
+            match.local_measures[sorter].argsort()[::-1][indices] for sorter in sorters
         ]
         loc_fmt = 'loc[{sorter},{rank}]({measure})'
-        feat = ut.odict([
-            (loc_fmt.format(sorter=sorter, rank=rank, measure=k), v)
-            for sorter, topxs in zip(sorters, chosen_xs)
-            for k, vs in local_measures.items()
-            for rank, v in zip(indices, vs[topxs])
-        ])
+        feat = ut.odict(
+            [
+                (loc_fmt.format(sorter=sorter, rank=rank, measure=k), v)
+                for sorter, topxs in zip(sorters, chosen_xs)
+                for k, vs in local_measures.items()
+                for rank, v in zip(indices, vs[topxs])
+            ]
+        )
         return feat
 
-    def make_feature_vector(match, local_keys=None, global_keys=None,
-                            summary_ops=None, sorters='ratio', indices=3,
-                            bin_key=None, bins=None):
+    def make_feature_vector(
+        match,
+        local_keys=None,
+        global_keys=None,
+        summary_ops=None,
+        sorters='ratio',
+        indices=3,
+        bin_key=None,
+        bins=None,
+    ):
         """
         Constructs the pairwise feature vector that represents a match
 
@@ -896,12 +949,18 @@ class PairwiseMatch(ub.NiceRepr):
         """
         feat = ut.odict([])
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
+            warnings.simplefilter('ignore', category=RuntimeWarning)
             feat.update(match._make_global_feature_vector(global_keys))
-            feat.update(match._make_local_summary_feature_vector(
-                local_keys, summary_ops, bin_key=bin_key, bins=bins))
-            feat.update(match._make_local_top_feature_vector(
-                local_keys, sorters=sorters, indices=indices))
+            feat.update(
+                match._make_local_summary_feature_vector(
+                    local_keys, summary_ops, bin_key=bin_key, bins=bins
+                )
+            )
+            feat.update(
+                match._make_local_top_feature_vector(
+                    local_keys, sorters=sorters, indices=indices
+                )
+            )
         return feat
 
 
@@ -916,12 +975,12 @@ def csum(x):
 # Different summary options available for pairwise feature vecs
 SUM_OPS = {
     # 'len'    : len,
-    'invsum' : invsum,
+    'invsum': invsum,
     # 'csum'   : csum,
-    'sum'    : np.sum,
-    'mean'   : np.mean,
-    'std'    : np.std,
-    'med' : np.median,
+    'sum': np.sum,
+    'mean': np.mean,
+    'std': np.std,
+    'med': np.median,
 }
 
 
@@ -968,6 +1027,7 @@ class AnnotPairFeatInfo(object):
         >>> print('global_keys = %r' % (global_keys,))
         >>> ut.cprint(featinfo.get_infostr(), 'blue')
     """
+
     def __init__(featinfo, columns=None, importances=None):
         featinfo.importances = importances
         if columns is not None:
@@ -983,14 +1043,17 @@ class AnnotPairFeatInfo(object):
 
     def make_pairfeat_cfg(featinfo):
         criteria = [('measure_type', '==', 'local')]
-        indices = sorted(map(int, set(map(
-            featinfo.local_rank, featinfo.select_columns(criteria)))))
-        sorters = sorted(set(map(
-            featinfo.local_sorter, featinfo.select_columns(criteria))))
+        indices = sorted(
+            map(int, set(map(featinfo.local_rank, featinfo.select_columns(criteria))))
+        )
+        sorters = sorted(
+            set(map(featinfo.local_sorter, featinfo.select_columns(criteria)))
+        )
 
         criteria = [('measure_type', '==', 'global')]
-        global_measures = sorted(set(map(
-            featinfo.global_measure, featinfo.select_columns(criteria))))
+        global_measures = sorted(
+            set(map(featinfo.global_measure, featinfo.select_columns(criteria)))
+        )
 
         global_keys = []
         for key in global_measures:
@@ -1001,16 +1064,12 @@ class AnnotPairFeatInfo(object):
         if 'speed' in global_keys:
             global_keys.remove('speed')  # hack
 
-        summary_cols = featinfo.select_columns([
-            ('measure_type', '==', 'summary')])
+        summary_cols = featinfo.select_columns([('measure_type', '==', 'summary')])
         summary_ops = sorted(set(map(featinfo.summary_op, summary_cols)))
-        summary_measures = sorted(set(map(featinfo.summary_measure,
-                                          summary_cols)))
-        summary_binvals = sorted(set(map(featinfo.summary_binval,
-                                         summary_cols)))
+        summary_measures = sorted(set(map(featinfo.summary_measure, summary_cols)))
+        summary_binvals = sorted(set(map(featinfo.summary_binval, summary_cols)))
         summary_binvals = ut.filter_Nones(summary_binvals)
-        summary_binkeys = sorted(set(map(featinfo.summary_binkey,
-                                         summary_cols)))
+        summary_binkeys = sorted(set(map(featinfo.summary_binkey, summary_cols)))
         summary_binkeys = ut.filter_Nones(summary_binkeys)
         if 'matches' in summary_measures:
             summary_measures.remove('matches')
@@ -1072,6 +1131,7 @@ class AnnotPairFeatInfo(object):
             value = 'len'
         """
         import six
+
         if isinstance(op, six.text_type):
             opdict = ut.get_comparison_operators()
             op = opdict.get(op)
@@ -1108,8 +1168,7 @@ class AnnotPairFeatInfo(object):
         ave_w = weight / num
         tup = ave_w, weight, num
         # return tup
-        df = pd.DataFrame([tup], columns=['ave_w', 'weight', 'num'],
-                          index=[name])
+        df = pd.DataFrame([tup], columns=['ave_w', 'weight', 'num'], index=[name])
         return df
 
     def print_margins(featinfo, group_id, ignore_trivial=True):
@@ -1246,27 +1305,32 @@ class AnnotPairFeatInfo(object):
         # https://stackoverflow.com/questions/18706631/pyparsing-get-token-location-in-results-name
         # Here is a start of a grammer if we need to get serious
         import pyparsing as pp
+
         # locator = pp.Empty().setParseAction(lambda s, l, t: l)
         # with feature dimension name encoding
         # _summary_keys = ['sum', 'mean', 'med', 'std', 'len']
         _summary_keys = featinfo._summary_keys
         S = pp.Suppress
+
         class Nestings(object):
             """ allows for a bit of syntactic sugar """
+
             def __call__(self, x):
                 return pp.Suppress('(') + x + pp.Suppress(')')
+
             def __getitem__(self, x):
                 return pp.Suppress('[') + x + pp.Suppress(']')
+
         brak = paren = Nestings()
         unary_id = pp.Regex('[12]')
         unary_id = (unary_id)('unary_id')
         # takes care of non-greedy matching of underscores
         # http://stackoverflow.com/questions/1905278/keyword-matching-in-
         unary_measure = pp.Combine(
-            pp.Word(pp.alphanums) +
-            pp.ZeroOrMore('_' + ~unary_id + pp.Word(pp.alphanums)))
+            pp.Word(pp.alphanums) + pp.ZeroOrMore('_' + ~unary_id + pp.Word(pp.alphanums))
+        )
         unary_sub = brak[pp.Word(pp.nums)]
-        global_unary = (unary_measure + S('_') + unary_id + pp.ZeroOrMore(unary_sub))
+        global_unary = unary_measure + S('_') + unary_id + pp.ZeroOrMore(unary_sub)
         global_unary = (global_unary)('global_unary')
 
         global_relation = pp.Word(pp.alphas + '_')
@@ -1282,8 +1346,7 @@ class AnnotPairFeatInfo(object):
         local_sorter = (local_sorter)('local_sorter')
         local_measure = (local_measure)('local_measure')
         local_feature = (
-            'loc' + brak[local_sorter + S(',') + local_rank] +
-            paren(local_measure)
+            'loc' + brak[local_sorter + S(',') + local_rank] + paren(local_measure)
         )('local_feature')
         # Summary
         summary_measure = pp.Word(pp.alphas + '_')('summary_measure')
@@ -1326,40 +1389,48 @@ class AnnotPairFeatInfo(object):
             type_ = featinfo.measure_type(key)
             grouped_keys[type_].append(key)
 
-        info_items = ub.odict([
-            ('global_measures', ut.lmap(featinfo.global_measure,
-                                        grouped_keys['global'])),
-
-            ('local_sorters', set(map(featinfo.local_sorter,
-                                       grouped_keys['local']))),
-            ('local_ranks', set(map(featinfo.local_rank,
-                                     grouped_keys['local']))),
-            ('local_measures', set(map(featinfo.local_measure,
-                                        grouped_keys['local']))),
-
-            ('summary_measures', set(map(featinfo.summary_measure,
-                                          grouped_keys['summary']))),
-            ('summary_ops', set(map(featinfo.summary_op,
-                                     grouped_keys['summary']))),
-            # ('summary_bins', set(map(featinfo.summary_bin,
-            #                          grouped_keys['summary']))),
-            ('summary_binvals', set(map(featinfo.summary_binval,
-                                        grouped_keys['summary']))),
-            ('summary_binkeys', set(map(featinfo.summary_binkey,
-                                        grouped_keys['summary']))),
-        ])
+        info_items = ub.odict(
+            [
+                (
+                    'global_measures',
+                    ut.lmap(featinfo.global_measure, grouped_keys['global']),
+                ),
+                ('local_sorters', set(map(featinfo.local_sorter, grouped_keys['local']))),
+                ('local_ranks', set(map(featinfo.local_rank, grouped_keys['local']))),
+                (
+                    'local_measures',
+                    set(map(featinfo.local_measure, grouped_keys['local'])),
+                ),
+                (
+                    'summary_measures',
+                    set(map(featinfo.summary_measure, grouped_keys['summary'])),
+                ),
+                ('summary_ops', set(map(featinfo.summary_op, grouped_keys['summary']))),
+                # ('summary_bins', set(map(featinfo.summary_bin,
+                #                          grouped_keys['summary']))),
+                (
+                    'summary_binvals',
+                    set(map(featinfo.summary_binval, grouped_keys['summary'])),
+                ),
+                (
+                    'summary_binkeys',
+                    set(map(featinfo.summary_binkey, grouped_keys['summary'])),
+                ),
+            ]
+        )
 
         import textwrap
+
         def _wrap(list_):
             unwrapped = ', '.join(sorted(list_))
-            indent = (' ' * 4)
+            indent = ' ' * 4
             lines_ = textwrap.wrap(unwrapped, width=80 - len(indent))
             lines = ['    ' + line for line in lines_]
             return lines
 
         lines = []
         lines.append('Feature Dimensions: %d' % (len(featinfo.columns)))
-        for item  in info_items.items():
+        for item in info_items.items():
             key, list_ = item
             list_ = {a for a in list_ if a is not None}
             if len(list_):
@@ -1394,7 +1465,7 @@ def ensure_metadata_vsone(annot1, annot2, cfgdict={}):
     ensure_metadata_feats(annot1, cfgdict=cfgdict)
     ensure_metadata_feats(annot2, cfgdict=cfgdict)
 
-    symmetric, = PairwiseMatch._take_params(cfgdict, ['symmetric'])
+    (symmetric,) = PairwiseMatch._take_params(cfgdict, ['symmetric'])
 
     ensure_metadata_flann(annot1, cfgdict=cfgdict)
 
@@ -1406,11 +1477,14 @@ def ensure_metadata_vsone(annot1, annot2, cfgdict={}):
 
 def ensure_metadata_normxy(annot, cfgdict={}):
     import vtool as vt
+
     if 'norm_xys' not in annot:
+
         def eval_normxy():
             xys = vt.get_xys(annot['kpts'])
             chip_wh = np.array(annot['chip_size'])[:, None]
             return xys / chip_wh
+
         annot.set_lazy_func('norm_xys', eval_normxy)
 
 
@@ -1440,6 +1514,7 @@ def ensure_metadata_feats(annot, cfgdict={}):
         >>> assert len(annot._stored_results) >= 5
     """
     import vtool as vt
+
     rchip_key = 'rchip'
     nchip_key = 'nchip'
     _feats_key = '_feats'
@@ -1448,58 +1523,67 @@ def ensure_metadata_feats(annot, cfgdict={}):
     rchip_fpath_key = 'rchip_fpath'
 
     if rchip_key not in annot:
+
         def eval_rchip():
             rchip_fpath = annot[rchip_fpath_key]
             return vt.imread(rchip_fpath)
+
         annot.set_lazy_func(rchip_key, eval_rchip)
 
     if nchip_key not in annot:
+
         def eval_normchip():
             print('EVAL NORMCHIP')
             # Hack in normalization (hack because rchip might already
             # be normalized)
             filter_list = []
             config = {
-                pi.varname: (cfgdict[pi.varname] if pi.varname in cfgdict else
-                             pi.default)
+                pi.varname: (cfgdict[pi.varname] if pi.varname in cfgdict else pi.default)
                 for pi in NORM_CHIP_CONFIG
             }
             # new way
             if config['histeq']:
-                filter_list.append(
-                    ('histeq', {})
-                )
+                filter_list.append(('histeq', {}))
             if config['medianblur']:
                 filter_list.append(
-                    ('medianblur', {
-                        'noise_thresh': config['medianblur_thresh'],
-                        'ksize1': config['medianblur_ksize1'],
-                        'ksize2': config['medianblur_ksize2'],
-                    }))
+                    (
+                        'medianblur',
+                        {
+                            'noise_thresh': config['medianblur_thresh'],
+                            'ksize1': config['medianblur_ksize1'],
+                            'ksize2': config['medianblur_ksize2'],
+                        },
+                    )
+                )
             if config['adapteq']:
                 ksize = config['adapteq_ksize']
                 filter_list.append(
-                    ('adapteq', {
-                        'tileGridSize': (ksize, ksize),
-                        'clipLimit': config['adapteq_limit'],
-                    })
+                    (
+                        'adapteq',
+                        {
+                            'tileGridSize': (ksize, ksize),
+                            'clipLimit': config['adapteq_limit'],
+                        },
+                    )
                 )
             rchip = annot[rchip_key]
             if filter_list:
                 from vtool import image_filters
+
                 ipreproc = image_filters.IntensityPreproc()
                 nchip = ipreproc.preprocess(rchip, filter_list)
             else:
                 nchip = rchip
             return nchip
+
         annot.set_lazy_func(nchip_key, eval_normchip)
 
     if kpts_key not in annot or vecs_key not in annot:
+
         def eval_feats():
             rchip = annot[nchip_key]
             feat_cfgkeys = [pi.varname for pi in VSONE_FEAT_CONFIG]
-            feat_cfgdict = {key: cfgdict[key] for key in feat_cfgkeys if
-                            key in cfgdict}
+            feat_cfgdict = {key: cfgdict[key] for key in feat_cfgkeys if key in cfgdict}
             _feats = vt.extract_features(rchip, **feat_cfgdict)
             return _feats
 
@@ -1512,6 +1596,7 @@ def ensure_metadata_feats(annot, cfgdict={}):
             _feats = annot[_feats_key]
             vecs = _feats[1]
             return vecs
+
         annot.set_lazy_func(_feats_key, eval_feats)
         annot.set_lazy_func(kpts_key, eval_kpts)
         annot.set_lazy_func(vecs_key, eval_vecs)
@@ -1520,10 +1605,12 @@ def ensure_metadata_feats(annot, cfgdict={}):
 
 def ensure_metadata_dlen_sqrd(annot):
     if 'dlen_sqrd' not in annot:
+
         def eval_dlen_sqrd(annot):
             rchip = annot['rchip']
             dlen_sqrd = rchip.shape[0] ** 2 + rchip.shape[1] ** 2
             return dlen_sqrd
+
         annot.set_lazy_func('dlen_sqrd', lambda: eval_dlen_sqrd(annot))
     return annot
 
@@ -1531,17 +1618,19 @@ def ensure_metadata_dlen_sqrd(annot):
 def ensure_metadata_flann(annot, cfgdict):
     """ setup lazy flann evaluation """
     import vtool as vt
+
     flann_params = {'algorithm': 'kdtree', 'trees': 8}
 
     if 'flann' not in annot:
+
         def eval_flann():
             vecs = annot['vecs']
             if len(vecs) == 0:
                 _flann = None
             else:
-                _flann = vt.flann_cache(vecs, flann_params=flann_params,
-                                        verbose=False)
+                _flann = vt.flann_cache(vecs, flann_params=flann_params, verbose=False)
             return _flann
+
         annot.set_lazy_func('flann', eval_flann)
     return annot
 
@@ -1583,18 +1672,20 @@ def symmetric_correspondence(annot1, annot2, K, Knorm, checks, allow_shrink=True
     num_neighbors = K + Knorm
 
     fx1_to_fx2, fx1_to_dist = normalized_nearest_neighbors(
-        annot2['flann'], annot1['vecs'], num_neighbors, checks)
+        annot2['flann'], annot1['vecs'], num_neighbors, checks
+    )
 
     fx2_to_fx1, fx2_to_dist = normalized_nearest_neighbors(
-        annot1['flann'], annot2['vecs'], num_neighbors, checks)
+        annot1['flann'], annot2['vecs'], num_neighbors, checks
+    )
 
     # fx2_to_flags = flag_symmetric_matches(fx2_to_fx1, fx1_to_fx2, K)
 
     assigntup2 = assign_symmetric_matches(
-        fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist, K, Knorm)
+        fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist, K, Knorm
+    )
 
-    (fm, match_dist, fx1_norm, norm_dist1, fx2_norm,
-     norm_dist2) = assigntup2
+    (fm, match_dist, fx1_norm, norm_dist1, fx2_norm, norm_dist2) = assigntup2
     norm_dist = np.minimum(norm_dist1, norm_dist2)
 
     return fm, match_dist, norm_dist, fx1_norm, fx2_norm
@@ -1615,11 +1706,13 @@ def asymmetric_correspondence(annot1, annot2, K, Knorm, checks, allow_shrink=Tru
     num_neighbors = K + Knorm
 
     fx2_to_fx1, fx2_to_dist = normalized_nearest_neighbors(
-        annot1['flann'], annot2['vecs'], num_neighbors, checks)
+        annot1['flann'], annot2['vecs'], num_neighbors, checks
+    )
     fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool)
     # Assign correspondences
-    assigntup = assign_unconstrained_matches(fx2_to_fx1, fx2_to_dist, K,
-                                             Knorm, fx2_to_flags)
+    assigntup = assign_unconstrained_matches(
+        fx2_to_fx1, fx2_to_dist, K, Knorm, fx2_to_flags
+    )
     fm, match_dist, fx1_norm, norm_dist = assigntup
     fx2_norm = None
 
@@ -1634,6 +1727,7 @@ def normalized_nearest_neighbors(flann1, vecs2, K, checks=800):
     between 0 and 1 using sifts uint8 trick
     """
     import vtool as vt
+
     if K == 0:
         (fx2_to_fx1, _fx2_to_dist_sqrd) = empty_neighbors(len(vecs2), 0)
     elif len(vecs2) == 0:
@@ -1643,10 +1737,11 @@ def normalized_nearest_neighbors(flann1, vecs2, K, checks=800):
     elif K > flann1.get_indexed_shape()[0]:
         # Corner case, may be better to throw an assertion error
         raise MatchingError('not enough database features')
-        #(fx2_to_fx1, _fx2_to_dist_sqrd) = empty_neighbors(len(vecs2), 0)
+        # (fx2_to_fx1, _fx2_to_dist_sqrd) = empty_neighbors(len(vecs2), 0)
     else:
         fx2_to_fx1, _fx2_to_dist_sqrd = flann1.nn_index(
-            vecs2, num_neighbors=K, checks=checks)
+            vecs2, num_neighbors=K, checks=checks
+        )
     _fx2_to_dist = np.sqrt(_fx2_to_dist_sqrd.astype(np.float64))
     # normalized SIFT dist
     fx2_to_dist = np.divide(_fx2_to_dist, PSEUDO_MAX_DIST)
@@ -1655,8 +1750,9 @@ def normalized_nearest_neighbors(flann1, vecs2, K, checks=800):
     return fx2_to_fx1, fx2_to_dist
 
 
-def assign_symmetric_matches(fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist,
-                             K, Knorm=None):
+def assign_symmetric_matches(
+    fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist, K, Knorm=None
+):
     r"""
     import vtool as vt
     from vtool.matching import *
@@ -1719,10 +1815,11 @@ def assign_symmetric_matches(fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist,
 
     fx2_to_flags = flag_symmetric_matches(fx2_to_fx1, fx1_to_fx2, K)
     flat_validx2 = np.flatnonzero(fx2_to_flags)
-    match_fx2   = np.floor_divide(flat_validx2, K, dtype=index_dtype)
+    match_fx2 = np.floor_divide(flat_validx2, K, dtype=index_dtype)
     match_rank2 = np.mod(flat_validx2, K, dtype=index_dtype)
-    flat_match_idx2 = np.ravel_multi_index((match_fx2, match_rank2),
-                                           dims=fx2_to_fx1.shape)
+    flat_match_idx2 = np.ravel_multi_index(
+        (match_fx2, match_rank2), dims=fx2_to_fx1.shape
+    )
     match_fx1 = fx2_to_fx1.take(flat_match_idx2)
     match_dist1 = fx2_to_dist.take(flat_match_idx2)
 
@@ -1733,11 +1830,9 @@ def assign_symmetric_matches(fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist,
     # TODO: for each position in fm need to find corresponding position in fm_
 
     # Currently just use the last one as a normalizer
-    norm_rank = np.array([basic_norm_rank] * len(match_fx2),
-                         dtype=match_fx2.dtype)
+    norm_rank = np.array([basic_norm_rank] * len(match_fx2), dtype=match_fx2.dtype)
     # norm_rank = basic_norm_rank
-    flat_norm_idx1 = np.ravel_multi_index((match_fx2, norm_rank),
-                                          dims=fx2_to_fx1.shape)
+    flat_norm_idx1 = np.ravel_multi_index((match_fx2, norm_rank), dims=fx2_to_fx1.shape)
     norm_fx1 = fx2_to_fx1.take(flat_norm_idx1)
     norm_dist1 = fx2_to_dist.take(flat_norm_idx1)
     norm_fx1 = fx2_to_fx1[match_fx2, norm_rank]
@@ -1747,16 +1842,16 @@ def assign_symmetric_matches(fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist,
     # REVERSE DIRECTION
     fx1_to_flags = flag_symmetric_matches(fx1_to_fx2, fx2_to_fx1, K)
     flat_validx1 = np.flatnonzero(fx1_to_flags)
-    match_fx1_   = np.floor_divide(flat_validx1, K, dtype=index_dtype)
+    match_fx1_ = np.floor_divide(flat_validx1, K, dtype=index_dtype)
     match_rank1 = np.mod(flat_validx1, K, dtype=index_dtype)
-    flat_match_idx1 = np.ravel_multi_index((match_fx1_, match_rank1),
-                                           dims=fx1_to_fx2.shape)
+    flat_match_idx1 = np.ravel_multi_index(
+        (match_fx1_, match_rank1), dims=fx1_to_fx2.shape
+    )
     match_fx2_ = fx1_to_fx2.take(flat_match_idx1)
     # match_dist2_ = fx1_to_dist.take(flat_match_idx1)
     fm_ = np.vstack((match_fx1_, match_fx2_)).T
 
-    flat_norm_idx2_ = np.ravel_multi_index((match_fx1_, norm_rank),
-                                           dims=fx1_to_fx2.shape)
+    flat_norm_idx2_ = np.ravel_multi_index((match_fx1_, norm_rank), dims=fx1_to_fx2.shape)
     norm_fx2_ = fx1_to_fx2.take(flat_norm_idx2_)
     norm_dist2_ = fx1_to_dist.take(flat_norm_idx2_)
 
@@ -1782,13 +1877,13 @@ def assign_symmetric_matches(fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist,
 
     np.minimum(a_norm_dist2_, a_norm_dist1)
 
-    assigntup = (a_fm, a_match_dist, a_norm_fx1, a_norm_dist1, a_norm_fx2_,
-                 a_norm_dist2_)
+    assigntup = (a_fm, a_match_dist, a_norm_fx1, a_norm_dist1, a_norm_fx2_, a_norm_dist2_)
     return assigntup
 
 
-def assign_unconstrained_matches(fx2_to_fx1, fx2_to_dist, K, Knorm=None,
-                                 fx2_to_flags=None):
+def assign_unconstrained_matches(
+    fx2_to_fx1, fx2_to_dist, K, Knorm=None, fx2_to_flags=None
+):
     """
     assigns vsone matches using results of nearest neighbors.
 
@@ -1847,14 +1942,13 @@ def assign_unconstrained_matches(fx2_to_fx1, fx2_to_dist, K, Knorm=None,
         # make everything valid
         flat_validx = np.arange(len(fx2_to_fx1) * K, dtype=index_dtype)
     else:
-        #fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool)
+        # fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool)
         flat_validx = np.flatnonzero(fx2_to_flags)
 
-    match_fx2  = np.floor_divide(flat_validx, K, dtype=index_dtype)
+    match_fx2 = np.floor_divide(flat_validx, K, dtype=index_dtype)
     match_rank = np.mod(flat_validx, K, dtype=index_dtype)
 
-    flat_match_idx = np.ravel_multi_index((match_fx2, match_rank),
-                                          dims=fx2_to_fx1.shape)
+    flat_match_idx = np.ravel_multi_index((match_fx2, match_rank), dims=fx2_to_fx1.shape)
     match_fx1 = fx2_to_fx1.take(flat_match_idx)
     match_dist = fx2_to_dist.take(flat_match_idx)
 
@@ -1866,10 +1960,8 @@ def assign_unconstrained_matches(fx2_to_fx1, fx2_to_dist, K, Knorm=None,
         basic_norm_rank = K + Knorm - 1
 
     # Currently just use the last one as a normalizer
-    norm_rank = np.array([basic_norm_rank] * len(match_fx2),
-                         dtype=match_fx2.dtype)
-    flat_norm_idx = np.ravel_multi_index((match_fx2, norm_rank),
-                                         dims=fx2_to_fx1.shape)
+    norm_rank = np.array([basic_norm_rank] * len(match_fx2), dtype=match_fx2.dtype)
+    flat_norm_idx = np.ravel_multi_index((match_fx2, norm_rank), dims=fx2_to_fx1.shape)
     norm_fx1 = fx2_to_fx1.take(flat_norm_idx)
     norm_dist = fx2_to_dist.take(flat_norm_idx)
     norm_fx1 = fx2_to_fx1[match_fx2, norm_rank]
@@ -1931,7 +2023,7 @@ def flag_symmetric_matches(fx2_to_fx1, fx1_to_fx2, K=2):
     # matches[fx2, k, i] is the i-th recip neighbor of the k-th neighbor of fx
     matched = matched.reshape((len(fx2_to_fx1), K, K))
     # If a reciprocal neighbor is itself, then the feature is good
-    flags = (matched == fx2_list[:, None, None])
+    flags = matched == fx2_list[:, None, None]
     fx2_to_flags = np.any(flags, axis=2)
     return fx2_to_flags
 
@@ -1942,4 +2034,5 @@ if __name__ == '__main__':
         python ~/code/vtool/vtool/matching.py
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

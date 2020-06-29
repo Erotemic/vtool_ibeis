@@ -118,7 +118,9 @@ def argsort_groups(scores_list, reverse=False, rng=np.random, randomize_levels=T
         >>> print(result)
 
     """
-    scores_list_ = [np.array(scores, copy=True).astype(np.float) for scores in scores_list]
+    scores_list_ = [
+        np.array(scores, copy=True).astype(np.float) for scores in scores_list
+    ]
     breakers_list = [rng.rand(len(scores)) for scores in scores_list_]
     # replace nan with -inf, or inf randomize order between equal values
     replval = -np.inf if reverse else np.inf
@@ -126,12 +128,14 @@ def argsort_groups(scores_list, reverse=False, rng=np.random, randomize_levels=T
     for scores in scores_list_:
         scores[np.isnan(scores)] = replval
     # The last column is sorted by first with lexsort
-    scorebreaker_list = [np.array((breakers, scores))
-                         for scores, breakers in zip(scores_list_, breakers_list)]
+    scorebreaker_list = [
+        np.array((breakers, scores))
+        for scores, breakers in zip(scores_list_, breakers_list)
+    ]
     if reverse:
-        idxs_list = [np.lexsort(scorebreaker)[::-1] for scorebreaker in  scorebreaker_list]
+        idxs_list = [np.lexsort(scorebreaker)[::-1] for scorebreaker in scorebreaker_list]
     else:
-        idxs_list = [np.lexsort(scorebreaker) for scorebreaker in  scorebreaker_list]
+        idxs_list = [np.lexsort(scorebreaker) for scorebreaker in scorebreaker_list]
     return idxs_list
 
 
@@ -141,8 +145,10 @@ def check_sift_validity(sift_uint8, lbl=None, verbose=ut.NOT_QUIET):
     """
     if lbl is None:
         lbl = ut.get_varname_from_stack(sift_uint8, N=1)
-    print('[checksift] Checking valididty of %d SIFT descriptors. lbl=%s' % (
-        sift_uint8.shape[0], lbl))
+    print(
+        '[checksift] Checking valididty of %d SIFT descriptors. lbl=%s'
+        % (sift_uint8.shape[0], lbl)
+    )
     is_correct_shape = len(sift_uint8.shape) == 2 and sift_uint8.shape[1] == 128
     is_correct_dtype = sift_uint8.dtype == np.uint8
     if not is_correct_shape:
@@ -160,7 +166,7 @@ def check_sift_validity(sift_uint8, lbl=None, verbose=ut.NOT_QUIET):
 
     # Check L2 norm
     sift_norm = np.linalg.norm(sift_float01, axis=1)
-    is_normal = np.isclose(sift_norm, 1.0, atol=.04)
+    is_normal = np.isclose(sift_norm, 1.0, atol=0.04)
     bad_locs_norm = np.where(np.logical_not(is_normal))[0]
     if len(bad_locs_norm) > 0:
         print('[checksift]  * bad norm   = %4d/%d' % (len(bad_locs_norm), num_sifts))
@@ -170,9 +176,9 @@ def check_sift_validity(sift_uint8, lbl=None, verbose=ut.NOT_QUIET):
     # Check less than thresh=.2
     # This check actually is not valid because the SIFT descriptors is
     # normalized after it is thresholded
-    #bad_locs_thresh = np.where((sift_float01 > .2).sum(axis=1))[0]
-    #print('[checksift]  * bad thresh = %4d/%d' % (len(bad_locs_thresh), num_sifts))
-    #if len(bad_locs_thresh) > 0:
+    # bad_locs_thresh = np.where((sift_float01 > .2).sum(axis=1))[0]
+    # print('[checksift]  * bad thresh = %4d/%d' % (len(bad_locs_thresh), num_sifts))
+    # if len(bad_locs_thresh) > 0:
     #    above_thresh = sift_float01[(sift_float01 > .2)]
     #    print('[checksift]  * components under thresh = %d' % (sift_float01 <= 2).sum())
     #    print('[checksift]  * components above thresh stats = ' +
@@ -215,10 +221,10 @@ def get_crop_slices(isfill):
             return endpoint + 1
         return min(consec_index)
 
-    consec_rows_top    = get_min_consec_endpoint(consec_rows_list, 0)
+    consec_rows_top = get_min_consec_endpoint(consec_rows_list, 0)
     consec_rows_bottom = get_max_consec_endpoint(consec_rows_list, nRows - 1)
-    remove_cols_left   = get_min_consec_endpoint(consec_cols_list, 0)
-    remove_cols_right  = get_max_consec_endpoint(consec_cols_list, nCols - 1)
+    remove_cols_left = get_min_consec_endpoint(consec_cols_list, 0)
+    remove_cols_right = get_max_consec_endpoint(consec_cols_list, nCols - 1)
     rowslice = slice(consec_rows_top, consec_rows_bottom)
     colslice = slice(remove_cols_left, remove_cols_right)
     return rowslice, colslice
@@ -244,7 +250,7 @@ def get_undirected_edge_ids(directed_edges):
         >>> print(result)
         edgeid_list = [0 0 1 2 3 1 1]
     """
-    #import vtool as vt
+    # import vtool as vt
     undirected_edges = to_undirected_edges(directed_edges)
     edgeid_list = compute_unique_data_ids(undirected_edges)
     return edgeid_list
@@ -252,7 +258,7 @@ def get_undirected_edge_ids(directed_edges):
 
 def to_undirected_edges(directed_edges, upper=False):
     assert len(directed_edges.shape) == 2 and directed_edges.shape[1] == 2
-    #flipped = qaid_arr < daid_arr
+    # flipped = qaid_arr < daid_arr
     if upper:
         flipped = directed_edges.T[0] > directed_edges.T[1]
     else:
@@ -297,13 +303,14 @@ def find_best_undirected_edge_indexes(directed_edges, score_arr=None):
         [0 2 3 4]
     """
     import vtool as vt
-    #assert len(directed_edges.shape) == 2 and directed_edges.shape[1] == 2
+
+    # assert len(directed_edges.shape) == 2 and directed_edges.shape[1] == 2
     ##flipped = qaid_arr < daid_arr
-    #flipped = directed_edges.T[0] < directed_edges.T[1]
+    # flipped = directed_edges.T[0] < directed_edges.T[1]
     ## standardize edge order
-    #edges_dupl = directed_edges.copy()
-    #edges_dupl[flipped, 0:2] = edges_dupl[flipped, 0:2][:, ::-1]
-    #edgeid_list = vt.compute_unique_data_ids(edges_dupl)
+    # edges_dupl = directed_edges.copy()
+    # edges_dupl[flipped, 0:2] = edges_dupl[flipped, 0:2][:, ::-1]
+    # edgeid_list = vt.compute_unique_data_ids(edges_dupl)
     edgeid_list = get_undirected_edge_ids(directed_edges)
     unique_edgeids, groupxs = vt.group_indices(edgeid_list)
     # if there is more than one edge in a group take the one with the highest score
@@ -382,16 +389,17 @@ def compute_ndarray_unique_rowids_unsafe(arr):
     """
     # no checks performed
     void_dtype = np.dtype((np.void, arr.dtype.itemsize * arr.shape[1]))
-    #assert arr.flags['C_CONTIGUOUS']
+    # assert arr.flags['C_CONTIGUOUS']
     arr_void_view = arr.view(void_dtype)
     unique, rowids = np.unique(arr_void_view, return_inverse=True)
     return rowids
-    #np.ascontiguousarray(arr).data == arr.data
-    #assert arr.data == arr_void_view.data
+    # np.ascontiguousarray(arr).data == arr.data
+    # assert arr.data == arr_void_view.data
 
 
 def nonunique_row_flags(arr):
     import vtool as vt
+
     unique_rowx = unique_row_indexes(arr)
     unique_flags = vt.index_to_boolmask(unique_rowx, len(arr))
     nonunique_flags = np.logical_not(unique_flags)
@@ -495,12 +503,9 @@ def compute_unique_integer_data_ids(data):
     # get the number of decimal places to shift
     exp_step = np.ceil(np.log10(data.max()))
     offsets = [int(10 ** (ix * exp_step)) for ix in reversed(range(0, ncols))]
-    dataid_list = np.array([
-        sum([
-            item * offset
-            for item, offset in zip(row, offsets)
-        ])
-        for row in data])
+    dataid_list = np.array(
+        [sum([item * offset for item, offset in zip(row, offsets)]) for row in data]
+    )
     return dataid_list
 
 
@@ -552,11 +557,7 @@ def index_partition(item_list, part1_items):
         >>> ut.assert_eq(part1_indexes.tolist(), [1, 2])
         >>> ut.assert_eq(part2_indexes.tolist(), [0])
     """
-    part1_indexes_ = [
-        item_list.index(item)
-        for item in part1_items
-        if item in item_list
-    ]
+    part1_indexes_ = [item_list.index(item) for item in part1_items if item in item_list]
     part1_indexes = np.array(part1_indexes_)
     part2_indexes = np.setdiff1d(np.arange(len(item_list)), part1_indexes)
     # FIXME: use dtype np.int_
@@ -640,10 +641,10 @@ def weighted_average_scoring(fsv, weight_filtxs, nonweight_filtxs):
         >>> print(result)
 
     """
-    weight_fs    = fsv.T.take(weight_filtxs, axis=0).T.prod(axis=1)
+    weight_fs = fsv.T.take(weight_filtxs, axis=0).T.prod(axis=1)
     nonweight_fs = fsv.T.take(nonweight_filtxs, axis=0).T.prod(axis=1)
     weight_fs_norm01 = weight_fs / weight_fs.sum()
-    #weight_fs_norm01[np.isnan(weight_fs_norm01)] = 0.0
+    # weight_fs_norm01[np.isnan(weight_fs_norm01)] = 0.0
     # If weights are nan, fill them with zeros
     weight_fs_norm01 = np.nan_to_num(weight_fs_norm01)
     new_fs = np.multiply(nonweight_fs, weight_fs_norm01)
@@ -667,7 +668,9 @@ def zipcompress_safe(arr_list, flags_list, axis=None):
 
 
 def zipcompress(arr_list, flags_list, axis=None):
-    return [np.compress(flags, arr, axis=axis) for arr, flags in zip(arr_list, flags_list)]
+    return [
+        np.compress(flags, arr, axis=axis) for arr, flags in zip(arr_list, flags_list)
+    ]
 
 
 def ziptake(arr_list, indices_list, axis=None):
@@ -702,6 +705,7 @@ def zipcat(arr1_list, arr2_list, axis=None):
         >>> print('arr3_list2 = %s' % (ut.repr3(arr3_list2),))
     """
     import vtool as vt
+
     assert len(arr1_list) == len(arr2_list), 'lists must correspond'
     if axis is None:
         arr1_iter = arr1_list
@@ -767,7 +771,7 @@ def atleast_nd(arr, n, tofront=False):
     """
     arr_ = np.asanyarray(arr)
     ndims = len(arr_.shape)
-    if n is not None and ndims <  n:
+    if n is not None and ndims < n:
         # append the required number of dimensions to the end
         if tofront:
             expander = (None,) * (n - ndims) + (Ellipsis,)
@@ -809,9 +813,9 @@ def ensure_shape(arr, dimshape):
         dimshape = None
     arr_ = atleast_nd(arr, n)
     if dimshape is not None:
-        newshape = tuple([
-            d1 if d2 is None else d2
-            for d1, d2 in zip(arr_.shape, dimshape)])
+        newshape = tuple(
+            [d1 if d2 is None else d2 for d1, d2 in zip(arr_.shape, dimshape)]
+        )
         arr_.shape = newshape
     return arr_
 
@@ -862,15 +866,15 @@ def atleast_shape(arr, dimshape):
     if n < len(sig_shape):
         raise ValueError(
             'len(dimshape)={} must be >= than '
-            'len(significant_shape(arr)={})'.format(n, sig_shape))
+            'len(significant_shape(arr)={})'.format(n, sig_shape)
+        )
     arr_ = atleast_nd(arr, n)
     for d1, d2 in zip(arr_.shape, dimshape):
         if d2 > 1 and d1 != 1 and d1 != d2:
-            raise ValueError('cannot broadcast {} to {}'.format(
-                arr_.shape, dimshape
-            ))
-    reps = tuple(1 if d2 is None or (d1 == d2) else d2
-                 for d1, d2 in zip(arr_.shape, dimshape))
+            raise ValueError('cannot broadcast {} to {}'.format(arr_.shape, dimshape))
+    reps = tuple(
+        1 if d2 is None or (d1 == d2) else d2 for d1, d2 in zip(arr_.shape, dimshape)
+    )
     arr_ = np.tile(arr_, reps)
     return arr_
 
@@ -1078,7 +1082,7 @@ def intersect2d_flags(A, B):
         >>> result = str((flag_list1, flag_list2))
         >>> print(result)
     """
-    A_, B_, C_  = intersect2d_structured_numpy(A, B)
+    A_, B_, C_ = intersect2d_structured_numpy(A, B)
     flag_list1 = flag_intersection(A_, C_)
     flag_list2 = flag_intersection(B_, C_)
     return flag_list1, flag_list2
@@ -1142,12 +1146,15 @@ def flag_intersection(arr1, arr2):
         >>> out = ut.timeit_compare(stmt_list, setup=setup, iterations=3)
     """
     import vtool as vt
+
     if arr1.size == 0 or arr2.size == 0:
         flags = np.full(arr1.shape[0], False, dtype=np.bool)
-        #return np.empty((0,), dtype=np.bool)
+        # return np.empty((0,), dtype=np.bool)
     else:
         # flags = np.logical_or.reduce([arr1 == row for row in arr2]).T[0]
-        flags = vt.iter_reduce_ufunc(np.logical_or, (arr1 == row_ for row_ in arr2)).ravel()
+        flags = vt.iter_reduce_ufunc(
+            np.logical_or, (arr1 == row_ for row_ in arr2)
+        ).ravel()
     return flags
 
 
@@ -1175,8 +1182,10 @@ def structure_rows(*arrs):
     """
     arr0 = arrs[0]
     ncols = arr0.shape[1]
-    dtype = {'names': ['f%d' % (i,) for i in range(ncols)],
-             'formats': ncols * [arr0.dtype]}
+    dtype = {
+        'names': ['f%d' % (i,) for i in range(ncols)],
+        'formats': ncols * [arr0.dtype],
+    }
     for arr in arrs:
         assert len(arr.shape) == 2, 'arrays must be 2d'
         assert arr.dtype == arr0.dtype, 'arrays must share the same dtype'
@@ -1194,8 +1203,9 @@ def unstructure_rows(*structured_arrs):
         structure_rows
     """
     # TODO: assert arr.dtype.fields are all the same type
-    unstructured_arrs = [arr.view(list(arr.dtype.fields.values())[0][0])
-                         for arr in structured_arrs]
+    unstructured_arrs = [
+        arr.view(list(arr.dtype.fields.values())[0][0]) for arr in structured_arrs
+    ]
     unstructured_arrs = []
     for arr_ in structured_arrs:
         dtype = list(arr_.dtype.fields.values())[0][0]
@@ -1220,21 +1230,24 @@ def intersect2d_structured_numpy(arr1, arr2, assume_unique=False):
     ncols = arr1.shape[1]
     assert arr1.dtype == arr2.dtype, (
         'arr1 and arr2 must have the same dtypes.'
-        'arr1.dtype=%r, arr2.dtype=%r' % (arr1.dtype, arr2.dtype))
+        'arr1.dtype=%r, arr2.dtype=%r' % (arr1.dtype, arr2.dtype)
+    )
     # [('f%d' % i, arr1.dtype) for i in range(ncols)]
-    #dtype = np.dtype([('f%d' % i, arr1.dtype) for i in range(ncols)])
-    #dtype = {'names': ['f{}'.format(i) for i in range(ncols)],
+    # dtype = np.dtype([('f%d' % i, arr1.dtype) for i in range(ncols)])
+    # dtype = {'names': ['f{}'.format(i) for i in range(ncols)],
     #         'formats': ncols * [arr1.dtype]}
-    dtype = {'names': ['f%d' % (i,) for i in range(ncols)],
-             'formats': ncols * [arr1.dtype]}
-    #try:
+    dtype = {
+        'names': ['f%d' % (i,) for i in range(ncols)],
+        'formats': ncols * [arr1.dtype],
+    }
+    # try:
     A_ = np.ascontiguousarray(arr1).view(dtype)
     B_ = np.ascontiguousarray(arr2).view(dtype)
     C_ = np.intersect1d(A_, B_, assume_unique=assume_unique)
-    #C = np.intersect1d(arr1.view(dtype),
+    # C = np.intersect1d(arr1.view(dtype),
     #                   arr2.view(dtype),
     #                   assume_unique=assume_unique)
-    #except ValueError:
+    # except ValueError:
     #    C = np.intersect1d(A.copy().view(dtype),
     #                       B.copy().view(dtype),
     #                       assume_unique=assume_unique)
@@ -1371,21 +1384,22 @@ def get_uncovered_mask(covered_array, covering_array):
 
     """
     import vtool as vt
+
     if len(covering_array) == 0:
         return np.ones(np.shape(covered_array), dtype=np.bool)
     else:
         flags_iter = (np.not_equal(covered_array, item) for item in covering_array)
         mask_array = vt.iter_reduce_ufunc(np.logical_and, flags_iter)
         return mask_array
-    #if len(covering_array) == 0:
+    # if len(covering_array) == 0:
     #    return np.ones(np.shape(covered_array), dtype=np.bool)
-    #else:
+    # else:
     #    flags_list = (np.not_equal(covered_array, item) for item in covering_array)
     #    mask_array = and_lists(*flags_list)
     #    return mask_array
 
 
-#def get_uncovered_mask2(covered_array, covering_array):
+# def get_uncovered_mask2(covered_array, covering_array):
 #    if len(covering_array) == 0:
 #        return np.ones(np.shape(covered_array), dtype=np.bool)
 #    else:
@@ -1496,12 +1510,16 @@ def compare_matrix_columns(matrix, columns, comp_op=np.equal, logic_op=np.logica
 
     """
     # FIXME: Generalize
-    #row_matrix = matrix.T
-    #row_list   = columns.T
-    return compare_matrix_to_rows(matrix.T, columns.T, comp_op=comp_op, logic_op=logic_op).T
+    # row_matrix = matrix.T
+    # row_list   = columns.T
+    return compare_matrix_to_rows(
+        matrix.T, columns.T, comp_op=comp_op, logic_op=logic_op
+    ).T
 
 
-def compare_matrix_to_rows(row_matrix, row_list, comp_op=np.equal, logic_op=np.logical_or):
+def compare_matrix_to_rows(
+    row_matrix, row_list, comp_op=np.equal, logic_op=np.logical_or
+):
     """
     Compares each row in row_list to each row in row matrix using comp_op
     Both must have the same number of columns.
@@ -1513,12 +1531,13 @@ def compare_matrix_to_rows(row_matrix, row_list, comp_op=np.equal, logic_op=np.l
     compop   = np.equal
     logic_op = np.logical_or
     """
-    row_result_list = [np.array([comp_op(matrow, row) for matrow in row_matrix])
-                       for row in row_list]
+    row_result_list = [
+        np.array([comp_op(matrow, row) for matrow in row_matrix]) for row in row_list
+    ]
     output = row_result_list[0]
     for row_result in row_result_list[1:]:
         logic_op(output, row_result, out=output)
-        #output = logic_op(output, row_result)
+        # output = logic_op(output, row_result)
     return output
 
 
@@ -1544,8 +1563,8 @@ def norm01(array, dim=None):
     """
     if not ut.is_float(array):
         array = array.astype(np.float32)
-    array_max  = array.max(dim)
-    array_min  = array.min(dim)
+    array_max = array.max(dim)
+    array_min = array.min(dim)
     array_exnt = np.subtract(array_max, array_min)
     array_norm = np.divide(np.subtract(array, array_min), array_exnt)
     return array_norm
@@ -1553,6 +1572,7 @@ def norm01(array, dim=None):
 
 def weighted_geometic_mean_unnormalized(data, weights):
     import vtool as vt
+
     terms = [x ** w for x, w in zip(data, weights)]
     termprod = vt.iter_reduce_ufunc(np.multiply, iter(terms))
     return termprod
@@ -1603,6 +1623,7 @@ def weighted_geometic_mean(data, weights):
         res2 = np.sqrt(img1 * img2)
     """
     import vtool as vt
+
     terms = [np.asarray(x ** w) for x, w in zip(data, weights)]
     termprod = vt.iter_reduce_ufunc(np.multiply, iter(terms))
     exponent = 1 / np.sum(weights)
@@ -1630,6 +1651,7 @@ def grab_webcam_image():
         >>> ut.show_if_requested()
     """
     import cv2
+
     cap = cv2.VideoCapture(0)
     # Capture frame-by-frame
     ret, img = cap.read()
@@ -1638,7 +1660,7 @@ def grab_webcam_image():
     return img
 
 
-#def xor_swap(arr1, arr2, inplace=True):
+# def xor_swap(arr1, arr2, inplace=True):
 #    if not inplace:
 #        arr1 = arr1.copy()
 #        arr2 = arr2.copy()
@@ -1678,10 +1700,12 @@ def find_first_true_indices(flags_list):
         >>> print(result)
         [0, None, 1, 2]
     """
+
     def tryget_fisrt_true(flags):
         index_list = np.where(flags)[0]
         index = None if len(index_list) == 0 else index_list[0]
         return index
+
     index_list = [tryget_fisrt_true(flags) for flags in flags_list]
     return index_list
 
@@ -1713,16 +1737,21 @@ def find_k_true_indicies(flags_list, k):
 
     if False:
         import vtool as vt
+
         flags_list = np.array(flags_list)
         rowxs, colxs = np.where(flags_list)
         first_k_groupxs = [groupx[0:k] for groupx in vt.group_indices(rowxs)[1]]
         chosen_xs = np.hstack(first_k_groupxs)
-        flat_xs = np.ravel_multi_index((rowxs.take(chosen_xs), colxs.take(chosen_xs)), flags_list.shape)
+        flat_xs = np.ravel_multi_index(
+            (rowxs.take(chosen_xs), colxs.take(chosen_xs)), flags_list.shape
+        )
         flat_xs
+
     def tryget_k_true(flags):
         index_list = np.where(flags)[0]
         index = None if len(index_list) == 0 else index_list[0:k]
         return index
+
     index_list = [tryget_k_true(flags) for flags in flags_list]
     return index_list
 
@@ -1754,14 +1783,18 @@ def find_next_true_indices(flags_list, offset_list):
         >>> print(result)
         [2, None, 2, None]
     """
+
     def tryget_next_true(flags, offset_):
         offset = offset_ + 1
         relative_flags = flags[offset:]
         rel_index_list = np.where(relative_flags)[0]
         index = None if len(rel_index_list) == 0 else rel_index_list[0] + offset
         return index
-    index_list = [None if offset is None else tryget_next_true(flags, offset)
-                  for flags, offset in zip(flags_list, offset_list)]
+
+    index_list = [
+        None if offset is None else tryget_next_true(flags, offset)
+        for flags, offset in zip(flags_list, offset_list)
+    ]
     return index_list
 
 
@@ -1800,7 +1833,7 @@ def safe_extreme(arr, op, fill=np.nan, finite=False, nans=True):
         if not nans:
             arr = arr.compress(np.logical_not(np.isnan(arr)))
         if len(arr) == 0:
-            extreme =  fill
+            extreme = fill
         else:
             extreme = op(arr)
     return extreme
@@ -1900,8 +1933,7 @@ def multigroup_lookup_naive(lazydict, keys_list, subkeys_list, custom_func):
     data_lists = []
     for keys, subkeys in zip(keys_list, subkeys_list):
         subvals_list = [
-            custom_func(lazydict, key, [subkey])[0]
-            for key, subkey in zip(keys, subkeys)
+            custom_func(lazydict, key, [subkey])[0] for key, subkey in zip(keys, subkeys)
         ]
         data_lists.append(subvals_list)
     return data_lists
@@ -1952,6 +1984,7 @@ def multigroup_lookup(lazydict, keys_list, subkeys_list, custom_func):
         >>> subkeys_list = [np.array([]), np.array([]), np.array([])]
     """
     import vtool as vt
+
     # Group the keys in each multi-list individually
     multi_groups = [vt.group_indices(keys) for keys in keys_list]
     # Combine keys across multi-lists usings a dict_stack
@@ -1999,8 +2032,18 @@ def multigroup_lookup(lazydict, keys_list, subkeys_list, custom_func):
     return data_lists
 
 
-def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
-             lbl2=None, output_lbl=None, verbose=True, iswarning=False):
+def asserteq(
+    output1,
+    output2,
+    thresh=1e-8,
+    nestpath=None,
+    level=0,
+    lbl1=None,
+    lbl2=None,
+    output_lbl=None,
+    verbose=True,
+    iswarning=False,
+):
     """
     recursive equality checks
 
@@ -2023,9 +2066,12 @@ def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
     except AssertionError as ex:
         print(type(output1))
         print(type(output2))
-        ut.printex(ex, 'FAILED TYPE CHECKS',
-                   keys=common_keys + [(type, 'output1'), (type, 'output2')],
-                   iswarning=iswarning)
+        ut.printex(
+            ex,
+            'FAILED TYPE CHECKS',
+            keys=common_keys + [(type, 'output1'), (type, 'output2')],
+            iswarning=iswarning,
+        )
         failed = True
         if not iswarning:
             raise
@@ -2034,7 +2080,10 @@ def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
         try:
             assert len(output1) == len(output2), 'lens are not equal'
         except AssertionError as ex:
-            keys = common_keys + [(len, 'output1'), (len, 'output2'), ]
+            keys = common_keys + [
+                (len, 'output1'),
+                (len, 'output2'),
+            ]
             ut.printex(ex, 'FAILED LEN CHECKS. ', keys=keys)
             raise
     # CHECK: ndarrays
@@ -2045,30 +2094,34 @@ def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
             assert output1.shape == output2.shape, 'ndarray shapes are unequal'
         except AssertionError as ex:
             keys = common_keys + ndarray_keys
-            ut.printex(ex, 'FAILED NUMPY SHAPE CHECKS.', keys=keys,
-                       iswarning=iswarning)
+            ut.printex(ex, 'FAILED NUMPY SHAPE CHECKS.', keys=keys, iswarning=iswarning)
             failed = True
             if not iswarning:
                 raise
         # CHECK: ndarray equality
         try:
-            passed, error = ut.almost_eq(output1, output2, thresh,
-                                         ret_error=True)
+            passed, error = ut.almost_eq(output1, output2, thresh, ret_error=True)
             assert np.all(passed), 'ndarrays are unequal.'
         except AssertionError as ex:
             # Statistics on value difference and value difference
             # above the thresholds
             diff_stats = ut.get_stats(error)  # NOQA
             error_stats = ut.get_stats(error[error >= thresh])  # NOQA
-            keys = common_keys + ndarray_keys + [
-                (len, 'output1'), (len, 'output2'), ('diff_stats'),
-                ('error_stats'), ('thresh'),
-            ]
+            keys = (
+                common_keys
+                + ndarray_keys
+                + [
+                    (len, 'output1'),
+                    (len, 'output2'),
+                    ('diff_stats'),
+                    ('error_stats'),
+                    ('thresh'),
+                ]
+            )
             PRINT_VAL_SAMPLE = True
             if PRINT_VAL_SAMPLE:
                 keys += ['output1', 'output2']
-            ut.printex(ex, 'FAILED NUMPY CHECKS.', keys=keys,
-                       iswarning=iswarning)
+            ut.printex(ex, 'FAILED NUMPY CHECKS.', keys=keys, iswarning=iswarning)
             failed = True
             if not iswarning:
                 raise
@@ -2078,12 +2131,21 @@ def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
             # recursive call
             try:
                 asserteq(
-                    item1, item2, lbl1=lbl2, lbl2=lbl1, thresh=thresh,
-                    nestpath=nestpath + [count], level=level + 1)
+                    item1,
+                    item2,
+                    lbl1=lbl2,
+                    lbl2=lbl1,
+                    thresh=thresh,
+                    nestpath=nestpath + [count],
+                    level=level + 1,
+                )
             except AssertionError as ex:
-                ut.printex(ex, 'recursive call failed',
-                           keys=common_keys + ['item1', 'item2', 'count'],
-                           iswarning=iswarning)
+                ut.printex(
+                    ex,
+                    'recursive call failed',
+                    keys=common_keys + ['item1', 'item2', 'count'],
+                    iswarning=iswarning,
+                )
                 failed = True
                 if not iswarning:
                     raise
@@ -2093,9 +2155,12 @@ def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
             assert output1 == output2, 'output1 != output2'
         except AssertionError as ex:
             print('nestpath= %r' % (nestpath,))
-            ut.printex(ex, 'FAILED SCALAR CHECK.',
-                       keys=common_keys + ['output1', 'output2'],
-                       iswarning=iswarning)
+            ut.printex(
+                ex,
+                'FAILED SCALAR CHECK.',
+                keys=common_keys + ['output1', 'output2'],
+                iswarning=iswarning,
+            )
             failed = True
             if not iswarning:
                 raise
@@ -2106,7 +2171,9 @@ def asserteq(output1, output2, thresh=1E-8, nestpath=None, level=0, lbl1=None,
             print('WARNING %s != %s' % (lbl1, lbl2))
 
 
-def compare_implementations(func1, func2, args, show_output=False, lbl1='', lbl2='', output_lbl=None):
+def compare_implementations(
+    func1, func2, args, show_output=False, lbl1='', lbl2='', output_lbl=None
+):
     """
     tests two different implementations of the same function
     """
@@ -2128,9 +2195,8 @@ def compare_implementations(func1, func2, args, show_output=False, lbl1='', lbl2
         print('implementations are in agreement :) ')
     except AssertionError as ex:
         # prints out a nested list corresponding to nested structure
-        ut.printex(ex, 'IMPLEMENTATIONS DO NOT AGREE', keys=[
-            ('func1_name'),
-            ('func2_name'), ]
+        ut.printex(
+            ex, 'IMPLEMENTATIONS DO NOT AGREE', keys=[('func1_name'), ('func2_name'),]
         )
         raise
     finally:
@@ -2166,7 +2232,7 @@ def greedy_setcover(universe, subsets, weights=None):
         >>> print('Cover: %r' % (chosen,))
         >>> print('Total Cost: %r=sum(%r)' % (sum(costs), costs))
     """
-    #unchosen = subsets.copy()
+    # unchosen = subsets.copy()
     uncovered = universe
     chosen = []
     costs = []
@@ -2249,21 +2315,22 @@ def find_elbow_point(curve):
     return tradeoff_idx
 
 
-def zstar_value(conf_level=.95):
+def zstar_value(conf_level=0.95):
     """
     References:
         http://stackoverflow.com/questions/28242593/correct-way-to-obtain-confidence-interval-with-scipy
     """
     import scipy.stats as spstats
-    #distribution =
-    #spstats.t.interval(.95, df=(ss - 1))[1]
-    #spstats.norm.interval(.95, df=1)[1]
+
+    # distribution =
+    # spstats.t.interval(.95, df=(ss - 1))[1]
+    # spstats.norm.interval(.95, df=1)[1]
     zstar = spstats.norm.interval(conf_level)[1]
-    #zstar = spstats.norm.ppf(spstats.norm.cdf(0) + (conf_level / 2))
+    # zstar = spstats.norm.ppf(spstats.norm.cdf(0) + (conf_level / 2))
     return zstar
 
 
-def calc_error_bars_from_sample(sample_size, num_positive, pop, conf_level=.95):
+def calc_error_bars_from_sample(sample_size, num_positive, pop, conf_level=0.95):
     """
     Determines a error bars of sample
 
@@ -2276,27 +2343,31 @@ def calc_error_bars_from_sample(sample_size, num_positive, pop, conf_level=.95):
         https://en.wikipedia.org/wiki/Standard_normal_table
         https://www.unc.edu/~rls/s151-2010/class23.pdf
     """
-    #zValC_lookup = {.95: 3.8416, .99: 6.6564,}
+    # zValC_lookup = {.95: 3.8416, .99: 6.6564,}
     # We sampled ss from a population of pop and got num_positive true cases.
     ss = sample_size
     # Calculate at this confidence level
     zval = zstar_value(conf_level)
     # Calculate our plus/minus error in positive percentage
-    pos_frac = (num_positive / ss)
+    pos_frac = num_positive / ss
     pf = (pop - ss) / (pop - 1)
     err_frac = zval * np.sqrt((pos_frac) * (1 - pos_frac) * pf / ss)
     lines = []
     lines.append('population_size = %r' % (pop,))
     lines.append('sample_size = %r' % (ss,))
     lines.append('num_positive = %r' % (num_positive,))
-    lines.append('positive rate is %.2f%% ± %.2f%% @ %r confidence' % (
-        100 * pos_frac, 100 * err_frac, conf_level))
-    lines.append('positive num is %d ± %d @ %r confidence' % (
-        int(np.round(pop * pos_frac)), int(np.round(pop * err_frac)), conf_level))
+    lines.append(
+        'positive rate is %.2f%% ± %.2f%% @ %r confidence'
+        % (100 * pos_frac, 100 * err_frac, conf_level)
+    )
+    lines.append(
+        'positive num is %d ± %d @ %r confidence'
+        % (int(np.round(pop * pos_frac)), int(np.round(pop * err_frac)), conf_level)
+    )
     print(ut.msgblock('Calculate Sample Error Margin', '\n'.join(lines)))
 
 
-def calc_sample_from_error_bars(err_frac, pop, conf_level=.95, prior=.5):
+def calc_sample_from_error_bars(err_frac, pop, conf_level=0.95, prior=0.5):
     """
     Determines a reasonable sample size to achieve desired error bars.
 
@@ -2315,28 +2386,28 @@ def calc_sample_from_error_bars(err_frac, pop, conf_level=.95, prior=.5):
     ss = pop * prior * zval ** 2 * (prior - 1) / (-err_frac ** 2 * pop + err_frac ** 2 + prior * zval ** 2 * (prior - 1))
     """
     # How much confidence ydo you want (in fraction of positive results)
-    #zVal_lookup = {.95: 1.96, .99: 2.58,}
+    # zVal_lookup = {.95: 1.96, .99: 2.58,}
     zval = zstar_value(conf_level)
 
-    std = .5
+    std = 0.5
     zval * std * (1 - std) / err_frac
 
-    #margin_error = err_frac
-    #margin_error = zval * np.sqrt(prior * (1 - prior) / ss)
+    # margin_error = err_frac
+    # margin_error = zval * np.sqrt(prior * (1 - prior) / ss)
 
-    #margin_error_small = zval * np.sqrt((prior * (1 - prior) / ss) * ((pop - ss) / (pop - 1)))
-    #prior = .5  # initial uncertainty
+    # margin_error_small = zval * np.sqrt((prior * (1 - prior) / ss) * ((pop - ss) / (pop - 1)))
+    # prior = .5  # initial uncertainty
 
     # Used for large samples
-    #ss_large = (prior * (1 - prior)) / ((margin_error / zval) ** 2)
+    # ss_large = (prior * (1 - prior)) / ((margin_error / zval) ** 2)
 
     # Used for small samples
     ss_numer = pop * prior * zval ** 2 * (1 - prior)
-    ss_denom = (err_frac ** 2 * pop + err_frac ** 2 + prior * zval ** 2 * (1 - prior))
+    ss_denom = err_frac ** 2 * pop + err_frac ** 2 + prior * zval ** 2 * (1 - prior)
     ss_small = ss_numer / ss_denom
 
-    #ss_ = ((zval ** 2) * 0.25) / (err_frac ** 2)
-    #ss = int(np.ceil(ss_ / (1 + ((ss_ - 1) / pop))))
+    # ss_ = ((zval ** 2) * 0.25) / (err_frac ** 2)
+    # ss = int(np.ceil(ss_ / (1 + ((ss_ - 1) / pop))))
     ss = int(np.ceil(ss_small))
     lines = []
     lines.append('population_size = %r' % (pop,))
@@ -2378,7 +2449,8 @@ def inbounds(num, low, high, eq=False):
 
     """
     import operator as op
-    less    = op.le if eq else op.lt
+
+    less = op.le if eq else op.lt
     greater = op.ge if eq else op.gt
     and_ = np.logical_and if isinstance(num, np.ndarray) else op.and_
     is_inbounds = and_(greater(num, low), less(num, high))
@@ -2441,6 +2513,7 @@ def fromiter_nd(iter_, shape, dtype):
 def make_video2(images, outdir):
     import vtool as vt
     from os.path import join
+
     n = str(int(np.ceil(np.log10(len(images)))))
     fmt = 'frame_%0' + n + 'd.png'
     ub.ensuredir(outdir)
@@ -2449,8 +2522,7 @@ def make_video2(images, outdir):
         vt.imwrite(fname, img)
 
 
-def make_video(images, outvid=None, fps=5, size=None,
-               is_color=True, format='XVID'):
+def make_video(images, outvid=None, fps=5, size=None, is_color=True, format='XVID'):
     """
     Create a video from a list of images.
 
@@ -2472,6 +2544,7 @@ def make_video(images, outvid=None, fps=5, size=None,
     # format = 'MJPG'
     # format = 'FMP4'
     import cv2
+
     fourcc = cv2.VideoWriter_fourcc(*str(format))
     vid = None
     for img in images:
@@ -2512,4 +2585,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.other
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

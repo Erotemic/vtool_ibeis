@@ -78,7 +78,7 @@ def svd(M):
     flags = cv2.SVD_FULL_UV
     S, U, Vt = cv2.SVDecomp(M, flags=flags)
     s = S.flatten()
-    #U, s, Vt = npl.svd(M)
+    # U, s, Vt = npl.svd(M)
     return U, s, Vt
 
 
@@ -103,7 +103,7 @@ def gauss2d_pdf(x_, y_, sigma=None, mu=None):
             raise NameError('The covariance matrix cant be singular')
     denom1 = TAU ** (size / 2.0)
     denom2 = np.sqrt(det)
-    #norm_const = 1.0 / (denom1 * denom2)
+    # norm_const = 1.0 / (denom1 * denom2)
     norm_const = np.reciprocal(denom1 * denom2)
     x_mu = x - mu  # deviation from mean
     invSigma = npl.inv(sigma)  # inverse covariance
@@ -120,17 +120,14 @@ def rotation_mat3x3(radians, sin=np.sin, cos=np.cos):
     # TODO: handle array inputs
     sin_ = sin(radians)
     cos_ = cos(radians)
-    R = np.array(((cos_, -sin_,  0),
-                  (sin_,  cos_,  0),
-                  (   0,     0,  1),))
+    R = np.array(((cos_, -sin_, 0), (sin_, cos_, 0), (0, 0, 1),))
     return R
 
 
 def rotation_mat2x2(theta):
     sin_ = np.sin(theta)
     cos_ = np.cos(theta)
-    rot_ = np.array(((cos_, -sin_),
-                     (sin_,  cos_),))
+    rot_ = np.array(((cos_, -sin_), (sin_, cos_),))
     return rot_
 
 
@@ -176,24 +173,18 @@ def rotation_around_bbox_mat3x3(theta, bbox0, bbox1=None):
 
 
 def translation_mat3x3(x, y, dtype=TRANSFORM_DTYPE):
-    T = np.array([[1, 0,  x],
-                  [0, 1,  y],
-                  [0, 0,  1]], dtype=dtype)
+    T = np.array([[1, 0, x], [0, 1, y], [0, 0, 1]], dtype=dtype)
     return T
 
 
 def scale_mat3x3(sx, sy=None, dtype=TRANSFORM_DTYPE):
     sy = sx if sy is None else sy
-    S = np.array([[sx, 0, 0],
-                  [0, sy, 0],
-                  [0,  0, 1]], dtype=dtype)
+    S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]], dtype=dtype)
     return S
 
 
 def shear_mat3x3(shear_x, shear_y, dtype=TRANSFORM_DTYPE):
-    shear = np.array([[      1, shear_x, 0],
-                      [shear_y,       1, 0],
-                      [      0,       0, 1]], dtype=dtype)
+    shear = np.array([[1, shear_x, 0], [shear_y, 1, 0], [0, 0, 1]], dtype=dtype)
     return shear
 
 
@@ -214,16 +205,15 @@ def affine_mat3x3(sx=1, sy=1, theta=0, shear=0, tx=0, ty=0, trig=np):
     cos1_ = trig.cos(theta)
     sin2_ = trig.sin(theta + shear)
     cos2_ = trig.cos(theta + shear)
-    Aff = np.array([
-        [sx * cos1_, -sy * sin2_, tx],
-        [sx * sin1_,  sy * cos2_, ty],
-        [        0,            0,  1]
-    ])
+    Aff = np.array(
+        [[sx * cos1_, -sy * sin2_, tx], [sx * sin1_, sy * cos2_, ty], [0, 0, 1]]
+    )
     return Aff
 
 
-def affine_around_mat3x3(x, y, sx=1.0, sy=1.0, theta=0.0, shear=0.0, tx=0.0,
-                         ty=0.0, x2=None, y2=None):
+def affine_around_mat3x3(
+    x, y, sx=1.0, sy=1.0, theta=0.0, shear=0.0, tx=0.0, ty=0.0, x2=None, y2=None
+):
     r"""
     Executes an affine transform around center point (x, y).
     Equivalent to translation.dot(affine).dot(inv(translation))
@@ -318,9 +308,13 @@ def affine_around_mat3x3(x, y, sx=1.0, sy=1.0, theta=0.0, shear=0.0, tx=0.0,
     tx_ = -sx * x * cos_theta + sy * y * sin_shear_p_theta + tx + x2
     ty_ = -sx * x * sin_theta - sy * y * cos_shear_p_theta + ty + y2
     # Sympy compiled expression
-    Aff = np.array([[sx * cos_theta, -sy * sin_shear_p_theta, tx_],
-                    [sx * sin_theta,  sy * cos_shear_p_theta, ty_],
-                    [             0,                       0, 1]])
+    Aff = np.array(
+        [
+            [sx * cos_theta, -sy * sin_shear_p_theta, tx_],
+            [sx * sin_theta, sy * cos_shear_p_theta, ty_],
+            [0, 0, 1],
+        ]
+    )
     return Aff
 
 
@@ -346,9 +340,9 @@ def dot_ltri(ltri1, ltri2):
     # use m, n, and o as temporary matrixes
     m11, m21, m22 = ltri1
     n11, n21, n22 = ltri2
-    o11 = (m11 * n11)
+    o11 = m11 * n11
     o21 = (m21 * n11) + (m22 * n21)
-    o22 = (m22 * n22)
+    o22 = m22 * n22
     ltri3 = np.array((o11, o21, o22), dtype=ltri1.dtype)
     return ltri3
 
@@ -367,14 +361,12 @@ def whiten_xy_points(xy_m):
         >>> result = (ub.hash_data(tup))
         >>> print(result)
     """
-    mu_xy  = xy_m.mean(1)  # center of mass
+    mu_xy = xy_m.mean(1)  # center of mass
     std_xy = xy_m.std(1)
     std_xy[std_xy == 0] = 1  # prevent divide by zero
     tx, ty = -mu_xy / std_xy
     sx, sy = 1 / std_xy
-    T = np.array([(sx, 0, tx),
-                  (0, sy, ty),
-                  (0,  0,  1)])
+    T = np.array([(sx, 0, tx), (0, sy, ty), (0, 0, 1)])
     xy_norm = ((xy_m.T - mu_xy) / std_xy).T
     return xy_norm, T
 
@@ -435,7 +427,7 @@ def remove_homogenous_coordinate(_xyzs):
     """
     assert _xyzs.shape[0] == 3
     with warnings.catch_warnings():
-        warnings.simplefilter("error")
+        warnings.simplefilter('error')
         _xys = np.divide(_xyzs[0:2], _xyzs[None, 2])
     return _xys
 
@@ -446,9 +438,9 @@ def transform_points_with_homography(H, _xys):
         H (ndarray[float64_t, ndim=2]):  homography/perspective matrix
         _xys (ndarray[ndim=2]): (2 x N) array
     """
-    xyz  = add_homogenous_coordinate(_xys)
+    xyz = add_homogenous_coordinate(_xys)
     xyz_t = matrix_multiply(H, xyz)
-    xy_t  = remove_homogenous_coordinate(xyz_t)
+    xy_t = remove_homogenous_coordinate(xyz_t)
     return xy_t
 
 
@@ -503,17 +495,19 @@ def normalize(arr, ord=None, axis=None, out=None):
     return arr_normed
 
 
-def random_affine_args(zoom_pdf=None,
-                       tx_pdf=None,
-                       ty_pdf=None,
-                       shear_pdf=None,
-                       theta_pdf=None,
-                       enable_flip=False,
-                       enable_stretch=False,
-                       default_distribution='uniform',
-                       scalar_anchor='reflect',  # 0
-                       txy_pdf=None,
-                       rng=np.random):
+def random_affine_args(
+    zoom_pdf=None,
+    tx_pdf=None,
+    ty_pdf=None,
+    shear_pdf=None,
+    theta_pdf=None,
+    enable_flip=False,
+    enable_stretch=False,
+    default_distribution='uniform',
+    scalar_anchor='reflect',  # 0
+    txy_pdf=None,
+    rng=np.random,
+):
     r"""
     TODO: allow for a pdf of ranges for each dimension
 
@@ -608,8 +602,8 @@ def random_affine_args(zoom_pdf=None,
 
     affine_args = (sx, sy, theta, shear, tx, ty)
     return affine_args
-    #Aff = vt.affine_mat3x3(sx, sy, theta, shear, tx, ty)
-    #return Aff
+    # Aff = vt.affine_mat3x3(sx, sy, theta, shear, tx, ty)
+    # return Aff
 
 
 def random_affine_transform(*args, **kwargs):
@@ -624,4 +618,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.linalg
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

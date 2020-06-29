@@ -16,5 +16,5 @@ def print_image_checks(img_fpath):
         _tup = (img_fpath, ut.filesize_str(img_fpath))
         print('[io] Image %r (%s) exists. Is it corrupted?' % _tup)
     else:
-        print('[io] Image %r does not exists ' (img_fpath,))
+        print('[io] Image %r does not exists '(img_fpath,))
     return hasimg

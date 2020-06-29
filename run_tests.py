@@ -3,11 +3,15 @@
 if __name__ == '__main__':
     import pytest
     import sys
+
     package_name = 'vtool'
     pytest_args = [
-        '--cov-config', '.coveragerc',
-        '--cov-report', 'html',
-        '--cov-report', 'term',
+        '--cov-config',
+        '.coveragerc',
+        '--cov-report',
+        'html',
+        '--cov-report',
+        'term',
         '--xdoctest',
         '--cov=' + package_name,
         package_name,

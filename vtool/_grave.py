@@ -6,17 +6,17 @@ class ScoreNormalizerUnsupervised(object):
                 gridsize=1024,
                 adjust=8,
                 monotonize=False,
-                #monotonize=True,
-                #clip_factor=(ut.PHI + 1),
+                # monotonize=True,
+                # clip_factor=(ut.PHI + 1),
                 clip_factor=None,
                 reverse=None,
-            ), kwargs)
+            ),
+            kwargs,
+        )
         check_unused_kwargs(kwargs, encoder.learn_kw.keys())
         # Target recall for learned threshold
         # Support data
-        encoder.support = dict(
-            X=None,
-        )
+        encoder.support = dict(X=None,)
         # Learned score normalization
         encoder.score_domain = None
         if X is not None:
@@ -30,6 +30,7 @@ class ScoreNormalizerUnsupervised(object):
 
     def learn_probabilities(encoder, X, y=None, verbose=True):
         import vtool as vt
+
         gridsize = encoder.learn_kw['gridsize']
         adjust = encoder.learn_kw['adjust']
         # Record support
@@ -43,24 +44,30 @@ class ScoreNormalizerUnsupervised(object):
         encoder.p_xdata = p_xdata
         encoder.xdata_domain = xdata_domain
         import scipy.interpolate
+
         encoder.interp_fn = scipy.interpolate.interp1d(
-            encoder.xdata_domain, encoder.p_xdata, kind='linear',
-            copy=False, assume_sorted=False)
+            encoder.xdata_domain,
+            encoder.p_xdata,
+            kind='linear',
+            copy=False,
+            assume_sorted=False,
+        )
 
     def visualize(encoder):
         import wbia.plottool as pt
-        #is_timedata = False
+
+        # is_timedata = False
         is_timedelta = True
         p_xdata = encoder.p_xdata
         xdata_domain = encoder.xdata_domain
-        #if is_timedata:
+        # if is_timedata:
         #    xdata_domain_ = [ut.unixtime_to_datetimeobj(unixtime) for unixtime in xdata_domain]
         if is_timedelta:
-            #xdata_domain_ = [ut.unixtime_to_timedelta(unixtime) for unixtime in xdata_domain]
+            # xdata_domain_ = [ut.unixtime_to_timedelta(unixtime) for unixtime in xdata_domain]
             pass
         else:
             pass
-            #xdata_domain_ = xdata_domain
+            # xdata_domain_ = xdata_domain
         pt.plot_probabilities([p_xdata], [''], xdata=xdata_domain)
         ax = pt.gca()
 
@@ -74,24 +81,28 @@ class ScoreNormalizerUnsupervised(object):
         if is_timedelta:
             ax.set_xlabel('Time Delta')
             ax.set_title('Timedelta distribution')
+
             def timeTicks(x, pos):
                 import datetime
+
                 d = datetime.timedelta(seconds=x)
                 return str(d)
+
             import matplotlib as mpl
+
             formatter = mpl.ticker.FuncFormatter(timeTicks)
             ax.xaxis.set_major_formatter(formatter)
             pt.gcf().autofmt_xdate()
-        #if is_timedata:
+        # if is_timedata:
         #    ax.set_xlabel('Date')
         #    ax.set_title('Timestamp distribution')
         #    pt.gcf().autofmt_xdate()
-        #ax.set_title('Timestamp distribution of %s' % (ibs.get_dbname()))
-        #pt.gcf().autofmt_xdate()
+        # ax.set_title('Timestamp distribution of %s' % (ibs.get_dbname()))
+        # pt.gcf().autofmt_xdate()
 
 
 def bow_test():
-    x  = np.array([1, 0, 0, 0, 0, 0], dtype=np.float)
+    x = np.array([1, 0, 0, 0, 0, 0], dtype=np.float)
     c1 = np.array([1, 0, 1, 0, 0, 1], dtype=np.float)
     c2 = np.array([1, 1, 1, 1, 1, 1], dtype=np.float)
     x /= x.sum()
@@ -110,8 +121,8 @@ def bow_test():
     # sue3       = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)
     # tom1       = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)
 
-    names         = ['fred', 'sue', 'tom']
-    num_exemplars = [     3,     2,     1]
+    names = ['fred', 'sue', 'tom']
+    num_exemplars = [3, 2, 1]
 
     ax2_nx = np.array(ut.flatten([[nx] * num for nx, num in enumerate(num_exemplars)]))
 
@@ -129,6 +140,7 @@ def bow_test():
 
     # nx2_axs = dict(zip(*))
     import vtool as vt
+
     groupxs = vt.group_indices(ax2_nx)[1]
     class_bows = np.vstack([arr.sum(axis=0) for arr in vt.apply_grouping(darr, groupxs)])
     # generate a query for each class
@@ -146,9 +158,11 @@ def bow_test():
         qarr = np.zeros((len(names), num_words))
 
         for cx in range(len(class_bows)):
-            sample = np.random.choice(np.arange(num_words), size=30, p=true_class_bows[cx])
+            sample = np.random.choice(
+                np.arange(num_words), size=30, p=true_class_bows[cx]
+            )
             hist = np.histogram(sample, bins=np.arange(num_words + 1))[0]
-            qarr[cx] = (hist / hist.max()) >= .5
+            qarr[cx] = (hist / hist.max()) >= 0.5
         # normalize histograms
         qarr = qarr / qarr.sum(axis=1)[:, None]
 
@@ -184,11 +198,14 @@ def match_inspect_graph():
         >>> gt.qtapp_loop(qwin=self, freq=10)
     """
     import vtool as vt
-    annots = [lazy_test_annot('easy1.png'),
-              lazy_test_annot('easy2.png'),
-              lazy_test_annot('easy3.png'),
-              lazy_test_annot('zebra.png'),
-              lazy_test_annot('hard3.png')]
+
+    annots = [
+        lazy_test_annot('easy1.png'),
+        lazy_test_annot('easy2.png'),
+        lazy_test_annot('easy3.png'),
+        lazy_test_annot('zebra.png'),
+        lazy_test_annot('hard3.png'),
+    ]
     matches = [vt.PairwiseMatch(a1, a2) for a1, a2 in ut.combinations(annots, 2)]
     self = MultiMatchInspector(matches=matches)
     return self
@@ -205,8 +222,7 @@ class MultiMatchInspector(INSPECT_BASE):
         # self.edge_tab = tab_widget.addNewTab('Edges')
         # self.match_tab = tab_widget.addNewTab('Matches')
 
-        self.edge_api_widget = gt.APIItemWidget(
-            doubleClicked=self.edge_doubleclick)
+        self.edge_api_widget = gt.APIItemWidget(doubleClicked=self.edge_doubleclick)
         self.match_inspector = MatchInspector(match=None)
 
         self.splitter.addWidget(self.edge_api_widget)
@@ -226,7 +242,9 @@ class MultiMatchInspector(INSPECT_BASE):
                 'index': list(range(len(self.matches))),
                 'aid1': [m.annot1['aid'] for m in self.matches],
                 'aid2': [m.annot2['aid'] for m in self.matches],
-            }, sort_reverse=False)
+            },
+            sort_reverse=False,
+        )
         headers = edge_api.make_headers(tblnice='Edges')
         self.edge_api_widget.change_headers(headers)
         self.edge_api_widget.resize_headers(edge_api)
@@ -234,5 +252,3 @@ class MultiMatchInspector(INSPECT_BASE):
         # self.edge_api_widget.view.verticalHeader().setDefaultSectionSize(24)
         # self.edge_api_widget.view.verticalHeader().setDefaultSectionSize(221)
         # self.edge_tab.setTabText('Matches (%r)' % (self.edge_api_widget.model.num_rows_total))
-
-

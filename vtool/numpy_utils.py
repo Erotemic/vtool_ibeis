@@ -64,7 +64,7 @@ def atleast_nd(arr, n, tofront=False):
     """
     arr_ = np.asanyarray(arr)
     ndims = len(arr_.shape)
-    if n is not None and ndims <  n:
+    if n is not None and ndims < n:
         # append the required number of dimensions to the front or back
         if tofront:
             expander = (None,) * (n - ndims) + (Ellipsis,)
@@ -91,9 +91,9 @@ def ensure_shape(arr, dimshape):
         dimshape = None
     arr_ = atleast_nd(arr, n)
     if dimshape is not None:
-        newshape = tuple([
-            d1 if d2 is None else d2
-            for d1, d2 in zip(arr_.shape, dimshape)])
+        newshape = tuple(
+            [d1 if d2 is None else d2 for d1, d2 in zip(arr_.shape, dimshape)]
+        )
         arr_.shape = newshape
     return arr_
 
@@ -226,14 +226,14 @@ def index_to_boolmask(index_list, maxval=None, isflat=True):
         mask = [1 1 0 0 1]
 
     """
-    #assert index_list.min() >= 0
+    # assert index_list.min() >= 0
     if maxval is None:
         maxval = index_list.max()
     mask = np.zeros(maxval, dtype=np.bool)
     if not isflat:
         # assumes non-flat
         mask.__setitem__(tuple(index_list.T), True)
-        #mask.__getitem__(tuple(index_list.T))
+        # mask.__getitem__(tuple(index_list.T))
     else:
         mask[index_list] = True
     return mask
@@ -362,4 +362,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.numpy_utils
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

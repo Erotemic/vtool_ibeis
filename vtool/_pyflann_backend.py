@@ -10,6 +10,7 @@ __all__ = ['pyflann', 'FLANN_CLS']
 
 try:
     import pyflann
+
     FLANN_CLS = pyflann.FLANN
 except ImportError:
     print('no pyflann, using cv2.flann_Index')
@@ -36,9 +37,11 @@ except ImportError:
 
     if 0:
         print('no pyflann, using dummy index')
+
         class _DUMMY_FLANN_CLS:
             def __init__(self):
                 raise RuntimeError('flann not installed')
+
         FLANN_CLS = _DUMMY_FLANN_CLS
 
 

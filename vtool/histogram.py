@@ -78,7 +78,9 @@ def argsubmaxima(hist, centers=None, maxima_thresh=None, _debug=False):
         >>> pt.show_if_requested()
         (array([ 3.0318792]), array([ 37.19208239]))
     """
-    maxima_x, maxima_y, argmaxima = hist_argmaxima(hist, centers, maxima_thresh=maxima_thresh)
+    maxima_x, maxima_y, argmaxima = hist_argmaxima(
+        hist, centers, maxima_thresh=maxima_thresh
+    )
     argmaxima = np.asarray(argmaxima)
     if _debug:
         print('Argmaxima: ')
@@ -90,9 +92,11 @@ def argsubmaxima(hist, centers=None, maxima_thresh=None, _debug=False):
     submaxima_x_, submaxima_y_ = interpolate_submaxima(argmaxima_, hist, centers)
     if np.any(flags):
         endpts = argmaxima[flags]
-        submaxima_x = (np.hstack([submaxima_x_, centers[endpts]])
-                       if centers is not None else
-                       np.hstack([submaxima_x_, endpts]))
+        submaxima_x = (
+            np.hstack([submaxima_x_, centers[endpts]])
+            if centers is not None
+            else np.hstack([submaxima_x_, endpts])
+        )
         submaxima_y = np.hstack([submaxima_y_, hist[endpts]])
     else:
         submaxima_y = submaxima_y_
@@ -145,8 +149,7 @@ def argsubmax2(ydata, xdata=None):
         raise ValueError('zero length array')
     ydata = np.asarray(ydata)
     xdata = None if xdata is None else np.asarray(xdata)
-    submaxima_x, submaxima_y = argsubmaxima2(ydata, xdata=xdata,
-                                             normalize_x=True)
+    submaxima_x, submaxima_y = argsubmaxima2(ydata, xdata=xdata, normalize_x=True)
     idx = submaxima_y.argmax()
     submax_y = submaxima_y[idx]
     submax_x = submaxima_x[idx]
@@ -154,19 +157,22 @@ def argsubmax2(ydata, xdata=None):
 
 
 def argsubmaxima2(ydata, xdata=None, thresh_factor=None, normalize_x=True):
-    return argsubextrema2('max', ydata, xdata=xdata,
-                          thresh_factor=thresh_factor, normalize_x=normalize_x)
+    return argsubextrema2(
+        'max', ydata, xdata=xdata, thresh_factor=thresh_factor, normalize_x=normalize_x
+    )
 
 
 def argsubminima2(ydata, xdata=None, thresh_factor=None, normalize_x=True):
     """
     """
-    return argsubextrema2('min', ydata, xdata=xdata,
-                          thresh_factor=thresh_factor, normalize_x=normalize_x)
+    return argsubextrema2(
+        'min', ydata, xdata=xdata, thresh_factor=thresh_factor, normalize_x=normalize_x
+    )
 
 
-def argsubextrema2(op, ydata, xdata=None, thresh_factor=None, normalize_x=True,
-                   flat=True):
+def argsubextrema2(
+    op, ydata, xdata=None, thresh_factor=None, normalize_x=True, flat=True
+):
     r"""
     Determines approximate maxima values to subindex accuracy.
 
@@ -291,7 +297,8 @@ def argsubextrema2(op, ydata, xdata=None, thresh_factor=None, normalize_x=True,
         if np.any(violates):
             warnings.warn(
                 'rel_subextrema was less extreme than the measured extrema',
-                RuntimeWarning)
+                RuntimeWarning,
+            )
             if xdata is not None:
                 rel_subextrema_x[violates] = xdata[rel_argextrema[violates]]
             else:
@@ -370,8 +377,8 @@ def _sublocalize_extrema(ydata, xdata, argextrema, cmp, normalize_x=True):
     violates = cmp(ydata[argextrema], subextrema_y)
     if np.any(violates):
         warnings.warn(
-            'subextrema was less extreme than the measured extrema',
-            RuntimeWarning)
+            'subextrema was less extreme than the measured extrema', RuntimeWarning
+        )
         if xdata is not None:
             subextrema_x[violates] = xdata[argextrema[violates]]
         else:
@@ -438,7 +445,7 @@ def hist_argmaxima(hist, centers=None, maxima_thresh=None):
     return maxima_x, maxima_y, argmaxima
 
 
-def hist_argmaxima2(hist, maxima_thresh=.8):
+def hist_argmaxima2(hist, maxima_thresh=0.8):
     """
     must take positive only values
 
@@ -481,12 +488,12 @@ def hist_argmaxima2(hist, maxima_thresh=.8):
             argmaxima_ = np.hstack([[0], argmaxima_])
     # Test if end is maximum point
     if end not in argmaxima_ and end > 0:
-        #end_is_extreme = np.all(hist[argmaxima_[-1] + 1:(end - 1)] < hist[end] )
+        # end_is_extreme = np.all(hist[argmaxima_[-1] + 1:(end - 1)] < hist[end] )
         end_is_extreme = hist[end] > hist[end - 1]
         if not end_is_extreme:
             # FIXME: might be a case when end is level
             pass
-            #end_is_extreme = np.all(hist[argmaxima_[-1] + 1:(end - 1)] == hist[end] )
+            # end_is_extreme = np.all(hist[argmaxima_[-1] + 1:(end - 1)] == hist[end] )
         if end_is_extreme and hist[end] >= maxval * maxima_thresh:
             argmaxima_ = np.hstack([argmaxima_, [end]])
     # threshold maxima to be within a factor of the maximum
@@ -564,8 +571,9 @@ def interpolate_submaxima(argmaxima, hist_, centers=None):
     #     x123[0, flags] = x123[1, flags] - 1
     #     x123[2, flags] = x123[1, flags] - 1
     # Fit parabola around points
-    coeff_list = [np.polyfit(x123_, y123_, deg=2)
-                  for (x123_, y123_) in zip(x123.T, y123.T)]
+    coeff_list = [
+        np.polyfit(x123_, y123_, deg=2) for (x123_, y123_) in zip(x123.T, y123.T)
+    ]
     A, B, C = np.vstack(coeff_list).T
     submaxima_x, submaxima_y = maximum_parabola_point(A, B, C)
 
@@ -583,7 +591,9 @@ def interpolate_submaxima(argmaxima, hist_, centers=None):
     return submaxima_x, submaxima_y
 
 
-def show_hist_submaxima(hist_, edges=None, centers=None, maxima_thresh=.8, pnum=(1, 1, 1)):
+def show_hist_submaxima(
+    hist_, edges=None, centers=None, maxima_thresh=0.8, pnum=(1, 1, 1)
+):
     r"""
     For C++ to show data
 
@@ -609,6 +619,7 @@ def show_hist_submaxima(hist_, edges=None, centers=None, maxima_thresh=.8, pnum=
         >>> pt.show_if_requested()
     """
     import wbia.plottool as pt
+
     if centers is None:
         centers = hist_edges_to_centers(edges)
     bin_colors = pt.get_orientation_color(centers)
@@ -616,12 +627,14 @@ def show_hist_submaxima(hist_, edges=None, centers=None, maxima_thresh=.8, pnum=
     POLAR = False
     if POLAR:
         pt.df2.plt.subplot(*pnum, polar=True, axisbg='#000000')
-    pt.draw_hist_subbin_maxima(hist_, centers, bin_colors=bin_colors, maxima_thresh=maxima_thresh)
-    #pt.gca().set_rmax(hist_.max() * 1.1)
-    #pt.gca().invert_yaxis()
-    #pt.gca().invert_xaxis()
+    pt.draw_hist_subbin_maxima(
+        hist_, centers, bin_colors=bin_colors, maxima_thresh=maxima_thresh
+    )
+    # pt.gca().set_rmax(hist_.max() * 1.1)
+    # pt.gca().invert_yaxis()
+    # pt.gca().invert_xaxis()
     pt.dark_background()
-    #if ut.get_argflag('--legend'):
+    # if ut.get_argflag('--legend'):
     #    pt.figure(fnum=pt.next_fnum())
     #    centers_ = np.append(centers, centers[0])
     #    r = np.ones(centers_.shape) * .2
@@ -633,14 +646,15 @@ def show_hist_submaxima(hist_, edges=None, centers=None, maxima_thresh=.8, pnum=
     #    #ax.set_title("Angle Colors", va='bottom')
     title = ut.get_argval('--title', default='')
     import wbia.plottool as pt
+
     pt.set_figtitle(title)
 
 
 def get_histinfo_str(hist, edges):
     centers = hist_edges_to_centers(edges)
-    hist_str   = 'hist    = ' + str(hist.tolist())
+    hist_str = 'hist    = ' + str(hist.tolist())
     center_str = 'centers = ' + str(centers.tolist())
-    edge_str   = 'edges   = [' +  ', '.join(['%.2f' % _ for _ in edges]) + ']'
+    edge_str = 'edges   = [' + ', '.join(['%.2f' % _ for _ in edges]) + ']'
     histinfo_str = hist_str + ut.NEWLINE + center_str + ut.NEWLINE + edge_str
     return histinfo_str
 
@@ -677,7 +691,6 @@ def get_histinfo_str(hist, edges):
 #     right_idx = right_edges.searchsorted(sa)
 
 
-
 #     right_edges[-1] - data[]
 
 #     data % right_edges[-1]
@@ -702,8 +715,9 @@ def get_histinfo_str(hist, edges):
 #     assign_right = sa.searchsorted(bin_edges[-1], 'right')
 
 
-def interpolated_histogram(data, weights, range_, bins,
-                           interpolation_wrap=True, _debug=False):
+def interpolated_histogram(
+    data, weights, range_, bins, interpolation_wrap=True, _debug=False
+):
     r"""
     Follows np.histogram, but does interpolation
 
@@ -766,19 +780,19 @@ def interpolated_histogram(data, weights, range_, bins,
     hist_dtype = np.float64
     # Compute bin step size, add one if last bin is the same as the first
     step = (stop - start) / float((bins + interpolation_wrap))
-    #edges = [start + i * step for i in range(bins + 1)]
-    #centers = hist_edges_to_centers(edges)
+    # edges = [start + i * step for i in range(bins + 1)]
+    # centers = hist_edges_to_centers(edges)
 
     half_step = step / 2.0
     # Find fractional bin center index for each datapoint
     data_offset = start + half_step
-    frac_index  = (data - data_offset) / step
+    frac_index = (data - data_offset) / step
     # Find bin center to the left of each datapoint
     left_index = np.floor(frac_index).astype(np.int32)
     # Find bin center to the right of each datapoint
     right_index = left_index + 1
     # Find the fraction of the distiance the right center is away from the datapoint
-    right_alpha = (frac_index - left_index)
+    right_alpha = frac_index - left_index
     left_alpha = 1.0 - right_alpha
 
     if _debug:
@@ -786,19 +800,19 @@ def interpolated_histogram(data, weights, range_, bins,
         print('step = %r' % step)
         print('half_step = %r' % half_step)
         print('data_offset = %r' % data_offset)
-        print("-.5 MOD tau = %r" % (-.5 % TAU,))
+        print('-.5 MOD tau = %r' % (-0.5 % TAU,))
 
     # Handle edge cases
     if interpolation_wrap:
         # when the stop == start (like in orientations)
-        left_index  %= bins
+        left_index %= bins
         right_index %= bins
     else:
         left_index[left_index < 0] = 0
         right_index[right_index >= bins] = bins - 1
 
     # Each keypoint votes into its left and right bins
-    left_vote  = left_alpha * weights
+    left_vote = left_alpha * weights
     right_vote = right_alpha * weights
     hist = np.zeros((bins,), hist_dtype)
     # TODO: can problably do this faster with cumsum
@@ -813,6 +827,7 @@ def interpolated_histogram(data, weights, range_, bins,
         edges = np.linspace(start, stop, bins + 1, endpoint=True)
     if _debug:
         import vtool as vt
+
         assert np.allclose(np.diff(edges), step)
         print(hist.shape)
         print(edges.shape)
@@ -874,6 +889,7 @@ def wrap_histogram(hist_, edges_, _debug=False):
     edge_wrap = np.hstack((edges_[0:1] - left_step, edges_, edges_[-1:] + right_step))
     if _debug:
         import vtool as vt
+
         print(vt.kpts_docrepr(hist_wrap, 'hist_wrap', False))
         print(vt.kpts_docrepr(edge_wrap, 'edge_wrap', False))
     return hist_wrap, edge_wrap
@@ -942,7 +958,7 @@ def subbin_bounds(z, radius, low, high):
         >>> print(result)
         (0, 7, 1.5)
     """
-    #print('quan pxl: z=%r, radius=%r, low=%r, high=%r' % (z, radius, low, high))
+    # print('quan pxl: z=%r, radius=%r, low=%r, high=%r' % (z, radius, low, high))
     # Get subpixel bounds ignoring boundaries
     z1 = z - radius
     z2 = z + radius
@@ -971,7 +987,7 @@ def show_ori_image_ondisk():
         >>> result = show_ori_image_ondisk()
         >>> pt.show_if_requested()
     """
-    #if img_fpath is not None:
+    # if img_fpath is not None:
     #    img_fpath = ut.get_argval('--fpath', type_=str, default=ut.grab_test_imgpath('star.png'))
     #    img_fpath = ut.get_argval('--fpath', type_=str, default=ut.grab_test_imgpath('star.png'))
     #    img = vt.imread(img_fpath)
@@ -982,7 +998,9 @@ def show_ori_image_ondisk():
     #    vt.imwrite(ori_img_fpath, vt.patch_ori(*vt.patch_gradient(img)))
     #    vt.imwrite(weights_img_fpath, vt.patch_mag(*vt.patch_gradient(img)))
     import vtool as vt
+
     print('show_ori_image_ondisk')
+
     def parse_img_from_arg(argstr_):
         fpath = ut.get_argval(argstr_, type_=str, default='None')
         if fpath is not None and fpath != 'None':
@@ -992,21 +1010,23 @@ def show_ori_image_ondisk():
             print('Did not read %s' % (fpath))
             img = None
         return img
+
     patch = parse_img_from_arg('--patch_img_fpath')
-    gori  = parse_img_from_arg('--ori_img_fpath') / 255.0 * TAU
+    gori = parse_img_from_arg('--ori_img_fpath') / 255.0 * TAU
     weights = parse_img_from_arg('--weights_img_fpath') / 255.0
     gradx = parse_img_from_arg('--gradx_img_fpath') / 255.0
     grady = parse_img_from_arg('--grady_img_fpath') / 255.0
     gauss = parse_img_from_arg('--gauss_weights_img_fpath') / 255.0
-    #print(' * ori_img_fpath = %r' % (ori_img_fpath,))
-    #print(' * weights_img_fpath = %r' % (weights_img_fpath,))
-    #print(' * gradx_img_fpath = %r' % (gradx_img_fpath,))
-    #print(' * grady_img_fpath = %r' % (grady_img_fpath,))
-    #import cv2
-    #cv2.imread(ori_img_fpath, cv2.IMREAD_UNCHANGED)
+    # print(' * ori_img_fpath = %r' % (ori_img_fpath,))
+    # print(' * weights_img_fpath = %r' % (weights_img_fpath,))
+    # print(' * gradx_img_fpath = %r' % (gradx_img_fpath,))
+    # print(' * grady_img_fpath = %r' % (grady_img_fpath,))
+    # import cv2
+    # cv2.imread(ori_img_fpath, cv2.IMREAD_UNCHANGED)
     show_ori_image(gori, weights, patch, gradx, grady, gauss)
     title = ut.get_argval('--title', default='')
     import wbia.plottool as pt
+
     pt.set_figtitle(title)
 
 
@@ -1016,6 +1036,7 @@ def show_ori_image(gori, weights, patch, gradx=None, grady=None, gauss=None, fnu
         python -m pyhesaff._pyhesaff --test-test_rot_invar --show --nocpp
     """
     import wbia.plottool as pt
+
     if fnum is None:
         fnum = pt.next_fnum()
     print('gori.max = %r' % gori.max())
@@ -1026,27 +1047,28 @@ def show_ori_image(gori, weights, patch, gradx=None, grady=None, gauss=None, fnu
 
     bgr_ori = (255 * bgr_ori).astype(np.uint8)
     print('bgr_ori.max = %r' % bgr_ori.max())
-    #bgr_ori = np.array(bgr_ori, dtype=np.uint8)
+    # bgr_ori = np.array(bgr_ori, dtype=np.uint8)
     legend = pt.make_ori_legend_img()
-    #gorimag_, woff, hoff = vt.stack_images(bgr_ori, legend, vert=False, modifysize=True)
+    # gorimag_, woff, hoff = vt.stack_images(bgr_ori, legend, vert=False, modifysize=True)
     import vtool as vt
-    gorimag_, offsets, sftup = vt.stack_images(bgr_ori, legend, vert=False,
-                                               modifysize=True,
-                                               return_sf=True)
+
+    gorimag_, offsets, sftup = vt.stack_images(
+        bgr_ori, legend, vert=False, modifysize=True, return_sf=True
+    )
     (woff, hoff) = offsets[1]
     if patch is None:
         pt.imshow(gorimag_, fnum=fnum)
     else:
         pt.imshow(gorimag_, fnum=fnum, pnum=(3, 1, 1), title='colored by orientation')
-        #pt.imshow(patch, fnum=fnum, pnum=(2, 2, 1))
-        #gradx, grady = np.cos(gori + TAU / 4.0), np.sin(gori + TAU / 4.0)
+        # pt.imshow(patch, fnum=fnum, pnum=(2, 2, 1))
+        # gradx, grady = np.cos(gori + TAU / 4.0), np.sin(gori + TAU / 4.0)
         if gradx is not None and grady is not None:
             if weights is not None:
                 gradx *= weights
                 grady *= weights
             pt.imshow(np.array(gradx * 255, dtype=np.uint8), fnum=fnum, pnum=(3, 3, 4))
             pt.imshow(np.array(grady * 255, dtype=np.uint8), fnum=fnum, pnum=(3, 3, 5))
-            #pt.imshow(bgr_ori, pnum=(2, 2, 4))
+            # pt.imshow(bgr_ori, pnum=(2, 2, 4))
             pt.draw_vector_field(gradx, grady, pnum=(3, 3, 6), invert=True)
         pt.imshow(patch, fnum=fnum, pnum=(3, 1, 3))
 
@@ -1057,4 +1079,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.histogram
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

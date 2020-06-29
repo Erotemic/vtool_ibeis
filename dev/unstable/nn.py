@@ -1,5 +1,13 @@
-def akmeans(data, nCentroids, max_iters=5, initmethod='akmeans++',
-            flann_params={}, ave_unchanged_thresh=0, ave_unchanged_iterwin=10, monitor=False):
+def akmeans(
+    data,
+    nCentroids,
+    max_iters=5,
+    initmethod='akmeans++',
+    flann_params={},
+    ave_unchanged_thresh=0,
+    ave_unchanged_iterwin=10,
+    monitor=False,
+):
     """
     Approximiate K-Means (using FLANN)
 
@@ -13,9 +21,15 @@ def akmeans(data, nCentroids, max_iters=5, initmethod='akmeans++',
     """
     # Setup iterations
     centroids = initialize_centroids(nCentroids, data, initmethod)
-    return akmeans_iterations(data, centroids, max_iters, flann_params,
-                              ave_unchanged_thresh, ave_unchanged_iterwin,
-                              monitor=monitor)
+    return akmeans_iterations(
+        data,
+        centroids,
+        max_iters,
+        flann_params,
+        ave_unchanged_thresh,
+        ave_unchanged_iterwin,
+        monitor=monitor,
+    )
 
 
 def initialize_centroids(nCentroids, data, initmethod='akmeans++'):
@@ -33,9 +47,16 @@ def initialize_centroids(nCentroids, data, initmethod='akmeans++'):
     return centroids
 
 
-def refine_akmeans(data, centroids, max_iters=5,
-                   flann_params={}, cache_dir='default', cfgstr='',
-                   use_data_hash=True, akmeans_cfgstr=None):
+def refine_akmeans(
+    data,
+    centroids,
+    max_iters=5,
+    flann_params={},
+    cache_dir='default',
+    cfgstr='',
+    use_data_hash=True,
+    akmeans_cfgstr=None,
+):
     """
     Cached refinement of approximates centroids
     """
@@ -45,13 +66,14 @@ def refine_akmeans(data, centroids, max_iters=5,
         ut.ensuredir(cache_dir)
     if akmeans_cfgstr is None:
         akmeans_cfgstr = nntool.get_flann_cfgstr(
-            data, flann_params, cfgstr, use_data_hash)
+            data, flann_params, cfgstr, use_data_hash
+        )
     centroids = akmeans_iterations(data, centroids, max_iters, flann_params, 0, 10)
     ut.save_cache(cache_dir, CLUSTERS_FNAME, akmeans_cfgstr, centroids)
     return centroids
 
 
-#def test_hdbscan():
+# def test_hdbscan():
 #    r"""
 #    CommandLine:
 #        python -m vtool.clustering2 --exec-test_hdbscan
@@ -71,9 +93,15 @@ def refine_akmeans(data, centroids, max_iters=5,
 #    pass
 
 
-def akmeans_iterations(data, centroids, max_iters, flann_params,
-                       ave_unchanged_thresh=0, ave_unchanged_iterwin=10,
-                       monitor=False):
+def akmeans_iterations(
+    data,
+    centroids,
+    max_iters,
+    flann_params,
+    ave_unchanged_thresh=0,
+    ave_unchanged_iterwin=10,
+    monitor=False,
+):
     """
     Helper function which continues the iterations of akmeans
 
@@ -120,16 +148,20 @@ def akmeans_iterations(data, centroids, max_iters, flann_params,
         # history['loss'].append(loss)
         # history['ave_unchanged'].append(ave_unchanged)
 
-    print((
-        '[akmeans] akmeans: data.shape=%r ; nCentroids=%r\n'
-        '[akmeans] * max_iters=%r\n'
-        '[akmeans] * ave_unchanged_iterwin=%r ; ave_unchanged_thresh=%r\n'
-    ) % (data.shape, nCentroids, max_iters,
-         ave_unchanged_thresh, ave_unchanged_iterwin))
+    print(
+        (
+            '[akmeans] akmeans: data.shape=%r ; nCentroids=%r\n'
+            '[akmeans] * max_iters=%r\n'
+            '[akmeans] * ave_unchanged_iterwin=%r ; ave_unchanged_thresh=%r\n'
+        )
+        % (data.shape, nCentroids, max_iters, ave_unchanged_thresh, ave_unchanged_iterwin)
+    )
     sys.stdout.flush()
     for count in ut.ProgIter(range(0, max_iters), length=max_iters, lbl='Akmeans: '):
         # 1) Assign each datapoint to the nearest centroid
-        datax2_centroidx, dists = approximate_assignments(centroids, data, 1, flann_params)
+        datax2_centroidx, dists = approximate_assignments(
+            centroids, data, 1, flann_params
+        )
         # 2) Compute new centroids (inplace) based on assignments
         centroids = compute_centroids(data, centroids, datax2_centroidx)
         # 3) Convergence Check: which datapoints changed membership?
@@ -161,6 +193,7 @@ CLUSTERS_FNAME = 'akmeans_centroids'
 def testdata_kmeans():
     # import utool as ut
     from sklearn.utils import check_array
+
     # from sklearn.utils.extmath import row_norms, squared_norm
     # from sklearn.metrics.pairwise import euclidean_distances
     # import warnings
@@ -178,6 +211,7 @@ def testdata_kmeans():
     n_clusters = K
     random_state = rng
     import numpy as np
+
     rng = np.random.RandomState(42)
     nump, dims = K ** 2, 128
     # dtype = np.uint8
@@ -186,8 +220,7 @@ def testdata_kmeans():
     num_samples = None
     flann_params = None
     X = data
-    X = check_array(X, accept_sparse="csr", order='C',
-                    dtype=[np.float32])
+    X = check_array(X, accept_sparse='csr', order='C', dtype=[np.float32])
     data = X
     return locals()
 
@@ -201,12 +234,10 @@ def kmeans_plusplus_sklearn(X, K, **kwargs):
     self = sklearn.cluster.MiniBatchKMeans(n_clusters=K, **kwargs)
 
     random_state = check_random_state(self.random_state)
-    X = check_array(X, accept_sparse="csr", order='C',
-                    dtype=[np.float64, np.float32])
+    X = check_array(X, accept_sparse='csr', order='C', dtype=[np.float64, np.float32])
     n_samples, n_features = X.shape
     if n_samples < self.n_clusters:
-        raise ValueError("Number of samples smaller than number "
-                         "of clusters.")
+        raise ValueError('Number of samples smaller than number ' 'of clusters.')
 
     x_squared_norms = row_norms(X, squared=True)
 
@@ -222,8 +253,7 @@ def kmeans_plusplus_sklearn(X, K, **kwargs):
         init_size = n_samples
     self.init_size_ = init_size
 
-    validation_indices = random_state.choice(n_samples, init_size,
-                                             replace=False)
+    validation_indices = random_state.choice(n_samples, init_size, replace=False)
     X_valid = X[validation_indices]
     x_squared_norms_valid = x_squared_norms[validation_indices]
 
@@ -233,8 +263,7 @@ def kmeans_plusplus_sklearn(X, K, **kwargs):
     best_inertia = None
     for init_idx in range(n_init):
         if self.verbose:
-            print("Init %d/%d with method: %s"
-                  % (init_idx + 1, n_init, self.init))
+            print('Init %d/%d with method: %s' % (init_idx + 1, n_init, self.init))
         counts = np.zeros(self.n_clusters, dtype=np.int32)
 
         # TODO: once the `k_means` function works with sparse input we
@@ -243,26 +272,36 @@ def kmeans_plusplus_sklearn(X, K, **kwargs):
         # Initialize the centers using only a fraction of the data as we
         # expect n_samples to be very large when using MiniBatchKMeans
         cluster_centers = sklearn.cluster.k_means_._init_centroids(
-            X, self.n_clusters, self.init,
+            X,
+            self.n_clusters,
+            self.init,
             random_state=random_state,
             x_squared_norms=x_squared_norms,
-            init_size=init_size, check_inputs=False)
+            init_size=init_size,
+            check_inputs=False,
+        )
 
         # Compute the label assignment on the init dataset
         _t = sklearn.cluster.k_means_._mini_batch_step(
-            X_valid, x_squared_norms[validation_indices],
-            cluster_centers, counts, old_center_buffer, False,
-            distances=None, verbose=self.verbose)
+            X_valid,
+            x_squared_norms[validation_indices],
+            cluster_centers,
+            counts,
+            old_center_buffer,
+            False,
+            distances=None,
+            verbose=self.verbose,
+        )
         batch_inertia, centers_squared_diff = _t
 
         # Keep only the best cluster centers across independent inits on
         # the common validation set
         _, inertia = sklearn.cluster.k_means_._labels_inertia(
-            X_valid, x_squared_norms_valid, cluster_centers)
+            X_valid, x_squared_norms_valid, cluster_centers
+        )
 
         if self.verbose:
-            print("Inertia for init %d/%d: %f"
-                  % (init_idx + 1, n_init, inertia))
+            print('Inertia for init %d/%d: %f' % (init_idx + 1, n_init, inertia))
         if best_inertia is None or inertia < best_inertia:
             self.cluster_centers_ = cluster_centers
             self.counts_ = counts
@@ -276,6 +315,7 @@ def k_means_pp_cv2(data, K):
     # Crieteria is a 3-tuple:
     #  (type, max_iter, epsilon)
     import cv2
+
     max_iter = 100
     n_init = 1
     # with ut.Timer('sklearn2km'):
@@ -291,13 +331,17 @@ def k_means_pp_cv2(data, K):
     epsilon = 0
     criteria = (criteria_type, max_iter, epsilon)
     with ut.Timer('cv2km++'):
-        loss, label, center = cv2.kmeans(data=data, K=K, bestLabels=None,
-                                         criteria=criteria, attempts=n_init,
-                                         flags=cv2.KMEANS_PP_CENTERS)
+        loss, label, center = cv2.kmeans(
+            data=data,
+            K=K,
+            bestLabels=None,
+            criteria=criteria,
+            attempts=n_init,
+            flags=cv2.KMEANS_PP_CENTERS,
+        )
 
 
-def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
-                          rng=None):
+def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None, rng=None):
     """
     Referencs:
         http://datasciencelab.wordpress.com/2014/01/15/improved-seeding-for-clustering-with-k-means/
@@ -526,18 +570,31 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     # return centers
 
 
-def get_akmeans_cfgstr(data, nCentroids, max_iters=5, initmethod='akmeans++', flann_params={},
-                       use_data_hash=True, cfgstr='', akmeans_cfgstr=None):
+def get_akmeans_cfgstr(
+    data,
+    nCentroids,
+    max_iters=5,
+    initmethod='akmeans++',
+    flann_params={},
+    use_data_hash=True,
+    cfgstr='',
+    akmeans_cfgstr=None,
+):
     if akmeans_cfgstr is None:
         # compute a hashstr based on the data
         cfgstr += '_nC=%d,nIter=%d,init=%s' % (nCentroids, max_iters, initmethod)
-        akmeans_cfgstr = nntool.get_flann_cfgstr(data, flann_params,
-                                                 cfgstr, use_data_hash)
+        akmeans_cfgstr = nntool.get_flann_cfgstr(
+            data, flann_params, cfgstr, use_data_hash
+        )
     return akmeans_cfgstr
 
 
 def assert_centroids(centroids, data, nCentroids, clip_centroids):
-    dbgkeys = ['centroids.shape', 'nCentroids', 'data.shape', ]
+    dbgkeys = [
+        'centroids.shape',
+        'nCentroids',
+        'data.shape',
+    ]
     try:
         assert centroids.shape[0] == nCentroids, 'bad number of centroids'
     except Exception as ex:
@@ -551,10 +608,22 @@ def assert_centroids(centroids, data, nCentroids, clip_centroids):
         raise
 
 
-def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
-                   cache_dir='default', force_recomp=False, use_data_hash=True,
-                   cfgstr='', refine=False, akmeans_cfgstr=None, use_cache=True,
-                   appname='vtool',  initmethod='akmeans++', clip_centroids=True):
+def cached_akmeans(
+    data,
+    nCentroids,
+    max_iters=5,
+    flann_params={},
+    cache_dir='default',
+    force_recomp=False,
+    use_data_hash=True,
+    cfgstr='',
+    refine=False,
+    akmeans_cfgstr=None,
+    use_cache=True,
+    appname='vtool',
+    initmethod='akmeans++',
+    clip_centroids=True,
+):
     """ precompute aproximate kmeans with builtin caching
 
     Example:
@@ -577,7 +646,11 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
         %timeit flann.kmeans(data, nCentroids, max_iterations=max_iters)
     """
     if data.shape[0] < nCentroids:
-        dbgkeys = ['centroids.shape', 'nCentroids', 'data.shape', ]
+        dbgkeys = [
+            'centroids.shape',
+            'nCentroids',
+            'data.shape',
+        ]
         ex = AssertionError('less data than centroids')
         ut.printex(ex, keys=dbgkeys, iswarning=clip_centroids)
         if not clip_centroids:
@@ -591,9 +664,19 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
         cache_dir = ut.get_app_resource_dir(appname)
         ut.ensuredir(cache_dir)
     # Build a cfgstr if the full one is not specified
-    akmeans_cfgstr = get_akmeans_cfgstr(data, nCentroids, max_iters,
-                                        initmethod, flann_params,
-                                        use_data_hash, cfgstr, akmeans_cfgstr) + initmethod
+    akmeans_cfgstr = (
+        get_akmeans_cfgstr(
+            data,
+            nCentroids,
+            max_iters,
+            initmethod,
+            flann_params,
+            use_data_hash,
+            cfgstr,
+            akmeans_cfgstr,
+        )
+        + initmethod
+    )
     try:
         # Try and load a previous centroiding
         if not use_cache or force_recomp:
@@ -602,10 +685,14 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
         print('[akmeans.precompute] load successful')
         if refine:
             # Refines the centroid centers if specified
-            centroids = refine_akmeans(data, centroids, max_iters=max_iters,
-                                       flann_params=flann_params,
-                                       cache_dir=cache_dir,
-                                       akmeans_cfgstr=akmeans_cfgstr)
+            centroids = refine_akmeans(
+                data,
+                centroids,
+                max_iters=max_iters,
+                flann_params=flann_params,
+                cache_dir=cache_dir,
+                akmeans_cfgstr=akmeans_cfgstr,
+            )
         try:
             assert centroids.shape[0] == nCentroids, 'bad number of centroids'
         except Exception as ex:
@@ -626,7 +713,7 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
     # First time computation
     print('[akmeans.precompute] pre_akmeans(): calling akmeans')
     # FLANN.AKMEANS IS NOT APPROXIMATE KMEANS
-    #if use_external_kmeans:
+    # if use_external_kmeans:
     #    import p yflann
     #    #import utool
     #    print('[akmeans.precompute] using flann.kmeans... (hope this is approximate)')
@@ -640,7 +727,7 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
     #    print('Begining computation...')
     #    centroids = flann.kmeans(data, nCentroids, max_iterations=max_iters)
     #    print('The true finish time is: ' + ut.get_timestamp('printable'))
-    #else:
+    # else:
     centroids = akmeans(data, nCentroids, max_iters, initmethod, flann_params)
     assert_centroids(centroids, data, nCentroids, clip_centroids)
     print('[akmeans.precompute] save and return')
@@ -651,6 +738,7 @@ def cached_akmeans(data, nCentroids, max_iters=5, flann_params={},
 
 def approximate_distances(centroids, data, K, flann_params):
     from vtool._pyflann_backend import pyflann
+
     # import pyflann
     (_, qdist2_sdist) = pyflann.FLANN().nn(centroids, data, K, **flann_params)
     return qdist2_sdist
@@ -658,6 +746,7 @@ def approximate_distances(centroids, data, K, flann_params):
 
 def approximate_assignments(seachedvecs, queryvecs, K, flann_params):
     from vtool._pyflann_backend import pyflann
+
     (qx2_sx, qdist2_sdist) = pyflann.FLANN().nn(seachedvecs, queryvecs, K, **flann_params)
     return qx2_sx, qdist2_sdist
 
@@ -756,15 +845,15 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
         outer_keys_list = np.array(map(np.array, outer_keys_list))
         items_list = np.array(map(np.array, items_list))
     outerkey2_innerkey2_items = ut.ddict(dict)
-    _iter =  zip(inner_key_list, outer_keys_list, items_list)
+    _iter = zip(inner_key_list, outer_keys_list, items_list)
     for inner_key, outer_keys, items in _iter:
         group_outerkeys, groupxs = group_indices(outer_keys)
         subitem_iter = (items.take(xs, axis=0) for xs in groupxs)
         for outer_key, subitems in zip(group_outerkeys, subitem_iter):
             outerkey2_innerkey2_items[outer_key][inner_key] = subitems
     return outerkey2_innerkey2_items
-    #daid2_wx2_drvecs = ut.ddict(lambda: ut.ddict(list))
-    #for wx, aids, rvecs in zip(wx_sublist, aids_list, rvecs_list1):
+    # daid2_wx2_drvecs = ut.ddict(lambda: ut.ddict(list))
+    # for wx, aids, rvecs in zip(wx_sublist, aids_list, rvecs_list1):
     #    group_aids, groupxs = clustertool.group_indices(aids)
     #    rvecs_group = clustertool.apply_grouping(rvecs, groupxs)
     #    for aid, subrvecs in zip(group_aids, rvecs_group):
@@ -773,14 +862,12 @@ def double_group(inner_key_list, outer_keys_list, items_list, ensure_numpy=False
 
 def sparse_normalize_rows(csr_mat):
     pass
-    #return sklearn.preprocessing.normalize(csr_mat, norm='l2', axis=1, copy=False)
+    # return sklearn.preprocessing.normalize(csr_mat, norm='l2', axis=1, copy=False)
 
 
 def sparse_multiply_rows(csr_mat, vec):
     """ Row-wise multiplication of a sparse matrix by a sparse vector """
     csr_vec = spsparse.csr_matrix(vec, copy=False)
-    #csr_vec.shape = (1, csr_vec.size)
+    # csr_vec.shape = (1, csr_vec.size)
     sparse_stack = [row.multiply(csr_vec) for row in csr_mat]
     return spsparse.vstack(sparse_stack, format='csr')
-
-

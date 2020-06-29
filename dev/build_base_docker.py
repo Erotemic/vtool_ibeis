@@ -51,7 +51,7 @@ def build_opencv_cmake_args(config):
                 'py_ver': '{}.{}'.format(sys.version_info[0], sys.version_info[1]),
                 'py_executable': sys.executable,
             },
-            'linux_jpeg_args': None
+            'linux_jpeg_args': None,
         }
         if all(v in os.environ for v in ('JPEG_INCLUDE_DIR', 'JPEG_LIBRARY')):
             default_config['linux_jpeg_args'] = {
@@ -69,79 +69,79 @@ def build_opencv_cmake_args(config):
     LINUX = config['sys_plat'].startswith('linux')
 
     if WIN32:
-        generator = "Visual Studio 14" + (" Win64" if config['is_64bit'] else '')
+        generator = 'Visual Studio 14' + (' Win64' if config['is_64bit'] else '')
     else:
         generator = 'Unix Makefiles'
 
     cmake_args = [
-        '-G', '"{}"'.format(generator),
+        '-G',
+        '"{}"'.format(generator),
         # See opencv/CMakeLists.txt for options and defaults
-        "-DBUILD_opencv_apps=OFF",
-        "-DBUILD_SHARED_LIBS=OFF",
-        "-DBUILD_TESTS=OFF",
-        "-DBUILD_PERF_TESTS=OFF",
-        "-DBUILD_DOCS=OFF"
+        '-DBUILD_opencv_apps=OFF',
+        '-DBUILD_SHARED_LIBS=OFF',
+        '-DBUILD_TESTS=OFF',
+        '-DBUILD_PERF_TESTS=OFF',
+        '-DBUILD_DOCS=OFF',
     ]
     if config['python_args'] is not None:
         py_config = config['python_args']
         PY_MAJOR = py_config['py_ver'][0]
         cmake_args += [
             # skbuild inserts PYTHON_* vars. That doesn't satisfy opencv build scripts in case of Py3
-            "-DPYTHON{}_EXECUTABLE={}".format(PY_MAJOR, py_config['py_executable']),
-            "-DBUILD_opencv_python{}=ON".format(PY_MAJOR),
-
+            '-DPYTHON{}_EXECUTABLE={}'.format(PY_MAJOR, py_config['py_executable']),
+            '-DBUILD_opencv_python{}=ON'.format(PY_MAJOR),
             # When off, adds __init__.py and a few more helper .py's. We use
             # our own helper files with a different structure.
-            "-DOPENCV_SKIP_PYTHON_LOADER=ON",
+            '-DOPENCV_SKIP_PYTHON_LOADER=ON',
             # Relative dir to install the built module to in the build tree.
             # The default is generated from sysconfig, we'd rather have a constant for simplicity
-            "-DOPENCV_PYTHON{}_INSTALL_PATH=python".format(PY_MAJOR),
+            '-DOPENCV_PYTHON{}_INSTALL_PATH=python'.format(PY_MAJOR),
             # Otherwise, opencv scripts would want to install `.pyd' right into site-packages,
             # and skbuild bails out on seeing that
-            "-DINSTALL_CREATE_DISTRIB=ON",
+            '-DINSTALL_CREATE_DISTRIB=ON',
         ]
 
     if config['build_contrib']:
         # TODO: need to know abspath
         root = '.'
         cmake_args += [
-            "-DOPENCV_EXTRA_MODULES_PATH=" + join(root, "opencv_contrib/modules")
+            '-DOPENCV_EXTRA_MODULES_PATH=' + join(root, 'opencv_contrib/modules')
         ]
 
     if config['build_headless']:
         # it seems that cocoa cannot be disabled so on macOS the package is not truly headless
-        cmake_args.append("-DWITH_WIN32UI=OFF")
-        cmake_args.append("-DWITH_QT=OFF")
+        cmake_args.append('-DWITH_WIN32UI=OFF')
+        cmake_args.append('-DWITH_QT=OFF')
     else:
         if DARWIN or LINUX:
-            cmake_args.append("-DWITH_QT=4")
+            cmake_args.append('-DWITH_QT=4')
 
     if LINUX:
-        cmake_args.append("-DWITH_V4L=ON")
-        cmake_args.append("-DENABLE_PRECOMPILED_HEADERS=OFF")
+        cmake_args.append('-DWITH_V4L=ON')
+        cmake_args.append('-DENABLE_PRECOMPILED_HEADERS=OFF')
 
         # tests fail with IPP compiled with
         # devtoolset-2 GCC 4.8.2 or vanilla GCC 4.9.4
         # see https://github.com/skvark/opencv-python/issues/138
-        cmake_args.append("-DWITH_IPP=OFF")
+        cmake_args.append('-DWITH_IPP=OFF')
         if not config['is_64bit']:
-            cmake_args.append("-DCMAKE_CXX_FLAGS=-U__STRICT_ANSI__")
+            cmake_args.append('-DCMAKE_CXX_FLAGS=-U__STRICT_ANSI__')
 
         if config['linux_jpeg_args'] is not None:
             jpeg_config = config['linux_jpeg_args']
             cmake_args += [
-                "-DBUILD_JPEG=OFF",
-                "-DJPEG_INCLUDE_DIR=" + jpeg_config['jpeg_include_dir'],
-                "-DJPEG_LIBRARY=" + jpeg_config['jpeg_library'],
+                '-DBUILD_JPEG=OFF',
+                '-DJPEG_INCLUDE_DIR=' + jpeg_config['jpeg_include_dir'],
+                '-DJPEG_LIBRARY=' + jpeg_config['jpeg_library'],
             ]
 
     # Fixes for macOS builds
     if DARWIN:
         # Some OSX LAPACK fns are incompatible, see
         # https://github.com/skvark/opencv-python/issues/21
-        cmake_args.append("-DWITH_LAPACK=OFF")
-        cmake_args.append("-DCMAKE_CXX_FLAGS=-stdlib=libc++")
-        cmake_args.append("-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.7")
+        cmake_args.append('-DWITH_LAPACK=OFF')
+        cmake_args.append('-DCMAKE_CXX_FLAGS=-stdlib=libc++')
+        cmake_args.append('-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.7')
 
     return cmake_args
 
@@ -195,8 +195,10 @@ def main():
         print('downloading opencv')
         fpath = ub.grabdata(
             'https://github.com/opencv/opencv/archive/{}.zip'.format(OPENCV_VERSION),
-            dpath=dpath, hash_prefix='1a00f2cdf2b1bd62e5a700a6f15026b2f2de9b1',
-            hasher='sha512', verbose=3
+            dpath=dpath,
+            hash_prefix='1a00f2cdf2b1bd62e5a700a6f15026b2f2de9b1',
+            hasher='sha512',
+            verbose=3,
         )
         ub.cmd('ln -s {} .'.format(fpath), cwd=dpath, verbose=0)
         ub.cmd('unzip {}'.format(fpath), cwd=dpath, verbose=0)
@@ -206,7 +208,7 @@ def main():
     PARENT_IMAGE = f'{BASE_REPO}/{BASE}'
 
     docker_header = ub.codeblock(
-        f'''
+        f"""
         FROM {PARENT_IMAGE}
 
         RUN yum install lz4-devel zlib-devel -y
@@ -217,7 +219,8 @@ def main():
         ENV _MY_DOCKER_TAG={DOCKER_TAG}
         ENV HOME=/root
         ENV PLAT={PLAT}
-        ''')
+        """
+    )
 
     MB_PYTHON_TAGS = [
         'cp38-cp38',
@@ -234,12 +237,14 @@ def main():
         # For architectures other than x86_64 we have to build cmake ourselves
         fpath = ub.grabdata(
             'https://github.com/Kitware/CMake/releases/download/v3.15.6/cmake-3.15.6.tar.gz',
-            dpath=dpath, hash_prefix='3210cbf4644a7cb8d08ad752a0b550d864666b0',
-            hasher='sha512', verbose=3
+            dpath=dpath,
+            hash_prefix='3210cbf4644a7cb8d08ad752a0b550d864666b0',
+            hasher='sha512',
+            verbose=3,
         )
         cmake_tar_fname = basename(fpath)
 
-        #manylinux1 provides curl-devel equivalent and libcurl statically linked
+        # manylinux1 provides curl-devel equivalent and libcurl statically linked
         # against the same newer OpenSSL as other source-built tools
         # (1.0.2s as of this writing)
 
@@ -247,8 +252,9 @@ def main():
         # curl -O -L https://github.com/Kitware/CMake/releases/download/v3.15.6/cmake-3.15.6.tar.gz
         # sha512sum cmake-3.15.6.tar.gz | grep '^3210cbf4644a7cb8d08ad752'
 
-        parts.append(ub.codeblock(
-            fr'''
+        parts.append(
+            ub.codeblock(
+                fr"""
 
             RUN yum install curl-devel -y
 
@@ -265,12 +271,15 @@ def main():
                 make install && \
                 cd .. && \
                 rm -rf cmake-*
-            '''))
+            """
+            )
+        )
 
     # note: perl build scripts does a lot of redundant work
     # if running "make install" separately
-    parts.append(ub.codeblock(
-        r'''
+    parts.append(
+        ub.codeblock(
+            r"""
         RUN yum install freetype-devel bzip2-devel zlib-devel -y && \
             mkdir -p ~/ffmpeg_sources
 
@@ -283,11 +292,14 @@ def main():
             make install -j$(getconf _NPROCESSORS_ONLN) && \
             cd ~/ffmpeg_sources && \
             rm -rf perl-5.20.1*
-        '''))
+        """
+        )
+    )
 
     if PLAT == 'i686':
-        parts.append(ub.codeblock(
-            r'''
+        parts.append(
+            ub.codeblock(
+                r"""
             RUN cd ~/ffmpeg_sources && \
                 curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
                 tar -xf OpenSSL_1_1_1c.tar.gz && \
@@ -298,10 +310,13 @@ def main():
                 make -j$(getconf _NPROCESSORS_ONLN) && \
                 make install_sw && \
                 rm -rf ~/openssl_build
-            '''))
+            """
+            )
+        )
     else:
-        parts.append(ub.codeblock(
-            r'''
+        parts.append(
+            ub.codeblock(
+                r"""
             RUN cd ~/ffmpeg_sources && \
                 curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
                 tar -xf OpenSSL_1_1_1c.tar.gz && \
@@ -310,10 +325,13 @@ def main():
                 make -j$(getconf _NPROCESSORS_ONLN) && \
                 make install_sw && \
                 rm -rf ~/openssl_build
-            '''))
+            """
+            )
+        )
 
-    parts.append(ub.codeblock(
-        r'''
+    parts.append(
+        ub.codeblock(
+            r"""
         RUN cd ~/ffmpeg_sources && \
             curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.14.01/nasm-2.14.01.tar.bz2 && \
             tar -xf nasm-2.14.01.tar.bz2 && cd nasm-2.14.01 && ./autogen.sh && \
@@ -356,21 +374,29 @@ def main():
             curl -O https://raw.githubusercontent.com/torvalds/linux/v4.14/include/uapi/linux/v4l2-controls.h && \
             curl -O https://raw.githubusercontent.com/torvalds/linux/v4.14/include/linux/compiler.h && \
             mv videodev2.h v4l2-common.h v4l2-controls.h compiler.h /usr/include/linux
-        '''))
+        """
+        )
+    )
 
     if PLAT == 'i686':
-        parts.append(ub.codeblock(
-            r'''
+        parts.append(
+            ub.codeblock(
+                r"""
             #in i686, yum metadata ends up with slightly wrong timestamps
             #which inhibits its update
             #https://github.com/skvark/opencv-python/issues/148
             RUN yum clean all
-            '''))
+            """
+            )
+        )
 
-    parts.append(ub.codeblock(
-        r'''
+    parts.append(
+        ub.codeblock(
+            r"""
         ENV PATH "$HOME/bin:$PATH"
-        '''))
+        """
+        )
+    )
 
     # Create a virtual environment for each supported python version
     for MB_PYTHON_TAG in MB_PYTHON_TAGS:
@@ -378,15 +404,18 @@ def main():
             pip_pkgs = 'cmake ubelt numpy wheel'
         else:
             pip_pkgs = 'ubelt numpy wheel'
-        parts.append(ub.codeblock(
-            fr'''
+        parts.append(
+            ub.codeblock(
+                fr"""
             RUN /opt/python/{MB_PYTHON_TAG}/bin/python -m pip -q --no-cache-dir install pip -U && \
                 /opt/python/{MB_PYTHON_TAG}/bin/python -m pip -q --no-cache-dir install setuptools pip virtualenv && \
                 /opt/python/{MB_PYTHON_TAG}/bin/python -m virtualenv /root/venv-{MB_PYTHON_TAG} && \
                 source /root/venv-{MB_PYTHON_TAG}/bin/activate && \
                 python -m pip -q --no-cache-dir install scikit-build ninja && \
                 python -m pip -q --no-cache-dir install {pip_pkgs}
-            '''))
+            """
+            )
+        )
 
     # we don't need opencv to build with python so only do this once
     MB_PYTHON_TAGS = MB_PYTHON_TAGS[0:1]
@@ -407,14 +436,15 @@ def main():
             'linux_jpeg_args': {
                 'jpeg_include_dir': '${JPEG_INCLUDE_DIR}',
                 'jpeg_library': '${JPEG_LIBRARY}',
-            }
+            },
         }
         sepstr = ' \\\n                '
         CMAKE_ARGS = sepstr.join(build_opencv_cmake_args(config))
 
         # Note we activate a python venv so we get the pip version of cmake.
-        parts.append(ub.codeblock(
-            fr'''
+        parts.append(
+            ub.codeblock(
+                fr"""
             RUN source /root/venv-{MB_PYTHON_TAG}/bin/activate && \
                 mkdir -p /root/code/opencv/build && \
                 cd /root/code/opencv/build && \
@@ -424,7 +454,9 @@ def main():
                 make -j{MAKE_CPUS} && \
                 make install && \
                 rm -rf /root/code/opencv/build
-            '''))
+            """
+            )
+        )
 
     docker_code = '\n\n'.join(parts)
 
@@ -437,12 +469,15 @@ def main():
     with open(dockerfile_fpath, 'w') as file:
         file.write(docker_code)
 
-    docker_build_cli = ' '.join([
-        'docker', 'build',
-        '--tag {}'.format(DOCKER_TAG),
-        '-f {}'.format(dockerfile_fpath),
-        '.'
-    ])
+    docker_build_cli = ' '.join(
+        [
+            'docker',
+            'build',
+            '--tag {}'.format(DOCKER_TAG),
+            '-f {}'.format(dockerfile_fpath),
+            '.',
+        ]
+    )
     print('docker_build_cli = {!r}'.format(docker_build_cli))
 
     if DRY:
@@ -458,12 +493,16 @@ def main():
             print('Failed command:')
             print(info['command'])
             print(info['err'])
-            raise Exception('Building docker failed with exit code {}'.format(info['ret']))
+            raise Exception(
+                'Building docker failed with exit code {}'.format(info['ret'])
+            )
         else:
             print(ub.color_text('\n--- SUCCESS ---', 'green'))
 
-        print(ub.highlight_code(ub.codeblock(
-            f'''
+        print(
+            ub.highlight_code(
+                ub.codeblock(
+                    f"""
             # Finished creating the docker image.
             # To test / export / publish you can do something like this:
 
@@ -482,7 +521,11 @@ def main():
             docker tag {DOCKER_TAG} {DOCKER_URI}
             docker push {DOCKER_URI}
 
-            '''), 'bash'))
+            """
+                ),
+                'bash',
+            )
+        )
 
     PUBLISH = 0
     if PUBLISH:

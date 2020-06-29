@@ -152,12 +152,13 @@ SCAX_DIM = 2
 SKEW_DIM = 3
 SCAY_DIM = 4
 ORI_DIM = 5
-LOC_DIMS   = np.array([XDIM, YDIM])
+LOC_DIMS = np.array([XDIM, YDIM])
 SHAPE_DIMS = np.array([SCAX_DIM, SKEW_DIM, SCAY_DIM])
 
 
-def get_grid_kpts(wh=(300, 300), wh_stride=None, scale=20, wh_num=None,
-                  dtype=np.float32, **kwargs):
+def get_grid_kpts(
+    wh=(300, 300), wh_stride=None, scale=20, wh_num=None, dtype=np.float32, **kwargs
+):
     """ Returns a regular grid of keypoints
 
     Args:
@@ -197,7 +198,7 @@ def get_grid_kpts(wh=(300, 300), wh_stride=None, scale=20, wh_num=None,
     inner_width = w - 2 * padding
     inner_height = h - 2 * padding
     if wh_num is not None:
-        #assert wh_stride is None, 'cannot specify both stride and wh_num'
+        # assert wh_stride is None, 'cannot specify both stride and wh_num'
         nx, ny = wh_num
         wh_stride = (inner_width / nx, inner_height / ny)
     elif wh_stride is None:
@@ -254,6 +255,7 @@ def get_oris(kpts):
 
 # --- keypoint properties ---
 
+
 def get_sqrd_scales(kpts):
     """
     gets average squared scale (does not take into account elliptical shape
@@ -295,11 +297,11 @@ def get_scales(kpts):
 
 # --- keypoint matrixes ---
 
+
 def get_ori_mats(kpts):
     """ Returns keypoint orientation matrixes """
     _oris = get_oris(kpts)
-    R_mats = [linalgtool.rotation_mat2x2(ori)
-              for ori in _oris]
+    R_mats = [linalgtool.rotation_mat2x2(ori) for ori in _oris]
     return R_mats
 
 
@@ -308,10 +310,10 @@ def convert_kptsZ_to_kpts(kpts_Z):
     Convert keypoints in Z format to invV format
     """
     import vtool as vt
+
     x, y, e11, e12, e22 = kpts_Z.T
-    #import numpy as np
-    Z_mats2x2 = np.array([[e11, e12],
-                         [e12, e22]])
+    # import numpy as np
+    Z_mats2x2 = np.array([[e11, e12], [e12, e22]])
     Z_mats2x2 = np.rollaxis(Z_mats2x2, 2)
     invV_mats2x2 = vt.decompose_Z_to_invV_mats2x2(Z_mats2x2)
     invV_mats2x2 = invV_mats2x2.astype(np.float32)
@@ -365,8 +367,7 @@ def get_invV_mats2x2(kpts):
     nKpts = len(kpts)
     _iv11s, _iv21s, _iv22s = get_invVs(kpts)
     _zeros = np.zeros(nKpts)
-    invV_arrs2x2 = np.array([[_iv11s, _zeros],
-                             [_iv21s, _iv22s]])  # R x C x N
+    invV_arrs2x2 = np.array([[_iv11s, _zeros], [_iv21s, _iv22s]])  # R x C x N
     invV_mats2x2 = np.rollaxis(invV_arrs2x2, 2)  # N x R x C
     return invV_mats2x2
 
@@ -409,7 +410,7 @@ def get_invVR_mats2x2(kpts):
     # You must apply rotations before you apply shape
     # This is because we are dealing with \emph{inv}(V).
     # numpy operates with data on the right (operate right-to-left)
-    R_mats2x2  = get_ori_mats(kpts)
+    R_mats2x2 = get_ori_mats(kpts)
     invVR_mats2x2 = matrix_multiply(invV_mats2x2, R_mats2x2)
     return invVR_mats2x2
 
@@ -429,9 +430,9 @@ def augment_2x2_with_translation(kpts, _mat2x2):
     # Use homogenous coordinates
     _zeros = np.zeros(nKpts)
     _ones = np.ones(nKpts)
-    _arrs3x3 =  np.array([[_11s, _12s, _13s],
-                          [_21s, _22s, _23s],
-                          [_zeros, _zeros, _ones]])  # R x C x N
+    _arrs3x3 = np.array(
+        [[_11s, _12s, _13s], [_21s, _22s, _23s], [_zeros, _zeros, _ones]]
+    )  # R x C x N
     _mats3x3 = np.rollaxis(_arrs3x3, 2)  # N x R x C
     return _mats3x3
 
@@ -470,23 +471,23 @@ def get_invV_mats3x3(kpts):
                 [2., 3., 0.],
                 [0., 0., 1.]]])
     """
-    #nKpts = len(kpts)
+    # nKpts = len(kpts)
     invV_mats2x2 = get_invV_mats2x2(kpts)
     invV_mats3x3 = augment_2x2_with_translation(kpts, invV_mats2x2)
     ## Unpack shape components
-    #_iv11s = invV_mats2x2.T[0, 0]
-    #_iv12s = invV_mats2x2.T[1, 0]
-    #_iv21s = invV_mats2x2.T[0, 1]
-    #_iv22s = invV_mats2x2.T[1, 1]
+    # _iv11s = invV_mats2x2.T[0, 0]
+    # _iv12s = invV_mats2x2.T[1, 0]
+    # _iv21s = invV_mats2x2.T[0, 1]
+    # _iv22s = invV_mats2x2.T[1, 1]
     ## Get translation components
-    #_iv13s, _iv23s = get_xys(kpts)
+    # _iv13s, _iv23s = get_xys(kpts)
     ## Use homogenous coordinates
-    #_zeros = np.zeros(nKpts)
-    #_ones = np.ones(nKpts)
-    #invV_arrs3x3 =  np.array([[_iv11s, _iv12s, _iv13s],
+    # _zeros = np.zeros(nKpts)
+    # _ones = np.ones(nKpts)
+    # invV_arrs3x3 =  np.array([[_iv11s, _iv12s, _iv13s],
     #                          [_iv21s, _iv22s, _iv23s],
     #                          [_zeros, _zeros, _ones]])  # R x C x N
-    #invV_mats3x3 = np.rollaxis(invV_arrs3x3, 2)  # N x R x C
+    # invV_mats3x3 = np.rollaxis(invV_arrs3x3, 2)  # N x R x C
     return invV_mats3x3
 
 
@@ -534,27 +535,29 @@ def get_invVR_mats3x3(kpts):
                 [ 3., -2., 40.],
                 [ 0.,  0.,  1.]]])
     """
-    #nKpts = len(kpts)
+    # nKpts = len(kpts)
     invVR_mats2x2 = get_invVR_mats2x2(kpts)
     invVR_mats3x3 = augment_2x2_with_translation(kpts, invVR_mats2x2)
     # Unpack shape components
-    #_iv11s = invVR_mats2x2.T[0, 0]
-    #_iv12s = invVR_mats2x2.T[1, 0]
-    #_iv21s = invVR_mats2x2.T[0, 1]
-    #_iv22s = invVR_mats2x2.T[1, 1]
+    # _iv11s = invVR_mats2x2.T[0, 0]
+    # _iv12s = invVR_mats2x2.T[1, 0]
+    # _iv21s = invVR_mats2x2.T[0, 1]
+    # _iv22s = invVR_mats2x2.T[1, 1]
     ## Get translation components
-    #_iv13s, _iv23s = get_xys(kpts)
+    # _iv13s, _iv23s = get_xys(kpts)
     ## Use homogenous coordinates
-    #_zeros = np.zeros(nKpts)
-    #_ones = np.ones(nKpts)
-    #invVR_arrs =  np.array([[_iv11s, _iv12s, _iv13s],
+    # _zeros = np.zeros(nKpts)
+    # _ones = np.ones(nKpts)
+    # invVR_arrs =  np.array([[_iv11s, _iv12s, _iv13s],
     #                        [_iv21s, _iv22s, _iv23s],
     #                        [_zeros, _zeros, _ones]])  # R x C x N
-    #invVR_mats = np.rollaxis(invVR_arrs, 2)  # N x R x C
+    # invVR_mats = np.rollaxis(invVR_arrs, 2)  # N x R x C
     return invVR_mats3x3
 
 
-def get_invV_mats(kpts, with_trans=False, with_ori=False, ashomog=False, ascontiguous=False):
+def get_invV_mats(
+    kpts, with_trans=False, with_ori=False, ashomog=False, ascontiguous=False
+):
     """
     TODO: DEPRICATE. too many conditionals
 
@@ -584,10 +587,10 @@ def get_invV_mats(kpts, with_trans=False, with_ori=False, ashomog=False, asconti
     else:
         invV_mats = get_invV_mats2x2(kpts)
     if with_trans or ashomog:
-        #_iv11s = invV_mats[:, 0, 0]
-        #_iv12s = invV_mats[:, 0, 1]
-        #_iv21s = invV_mats[:, 1, 0]
-        #_iv22s = invV_mats[:, 1, 1]
+        # _iv11s = invV_mats[:, 0, 0]
+        # _iv12s = invV_mats[:, 0, 1]
+        # _iv21s = invV_mats[:, 1, 0]
+        # _iv22s = invV_mats[:, 1, 1]
         _iv11s = invV_mats.T[0, 0]
         _iv12s = invV_mats.T[1, 0]
         _iv21s = invV_mats.T[0, 1]
@@ -599,13 +602,14 @@ def get_invV_mats(kpts, with_trans=False, with_ori=False, ashomog=False, asconti
             _iv13s, _iv23s = get_xys(kpts)
         else:
             _iv13s = _iv23s = _zeros
-        invV_arrs =  np.array([[_iv11s, _iv12s, _iv13s],
-                               [_iv21s, _iv22s, _iv23s],
-                               [_zeros, _zeros, _ones]])  # R x C x N
+        invV_arrs = np.array(
+            [[_iv11s, _iv12s, _iv13s], [_iv21s, _iv22s, _iv23s], [_zeros, _zeros, _ones]]
+        )  # R x C x N
         invV_mats = np.rollaxis(invV_arrs, 2)  # N x R x C
     if ascontiguous:
         invV_mats = np.ascontiguousarray(invV_mats)
     return invV_mats
+
 
 # --- scaled and offset keypoint components ---
 
@@ -683,18 +687,18 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
         %timeit reduce(matrix_multiply, (S2, invVR_aff2Ds, S1, T1))
     """
     (patch_h, patch_w) = patch_shape
-    half_width  = (patch_w / 2.0)  # - .5
-    half_height = (patch_h / 2.0)  # - .5
+    half_width = patch_w / 2.0  # - .5
+    half_height = patch_h / 2.0  # - .5
     # Center src image
-    T1 = linalgtool.translation_mat3x3(-half_width + .5, -half_height + .5)
+    T1 = linalgtool.translation_mat3x3(-half_width + 0.5, -half_height + 0.5)
     # Scale src to the unit circle
-    #S1 = linalgtool.scale_mat3x3(1.0 / patch_w, 1.0 / patch_h)
+    # S1 = linalgtool.scale_mat3x3(1.0 / patch_w, 1.0 / patch_h)
     S1 = linalgtool.scale_mat3x3(1.0 / half_width, 1.0 / half_height)
     # Transform the source image to the keypoint ellipse
     invVR_aff2Ds = get_invVR_mats3x3(kpts)
     # Adjust for the requested scale factor
     S2 = linalgtool.scale_mat3x3(scale_factor, scale_factor)
-    #perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
+    # perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
     M_list = reduce(matrix_multiply, (S2, invVR_aff2Ds, S1.dot(T1)))
     return M_list
 
@@ -789,8 +793,8 @@ def get_kpts_eccentricity(kpts):
     B = Z_mats2x2[:, 0, 1] * 2
     C = Z_mats2x2[:, 1, 1]
     nu = 1
-    numer = (2 * np.sqrt((A - C) ** 2 + B ** 2))
-    denom = (nu * (A + C) + np.sqrt((A - C) ** 2 + B ** 2))
+    numer = 2 * np.sqrt((A - C) ** 2 + B ** 2)
+    denom = nu * (A + C) + np.sqrt((A - C) ** 2 + B ** 2)
     ecc = numer / denom
     return ecc
 
@@ -840,9 +844,9 @@ def offset_kpts(kpts, offset=(0.0, 0.0), scale_factor=1.0):
                   [46.5 , 14.5 , 20.03,  8.82,  7.05,  0.  ],
                   [48.  , 15.5 , 24.08,  1.7 ,  5.87,  0.  ]], dtype=np.float64),
     """
-    if (np.all(offset == (0.0, 0.0)) and
-        (np.all(scale_factor == 1.0) or
-         np.all(scale_factor == (1.0, 1.0)))):
+    if np.all(offset == (0.0, 0.0)) and (
+        np.all(scale_factor == 1.0) or np.all(scale_factor == (1.0, 1.0))
+    ):
         return kpts
     try:
         sfx, sfy = scale_factor
@@ -852,7 +856,7 @@ def offset_kpts(kpts, offset=(0.0, 0.0), scale_factor=1.0):
     T = linalgtool.translation_mat3x3(tx, ty)
     S = linalgtool.scale_mat3x3(sfx, sfy)
     M = T.dot(S)
-    #M = linalgtool.scaleedoffset_mat3x3(offset, scale_factor)
+    # M = linalgtool.scaleedoffset_mat3x3(offset, scale_factor)
     kpts_ = transform_kpts(kpts, M)
     return kpts_
 
@@ -894,11 +898,14 @@ def transform_kpts(kpts, M):
         # THERE IS NO WAY TO GET KEYPOINTS TRANFORMED BY A HOMOGENOUS
         # TRANSFORM MATRIX INTO THE 6 COMPONENT KEYPOINT VECTOR.
         import warnings
+
         warnings.warn('WARNING: [vtool.keypoint] transform produced non-affine keypoint')
         # We can approximate it very very roughly
-        MinvVR_mats3x3 = np.divide(MinvVR_mats3x3, MinvVR_mats3x3[:, None, None, 2, 2])  # 2.6 us
+        MinvVR_mats3x3 = np.divide(
+            MinvVR_mats3x3, MinvVR_mats3x3[:, None, None, 2, 2]
+        )  # 2.6 us
         raise
-        #MinvVR_mats3x3 / MinvVR_mats3x3[:, None, None, 2, :]
+        # MinvVR_mats3x3 / MinvVR_mats3x3[:, None, None, 2, :]
     kpts_ = flatten_invV_mats_to_kpts(MinvVR_mats3x3)
     return kpts_
 
@@ -938,14 +945,15 @@ def transform_kpts_xys(H, kpts):
     xy = get_xys(kpts)
     xy_t = linalgtool.transform_points_with_homography(H, xy)
     return xy_t
-    #xyz   = get_homog_xyzs(kpts)
-    #xyz_t = matrix_multiply(H, xyz)
-    #xy_t  = linalgtool.add_homogenous_coordinate(xyz_t)
-    #return xy_t
+    # xyz   = get_homog_xyzs(kpts)
+    # xyz_t = matrix_multiply(H, xyz)
+    # xy_t  = linalgtool.add_homogenous_coordinate(xyz_t)
+    # return xy_t
 
-#---------------------
+
+# ---------------------
 # invV_mats functions
-#---------------------
+# ---------------------
 
 
 def get_invVR_mats_sqrd_scale(invVR_mats):
@@ -1030,7 +1038,7 @@ def get_invVR_mats_xys(invVR_mats):
         >>> invVR_mats.T[2, 0:2]
     """
     # ORIG NUMPY
-    #_xys = invVR_mats[:, 0:2, 2].T
+    # _xys = invVR_mats[:, 0:2, 2].T
     # BETTER NUMPY
     _xys = invVR_mats.T[2, 0:2]
     return _xys
@@ -1455,14 +1463,14 @@ def get_invVR_mats_oris(invVR_mats):
         >>> ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))
     """
     # Extract only the needed shape components
-    #_iv11s = invVR_mats[:, 0, 0]
-    #_iv12s = invVR_mats[:, 0, 1]
+    # _iv11s = invVR_mats[:, 0, 0]
+    # _iv12s = invVR_mats[:, 0, 1]
     _iv11s = invVR_mats.T[0, 0]
     _iv12s = invVR_mats.T[1, 0]
     # Solve for orientations. Adjust gravity vector pointing down
     _oris = (-trig.atan2(_iv12s, _iv11s)) % TAU
     return _oris
-    "#endif"
+    '#endif'
 
 
 def rectify_invV_mats_are_up(invVR_mats):
@@ -1561,8 +1569,8 @@ def rectify_invV_mats_are_up(invVR_mats):
 def flatten_invV_mats_to_kpts(invV_mats):
     """ flattens invV matrices into kpts format """
     invV_mats, _oris = rectify_invV_mats_are_up(invV_mats)
-    _xs    = invV_mats[:, 0, 2]
-    _ys    = invV_mats[:, 1, 2]
+    _xs = invV_mats[:, 0, 2]
+    _ys = invV_mats[:, 1, 2]
     _iv11s = invV_mats[:, 0, 0]
     _iv21s = invV_mats[:, 1, 0]
     assert np.all(invV_mats[:, 0, 1] == 0), 'expected lower triangular matrix'
@@ -1621,6 +1629,7 @@ def get_Z_mats(V_mats):
 def decompose_Z_to_invV_2x2(Z_2x2):
     import vtool as vt
     import scipy.linalg
+
     RV_2x2 = scipy.linalg.sqrtm(Z_2x2)
     invVR_2x2 = np.linalg.inv(RV_2x2)
     invV_2x2, ori_ = vt.rectify_invV_mats_are_up(invVR_2x2[None, :, :])
@@ -1838,12 +1847,8 @@ def get_kpts_wh(kpts, outer=True):
     if outer:
         # Either use bbox or elliptical points
         invV_mats2x2 = get_invVR_mats2x2(kpts)
-        corners = np.array([
-            [-1, 1, 1, -1],
-            [-1, -1, 1, 1],
-        ])
-        warped_corners = np.array([invV.dot(corners)
-                                   for invV in invV_mats2x2])
+        corners = np.array([[-1, 1, 1, -1], [-1, -1, 1, 1],])
+        warped_corners = np.array([invV.dot(corners) for invV in invV_mats2x2])
         maxx = warped_corners[:, 0, :].max(axis=1)
         minx = warped_corners[:, 0, :].min(axis=1)
         maxy = warped_corners[:, 1, :].max(axis=1)
@@ -1864,8 +1869,7 @@ def get_kpts_wh(kpts, outer=True):
         part = np.sqrt(c ** 2 + d ** 2)
         y_crit_thetas1 = -2 * np.arctan((c + part) / d)
         y_crit_thetas2 = -2 * np.arctan((c - part) / d)
-        y_crit_thetas = np.vstack(
-            (y_crit_thetas1, y_crit_thetas2))
+        y_crit_thetas = np.vstack((y_crit_thetas1, y_crit_thetas2))
         y_crit_u = np.cos(y_crit_thetas)
         y_crit_v = np.sin(y_crit_thetas)
         y_crit_x = a * y_crit_u
@@ -1967,8 +1971,8 @@ def get_kpts_dlen_sqrd(kpts, outer=False):
 def cast_split(kpts, dtype=KPTS_DTYPE):
     """ breakup keypoints into location, shape, and orientation """
     kptsT = kpts.T
-    _xs   = np.array(kptsT[0], dtype=dtype)
-    _ys   = np.array(kptsT[1], dtype=dtype)
+    _xs = np.array(kptsT[0], dtype=dtype)
+    _ys = np.array(kptsT[1], dtype=dtype)
     _invVs = np.array(kptsT[2:5], dtype=dtype)
     if kpts.shape[1] == 6:
         _oris = np.array(kptsT[5:6], dtype=dtype)
@@ -1979,9 +1983,10 @@ def cast_split(kpts, dtype=KPTS_DTYPE):
 
 # --- strings ---
 
+
 def get_xy_strs(kpts):
     """ strings debugging and output """
-    _xs, _ys   = get_xys(kpts)
+    _xs, _ys = get_xys(kpts)
     xy_strs = [('xy=(%.1f, %.1f)' % (x, y,)) for x, y, in zip(_xs, _ys)]
     return xy_strs
 
@@ -1989,10 +1994,11 @@ def get_xy_strs(kpts):
 def get_shape_strs(kpts):
     """ strings debugging and output """
     invVs = get_invVs(kpts)
-    shape_strs  = [(('[(%3.1f, 0.00),\n' +
-                     ' (%3.1f, %3.1f)]') % (iv11, iv21, iv22,))
-                   for iv11, iv21, iv22 in zip(*invVs)]
-    shape_strs = ['invV=\n' +  _str for _str in shape_strs]
+    shape_strs = [
+        (('[(%3.1f, 0.00),\n' + ' (%3.1f, %3.1f)]') % (iv11, iv21, iv22,))
+        for iv11, iv21, iv22 in zip(*invVs)
+    ]
+    shape_strs = ['invV=\n' + _str for _str in shape_strs]
     return shape_strs
 
 
@@ -2060,7 +2066,7 @@ def kpts_docrepr(arr, name='arr', indent=True, *args, **kwargs):
     if len(name) == 0:
         eq = ''
     prefix = name + eq + 'np.'
-    docrepr_ = ut.indent(prefix + reprstr_, ' ' * len(prefix))[len(prefix):]
+    docrepr_ = ut.indent(prefix + reprstr_, ' ' * len(prefix))[len(prefix) :]
     if indent:
         docrepr = ut.indent('>>> ' + ut.indent(docrepr_, '... ')[4:], ' ' * 8)
     else:
@@ -2135,19 +2141,23 @@ def get_match_spatial_squared_error(kpts1, kpts2, H, fx2_to_fx1):
             assert kpts2.shape[0] == fx2_to_fx1.shape[0]
             assert kpts1.shape[0] >= fx2_to_fx1.max()
         except AssertionError as ex:
-            ut.printex(ex, 'bad shape', keys=[
-                'kpts2.shape',
-                'kpts1.shape',
-                'fx2_to_fx1.shape',
-                'fx2_to_fx1.max()']
+            ut.printex(
+                ex,
+                'bad shape',
+                keys=[
+                    'kpts2.shape',
+                    'kpts1.shape',
+                    'fx2_to_fx1.shape',
+                    'fx2_to_fx1.max()',
+                ],
             )
             raise
     # Transform img1 xy-keypoints into img2 space
     xy1_t = transform_kpts_xys(H, kpts1)
     # Get untransformed image 2 xy-keypoints
-    xy2   = get_xys(kpts2)
+    xy2 = get_xys(kpts2)
     # get spatial keypoint distance to all neighbor candidates
-    bcast_xy2   = xy2[:, None, :].T
+    bcast_xy2 = xy2[:, None, :].T
     bcast_xy1_t = xy1_t.T[fx2_to_fx1]
     fx2_to_xyerr_sqrd = distance.L2_sqrd(bcast_xy2, bcast_xy1_t)
     return fx2_to_xyerr_sqrd
@@ -2208,6 +2218,7 @@ def get_even_point_sample(kpts):
     """
     # BROKEN
     from vtool import ellipse
+
     nSamples = 32
     ell_border_pts_list = ellipse.sample_uniform(kpts, nSamples)
     return ell_border_pts_list
@@ -2219,4 +2230,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.keypoint
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

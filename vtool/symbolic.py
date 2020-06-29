@@ -11,6 +11,7 @@ import ubelt as ub
 
 def custom_sympy_attrs(mat):
     import sympy
+
     def matmul(other, hold=True):
         if hold:
             new = sympy.MatMul(mat, other)
@@ -18,10 +19,12 @@ def custom_sympy_attrs(mat):
             new = mat.multiply(other)
         custom_sympy_attrs(new)
         return new
+
     def inv_():
         new = mat.inv()
         custom_sympy_attrs(new)
         return new
+
     setattr(mat, 'matmul', matmul)
     setattr(mat, 'inv_', inv_)
     return mat
@@ -29,6 +32,7 @@ def custom_sympy_attrs(mat):
 
 def sympy_mat(arr):
     import sympy
+
     mat = sympy.Matrix(arr)
     mat = custom_sympy_attrs(mat)
     return mat
@@ -36,6 +40,7 @@ def sympy_mat(arr):
 
 def evalprint(str_, globals_=None, locals_=None, simplify=False):
     import sympy
+
     if globals_ is None:
         globals_ = ut.get_parent_frame().f_globals
     if locals_ is None:
@@ -74,6 +79,7 @@ def check_expr_eq(expr1, expr2, verbose=True):
         >>> print(result)
     """
     import sympy
+
     if isinstance(expr1, six.string_types):
         expr1 = sympy.simplify(expr1)
     if isinstance(expr2, six.string_types):
@@ -85,7 +91,7 @@ def check_expr_eq(expr1, expr2, verbose=True):
         print('failexpr = %r' % (failexpr,))
         random_point_check = False
     print('... seems %r' % (random_point_check,))
-    #return random_point_check
+    # return random_point_check
     expr3 = expr1 - expr2
     if not random_point_check and True:
         common_symbols = expr1.free_symbols.intersection(expr2.free_symbols)
@@ -112,25 +118,29 @@ def symbolic_randcheck(expr1, expr2, domain={}, n=10):
         min_, max_ = domain.get(key, (-100, 100))
         range_ = max_ - min_
         return (rng.rand() * (range_)) + min_
+
     num_checks = n
     input_list = []
     results_list = []
     for num in range(num_checks):
         expr1_subs = {key: get_domain(key, domain) for key in expr1.free_symbols}
-        expr2_subs = {key: expr1_subs[key] if key in expr1_subs else get_domain(key, domain)
-                      for key in expr2.free_symbols}
+        expr2_subs = {
+            key: expr1_subs[key] if key in expr1_subs else get_domain(key, domain)
+            for key in expr2.free_symbols
+        }
         expr1_value = expr1.evalf(subs=expr1_subs)
         expr2_value = expr2.evalf(subs=expr2_subs)
         input_list.append((expr1_subs, expr2_subs))
         results_list.append((expr1_value, expr2_value))
     results_list = np.array(results_list)
-    #truth_list = np.allclose(results_list.T[0], results_list.T[1])
+    # truth_list = np.allclose(results_list.T[0], results_list.T[1])
     truth_list = results_list.T[0] == results_list.T[1]
     return truth_list, results_list, input_list
 
 
 def sympy_latex_repr(expr1):
     import sympy
+
     expr1_repr = sympy.latex(expr1)
     expr1_repr = expr1_repr.replace('\\\\', '\\\\\n')
     expr1_repr = expr1_repr.replace(r'\left[\begin{smallmatrix}{}', '\\MAT{\n')
@@ -144,19 +154,20 @@ def sympy_latex_repr(expr1):
     # hack of align
     expr1_repr = ut.align(expr1_repr, '&', pos=None)
     return expr1_repr
-    #print(expr1_repr)
+    # print(expr1_repr)
 
 
 def sympy_numpy_repr(expr1):
     import re
+
     expr1_repr = repr(expr1)
     expr1_repr = expr1_repr.replace('Matrix', 'np.array')
     expr1_repr = re.sub('\\bsin\\b', 'np.sin', expr1_repr)
     expr1_repr = re.sub('\\bcos\\b', 'np.cos', expr1_repr)
     expr1_repr = ut.autoformat_pep8(expr1_repr)
     print(expr1_repr)
-    #import autopep8
-    #autopep8.fix_code(expr1_repr)
+    # import autopep8
+    # autopep8.fix_code(expr1_repr)
 
 
 """
@@ -194,4 +205,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.symbolic
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

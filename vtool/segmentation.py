@@ -17,7 +17,7 @@ def printDBG(msg):
 def resize_img_and_bbox(img_fpath, bbox_, new_size=None, sqrt_area=400.0):
     printDBG('[segm] imread(%r) ' % img_fpath)
     full_img = cv2.imread(img_fpath)
-    (full_h, full_w) = full_img.shape[:2]                 # Image Shape
+    (full_h, full_w) = full_img.shape[:2]  # Image Shape
     printDBG('[segm] full_img.shape=%r' % (full_img.shape,))
     (rw_, rh_) = bbox_[2:]
     # Ensure that we know the new chip size
@@ -28,6 +28,7 @@ def resize_img_and_bbox(img_fpath, bbox_, new_size=None, sqrt_area=400.0):
             ht = np.sqrt(target_area * h / w)
             wt = w * ht / h
             return (int(round(wt)), int(round(ht)))
+
         new_size_ = _resz(rw_, rh_)
     else:
         new_size_ = new_size
@@ -44,7 +45,7 @@ def resize_img_and_bbox(img_fpath, bbox_, new_size=None, sqrt_area=400.0):
     return img_resz, bbox_resz
 
 
-def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=.025):
+def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=0.025):
     """
     Clean the mask
     (num_erode, num_dilate) = (1, 1)
@@ -99,32 +100,33 @@ def demo_grabcut(bgr_img):
     """
     import wbia.plottool as pt
     from wbia.plottool import interact_impaint
-    label_colors = [       255,           170,            50,          0]
+
+    label_colors = [255, 170, 50, 0]
     label_values = [cv2.GC_FGD, cv2.GC_PR_FGD, cv2.GC_PR_BGD, cv2.GC_BGD]
     h, w = bgr_img.shape[0:2]
     init_mask = np.zeros((h, w), dtype=np.float32)  # Initialize: mask
     # Set inside to cv2.GC_PR_FGD (probably forground)
-    init_mask[ :, :] = label_colors[label_values.index(cv2.GC_PR_BGD)]
+    init_mask[:, :] = label_colors[label_values.index(cv2.GC_PR_BGD)]
     # Set border to cv2.GC_BGD (definitely background)
-    init_mask[ 0, :] = label_colors[label_values.index(cv2.GC_BGD)]
+    init_mask[0, :] = label_colors[label_values.index(cv2.GC_BGD)]
     init_mask[-1, :] = label_colors[label_values.index(cv2.GC_BGD)]
-    init_mask[:,  0] = label_colors[label_values.index(cv2.GC_BGD)]
+    init_mask[:, 0] = label_colors[label_values.index(cv2.GC_BGD)]
     init_mask[:, -1] = label_colors[label_values.index(cv2.GC_BGD)]
-    #import vtool as vt
+    # import vtool as vt
     cached_mask_fpath = 'tmp_mask.png'
     if ub.argflag('--nocache'):
         ut.delete(cached_mask_fpath)
     print('unique init mask colors')
     print(np.unique(init_mask))
-    custom_mask = interact_impaint.cached_impaint(bgr_img, cached_mask_fpath,
-                                                  label_colors=label_colors,
-                                                  init_mask=init_mask)
+    custom_mask = interact_impaint.cached_impaint(
+        bgr_img, cached_mask_fpath, label_colors=label_colors, init_mask=init_mask
+    )
     print('unique custom mask colors')
     print(np.unique(custom_mask))
     print('delete tmp_mask.png to redo')
-    #if ut.checkpath(cached_mask_fpath):
+    # if ut.checkpath(cached_mask_fpath):
     #    custom_mask = vt.imread(cached_mask_fpath, grayscale=True)
-    #else:
+    # else:
     #    custom_mask = interact_impaint.impaint_mask(bgr_img, label_colors, init_mask=init_mask)
     #    vt.imwrite(cached_mask_fpath, custom_mask)
 
@@ -137,8 +139,8 @@ def demo_grabcut(bgr_img):
         prior_mask[label_loc] = value
     prior_mask = prior_mask.astype(np.uint8)
     print('running grabcut')
-    #print('prior_mask.dtype = %r' % (prior_mask.dtype,))
-    #print('bgr_img.dtype = %r' % (bgr_img.dtype,))
+    # print('prior_mask.dtype = %r' % (prior_mask.dtype,))
+    # print('bgr_img.dtype = %r' % (bgr_img.dtype,))
     with ut.Timer('grabcut'):
         post_mask = grabcut(bgr_img, prior_mask)
     if post_mask.dtype == np.uint8:
@@ -168,7 +170,7 @@ def grabcut(bgr_img, prior_mask, binary=True):
         is_forground = (post_mask == cv2.GC_FGD) + (post_mask == cv2.GC_PR_FGD)
         post_mask = np.where(is_forground, 255, 0).astype('uint8')
     else:
-        label_colors = [       255,           170,            50,          0]
+        label_colors = [255, 170, 50, 0]
         label_values = [cv2.GC_FGD, cv2.GC_PR_FGD, cv2.GC_PR_BGD, cv2.GC_BGD]
         pos_list = [post_mask == value for value in label_values]
         for pos, color in zip(pos_list, label_colors):
@@ -205,16 +207,16 @@ def mask_colored_img(img_rgb, mask, encoding='bgr'):
 # grabcut_mode = cv2.GC_EVAL
 # grabcut_mode = cv2.GC_INIT_WITH_RECT
 # cv2.GC_BGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD, cv2.GC_FGD
-#@profile
+# @profile
 def grabcut2(rgb_chip):
     (h, w) = rgb_chip.shape[0:2]
     _mask = np.zeros((h, w), dtype=np.uint8)  # Initialize: mask
     # Set inside to cv2.GC_PR_FGD (probably forground)
-    _mask[ :, :] = cv2.GC_PR_FGD
+    _mask[:, :] = cv2.GC_PR_FGD
     # Set border to cv2.GC_BGD (definitely background)
-    _mask[ 0, :] = cv2.GC_BGD
+    _mask[0, :] = cv2.GC_BGD
     _mask[-1, :] = cv2.GC_BGD
-    _mask[:,  0] = cv2.GC_BGD
+    _mask[:, 0] = cv2.GC_BGD
     _mask[:, -1] = cv2.GC_BGD
     # Grab Cut Parameters
     rect = (0, 0, w, h)
@@ -246,24 +248,26 @@ def segment(img_fpath, bbox_, new_size=None):
     #  WH Unsafe
     img_resz, bbox_resz = resize_img_and_bbox(img_fpath, bbox_, new_size=new_size)
     # WH Unsafe
-    (img_h, img_w) = img_resz.shape[:2]                       # Image Shape
+    (img_h, img_w) = img_resz.shape[:2]  # Image Shape
     printDBG(' * img_resz.shape=%r' % ((img_h, img_w),))
     # WH Safe
     tlbr = ut.xywh_to_tlbr(bbox_resz, (img_w, img_h))  # Rectangle ANNOTATION
     (x1, y1, x2, y2) = tlbr
-    rect = tuple(bbox_resz)                               # Initialize: rect
+    rect = tuple(bbox_resz)  # Initialize: rect
     printDBG(' * rect=%r' % (rect,))
     printDBG(' * tlbr=%r' % (tlbr,))
     # WH Unsafe
     _mask = np.zeros((img_h, img_w), dtype=np.uint8)  # Initialize: mask
-    _mask[y1:y2, x1:x2] = cv2.GC_PR_FGD             # Set ANNOTATION to cv2.GC_PR_FGD
+    _mask[y1:y2, x1:x2] = cv2.GC_PR_FGD  # Set ANNOTATION to cv2.GC_PR_FGD
     # Grab Cut
     tt = ut.Timer(' * cv2.grabCut()', verbose=DEBUG_SEGM)
     cv2.grabCut(img_resz, _mask, rect, bgd_model, fgd_model, num_iters, mode=mode)
     tt.toc()
-    img_mask = np.where((_mask == cv2.GC_FGD) + (_mask == cv2.GC_PR_FGD), 255, 0).astype('uint8')
+    img_mask = np.where((_mask == cv2.GC_FGD) + (_mask == cv2.GC_PR_FGD), 255, 0).astype(
+        'uint8'
+    )
     # Crop
-    chip      = img_resz[y1:y2, x1:x2]
+    chip = img_resz[y1:y2, x1:x2]
     chip_mask = img_mask[y1:y2, x1:x2]
     chip_mask = clean_mask(chip_mask)
     chip_mask = np.array(chip_mask, np.float) / 255.0
@@ -282,4 +286,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.segmentation
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

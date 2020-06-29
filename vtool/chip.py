@@ -5,6 +5,7 @@ import numpy.linalg as npl
 from vtool import linalg as ltool
 from vtool import image as gtool
 import utool as ut
+
 try:
     import cv2
 except ImportError as ex:
@@ -67,16 +68,16 @@ def get_image_to_chip_transform(bbox, chipsz, theta):
     (cw_, ch_) = chipsz
     tx1 = -(x + (w / 2.0))
     ty1 = -(y + (h / 2.0))
-    sx = (cw_ / w)
-    sy = (ch_ / h)
-    tx2 = (cw_ / 2.0)
-    ty2 = (ch_ / 2.0)
+    sx = cw_ / w
+    sy = ch_ / h
+    tx2 = cw_ / 2.0
+    ty2 = ch_ / 2.0
     # Translate from bbox center to (0, 0)
     T1 = ltool.translation_mat3x3(tx1, ty1)
     # Scale to chip height
-    S  = ltool.scale_mat3x3(sx, sy)
+    S = ltool.scale_mat3x3(sx, sy)
     # Rotate to chip orientation
-    R  = ltool.rotation_mat3x3(-theta)
+    R = ltool.rotation_mat3x3(-theta)
     # Translate from (0, 0) to chip center
     T2 = ltool.translation_mat3x3(tx2, ty2)
     # Merge into single transformation (operate left-to-right aka data on left)
@@ -90,12 +91,14 @@ def _get_chip_to_image_transform(bbox, chipsz, theta):
         chipsz - size of the chip
         theta  - rotation of the bounding box
     """
-    C    = get_image_to_chip_transform(bbox, chipsz, theta)
+    C = get_image_to_chip_transform(bbox, chipsz, theta)
     invC = npl.inv(C)
     return invC
 
 
-def extract_chip_from_gpath(gfpath, bbox, theta, new_size, interpolation=cv2.INTER_LANCZOS4):
+def extract_chip_from_gpath(
+    gfpath, bbox, theta, new_size, interpolation=cv2.INTER_LANCZOS4
+):
     imgBGR = gtool.imread(gfpath)  # Read parent image
     chipBGR = extract_chip_from_img(imgBGR, bbox, theta, new_size, interpolation)
     return chipBGR
@@ -115,7 +118,9 @@ def extract_chip_from_gpath_into_square(args):
     return extract_chip_into_square(imgBGR, bbox, theta, target_size)
 
 
-def extract_chip_from_img(imgBGR, bbox, theta, new_size, interpolation=cv2.INTER_LANCZOS4):
+def extract_chip_from_img(
+    imgBGR, bbox, theta, new_size, interpolation=cv2.INTER_LANCZOS4
+):
     """ Crops chip from image ; Rotates and scales;
 
     ibs.show_annot_image(aid)[0].pt_save_and_view()
@@ -152,15 +157,17 @@ def extract_chip_from_img(imgBGR, bbox, theta, new_size, interpolation=cv2.INTER
     """
     # THE CULPRIT FOR MULTIPROCESSING FREEZES
     flags = interpolation
-    #if True:
+    # if True:
     M = get_image_to_chip_transform(bbox, new_size, theta)  # Build transformation
-    chipBGR = cv2.warpAffine(imgBGR, M[0:2], tuple(new_size), flags=flags, borderMode=cv2.BORDER_CONSTANT)
-    #else:
+    chipBGR = cv2.warpAffine(
+        imgBGR, M[0:2], tuple(new_size), flags=flags, borderMode=cv2.BORDER_CONSTANT
+    )
+    # else:
     #    # if theta == 0, not sure if this is better. Certainly not more general
     #    x, y, w, h = bbox
     #    roiBGR = imgBGR[y:y + h, x:x + w, :]
     #    chipBGR = cv2.resize(roiBGR, tuple(new_size), interpolation=interpolation)
-    #chipBGR = gtool.warpAffine(imgBGR, M, new_size)  # Rotate and scale
+    # chipBGR = gtool.warpAffine(imgBGR, M, new_size)  # Rotate and scale
     return chipBGR
 
 
@@ -177,6 +184,7 @@ def gridsearch_chipextract():
         >>> ut.show_if_requested()
     """
     import cv2
+
     test_func = extract_chip_from_img
     if False:
         gpath = ut.grab_test_imgpath('carl.jpg')
@@ -188,27 +196,34 @@ def gridsearch_chipextract():
         bbox = (450, 373, 2062, 1124)
         theta = 0.0
         old_size = bbox[2:4]
-        #target_area = 700 ** 2
+        # target_area = 700 ** 2
         target_area = 1200 ** 2
         new_size = ScaleStrat.area(target_area, old_size)
         print('old_size = %r' % (old_size,))
         print('new_size = %r' % (new_size,))
-        #new_size = (677, 369)
+        # new_size = (677, 369)
     imgBGR = gtool.imread(gpath)
     args = (imgBGR, bbox, theta, new_size)
-    param_info = ut.ParamInfoList('extract_params', [
-        ut.ParamInfo('interpolation', cv2.INTER_LANCZOS4,
-                     varyvals=[
-                         cv2.INTER_LANCZOS4,
-                         cv2.INTER_CUBIC,
-                         cv2.INTER_LINEAR,
-                         cv2.INTER_NEAREST,
-                         #cv2.INTER_AREA
-                     ],)
-    ])
+    param_info = ut.ParamInfoList(
+        'extract_params',
+        [
+            ut.ParamInfo(
+                'interpolation',
+                cv2.INTER_LANCZOS4,
+                varyvals=[
+                    cv2.INTER_LANCZOS4,
+                    cv2.INTER_CUBIC,
+                    cv2.INTER_LINEAR,
+                    cv2.INTER_NEAREST,
+                    # cv2.INTER_AREA
+                ],
+            )
+        ],
+    )
     show_func = None
     # Generalize
     import wbia.plottool as pt
+
     pt.imshow(imgBGR)  # HACK
     cfgdict_list, cfglbl_list = param_info.get_gridsearch_input(defaultslice=slice(0, 10))
     fnum = pt.ensure_fnum(None)
@@ -216,15 +231,20 @@ def gridsearch_chipextract():
         show_func = pt.imshow
     lbl = ut.get_funcname(test_func)
     cfgresult_list = [
-        test_func(*args, **cfgdict)
-        for cfgdict in ut.ProgressIter(cfgdict_list, lbl=lbl)
+        test_func(*args, **cfgdict) for cfgdict in ut.ProgressIter(cfgdict_list, lbl=lbl)
     ]
     onclick_func = None
     ut.interact_gridsearch_result_images(
-        show_func, cfgdict_list, cfglbl_list,
-        cfgresult_list, fnum=fnum,
-        figtitle=lbl, unpack=False,
-        max_plots=25, onclick_func=onclick_func)
+        show_func,
+        cfgdict_list,
+        cfglbl_list,
+        cfgresult_list,
+        fnum=fnum,
+        figtitle=lbl,
+        unpack=False,
+        max_plots=25,
+        onclick_func=onclick_func,
+    )
     pt.iup()
 
 
@@ -315,15 +335,16 @@ def get_scaled_size_with_dlen(target_dlen, w, h):
     returns new_size which scales (w, h) as close to target_dlen as possible
     and maintains aspect ratio
     """
-    #ht = np.sqrt(target_area * h / w)
-    #wt = w * ht / h
-    #new_size = (int(round(wt)), int(round(ht)))
+    # ht = np.sqrt(target_area * h / w)
+    # wt = w * ht / h
+    # new_size = (int(round(wt)), int(round(ht)))
     raise NotImplementedError()
-    #return new_size
+    # return new_size
 
 
-def compute_chip(gfpath, bbox, theta, new_size, filter_list=[],
-                 interpolation=cv2.INTER_LANCZOS4):
+def compute_chip(
+    gfpath, bbox, theta, new_size, filter_list=[], interpolation=cv2.INTER_LANCZOS4
+):
     r""" Extracts a chip and applies filters
 
     DEPRICATE
@@ -410,7 +431,7 @@ def get_extramargin_measures(bbox_gs, new_size, halfoffset_ms=(64, 64)):
     # margin _ms (the margin chip has the scale of chip space with padding)
     # imagespace _gs (the space using in bbox_gs specification)
     x_gs, y_gs, w_gs, h_gs = bbox_gs
-    if w_gs == 0 or  h_gs == 0:
+    if w_gs == 0 or h_gs == 0:
         raise ValueError('Bounding box has no area')
     w_cs, h_cs = new_size
     # Extra margin in chip space
@@ -424,12 +445,13 @@ def get_extramargin_measures(bbox_gs, new_size, halfoffset_ms=(64, 64)):
     halfoffset_gs = ((sx * xo_ms), (sy * yo_ms))
     xo_gs, yo_gs = halfoffset_gs
     # Find the size of the expanded margin bbox in image space
-    mbbox_gs = (x_gs - xo_gs, y_gs - yo_gs,
-                w_gs + (2 * xo_gs), h_gs + (2 * yo_gs))
+    mbbox_gs = (x_gs - xo_gs, y_gs - yo_gs, w_gs + (2 * xo_gs), h_gs + (2 * yo_gs))
     return mbbox_gs, margin_size
 
 
-def testshow_extramargin_info(gfpath, bbox_gs, theta, new_size, halfoffset_ms, mbbox_gs, margin_size):
+def testshow_extramargin_info(
+    gfpath, bbox_gs, theta, new_size, halfoffset_ms, mbbox_gs, margin_size
+):
     import wbia.plottool as pt
     import vtool as vt
 
@@ -437,7 +459,7 @@ def testshow_extramargin_info(gfpath, bbox_gs, theta, new_size, halfoffset_ms, m
     chipBGR = compute_chip(gfpath, bbox_gs, theta, new_size, [])
     mchipBGR = compute_chip(gfpath, mbbox_gs, theta, margin_size, [])
 
-    #index = 0
+    # index = 0
     w_cs, h_cs = new_size
     xo_ms, yo_ms = halfoffset_ms
     bbox_ms = [xo_ms, yo_ms, w_cs, h_cs]
@@ -456,12 +478,16 @@ def testshow_extramargin_info(gfpath, bbox_gs, theta, new_size, halfoffset_ms, m
     pt.gca().set_xlabel(str(imgBGR.shape))
     pt.imshow(chipBGR, pnum=(1, 3, 2), fnum=fnum, title='original chip')
     pt.gca().set_xlabel(str(chipBGR.shape))
-    pt.imshow(mchipBGR, pnum=(1, 3, 3), fnum=fnum,
-              title='scaled chip with expanded margin.\n(orig margin drawn in orange)')
+    pt.imshow(
+        mchipBGR,
+        pnum=(1, 3, 3),
+        fnum=fnum,
+        title='scaled chip with expanded margin.\n(orig margin drawn in orange)',
+    )
     pt.gca().set_xlabel(str(mchipBGR.shape))
 
     pt.show_if_requested()
-    #pt.imshow(chipBGR)
+    # pt.imshow(chipBGR)
 
 
 if __name__ == '__main__':
@@ -470,4 +496,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.chip
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

@@ -36,6 +36,7 @@ class Bitmap(object):
     of a single pixel in the bitmap. A value of 0 indicates that the pixel is `off`
     and any other value indicates that it is `on`.
     """
+
     def __init__(self, width, height, pixels=None):
         self.width = width
         self.height = height
@@ -109,11 +110,13 @@ class Glyph(object):
 class Font(object):
     def __init__(self, filename, size):
         import freetype
+
         self.face = freetype.Face(filename)
         self.face.set_pixel_sizes(0, size)
 
     def glyph_for_character(self, char):
         import freetype
+
         self.face.load_char(char, freetype.FT_LOAD_RENDER | freetype.FT_LOAD_TARGET_MONO)
         return Glyph.from_glyphslot(self.face.glyph)
 
@@ -218,9 +221,11 @@ def get_text_test_img(text):
     fnt = Font(filename, 24)
     buf = fnt.render_text(text)
     import numpy as np
+
     img = np.array(buf.pixels)
     text_img = img.reshape(buf.height, buf.width) * 255
     return text_img
+
 
 if __name__ == '__main__':
     """
@@ -228,4 +233,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.fontdemo
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

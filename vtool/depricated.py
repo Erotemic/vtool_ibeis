@@ -1,5 +1,3 @@
-
-
 class ThumbnailCacheContext(object):
     """ Lazy computation of of images as thumbnails.
 
@@ -9,12 +7,17 @@ class ThumbnailCacheContext(object):
     flagged as dirty and give them back to the context.  thumbs_list will be
     populated on contex exit
     """
-    def __init__(self, uuid_list, asrgb=True, thumb_size=64, thumb_dpath=None, appname='vtool'):
+
+    def __init__(
+        self, uuid_list, asrgb=True, thumb_size=64, thumb_dpath=None, appname='vtool'
+    ):
         if thumb_dpath is None:
             # Get default thumb path
             thumb_dpath = ut.get_app_resource_dir(appname, 'thumbs')
         ut.ensuredir(thumb_dpath)
-        self.thumb_gpaths = [join(thumb_dpath, str(uuid) + 'thumb.png') for uuid in uuid_list]
+        self.thumb_gpaths = [
+            join(thumb_dpath, str(uuid) + 'thumb.png') for uuid in uuid_list
+        ]
         self.asrgb = asrgb
         self.thumb_size = thumb_size
         self.thumb_list = None
@@ -25,7 +28,7 @@ class ThumbnailCacheContext(object):
         # These items need to be computed
         self.dirty_list = [not exists(gpath) for gpath in self.thumb_gpaths]
         self.dirty_gpaths = ut.compress(self.thumb_gpaths, self.dirty_list)
-        #print('[gtool.thumb] len(dirty_gpaths): %r' % len(self.dirty_gpaths))
+        # print('[gtool.thumb] len(dirty_gpaths): %r' % len(self.dirty_gpaths))
         self.needs_compute = len(self.dirty_gpaths) > 0
         return self
 
@@ -33,7 +36,7 @@ class ThumbnailCacheContext(object):
         """ Pass in any images marked by the context as dirty here """
         # Remove any non images
         isvalid_list = [img is not None for img in img_list]
-        valid_images  = ut.compress(img_list, isvalid_list)
+        valid_images = ut.compress(img_list, isvalid_list)
         valid_fpath = ut.compress(self.thumb_gpaths, isvalid_list)
         # Resize to thumbnails
         max_dsize = (self.thumb_size, self.thumb_size)
@@ -54,5 +57,6 @@ class ThumbnailCacheContext(object):
         # Try to read thumbnails on disk
         self.thumb_list = [_trimread(gpath) for gpath in self.thumb_gpaths]
         if self.asrgb:
-            self.thumb_list = [None if thumb is None else cvt_BGR2RGB(thumb)
-                               for thumb in self.thumb_list]
+            self.thumb_list = [
+                None if thumb is None else cvt_BGR2RGB(thumb) for thumb in self.thumb_list
+            ]

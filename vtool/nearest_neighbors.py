@@ -15,6 +15,7 @@ class AnnoyWrapper(object):
     """
     Wrapper for annoy to use the FLANN api
     """
+
     def __init__(self):
         self.ann = None
         self.params = {
@@ -24,6 +25,7 @@ class AnnoyWrapper(object):
 
     def build_index(self, dvecs, **kwargs):
         import annoy
+
         self.params.update(kwargs)
         self.ann = annoy.AnnoyIndex(f=dvecs.shape[1], metric='euclidean')
         for i, dvec in enumerate(dvecs):
@@ -37,7 +39,8 @@ class AnnoyWrapper(object):
         dists = np.empty((len(qvecs), num_neighbs), dtype=np.float)
         for i, qvec in enumerate(qvecs):
             idxs[i], dists[i] = ann.get_nns_by_vector(
-                qvec, n=num_neighbs, search_k=checks, include_distances=True)
+                qvec, n=num_neighbs, search_k=checks, include_distances=True
+            )
         return idxs, dists
 
 
@@ -45,6 +48,7 @@ def test_annoy():
     from vtool import demodata
     import annoy
     import utool
+
     qvecs = demodata.testdata_dummy_sift(2 * 1000)
     dvecs = demodata.testdata_dummy_sift(100 * 1000)
     dim = dpts.shape[1]
@@ -65,16 +69,18 @@ def test_annoy():
     for timer in utool.Timerit(trials, label='annoy query'):
         with timer:
             for qvec in qvecs:
-                ann.get_nns_by_vector(qvec, n=num_neighbs, search_k=checks,
-                                      include_distances=True)
+                ann.get_nns_by_vector(
+                    qvec, n=num_neighbs, search_k=checks, include_distances=True
+                )
 
     # ---------------
 
     for timer in utool.Timerit(trials, label='build flann'):
         with timer:
             flann = FLANN_CLS()
-            flann.build_index(dvecs, algorithm='kdtree', trees=num_trees,
-                              checks=checks, cores=1)
+            flann.build_index(
+                dvecs, algorithm='kdtree', trees=num_trees, checks=checks, cores=1
+            )
 
     for timer in utool.Timerit(trials, label='flann query'):
         with timer:
@@ -104,6 +110,7 @@ def test_cv2_flann():
     from vtool import demodata
     import wbia.plottool as pt
     import vtool as vt
+
     img1 = vt.imread(ut.grab_test_imgpath('easy1.png'))
     img2 = vt.imread(ut.grab_test_imgpath('easy2.png'))
 
@@ -112,10 +119,12 @@ def test_cv2_flann():
     pt.imshow(disparity)
     pt.show()
 
-    #cv2.estima
+    # cv2.estima
 
     flow = cv2.createOptFlow_DualTVL1()
-    img1, img2 = vt.convert_image_list_colorspace([img1, img2], 'gray', src_colorspace='bgr')
+    img1, img2 = vt.convert_image_list_colorspace(
+        [img1, img2], 'gray', src_colorspace='bgr'
+    )
     img2 = vt.resize(img2, img1.shape[0:2][::-1])
     out = img1.copy()
     flow.calc(img1, img2, out)
@@ -124,8 +133,8 @@ def test_cv2_flann():
     kp1, vecs1 = orb.detectAndCompute(img1, None)
     kp2, vecs2 = orb.detectAndCompute(img2, None)
 
-    detector = cv2.FeatureDetector_create("SIFT")
-    descriptor = cv2.DescriptorExtractor_create("SIFT")
+    detector = cv2.FeatureDetector_create('SIFT')
+    descriptor = cv2.DescriptorExtractor_create('SIFT')
 
     skp = detector.detect(img1)
     skp, sd = descriptor.compute(img1, skp)
@@ -141,18 +150,18 @@ def test_cv2_flann():
     vecs2 = demodata.testdata_dummy_sift(10)  # NOQA
 
     FLANN_INDEX_KDTREE = 0  # bug: flann enums are missing
-    #flann_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=4)
+    # flann_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=4)
     index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-    search_params = dict(checks=50)   # or pass empty dictionary
+    search_params = dict(checks=50)  # or pass empty dictionary
     flann = cv2.FlannBasedMatcher(index_params, search_params)  # NOQA
 
     cv2.flann.Index(vecs1, index_params)
 
-    #cv2.FlannBasedMatcher(flann_params)
+    # cv2.FlannBasedMatcher(flann_params)
 
     cv2.flann.Index(vecs1, flann_params)  # NOQA
 
-    #def match_flann(desc1, desc2, r_threshold = 0.6):
+    # def match_flann(desc1, desc2, r_threshold = 0.6):
     #    flann = cv2.flann_Index(desc2, flann_params)
     #    idx2, dist = flann.knnSearch(desc1, 2, params = {}) # bug: need to provide empty dict
     #    mask = dist[:,0] / dist[:,1] < r_threshold
@@ -268,8 +277,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
 
 def assign_to_centroids(dpts, qpts, num_neighbors=1, flann_params={}):
     """ Helper for akmeans """
-    (qx2_dx, qx2_dist) = FLANN_CLS().nn_index(
-        dpts, qpts, num_neighbors, **flann_params)
+    (qx2_dx, qx2_dist) = FLANN_CLS().nn_index(dpts, qpts, num_neighbors, **flann_params)
     return qx2_dx
 
 
@@ -282,12 +290,13 @@ def get_flann_params_cfgstr(flann_params):
         flann_valsig_ = str(ut.sortedby(flann_vals, flann_keys, reverse=True))
     else:
         flann_valsig_ = str(list(flann_params.values()))
-    flann_valsig = ut.remove_chars(flann_valsig_, ', \'[]')
+    flann_valsig = ut.remove_chars(flann_valsig_, ", '[]")
     return flann_valsig
 
 
-def get_flann_cfgstr(dpts, flann_params, cfgstr='', use_params_hash=True,
-                     use_data_hash=True):
+def get_flann_cfgstr(
+    dpts, flann_params, cfgstr='', use_params_hash=True, use_data_hash=True
+):
     """
 
     CommandLine:
@@ -317,18 +326,29 @@ def get_flann_cfgstr(dpts, flann_params, cfgstr='', use_params_hash=True,
     return flann_cfgstr
 
 
-def get_flann_fpath(dpts, cache_dir='default', cfgstr='', flann_params={},
-                    use_params_hash=True, use_data_hash=True, appname='vtool',
-                    verbose=True):
+def get_flann_fpath(
+    dpts,
+    cache_dir='default',
+    cfgstr='',
+    flann_params={},
+    use_params_hash=True,
+    use_data_hash=True,
+    appname='vtool',
+    verbose=True,
+):
     """ returns filepath for flann index """
     if cache_dir == 'default':
         if verbose:
             print('[flann] using default cache dir')
         cache_dir = ub.ensure_app_cache_dir(appname)
         ub.ensuredir(cache_dir)
-    flann_cfgstr = get_flann_cfgstr(dpts, flann_params, cfgstr,
-                                    use_params_hash=use_params_hash,
-                                    use_data_hash=use_data_hash)
+    flann_cfgstr = get_flann_cfgstr(
+        dpts,
+        flann_params,
+        cfgstr,
+        use_params_hash=use_params_hash,
+        use_data_hash=use_data_hash,
+    )
     if verbose:
         print('...flann_cache cfgstr = %r: ' % flann_cfgstr)
     # Append any user labels
@@ -337,9 +357,18 @@ def get_flann_fpath(dpts, cache_dir='default', cfgstr='', flann_params={},
     return flann_fpath
 
 
-def flann_cache(dpts, cache_dir='default', cfgstr='', flann_params={},
-                use_cache=True, save=True, use_params_hash=True,
-                use_data_hash=True, appname='vtool', verbose=None):
+def flann_cache(
+    dpts,
+    cache_dir='default',
+    cfgstr='',
+    flann_params={},
+    use_cache=True,
+    save=True,
+    use_params_hash=True,
+    use_data_hash=True,
+    appname='vtool',
+    verbose=None,
+):
     """
     Tries to load a cached flann index before doing anything
     from vtool.nn
@@ -351,12 +380,17 @@ def flann_cache(dpts, cache_dir='default', cfgstr='', flann_params={},
     if verbose > 1:
         print('+--- START CACHED FLANN INDEX ')
     if len(dpts) == 0:
-        raise ValueError(
-            'cannot build flann when len(dpts) == 0. (prevents a segfault)')
-    flann_fpath = get_flann_fpath(dpts, cache_dir, cfgstr, flann_params,
-                                  use_params_hash=use_params_hash,
-                                  use_data_hash=use_data_hash, appname=appname,
-                                  verbose=verbose)
+        raise ValueError('cannot build flann when len(dpts) == 0. (prevents a segfault)')
+    flann_fpath = get_flann_fpath(
+        dpts,
+        cache_dir,
+        cfgstr,
+        flann_params,
+        use_params_hash=use_params_hash,
+        use_data_hash=use_data_hash,
+        appname=appname,
+        verbose=verbose,
+    )
     # Load the index if it exists
     flann = FLANN_CLS()
     flann.flann_fpath = flann_fpath
@@ -377,10 +411,12 @@ def flann_cache(dpts, cache_dir='default', cfgstr='', flann_params={},
     num_dpts = len(dpts)
     if flann is None:
         flann = FLANN_CLS()
-    if verbose > 1 or (verbose > 0 and num_dpts > 1E6):
+    if verbose > 1 or (verbose > 0 and num_dpts > 1e6):
         print('...building kdtree over %d points (this may take a sec).' % num_dpts)
     if num_dpts == 0:
-        print('WARNING: CANNOT BUILD FLANN INDEX OVER 0 POINTS. THIS MAY BE A SIGN OF A DEEPER ISSUE')
+        print(
+            'WARNING: CANNOT BUILD FLANN INDEX OVER 0 POINTS. THIS MAY BE A SIGN OF A DEEPER ISSUE'
+        )
         return flann
 
     flann.build_index(dpts, **flann_params)
@@ -393,8 +429,9 @@ def flann_cache(dpts, cache_dir='default', cfgstr='', flann_params={},
     return flann
 
 
-def flann_augment(dpts, new_dpts, cache_dir, cfgstr, new_cfgstr, flann_params,
-                  use_cache=True, save=True):
+def flann_augment(
+    dpts, new_dpts, cache_dir, cfgstr, new_cfgstr, flann_params, use_cache=True, save=True
+):
     """
     Example:
         >>> # DISABLE_DOCTEST
@@ -413,17 +450,13 @@ def flann_augment(dpts, new_dpts, cache_dir, cfgstr, new_cfgstr, flann_params,
     flann.add_points(new_dpts)
     if save:
         aug_dpts = np.vstack((dpts, new_dpts))
-        new_flann_fpath = get_flann_fpath(
-            aug_dpts, cache_dir, new_cfgstr, flann_params)
+        new_flann_fpath = get_flann_fpath(aug_dpts, cache_dir, new_cfgstr, flann_params)
         flann.save_index(new_flann_fpath)
     return flann
 
 
 def get_kdtree_flann_params():
-    flann_params = {
-        'algorithm': 'kdtree',
-        'trees': 4
-    }
+    flann_params = {'algorithm': 'kdtree', 'trees': 4}
     return flann_params
 
 
@@ -452,13 +485,7 @@ def get_flann_params(algorithm='kdtree', **kwargs):
         >>> result = ('flann_params = %s' % (ub.repr2(flann_params),))
         >>> print(result)
     """
-    _algorithm_options = [
-        'linear',
-        'kdtree',
-        'kmeans',
-        'composite',
-        'kdtree_single'
-    ]
+    _algorithm_options = ['linear', 'kdtree', 'kmeans', 'composite', 'kdtree_single']
     _centersinit_options = [
         'random',
         'gonzales',
@@ -466,53 +493,55 @@ def get_flann_params(algorithm='kdtree', **kwargs):
     ]
     # Search params (for all algos)
     assert algorithm in _algorithm_options
-    flann_params = {
-        'algorithm': algorithm
-    }
+    flann_params = {'algorithm': algorithm}
     if algorithm != 'linear':
-        flann_params.update({
-            'random_seed': -1
-        })
+        flann_params.update({'random_seed': -1})
     if algorithm in ['kdtree', 'composite']:
         # kdtree index parameters
-        flann_params.update({
-            'algorithm': _algorithm_options[1],
-            'trees': 4,
-            'checks': 32,  # how many leafs (features) to check in one search
-        })
+        flann_params.update(
+            {
+                'algorithm': _algorithm_options[1],
+                'trees': 4,
+                'checks': 32,  # how many leafs (features) to check in one search
+            }
+        )
     elif algorithm in ['kmeans', 'composite']:
         # Kmeans index parametrs
-        flann_params.update({
-            'branching': 32,
-            'iterations': 5,
-            'centers_init': _centersinit_options[2],
-            'cb_index': 0.5,  # cluster boundary index for searching kmeanms tree
-            'checks': 32,  # how many leafs (features) to check in one search
-        })
+        flann_params.update(
+            {
+                'branching': 32,
+                'iterations': 5,
+                'centers_init': _centersinit_options[2],
+                'cb_index': 0.5,  # cluster boundary index for searching kmeanms tree
+                'checks': 32,  # how many leafs (features) to check in one search
+            }
+        )
     elif algorithm == 'autotuned':
-        flann_params.update({
-            'algorithm'        : 'autotuned',
-            'target_precision' : .01,    # precision desired (used for autotuning, -1 otherwise)
-            'build_weight'     : 0.01,   # build tree time weighting factor
-            'memory_weight'    : 0.0,    # index memory weigthing factor
-            'sample_fraction'  : 0.001,  # what fraction of the dataset to use for autotuning
-        })
+        flann_params.update(
+            {
+                'algorithm': 'autotuned',
+                'target_precision': 0.01,  # precision desired (used for autotuning, -1 otherwise)
+                'build_weight': 0.01,  # build tree time weighting factor
+                'memory_weight': 0.0,  # index memory weigthing factor
+                'sample_fraction': 0.001,  # what fraction of the dataset to use for autotuning
+            }
+        )
     elif algorithm == 'lsh':
-        flann_params.update({
-            'table_number_': 12,
-            'key_size_': 20,
-            'multi_probe_level_': 2,
-        })
+        flann_params.update(
+            {'table_number_': 12, 'key_size_': 20, 'multi_probe_level_': 2,}
+        )
 
     flann_params = ut.update_existing(flann_params, kwargs, assert_exists=True)
     return flann_params
 
 
-def tune_flann(dpts,
-               target_precision=.90,
-               build_weight=0.50,
-               memory_weight=0.00,
-               sample_fraction=0.01):
+def tune_flann(
+    dpts,
+    target_precision=0.90,
+    build_weight=0.50,
+    memory_weight=0.00,
+    sample_fraction=0.01,
+):
     r"""
 
     References:
@@ -558,16 +587,20 @@ def tune_flann(dpts,
     """
     with ut.Timer('tuning flann'):
         print('Autotuning flann with %d %dD vectors' % (dpts.shape[0], dpts.shape[1]))
-        print('a sample of %d vectors will be used' % (int(dpts.shape[0] * sample_fraction)))
+        print(
+            'a sample of %d vectors will be used' % (int(dpts.shape[0] * sample_fraction))
+        )
         flann = FLANN_CLS()
-        #num_data = len(dpts)
-        flann_atkwargs = dict(algorithm='autotuned',
-                              target_precision=target_precision,
-                              build_weight=build_weight,
-                              memory_weight=memory_weight,
-                              sample_fraction=sample_fraction)
+        # num_data = len(dpts)
+        flann_atkwargs = dict(
+            algorithm='autotuned',
+            target_precision=target_precision,
+            build_weight=build_weight,
+            memory_weight=memory_weight,
+            sample_fraction=sample_fraction,
+        )
         suffix = repr(flann_atkwargs)
-        badchar_list = ',{}\': '
+        badchar_list = ",{}': "
         for badchar in badchar_list:
             suffix = suffix.replace(badchar, '')
         print('flann_atkwargs:')
@@ -594,47 +627,50 @@ def tune_flann(dpts,
         ]
         relevant_params_dict = dict(
             linear=['algorithm'],
-            #---
-            kdtree=[
-                'trees'
-            ],
-            #---
-            kmeans=[
-                'branching',
-                'iterations',
-                'centers_init',
-                'cb_index',
-            ],
-            #---
-            lsh=[
-                'table_number',
-                'key_size',
-                'multi_probe_level',
-            ],
+            # ---
+            kdtree=['trees'],
+            # ---
+            kmeans=['branching', 'iterations', 'centers_init', 'cb_index',],
+            # ---
+            lsh=['table_number', 'key_size', 'multi_probe_level',],
         )
-        relevant_params_dict['composite'] = relevant_params_dict['kmeans'] + relevant_params_dict['kdtree'] + common_params
+        relevant_params_dict['composite'] = (
+            relevant_params_dict['kmeans']
+            + relevant_params_dict['kdtree']
+            + common_params
+        )
         relevant_params_dict['kmeans'] += common_params
         relevant_params_dict['kdtree'] += common_params
         relevant_params_dict['lsh'] += common_params
 
-        #kdtree_single_params = [
+        # kdtree_single_params = [
         #    'leaf_max_size',
-        #]
-        #other_params = [
+        # ]
+        # other_params = [
         #    'build_weight',
         #    'sorted',
-        #]
+        # ]
         out_file = 'flann_tuned' + suffix
         ut.write_to(out_file, ub.repr2(tuned_params, sorted_=True, newlines=True))
         flann.delete_index()
         if tuned_params['algorithm'] in relevant_params_dict:
             print('relevant_params=')
             relevant_params = relevant_params_dict[tuned_params['algorithm']]
-            print(ub.repr2(ut.dict_subset(tuned_params, relevant_params),
-                              sorted_=True, newlines=True))
+            print(
+                ub.repr2(
+                    ut.dict_subset(tuned_params, relevant_params),
+                    sorted_=True,
+                    newlines=True,
+                )
+            )
             print('irrelevant_params=')
-            print(ub.repr2(ut.dict_setdiff(tuned_params, relevant_params),
-                              sorted_=True, newlines=True))
+            print(
+                ub.repr2(
+                    ut.dict_setdiff(tuned_params, relevant_params),
+                    sorted_=True,
+                    newlines=True,
+                )
+            )
         else:
             print('unknown tuned algorithm=%r' % (tuned_params['algorithm'],))
 
@@ -665,6 +701,7 @@ def flann_index_time_experiment():
         """
         Perform only a few allocations of test data
         """
+
         def __init__(self):
             self.num = 10000
             self.data_pool = None
@@ -674,7 +711,10 @@ def flann_index_time_experiment():
             print('[alloc] num = %r' % (num,))
             self.num = num
             self.data_pool = vt.demodata.testdata_dummy_sift(num)
-            print('[alloc] object size ' + ut.get_object_size_str(self.data_pool, 'data_pool'))
+            print(
+                '[alloc] object size '
+                + ut.get_object_size_str(self.data_pool, 'data_pool')
+            )
 
         def get_testdata(self, num):
             if len(self.data_pool) < num:
@@ -689,11 +729,10 @@ def flann_index_time_experiment():
         data_list = []
         num = 1000
         print('-----')
-        for count in ut.ProgIter(itertools.count(), length=-1, freq=1,
-                                 adjust=False):
+        for count in ut.ProgIter(itertools.count(), length=-1, freq=1, adjust=False):
             num = int(num * 1.2)
             print('num = %r' % (num,))
-            #if num > 1E6:
+            # if num > 1E6:
             #    break
             data = pool.get_testdata(num)
             print('object size ' + ut.get_object_size_str(data, 'data'))
@@ -721,9 +760,15 @@ def flann_index_time_experiment():
 
     def plotdata(data_list):
         count_arr = ut.get_list_column(data_list, 1)
-        time_arr  = ut.get_list_column(data_list, 2)
-        pt.plot2(count_arr, time_arr, marker='-o', equal_aspect=False,
-                 x_label='num_vectors', y_label='FLANN build time')
+        time_arr = ut.get_list_column(data_list, 2)
+        pt.plot2(
+            count_arr,
+            time_arr,
+            marker='-o',
+            equal_aspect=False,
+            x_label='num_vectors',
+            y_label='FLANN build time',
+        )
 
     plotdata(data_list1)
     plotdata(data_list2)
@@ -795,4 +840,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.nearest_neighbors
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

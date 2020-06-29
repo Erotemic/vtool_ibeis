@@ -41,8 +41,8 @@ def verts_from_bbox(bbox, close=False):
         verts = ((10, 10), (60, 10), (60, 60), (10, 60))
     """
     x1, y1, w, h = bbox
-    x2 = (x1 + w)
-    y2 = (y1 + h)
+    x2 = x1 + w
+    y2 = y1 + h
     if close:
         # Close the verticies list (for drawing lines)
         verts = ((x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1))
@@ -89,11 +89,12 @@ def draw_border(img_in, color=(0, 128, 255), thickness=2, out=None):
         >>> pt.show_if_requested()
     """
     h, w = img_in.shape[0:2]
-    #verts = verts_from_bbox((0, 0, w, h))
-    #verts = verts_from_bbox((0, 0, w - 1, h - 1))
+    # verts = verts_from_bbox((0, 0, w, h))
+    # verts = verts_from_bbox((0, 0, w - 1, h - 1))
     half_thickness = thickness // 2
-    verts = verts_from_bbox((half_thickness, half_thickness,
-                             w - thickness, h - thickness))
+    verts = verts_from_bbox(
+        (half_thickness, half_thickness, w - thickness, h - thickness)
+    )
     # FIXME: adjust verts and draw lines here to fill in the corners correctly
     img = draw_verts(img_in, verts, color=color, thickness=thickness, out=out)
     return img
@@ -171,11 +172,13 @@ def draw_verts(img_in, verts, color=(0, 128, 255), thickness=2, out=None):
     connect = True
     if connect:
         line_list_sequence = zip(verts[:-1], verts[1:])
-        line_tuple_sequence = ((tuple(p1_), tuple(p2_)) for (p1_, p2_) in line_list_sequence)
+        line_tuple_sequence = (
+            (tuple(p1_), tuple(p2_)) for (p1_, p2_) in line_list_sequence
+        )
         cv2.line(out, tuple(verts[0]), tuple(verts[-1]), color, thickness)
         for (p1, p2) in line_tuple_sequence:
             cv2.line(out, p1, p2, color, thickness)
-            #print('p1, p2: (%r, %r)' % (p1, p2))
+            # print('p1, p2: (%r, %r)' % (p1, p2))
     else:
         for count, p in enumerate(verts, start=1):
             cv2.circle(out, tuple(p), count, color, thickness=1)
@@ -255,6 +258,7 @@ def closest_point_on_line_segment(p, e1, e2):
 
 def distance_to_lineseg(p, e1, e2):
     import vtool as vt
+
     close_pt = vt.closest_point_on_line_segment(p, e1, e2)
     dist_to_lineseg = vt.L2(p, close_pt)
     return dist_to_lineseg
@@ -313,7 +317,10 @@ def closest_point_on_line(p, e1, e2):
 
 def closest_point_on_vert_segments(p, verts):
     import vtool as vt
-    candidates = [closest_point_on_line_segment(p, e1, e2) for e1, e2 in ut.itertwo(verts)]
+
+    candidates = [
+        closest_point_on_line_segment(p, e1, e2) for e1, e2 in ut.itertwo(verts)
+    ]
     dists = np.array([vt.L2_sqrd(p, new_pt) for new_pt in candidates])
     new_pts = candidates[dists.argmin()]
     return new_pts
@@ -330,6 +337,7 @@ def closest_point_on_bbox(p, bbox):
         >>> [closest_point_on_bbox(p, bbox) for p in p_list]
     """
     import vtool as vt
+
     verts = np.array(vt.verts_from_bbox(bbox, close=True))
     new_pts = closest_point_on_vert_segments(p, verts)
     return new_pts
@@ -387,7 +395,7 @@ def extent_from_bbox(bbox):
     return extent
 
 
-#def tlbr_from_bbox(bbox):
+# def tlbr_from_bbox(bbox):
 def bbox_from_extent(extent):
     """
     Args:
@@ -413,7 +421,7 @@ def bbox_from_extent(extent):
 
 
 def bbox_from_center_wh(center_xy, wh):
-    return bbox_from_xywh(center_xy, wh, xy_rel_pos=[.5, .5])
+    return bbox_from_xywh(center_xy, wh, xy_rel_pos=[0.5, 0.5])
 
 
 def bbox_center(bbox):
@@ -441,9 +449,10 @@ def get_pointset_extent_wh(pts):
 def cvt_bbox_xywh_to_pt1pt2(xywh, sx=1.0, sy=1.0, round_=True):
     """ Converts bbox to thumb format with a scale factor"""
     import vtool as vt
+
     (x1, y1, _w, _h) = xywh
-    x2 = (x1 + _w)
-    y2 = (y1 + _h)
+    x2 = x1 + _w
+    y2 = y1 + _h
     if round_:
         pt1 = (vt.iround(x1 * sx), vt.iround(y1 * sy))
         pt2 = (vt.iround(x2 * sx), vt.iround(y2 * sy))
@@ -457,6 +466,7 @@ def scale_bbox(bbox, sx, sy=None):
     if sy is None:
         sy = sx
     from vtool import linalg
+
     centerx, centery = bbox_center(bbox)
     S = linalg.scale_around_mat3x3(sx, sy, centerx, centery)
     verts = np.array(verts_from_bbox(bbox))
@@ -521,6 +531,7 @@ def scaled_verts_from_bbox(bbox, theta, sx, sy):
     if bbox is None:
         return None
     from vtool import linalg
+
     # Transformation matrixes
     R = linalg.rotation_around_bbox_mat3x3(theta, bbox)
     S = linalg.scale_mat3x3(sx, sy)
@@ -584,4 +595,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.geometry
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

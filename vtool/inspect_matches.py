@@ -2,13 +2,16 @@
 from __future__ import absolute_import, division, print_function
 import utool as ut
 import ubelt as ub
+
 try:
     import wbia.guitool as gt
     from wbia.guitool import mpl_widget
+
     INSPECT_BASE = gt.GuitoolWidget
     MatplotlibWidget = mpl_widget.MatplotlibWidget
 except ImportError:
     import warnings
+
     warnings.warn('WARNING: guitool not available')
     MatplotlibWidget = object
     INSPECT_BASE = object
@@ -16,38 +19,43 @@ except ImportError:
 
 def lazy_test_annot(key):
     import numpy as np
+
     rchip_fpath = ut.grab_test_imgpath(key)
-    annot = ut.LazyDict({
-        'aid': key.split('.')[0],
-        'nid': key[0:4],
-        'rchip_fpath': rchip_fpath,
-        'gps': (np.nan, np.nan),
-        'yaw': np.nan,
-        'view': np.nan,
-        'qual': np.nan,
-        'time': np.nan,
-    })
+    annot = ut.LazyDict(
+        {
+            'aid': key.split('.')[0],
+            'nid': key[0:4],
+            'rchip_fpath': rchip_fpath,
+            'gps': (np.nan, np.nan),
+            'yaw': np.nan,
+            'view': np.nan,
+            'qual': np.nan,
+            'time': np.nan,
+        }
+    )
     return annot
+
 
 try:
     import wbia.dtool as dt
 
-    MatchDisplayConfig = dt.from_param_info_list([
-        ut.ParamInfo('overlay', True),
-        ut.ParamInfo('show_all_kpts', False),
-        ut.ParamInfo('mask_blend', 0.0, min_=0, max_=1),
-
-        ut.ParamInfo('heatmask', True, hideif=':not overlay'),
-        ut.ParamInfo('show_homog', False, hideif=':not overlay'),
-        ut.ParamInfo('show_ori', False, hideif=':not overlay'),
-        ut.ParamInfo('show_ell', False, hideif=':not overlay'),
-        ut.ParamInfo('show_pts', False, hideif=':not overlay'),
-        ut.ParamInfo('show_lines', False, hideif=lambda cfg: not cfg['overlay']),
-        ut.ParamInfo('show_rect', False, hideif=':not overlay'),
-        ut.ParamInfo('show_eig', False, hideif=':not overlay'),
-        ut.ParamInfo('ell_alpha', 0.6, min_=0, max_=1, hideif=':not overlay'),
-        ut.ParamInfo('line_alpha', 0.35, min_=0, max_=1, hideif=':not overlay'),
-    ])
+    MatchDisplayConfig = dt.from_param_info_list(
+        [
+            ut.ParamInfo('overlay', True),
+            ut.ParamInfo('show_all_kpts', False),
+            ut.ParamInfo('mask_blend', 0.0, min_=0, max_=1),
+            ut.ParamInfo('heatmask', True, hideif=':not overlay'),
+            ut.ParamInfo('show_homog', False, hideif=':not overlay'),
+            ut.ParamInfo('show_ori', False, hideif=':not overlay'),
+            ut.ParamInfo('show_ell', False, hideif=':not overlay'),
+            ut.ParamInfo('show_pts', False, hideif=':not overlay'),
+            ut.ParamInfo('show_lines', False, hideif=lambda cfg: not cfg['overlay']),
+            ut.ParamInfo('show_rect', False, hideif=':not overlay'),
+            ut.ParamInfo('show_eig', False, hideif=':not overlay'),
+            ut.ParamInfo('ell_alpha', 0.6, min_=0, max_=1, hideif=':not overlay'),
+            ut.ParamInfo('line_alpha', 0.35, min_=0, max_=1, hideif=':not overlay'),
+        ]
+    )
 except ImportError:
     pass
 
@@ -125,10 +133,12 @@ class MatchInspector(INSPECT_BASE):
         if self.isVisible():
             self.first_show()
 
-    def initialize(self, match=None, on_context=None, autoupdate=True,
-                   info_text=None, cfgdict=None):
+    def initialize(
+        self, match=None, on_context=None, autoupdate=True, info_text=None, cfgdict=None
+    ):
         from wbia.plottool import abstract_interaction
         from wbia.guitool.__PYQT__ import QtCore
+
         self.set_match(match, on_context, info_text)
         self._setup_configs(cfgdict=cfgdict)
         self._setup_layout(autoupdate=autoupdate)
@@ -145,6 +155,7 @@ class MatchInspector(INSPECT_BASE):
 
     def screenshot(self):
         import wbia.plottool as pt
+
         with pt.RenderingContext() as render:
             self.match.show(**self.disp_config)
         fpaths = gt.newFileDialog('.', mode='save', exec_=True)
@@ -153,28 +164,34 @@ class MatchInspector(INSPECT_BASE):
             if not fpath.endswith('.jpg'):
                 fpath += '.jpg'
             import vtool as vt
+
             vt.imwrite(fpath, render.image)
 
     def embed(self):
         match = self.match  # NOQA
         import utool
+
         utool.embed()
 
     def _new_config_widget(self, cfg, changed=None):
         from wbia.guitool import PrefWidget2
+
         user_mode = 0
         cfg_widget = PrefWidget2.EditConfigWidget(
-            config=cfg, user_mode=user_mode, parent=self, changed=changed)
+            config=cfg, user_mode=user_mode, parent=self, changed=changed
+        )
         return cfg_widget
 
     def closeEvent(self, event):
         from wbia.plottool import abstract_interaction
+
         abstract_interaction.unregister_interaction(self)
         super(MatchInspector, self).closeEvent(event)
 
     def _setup_configs(self, cfgdict=None):
         from vtool import matching
         import wbia.dtool
+
         # import pyhesaff
 
         # default_dict = pyhesaff.get_hesaff_default_params()
@@ -191,8 +208,7 @@ class MatchInspector(INSPECT_BASE):
         self.featconfig = TmpFeatConfig()
         self.chipconfig = TmpNChipConfig()
 
-        TmpVsOneConfig = dtool.from_param_info_list(
-            matching.VSONE_DEFAULT_CONFIG)
+        TmpVsOneConfig = dtool.from_param_info_list(matching.VSONE_DEFAULT_CONFIG)
         self.config = TmpVsOneConfig()
         self.disp_config = MatchDisplayConfig()
 
@@ -205,23 +221,28 @@ class MatchInspector(INSPECT_BASE):
 
         # Make config widgets after setting defaults
         self.chipconfig_widget = self._new_config_widget(
-            self.chipconfig, changed=self.on_chip_cfg_changed)
+            self.chipconfig, changed=self.on_chip_cfg_changed
+        )
         self.featconfig_widget = self._new_config_widget(
-            self.featconfig, changed=self.on_feat_cfg_changed)
+            self.featconfig, changed=self.on_feat_cfg_changed
+        )
         self.config_widget = self._new_config_widget(
-            self.config, changed=self.on_cfg_changed)
+            self.config, changed=self.on_cfg_changed
+        )
         self.disp_config_widget = self._new_config_widget(
-            self.disp_config, changed=self.on_cfg_changed)
+            self.disp_config, changed=self.on_cfg_changed
+        )
 
     def _setup_layout(self, autoupdate=True):
         from wbia.guitool.__PYQT__ import QtWidgets
+
         self.menubar = gt.newMenubar(self)
         self.menuFile = self.menubar.newMenu('Dev')
         self.menuFile.newAction(triggered=self.embed)
         self.menuFile.newAction(triggered=self.screenshot)
         splitter1 = self.addNewSplitter(orientation='horiz')
         config_vframe = splitter1.newWidget()
-        splitter2     = splitter1.addNewSplitter(orientation='vert')
+        splitter2 = splitter1.addNewSplitter(orientation='vert')
         config_vframe.addWidget(QtWidgets.QLabel('Chip Config'))
         config_vframe.addWidget(self.chipconfig_widget)
         config_vframe.addWidget(QtWidgets.QLabel('Feat Config'))
@@ -233,7 +254,8 @@ class MatchInspector(INSPECT_BASE):
         # update_hframe = config_vframe.addNewWidget(orientation='horiz')
         # update_hframe.addNewButton('Update', pressed=self.update)
         self.autoupdate_cb = config_vframe.addNewCheckBox(
-            'auto-update', checked=autoupdate, changed=self.first_show)
+            'auto-update', checked=autoupdate, changed=self.first_show
+        )
 
         self.mpl_widget = MatplotlibWidget(parent=self)
         splitter2.addWidget(self.mpl_widget)
@@ -242,6 +264,7 @@ class MatchInspector(INSPECT_BASE):
 
     def execute_vsone(self):
         from vtool import matching
+
         print('[inspect_match] Execute vsone')
 
         cfgdict = {}
@@ -251,8 +274,7 @@ class MatchInspector(INSPECT_BASE):
         match = self.match
         match.verbose = True
         match._inplace_default = True
-        matching.ensure_metadata_vsone(match.annot1, match.annot2,
-                                       cfgdict=cfgdict)
+        matching.ensure_metadata_vsone(match.annot1, match.annot2, cfgdict=cfgdict)
 
         match_config = self.config.asdict()
         match.apply_all(match_config)
@@ -281,7 +303,7 @@ class MatchInspector(INSPECT_BASE):
         self.mpl_widget.clf()
         ax = self.mpl_widget.ax
         match.show(ax=ax, **self.disp_config)
-        #fig.show()
+        # fig.show()
         self.mpl_widget.fig.canvas.draw()
 
     def update(self, state=None):
@@ -322,22 +344,23 @@ class MatchInspector(INSPECT_BASE):
 
 def make_match_interaction(matches, metadata, type_='RAT+SV', **kwargs):
     import wbia.plottool.interact_matches
-    #import wbia.plottool as pt
+
+    # import wbia.plottool as pt
     fm, fs = matches[type_][0:2]
     try:
         H1 = metadata['H_' + type_.split('+')[0]]
     except Exception:
         H1 = None
-    #fm, fs = matches['RAT'][0:2]
+    # fm, fs = matches['RAT'][0:2]
     annot1 = metadata['annot1']
     annot2 = metadata['annot2']
     rchip1, kpts1, vecs1 = ub.dict_take(annot1, ['nchip', 'kpts', 'vecs'])
     rchip2, kpts2, vecs2 = ub.dict_take(annot2, ['nchip', 'kpts', 'vecs'])
-    #pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)
+    # pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)
     fsv = fs[:, None]
     interact = plottool.interact_matches.MatchInteraction2(
-        rchip1, rchip2, kpts1, kpts2, fm, fs, fsv, vecs1, vecs2, H1=H1,
-        **kwargs)
+        rchip1, rchip2, kpts1, kpts2, fm, fs, fsv, vecs1, vecs2, H1=H1, **kwargs
+    )
     return interact
 
 
@@ -353,4 +376,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.inspect_matches
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

@@ -8,8 +8,8 @@ import utool as ut
 def run_tests():
     # Build module list and run tests
     import sys
-    exclude_doctests_fnames = set([
-    ])
+
+    exclude_doctests_fnames = set([])
     exclude_dirs = [
         '_broken',
         'old',
@@ -22,7 +22,8 @@ def run_tests():
     ]
     import vtool as vt
     from os.path import dirname
-    #dpath_list = ['vtool']
+
+    # dpath_list = ['vtool']
     if ut.in_pyinstaller_package():
         # HACK, find_doctestable_modnames does not work in pyinstaller
         """
@@ -65,11 +66,13 @@ def run_tests():
     else:
         dpath_list = [dirname(vt.__file__)]
         doctest_modname_list = ut.find_doctestable_modnames(
-            dpath_list, exclude_doctests_fnames, exclude_dirs)
+            dpath_list, exclude_doctests_fnames, exclude_dirs
+        )
 
     coverage = ut.get_argflag(('--coverage', '--cov',))
     if coverage:
         import coverage
+
         cov = coverage.Coverage(source=doctest_modname_list)
         cov.start()
         print('Starting coverage')
@@ -116,8 +119,10 @@ def run_tests():
     else:
         return 0
 
+
 if __name__ == '__main__':
     import multiprocessing
+
     ut.change_term_title('RUN VTOOL TESTS')
     multiprocessing.freeze_support()
     retcode = run_tests()

@@ -8,15 +8,16 @@ from vtool import linalg
 import numpy as np
 from utool._internal.meta_util_six import get_funcname
 
-GLOBAL_SETUP = '''
+GLOBAL_SETUP = """
 import numpy as np
 import numpy.linalg as npl
 import vtool
-'''
+"""
 
 
 def _run_benchmark(setup_, func_list, argstr, number=1000):
     import timeit
+
     setup = GLOBAL_SETUP + '\n' + setup_
     print('----------')
     print('BENCHMARK: ' + utool.get_caller_name())
@@ -81,10 +82,11 @@ def test_det_dist():
 
 def benchmark_det_dist():
     setup = utool.unindent(
-        '''
+        """
         det1 = np.random.rand(100).astype(np.float64)
         det2 = np.random.rand(100).astype(np.float64)
-        ''')
+        """
+    )
     func_list = [
         'vtool.linalg.det_distance',
         'vtool.linalg.det_distance_cython',
@@ -95,12 +97,13 @@ def benchmark_det_dist():
 
 def benchmark_invVR_sqrd_scale():
     setup = utool.unindent(
-        '''
+        """
         import numpy as np
         import numpy.linalg as npl
         import vtool
         invVRs = np.random.rand(100, 3, 3).astype(np.float64)
-        ''')
+        """
+    )
     func_list = [
         'vtool.keypoint.get_invVR_mats_sqrd_scale',
         'vtool.keypoint.get_invVR_mats_sqrd_scale_cython',
@@ -111,10 +114,11 @@ def benchmark_invVR_sqrd_scale():
 
 def benchmark_L2_dist():
     setup = utool.unindent(
-        '''
+        """
         hist1 = np.random.rand(100, 128).astype(np.float64)
         hist2 = np.random.rand(100, 128).astype(np.float64)
-        ''')
+        """
+    )
     func_list = [
         'vtool.linalg.L2_sqrd',
         'vtool.linalg.L2_sqrd_cython',
@@ -126,17 +130,18 @@ def benchmark_L2_dist():
 if __name__ == '__main__':
     try:
         from vtool import linalg_cython  # NOQA
+
         print('[vtool] cython is on')
     except ImportError as ex:
         utool.printex(ex, iswarning=True)
         print('[vtool] cython is off')
         # raise
-    #from vtool import linalg
+    # from vtool import linalg
     test_locals1, error_report1 = utool.run_test(test_L2_sqrd)
     test_locals2, error_report2 = utool.run_test(test_invVR_sqrd_scale)
     test_locals3, error_report3 = utool.run_test(test_det_dist)
     benchmark_L2_dist()
     benchmark_invVR_sqrd_scale()
     benchmark_det_dist()
-    #execstr = utool.execstr_dict(test_linalg, 'test_locals')
-    #exec(execstr)
+    # execstr = utool.execstr_dict(test_linalg, 'test_locals')
+    # exec(execstr)

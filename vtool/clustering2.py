@@ -16,11 +16,13 @@ from vtool._pyflann_backend import FLANN_CLS
 
 def tune_flann2(data):
     flann = FLANN_CLS()
-    flann_atkwargs = dict(algorithm='autotuned',
-                          target_precision=.6,
-                          build_weight=0.01,
-                          memory_weight=0.0,
-                          sample_fraction=0.001)
+    flann_atkwargs = dict(
+        algorithm='autotuned',
+        target_precision=0.6,
+        build_weight=0.01,
+        memory_weight=0.0,
+        sample_fraction=0.001,
+    )
     print(flann_atkwargs)
     print('Autotuning flann')
     tuned_params = flann.build_index(data, **flann_atkwargs)
@@ -37,6 +39,7 @@ class AnnoyWraper(object):
 
     def build_annoy(self, centroids, trees=3):
         import annoy
+
         self.a = annoy.AnnoyIndex(centroids.shape[1], metric='euclidean')
         for i, v in enumerate(centroids):
             self.a.add_item(i, v)
@@ -47,7 +50,9 @@ class AnnoyWraper(object):
         index_list = []
         dist_list = []
         for v in query_vecs:
-            idx, dist = a.get_nns_by_vector(v, num, search_k=checks, include_distances=True)
+            idx, dist = a.get_nns_by_vector(
+                v, num, search_k=checks, include_distances=True
+            )
             index_list.append(idx)
             dist_list.append(dist)
         return np.array(index_list), np.array(dist_list) ** 2
@@ -59,7 +64,7 @@ class AnnoyWraper(object):
 
 def jagged_group(groupids_list):
     """ flattens and returns group indexes into the flattened list """
-    #flatx2_itemx = np.array(list(ub.flatten(itemxs_iter)))
+    # flatx2_itemx = np.array(list(ub.flatten(itemxs_iter)))
     flatids = np.array(list(ub.flatten(groupids_list)))
     keys, groupxs = group_indices(flatids)
     return keys, groupxs
@@ -70,7 +75,7 @@ def apply_jagged_grouping(unflat_items, groupxs):
     flat_items = np.array(list(ub.flatten(unflat_items)))
     item_groups = apply_grouping(flat_items, groupxs)
     return item_groups
-    #itemxs_iter = [[count] * len(idx2_groupid) for count, idx2_groupid in enumerate(groupids_list)]
+    # itemxs_iter = [[count] * len(idx2_groupid) for count, idx2_groupid in enumerate(groupids_list)]
 
 
 def groupedzip(id_list, datas_list):
@@ -112,7 +117,7 @@ def groupedzip(id_list, datas_list):
         ]
     """
     unique_ids, groupxs = group_indices(id_list)
-    grouped_datas_list = [apply_grouping_(data,  groupxs) for data in datas_list]
+    grouped_datas_list = [apply_grouping_(data, groupxs) for data in datas_list]
     grouped_iter = zip(*grouped_datas_list)
     return unique_ids, grouped_iter
 
@@ -293,13 +298,14 @@ def find_duplicate_items(item_arr):
     sortx = item_arr.argsort()
     groupids_sorted = item_arr.take(sortx)
 
-    #duplicate_idxs = np.flatnonzero(~np.diff(groupids_sorted).astype(np.bool))
+    # duplicate_idxs = np.flatnonzero(~np.diff(groupids_sorted).astype(np.bool))
     diff = np.diff(groupids_sorted)
-    #notdiff = np.bitwise_not(diff.astype(np.bool))
+    # notdiff = np.bitwise_not(diff.astype(np.bool))
     edges = np.flatnonzero(diff.astype(np.bool)) + 1
-    duplicate_items = [group[0] for group in np.split(groupids_sorted, edges)
-                       if group.shape[0] > 1]
-    #duplicate_items = groupids_sorted.take(duplicate_idxs)
+    duplicate_items = [
+        group[0] for group in np.split(groupids_sorted, edges) if group.shape[0] > 1
+    ]
+    # duplicate_items = groupids_sorted.take(duplicate_idxs)
     return duplicate_items
 
 
@@ -334,9 +340,9 @@ def apply_grouping(items, groupxs, axis=0):
         [array([8, 5, 6]), array([1, 5, 8, 7]), array([5, 3, 0, 9])]
     """
     # SHOULD DO A CONTIGUOUS CHECK HERE
-    #items_ = np.ascontiguousarray(items)
+    # items_ = np.ascontiguousarray(items)
     return [items.take(xs, axis=axis) for xs in groupxs]
-    #return [items[idxs] for idxs in groupxs]
+    # return [items[idxs] for idxs in groupxs]
 
 
 def apply_grouping_(items, groupxs):
@@ -375,7 +381,10 @@ def invert_apply_grouping(grouped_items, groupxs):
         []
     """
     if len(grouped_items) == 0:
-        assert len(groupxs) == 0, 'inconsistant. len(grouped_items)=%d, len(groupxs)=%d' % (len(grouped_items), len(groupxs))
+        assert len(groupxs) == 0, (
+            'inconsistant. len(grouped_items)=%d, len(groupxs)=%d'
+            % (len(grouped_items), len(groupxs))
+        )
         return []
     # maxval = max(map(max, groupxs))
     maxval = _max(list(map(_max, groupxs)))
@@ -440,25 +449,29 @@ def groupby_dict(items, idx2_groupid):
     grouped = {key: val for key, val in groupby_gen(items, idx2_groupid)}
     return grouped
 
+
 # ---------------
 # Plotting Code
 # ---------------
 
 
-def plot_centroids(data, centroids, num_pca_dims=3, whiten=False,
-                   labels='centroids', fnum=1, prefix=''):
+def plot_centroids(
+    data, centroids, num_pca_dims=3, whiten=False, labels='centroids', fnum=1, prefix=''
+):
     """ Plots centroids and datapoints. Plots accurately up to 3 dimensions.
     If there are more than 3 dimensions, PCA is used to recude the dimenionality
     to the <num_pca_dims> principal components
     """
     # http://www.janeriksolem.net/2012/03/isomap-with-scikit-learn.html
     from wbia.plottool import draw_func2 as df2
+
     data_dims = data.shape[1]
     show_dims = min(num_pca_dims, data_dims)
     if data_dims != show_dims:
         # we can't physiologically see the data, so look at a projection
         print('[akmeans] Doing PCA')
         from sklearn import decomposition
+
         pcakw = dict(copy=True, n_components=show_dims, whiten=whiten)
         pca = decomposition.PCA(**pcakw).fit(data)
         pca_data = pca.transform(data)
@@ -483,14 +496,14 @@ def plot_centroids(data, centroids, num_pca_dims=3, whiten=False,
     datax2_label = np.array(datax2_label, dtype=np.int32)
     print(datax2_label)
     assert len(datax2_label.shape) == 1, repr(datax2_label.shape)
-    #if datax2_centroids is None:
+    # if datax2_centroids is None:
     #    (datax2_centroidx, _) = p FLANN_CLS().nn(centroids, data, 1)
-    #data_colors = colors[np.array(datax2_centroidx, dtype=np.int32)]
+    # data_colors = colors[np.array(datax2_centroidx, dtype=np.int32)]
     nColors = datax2_label.max() - datax2_label.min() + 1
     print('nColors=%r' % (nColors,))
     print('K=%r' % (K,))
-    colors = np.array(df2.distinct_colors(nColors, brightness=.95))
-    clus_colors = np.array(df2.distinct_colors(nCentroids, brightness=.95))
+    colors = np.array(df2.distinct_colors(nColors, brightness=0.95))
+    clus_colors = np.array(df2.distinct_colors(nCentroids, brightness=0.95))
     assert labels != 'centroids' or nColors == K
     assert len(datax2_label.shape) == 1, repr(datax2_label.shape)
     data_colors = colors[datax2_label]
@@ -498,30 +511,33 @@ def plot_centroids(data, centroids, num_pca_dims=3, whiten=False,
     fig = df2.figure(fnum, doclf=True, docla=True)
     if show_dims == 2:
         ax = df2.plt.gca()
-        df2.plt.scatter(data_x, data_y, s=20,  c=data_colors, marker='o', alpha=1)
-        #df2.plt.scatter(data_x, data_y, s=20,  c=data_colors, marker='o', alpha=.2)
+        df2.plt.scatter(data_x, data_y, s=20, c=data_colors, marker='o', alpha=1)
+        # df2.plt.scatter(data_x, data_y, s=20,  c=data_colors, marker='o', alpha=.2)
         df2.plt.scatter(clus_x, clus_y, s=500, c=clus_colors, marker='*')
         ax.autoscale(enable=False)
         ax.set_aspect('equal')
         df2.dark_background(ax)
     if show_dims == 3:
         from mpl_toolkits.mplot3d import Axes3D  # NOQA
+
         ax = fig.add_subplot(111, projection='3d')
         data_z = pca_data[:, 2]
         clus_z = pca_centroids[:, 2]
-        #ax.scatter(data_x, data_y, data_z, s=20,  c=data_colors, marker='o', alpha=.2)
-        ax.scatter(data_x, data_y, data_z, s=20,  c=data_colors, marker='o', alpha=1)
+        # ax.scatter(data_x, data_y, data_z, s=20,  c=data_colors, marker='o', alpha=.2)
+        ax.scatter(data_x, data_y, data_z, s=20, c=data_colors, marker='o', alpha=1)
         ax.scatter(clus_x, clus_y, clus_z, s=500, c=clus_colors, marker='*')
         ax.autoscale(enable=False)
         ax.set_aspect('equal')
         df2.dark_background(ax)
-        #ax.set_alpha(.1)
-        #ax.set_frame_on(False)
+        # ax.set_alpha(.1)
+        # ax.set_frame_on(False)
     ax = df2.plt.gca()
     waswhitestr = ' +whitening' * whiten
-    titlestr = ('{prefix}AKmeans: K={K}.'
-                'PCA projection {data_dims}D -> {show_dims}D'
-                '{waswhitestr}').format(**locals())
+    titlestr = (
+        '{prefix}AKmeans: K={K}.'
+        'PCA projection {data_dims}D -> {show_dims}D'
+        '{waswhitestr}'
+    ).format(**locals())
     ax.set_title(titlestr)
     return fig
 
@@ -570,9 +586,10 @@ def uniform_sample_hypersphere(num, ndim=2, only_quadrent_1=False):
         >>> ut.show_if_requested()
     """
     import vtool as vt
+
     pts = np.random.rand(num, ndim)
     if not only_quadrent_1:
-        pts =  pts * 2 - 1
+        pts = pts * 2 - 1
         pass
     pts = vt.normalize_rows(pts)
     return pts
@@ -715,16 +732,23 @@ def unsupervised_multicut_labeling(cost_matrix, thresh=0):
     """
     import opengm
     import numpy as np
-    #import wbia.plottool as pt
+
+    # import wbia.plottool as pt
     from itertools import product
+
     cost_matrix_ = cost_matrix - thresh
     num_vars = len(cost_matrix_)
 
     # Enumerate undirected edges (node index pairs)
     var_indices = np.arange(num_vars)
     varindex_pairs = np.array(
-        [(a1, a2) for a1, a2 in product(var_indices, var_indices)
-         if a1 != a2 and a1 > a2], dtype=np.uint32)
+        [
+            (a1, a2)
+            for a1, a2 in product(var_indices, var_indices)
+            if a1 != a2 and a1 > a2
+        ],
+        dtype=np.uint32,
+    )
     varindex_pairs.sort(axis=1)
 
     # Create nodes in the graphical model.  In this case there are <num_vars>
@@ -736,47 +760,49 @@ def unsupervised_multicut_labeling(cost_matrix, thresh=0):
     # Use one potts function for each edge
     for varx1, varx2 in varindex_pairs:
         cost = cost_matrix_[varx1, varx2]
-        potts_func = opengm.PottsFunction((num_vars, num_vars), valueEqual=0, valueNotEqual=cost)
+        potts_func = opengm.PottsFunction(
+            (num_vars, num_vars), valueEqual=0, valueNotEqual=cost
+        )
         potts_func_id = gm.addFunction(potts_func)
         var_indicies = np.array([varx1, varx2])
         gm.addFactor(potts_func_id, var_indicies)
 
-    #pt.ensureqt()
-    #opengm.visualizeGm(gm=gm)
+    # pt.ensureqt()
+    # opengm.visualizeGm(gm=gm)
 
     # Not sure what parameters are allowed to be passed here.
     parameter = opengm.InfParam()
     inf = opengm.inference.Multicut(gm, parameter=parameter)
     inf.infer()
     labels = inf.arg()
-    #print(labels)
+    # print(labels)
     return labels
 
-#def alpha_expansion_cut(graph):
+    # def alpha_expansion_cut(graph):
     # https://github.com/amueller/gco_python/blob/master/example.py
     #    import pygco
-    #prob_annots2 = prob_annots.copy()
-    #finite_probs = (prob_annots2[np.isfinite(prob_annots2)])
-    #mean = finite_probs.mean()
+    # prob_annots2 = prob_annots.copy()
+    # finite_probs = (prob_annots2[np.isfinite(prob_annots2)])
+    # mean = finite_probs.mean()
     ## make symmetric
-    #prob_annots2[~np.isfinite(prob_annots2)] = finite_probs.max() * 2
-    #prob_annots2 = (prob_annots2.T + prob_annots2) / 2
-    #int_factor = 100 / mean
-    #pairwise_cost = (prob_annots2 * int_factor).astype(np.int32)
-    #n_labels = 2
-    #unary_cost = np.ones((prob_annots.shape[0], n_labels)).astype(np.int32)
-    #u, v = np.meshgrid(np.arange(prob_annots.shape[0]).astype(np.int32), np.arange(len(prob_annots)).astype(np.int32))
-    #edges = np.vstack((u.flatten(), v.flatten(), pairwise_cost.flatten())).T.astype(np.int32)
+    # prob_annots2[~np.isfinite(prob_annots2)] = finite_probs.max() * 2
+    # prob_annots2 = (prob_annots2.T + prob_annots2) / 2
+    # int_factor = 100 / mean
+    # pairwise_cost = (prob_annots2 * int_factor).astype(np.int32)
+    # n_labels = 2
+    # unary_cost = np.ones((prob_annots.shape[0], n_labels)).astype(np.int32)
+    # u, v = np.meshgrid(np.arange(prob_annots.shape[0]).astype(np.int32), np.arange(len(prob_annots)).astype(np.int32))
+    # edges = np.vstack((u.flatten(), v.flatten(), pairwise_cost.flatten())).T.astype(np.int32)
 
-    #import pygco
-    #n_iter = 5
-    #algorithm = 'expansion'
-    #unary_cost = np.ascontiguousarray(unary_cost)
+    # import pygco
+    # n_iter = 5
+    # algorithm = 'expansion'
+    # unary_cost = np.ascontiguousarray(unary_cost)
     ##pairwise_cost = np.ascontiguousarray(pairwise_cost)
-    #pairwise_cost = np.eye(n_labels).astype(np.int32)
-    #edges = np.ascontiguousarray(edges)
-    #pygco.cut_from_graph(edges, unary_cost, pairwise_cost, n_iter, algorithm)
-    #pairwise_cost = prob_annots
+    # pairwise_cost = np.eye(n_labels).astype(np.int32)
+    # edges = np.ascontiguousarray(edges)
+    # pygco.cut_from_graph(edges, unary_cost, pairwise_cost, n_iter, algorithm)
+    # pairwise_cost = prob_annots
     pass
 
 
@@ -784,16 +810,17 @@ def example_binary():
     import matplotlib.pyplot as plt
     import numpy as np
     from pygco import cut_simple, cut_from_graph
+
     # generate trivial data
     x = np.ones((10, 10))
     x[:, 5:] = -1
     x_noisy = x + np.random.normal(0, 0.8, size=x.shape)
-    x_thresh = x_noisy > .0
+    x_thresh = x_noisy > 0.0
 
     # create unaries
     unaries = x_noisy
     # as we convert to int, we need to multipy to get sensible values
-    unaries = (10 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
+    unaries = (10 * np.dstack([unaries, -unaries]).copy('C')).astype(np.int32)
     unaries[:] = 0
     # create potts pairwise
     pairwise = -10 * np.eye(2, dtype=np.int32)
@@ -812,17 +839,17 @@ def example_binary():
     result_graph = cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
 
     # plot results
-    plt.subplot(231, title="original")
+    plt.subplot(231, title='original')
     plt.imshow(x, interpolation='nearest')
-    plt.subplot(232, title="noisy version")
+    plt.subplot(232, title='noisy version')
     plt.imshow(x_noisy, interpolation='nearest')
-    plt.subplot(233, title="rounded to integers")
+    plt.subplot(233, title='rounded to integers')
     plt.imshow(unaries[:, :, 0], interpolation='nearest')
-    plt.subplot(234, title="thresholding result")
+    plt.subplot(234, title='thresholding result')
     plt.imshow(x_thresh, interpolation='nearest')
-    plt.subplot(235, title="cut_simple")
+    plt.subplot(235, title='cut_simple')
     plt.imshow(result, interpolation='nearest')
-    plt.subplot(236, title="cut_from_graph")
+    plt.subplot(236, title='cut_from_graph')
     plt.imshow(result_graph.reshape(x.shape), interpolation='nearest')
 
     plt.show()
@@ -835,4 +862,5 @@ if __name__ == '__main__':
         python -m vtool.clustering2 all
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

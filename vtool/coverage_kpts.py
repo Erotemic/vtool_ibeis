@@ -10,18 +10,21 @@ from vtool import keypoint as ktool
 
 
 # TODO: integrate more
-COVKPTS_DEFAULT = ut.ParamInfoList('coverage_kpts', [
-    ut.ParamInfo('cov_agg_mode' , 'max'),
-    ut.ParamInfo('cov_blur_ksize' , (5, 5)),
-    ut.ParamInfo('cov_blur_on' , True),
-    ut.ParamInfo('cov_blur_sigma' , 5.0),
-    ut.ParamInfo('cov_remove_scale' , True),
-    ut.ParamInfo('cov_remove_shape' , True),
-    ut.ParamInfo('cov_scale_factor' , .3),
-    ut.ParamInfo('cov_size_penalty_frac' , .1),
-    ut.ParamInfo('cov_size_penalty_on' , True),
-    ut.ParamInfo('cov_size_penalty_power' , .5),
-])
+COVKPTS_DEFAULT = ut.ParamInfoList(
+    'coverage_kpts',
+    [
+        ut.ParamInfo('cov_agg_mode', 'max'),
+        ut.ParamInfo('cov_blur_ksize', (5, 5)),
+        ut.ParamInfo('cov_blur_on', True),
+        ut.ParamInfo('cov_blur_sigma', 5.0),
+        ut.ParamInfo('cov_remove_scale', True),
+        ut.ParamInfo('cov_remove_shape', True),
+        ut.ParamInfo('cov_scale_factor', 0.3),
+        ut.ParamInfo('cov_size_penalty_frac', 0.1),
+        ut.ParamInfo('cov_size_penalty_on', True),
+        ut.ParamInfo('cov_size_penalty_power', 0.5),
+    ],
+)
 
 
 def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
@@ -56,22 +59,28 @@ def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
     """
     # use a disk instead of a gaussian
     import skimage.morphology
-    cov_scale_factor = .25
+
+    cov_scale_factor = 0.25
     radius = min(int((min(chipsize) * cov_scale_factor) // 2) - 1, 50)
     patch = skimage.morphology.disk(radius)
-    mask = make_kpts_coverage_mask(kpts, chipsize, resize=True,
-                                   cov_size_penalty_on=False,
-                                   patch=patch,
-                                   cov_scale_factor=cov_scale_factor,
-                                   cov_blur_sigma=1.5,
-                                   cov_blur_on=True)
+    mask = make_kpts_coverage_mask(
+        kpts,
+        chipsize,
+        resize=True,
+        cov_size_penalty_on=False,
+        patch=patch,
+        cov_scale_factor=cov_scale_factor,
+        cov_blur_sigma=1.5,
+        cov_blur_on=True,
+    )
     import wbia.plottool as pt
+
     # heatmask = np.ones(tuple(chipsize) + (4,)) * pt.RED
     heatmask = pt.plt.get_cmap(cmap)(mask)
     # conver to bgr
     heatmask[:, :, 0:3] = heatmask[:, :, 0:3][:, :, ::-1]
     # apply alpha channel
-    heatmask[:, :, 3] = mask * .5
+    heatmask[:, :, 3] = mask * 0.5
     return heatmask
 
 
@@ -80,6 +89,7 @@ def make_heatmask(mask, cmap='plasma'):
     # use a disk instead of a gaussian
     import wbia.plottool as pt
     import vtool as vt
+
     assert len(mask.shape) == 2
     mask = vt.rectify_to_float01(mask)
     heatmask = pt.plt.get_cmap(cmap)(mask)
@@ -91,25 +101,27 @@ def make_heatmask(mask, cmap='plasma'):
 
 
 def make_kpts_coverage_mask(
-        kpts, chipsize,
-        weights=None,
-        return_patch=False,
-        patch=None,
-        resize=False,
-        out=None,
-        cov_blur_on=True,
-        cov_disk_hack=None,
-        cov_blur_ksize=(17, 17),
-        cov_blur_sigma=5.0,
-        cov_gauss_shape=(19, 19),
-        cov_gauss_sigma_frac=.3,
-        cov_scale_factor=.2,
-        cov_agg_mode='max',
-        cov_remove_shape=False,
-        cov_remove_scale=False,
-        cov_size_penalty_on=True,
-        cov_size_penalty_power=.5,
-        cov_size_penalty_frac=.1):
+    kpts,
+    chipsize,
+    weights=None,
+    return_patch=False,
+    patch=None,
+    resize=False,
+    out=None,
+    cov_blur_on=True,
+    cov_disk_hack=None,
+    cov_blur_ksize=(17, 17),
+    cov_blur_sigma=5.0,
+    cov_gauss_shape=(19, 19),
+    cov_gauss_sigma_frac=0.3,
+    cov_scale_factor=0.2,
+    cov_agg_mode='max',
+    cov_remove_shape=False,
+    cov_remove_scale=False,
+    cov_size_penalty_on=True,
+    cov_size_penalty_power=0.5,
+    cov_size_penalty_frac=0.1,
+):
     r"""
     Returns a intensity image denoting which pixels are covered by the input
     keypoints
@@ -146,20 +158,29 @@ def make_kpts_coverage_mask(
     chipshape = chipsize[::-1]
     # Warp patches onto a scaled image
     dstimg = warp_patch_onto_kpts(
-        kpts, patch, chipshape, weights=weights, out=out,
+        kpts,
+        patch,
+        chipshape,
+        weights=weights,
+        out=out,
         cov_scale_factor=cov_scale_factor,
         cov_agg_mode=cov_agg_mode,
         cov_remove_shape=cov_remove_shape,
         cov_remove_scale=cov_remove_scale,
         cov_size_penalty_on=cov_size_penalty_on,
         cov_size_penalty_power=cov_size_penalty_power,
-        cov_size_penalty_frac=cov_size_penalty_frac
+        cov_size_penalty_frac=cov_size_penalty_frac,
     )
     # Smooth weight of influence
     if cov_blur_on:
-        cv2.GaussianBlur(dstimg, ksize=cov_blur_ksize, sigmaX=cov_blur_sigma,
-                         sigmaY=cov_blur_sigma, dst=dstimg,
-                         borderType=cv2.BORDER_CONSTANT)
+        cv2.GaussianBlur(
+            dstimg,
+            ksize=cov_blur_ksize,
+            sigmaX=cov_blur_sigma,
+            sigmaY=cov_blur_sigma,
+            dst=dstimg,
+            borderType=cv2.BORDER_CONSTANT,
+        )
     if resize:
         # Resize to original chpsize of requested
         dsize = chipsize
@@ -171,16 +192,19 @@ def make_kpts_coverage_mask(
 
 
 def warp_patch_onto_kpts(
-        kpts, patch, chipshape,
-        weights=None,
-        out=None,
-        cov_scale_factor=.2,
-        cov_agg_mode='max',
-        cov_remove_shape=False,
-        cov_remove_scale=False,
-        cov_size_penalty_on=True,
-        cov_size_penalty_power=.5,
-        cov_size_penalty_frac=.1):
+    kpts,
+    patch,
+    chipshape,
+    weights=None,
+    out=None,
+    cov_scale_factor=0.2,
+    cov_agg_mode='max',
+    cov_remove_shape=False,
+    cov_remove_scale=False,
+    cov_size_penalty_on=True,
+    cov_size_penalty_power=0.5,
+    cov_size_penalty_frac=0.1,
+):
     r"""
     Overlays the source image onto a destination image in each keypoint location
 
@@ -242,12 +266,13 @@ def warp_patch_onto_kpts(
         >>> pt.show_if_requested()
     """
     import vtool as vt
-    #if len(kpts) == 0:
+
+    # if len(kpts) == 0:
     #    return None
     chip_scale_h = int(np.ceil(chipshape[0] * cov_scale_factor))
     chip_scale_w = int(np.ceil(chipshape[1] * cov_scale_factor))
     if len(kpts) == 0:
-        dstimg =  np.zeros((chip_scale_h, chip_scale_w))
+        dstimg = np.zeros((chip_scale_h, chip_scale_w))
         return dstimg
     if weights is None:
         weights = np.ones(len(kpts))
@@ -260,37 +285,43 @@ def warp_patch_onto_kpts(
         # disregard affine information in keypoints
         # i still dont understand why we are trying this
         (patch_h, patch_w) = patch_shape
-        half_width  = (patch_w / 2.0)  # - .5
-        half_height = (patch_h / 2.0)  # - .5
+        half_width = patch_w / 2.0  # - .5
+        half_height = patch_h / 2.0  # - .5
         # Center src image
-        T1 = vt.translation_mat3x3(-half_width + .5, -half_height + .5)
+        T1 = vt.translation_mat3x3(-half_width + 0.5, -half_height + 0.5)
         # Scale src to the unit circle
         if not cov_remove_scale:
             S1 = vt.scale_mat3x3(1.0 / half_width, 1.0 / half_height)
         # Transform the source image to the keypoint ellipse
         kpts_T = np.array([vt.translation_mat3x3(x, y) for (x, y) in vt.get_xys(kpts).T])
         if not cov_remove_scale:
-            kpts_S = np.array([vt.scale_mat3x3(np.sqrt(scale))
-                               for scale in vt.get_scales(kpts).T])
+            kpts_S = np.array(
+                [vt.scale_mat3x3(np.sqrt(scale)) for scale in vt.get_scales(kpts).T]
+            )
         # Adjust for the requested scale factor
         S2 = vt.scale_mat3x3(cov_scale_factor, cov_scale_factor)
-        #perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
+        # perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
         if not cov_remove_scale:
             M_list = reduce(vt.matrix_multiply, (S2, kpts_T, kpts_S, S1, T1))
         else:
             M_list = reduce(vt.matrix_multiply, (S2, kpts_T, T1))
     # </HACK>
     else:
-        M_list = ktool.get_transforms_from_patch_image_kpts(kpts, patch_shape,
-                                                            cov_scale_factor)
+        M_list = ktool.get_transforms_from_patch_image_kpts(
+            kpts, patch_shape, cov_scale_factor
+        )
     affmat_list = M_list[:, 0:2, :]
     weight_list = weights
     # For each keypoint warp a gaussian scaled by the feature score into the image
     warped_patch_iter = warped_patch_generator(
-        patch, dsize, affmat_list, weight_list,
+        patch,
+        dsize,
+        affmat_list,
+        weight_list,
         cov_size_penalty_on=cov_size_penalty_on,
         cov_size_penalty_power=cov_size_penalty_power,
-        cov_size_penalty_frac=cov_size_penalty_frac)
+        cov_size_penalty_frac=cov_size_penalty_frac,
+    )
     # Either max or sum
     if cov_agg_mode == 'max':
         dstimg = vt.iter_reduce_ufunc(np.maximum, warped_patch_iter, out=out)
@@ -304,10 +335,14 @@ def warp_patch_onto_kpts(
 
 
 def warped_patch_generator(
-        patch, dsize, affmat_list, weight_list,
-        cov_size_penalty_on=True,
-        cov_size_penalty_power=.5,
-        cov_size_penalty_frac=.1):
+    patch,
+    dsize,
+    affmat_list,
+    weight_list,
+    cov_size_penalty_on=True,
+    cov_size_penalty_power=0.5,
+    cov_size_penalty_frac=0.1,
+):
     """
     generator that warps the patches (like gaussian) onto an image with dsize
     using constant memory.
@@ -319,10 +354,10 @@ def warped_patch_generator(
         http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#warpaffine
     """
     shape = dsize[::-1]
-    #warpAffine is weird. If the shape of the dst is the same as src we can
-    #use the dst outvar. I dont know why it needs that.  It seems that this
-    #will not operate in place even if a destination array is passed in when
-    #src.shape != dst.shape.
+    # warpAffine is weird. If the shape of the dst is the same as src we can
+    # use the dst outvar. I dont know why it needs that.  It seems that this
+    # will not operate in place even if a destination array is passed in when
+    # src.shape != dst.shape.
     patch_h, patch_w = patch.shape
     # If we pad the patch we can use dst
     padded_patch = np.zeros(shape, dtype=np.float32)
@@ -332,15 +367,23 @@ def warped_patch_generator(
     # each score is spread across its contributing pixels
     for (M, weight) in zip(affmat_list, weight_list):
         # inplace weighting of the patch
-        np.multiply(patch, weight, out=padded_patch[:prepad_h, :prepad_w] )
+        np.multiply(patch, weight, out=padded_patch[:prepad_h, :prepad_w])
         # inplace warping of the padded_patch
-        cv2.warpAffine(padded_patch, M, dsize, dst=warped,
-                       flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT,
-                       borderValue=0)
+        cv2.warpAffine(
+            padded_patch,
+            M,
+            dsize,
+            dst=warped,
+            flags=cv2.INTER_LINEAR,
+            borderMode=cv2.BORDER_CONSTANT,
+            borderValue=0,
+        )
         if cov_size_penalty_on:
             # TODO: size penalty should be based of splitting number of
             # bins in a keypoint over the region that it covers
-            total_weight = (warped.sum() ** cov_size_penalty_power) * cov_size_penalty_frac
+            total_weight = (
+                warped.sum() ** cov_size_penalty_power
+            ) * cov_size_penalty_frac
             if total_weight > 1:
                 # Whatever the size of the keypoint is it should
                 # contribute a total of 1 score
@@ -348,8 +391,9 @@ def warped_patch_generator(
         yield warped
 
 
-def get_gaussian_weight_patch(gauss_shape=(19, 19), gauss_sigma_frac=.3,
-                              gauss_norm_01=True):
+def get_gaussian_weight_patch(
+    gauss_shape=(19, 19), gauss_sigma_frac=0.3, gauss_norm_01=True
+):
     r"""
     2d gaussian image useful for plotting
 
@@ -381,22 +425,22 @@ def get_gaussian_weight_patch(gauss_shape=(19, 19), gauss_sigma_frac=.3,
 def get_coverage_kpts_gridsearch_configs():
     """ testing function """
     varied_dict = {
-        'cov_agg_mode'           : ['max', 'sum'],
+        'cov_agg_mode': ['max', 'sum'],
         #'cov_blur_ksize'         : [(19, 19), (5, 5)],
-        'cov_blur_ksize'         : [(5, 5)],
-        'cov_blur_on'            : [True, False],
-        'cov_blur_sigma'         : [5.0],
-        'cov_remove_scale'       : [True],
-        'cov_remove_shape'       : [False, True],
-        'cov_scale_factor'       : [.3],
-        'cov_size_penalty_frac'  : [.1],
-        'cov_size_penalty_on'    : [True],
-        'cov_size_penalty_power' : [.5],
+        'cov_blur_ksize': [(5, 5)],
+        'cov_blur_on': [True, False],
+        'cov_blur_sigma': [5.0],
+        'cov_remove_scale': [True],
+        'cov_remove_shape': [False, True],
+        'cov_scale_factor': [0.3],
+        'cov_size_penalty_frac': [0.1],
+        'cov_size_penalty_on': [True],
+        'cov_size_penalty_power': [0.5],
     }
     slice_dict = {
-        'cov_scale_factor' : slice(0, 3),
-        'cov_agg_mode'     : slice(0, 2),
-        'cov_blur_ksize'   : slice(0, 2),
+        'cov_scale_factor': slice(0, 3),
+        'cov_agg_mode': slice(0, 2),
+        'cov_blur_ksize': slice(0, 2),
         #'grid_sigma'        : slice(0, 4),
     }
     slice_dict = None
@@ -412,7 +456,10 @@ def get_coverage_kpts_gridsearch_configs():
             cfgdict['cov_blur_ksize'] = None
             cfgdict['cov_blur_sigma'] = None
         return cfgdict
-    cfgdict_list, cfglbl_list = ut.make_constrained_cfg_and_lbl_list(varied_dict, constrain_func, slice_dict)
+
+    cfgdict_list, cfglbl_list = ut.make_constrained_cfg_and_lbl_list(
+        varied_dict, constrain_func, slice_dict
+    )
     return cfgdict_list, cfglbl_list
 
 
@@ -431,37 +478,48 @@ def gridsearch_kpts_coverage_mask():
         >>> pt.show_if_requested()
     """
     import wbia.plottool as pt
+
     cfgdict_list, cfglbl_list = get_coverage_kpts_gridsearch_configs()
     kpts, chipsize, weights = testdata_coverage('easy1.png')
     imgmask_list = [
-        255 *  make_kpts_coverage_mask(kpts, chipsize, weights,
-                                       return_patch=False, **cfgdict)
+        255
+        * make_kpts_coverage_mask(kpts, chipsize, weights, return_patch=False, **cfgdict)
         for cfgdict in ub.ProgIter(cfgdict_list, label='coverage grid')
     ]
-    #NORMHACK = True
-    #if NORMHACK:
+    # NORMHACK = True
+    # if NORMHACK:
     #    imgmask_list = [
     #        255 * (mask / mask.max()) for mask in imgmask_list
     #    ]
     fnum = pt.next_fnum()
     ut.interact_gridsearch_result_images(
-        pt.imshow, cfgdict_list, cfglbl_list,
-        imgmask_list, fnum=fnum, figtitle='coverage image', unpack=False,
-        max_plots=25)
+        pt.imshow,
+        cfgdict_list,
+        cfglbl_list,
+        imgmask_list,
+        fnum=fnum,
+        figtitle='coverage image',
+        unpack=False,
+        max_plots=25,
+    )
     pt.iup()
 
 
 def testdata_coverage(fname=None):
     """ testing function """
     import vtool as vt
+
     # build test data
     kpts, vecs = vt.demodata.get_testdata_kpts(fname, with_vecs=True)
     # HACK IN DISTINCTIVENESS
     if fname is not None:
         from wbia.algo.hots import distinctiveness_normalizer
+
         cachedir = ub.ensure_app_cache_dir('ibeis', 'distinctiveness_model')
         species = 'zebra_plains'
-        dstcnvs_normer = distinctiveness_normalizer.DistinctivnessNormalizer(species, cachedir=cachedir)
+        dstcnvs_normer = distinctiveness_normalizer.DistinctivnessNormalizer(
+            species, cachedir=cachedir
+        )
         dstcnvs_normer.load(cachedir)
         weights = dstcnvs_normer.get_distinctiveness(vecs)
     else:
@@ -473,10 +531,12 @@ def testdata_coverage(fname=None):
     return kpts, chipsize, weights
 
 
-def show_coverage_map(chip, mask, patch, kpts, fnum=None, ell_alpha=.6,
-                      show_mask_kpts=False):
+def show_coverage_map(
+    chip, mask, patch, kpts, fnum=None, ell_alpha=0.6, show_mask_kpts=False
+):
     """ testing function """
     import wbia.plottool as pt
+
     if fnum is None:
         fnum = pt.next_fnum()
     pnum_ = pt.get_pnum_func(nRows=2, nCols=2)
@@ -491,7 +551,7 @@ def show_coverage_map(chip, mask, patch, kpts, fnum=None, ell_alpha=.6,
     pt.draw_kpts2(kpts, rect=True, ell_alpha=ell_alpha)
     masked_chip = (chip * mask[:, :, None]).astype(np.uint8)
     pt.imshow(masked_chip, fnum=fnum, pnum=pnum_(3), title='masked chip')
-    #pt.draw_kpts2(kpts)
+    # pt.draw_kpts2(kpts)
 
 
 if __name__ == '__main__':
@@ -500,4 +560,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.coverage_kpts
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

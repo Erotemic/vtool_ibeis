@@ -23,22 +23,25 @@ def get_testdata_dir(ensure=True, key='testdb1'):
 
 def get_test_gpaths(ndata=None, names=None, **kwargs):
     # Read ndata from args or command line
-    ndata_arg = utool.get_argval('--ndata', type_=int, default=None, help_='use --ndata to specify bigger data')
+    ndata_arg = utool.get_argval(
+        '--ndata', type_=int, default=None, help_='use --ndata to specify bigger data'
+    )
     if ndata_arg is not None:
         ndata = ndata_arg
     imgdir = get_testdata_dir(**kwargs)
     gpath_list = sorted(list(utool.list_images(imgdir, full=True, recursive=True)))
     # Get only the gpaths of certain names
     if names is not None:
-        gpath_list = [gpath for gpath in gpath_list if
-                      utool.basename_noext(gpath) in names]
+        gpath_list = [
+            gpath for gpath in gpath_list if utool.basename_noext(gpath) in names
+        ]
     # Get a some number of test images
     if ndata is not None:
         gpath_cycle = cycle(gpath_list)
         if six.PY2:
-            gpath_list  = [gpath_cycle.next() for _ in range(ndata)]
+            gpath_list = [gpath_cycle.next() for _ in range(ndata)]
         else:
-            gpath_list  = [next(gpath_cycle) for _ in range(ndata)]
+            gpath_list = [next(gpath_cycle) for _ in range(ndata)]
     return gpath_list
 
 

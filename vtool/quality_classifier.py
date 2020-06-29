@@ -1,4 +1,3 @@
-
 """
 References:
     % Single-image noise level estimation for blind denoising.
@@ -60,6 +59,7 @@ def contrast_measures(img):
 
     import skimage.morphology
     import skimage.filters.rank
+
     entropyimg = skimage.filters.rank.entropy(img, skimage.morphology.disk(2))
     ave_local_entropy = entropyimg.sum() / np.prod(entropyimg.shape)
 
@@ -69,11 +69,13 @@ def contrast_measures(img):
 
 def test_average_contrast():
     import vtool as vt
+
     ut.get_valid_test_imgkeys()
     img_fpath_list = [ut.grab_test_imgpath(key) for key in ut.get_valid_test_imgkeys()]
     img_list = [vt.imread(img, grayscale=True) for img in img_fpath_list]
     avecontrast_list = np.array([compute_average_contrast(img) for img in img_list])
     import wbia.plottool as pt
+
     nCols = len(img_list)
     fnum = None
     if fnum is None:
@@ -81,7 +83,7 @@ def test_average_contrast():
     pt.figure(fnum=fnum, pnum=(2, 1, 1))
     sortx = avecontrast_list.argsort()
     y_list = avecontrast_list[sortx]
-    x_list = np.arange(0, nCols) + .5
+    x_list = np.arange(0, nCols) + 0.5
     pt.plot(x_list, y_list, 'bo-')
     sorted_imgs = list(ub.take(img_list, sortx))
 
@@ -110,6 +112,7 @@ def fourier_devtest(img):
         >>> magnitude_spectrum = fourier_devtest(img)
     """
     import wbia.plottool as pt
+
     def pad_img(img):
         rows, cols = img.shape
         nrows = cv2.getOptimalDFTSize(rows)
@@ -122,7 +125,7 @@ def fourier_devtest(img):
 
     def convert_to_fdomain(img):
         dft = cv2.dft(img.astype(np.float32), flags=cv2.DFT_COMPLEX_OUTPUT)
-        #dft_shift = np.fft.fftshift(dft)
+        # dft_shift = np.fft.fftshift(dft)
         return dft
 
     def convert_from_fdomain(dft):
@@ -142,14 +145,14 @@ def fourier_devtest(img):
 
     nimg = pad_img(img)
     dft = convert_to_fdomain(nimg)
-    #freq_domain = np.fft.fft2(img)
-    #freq_domain_shift = np.fft.fftshift(freq_domain)
+    # freq_domain = np.fft.fft2(img)
+    # freq_domain_shift = np.fft.fftshift(freq_domain)
 
     rows, cols = nimg.shape
-    crow, ccol = rows / 2 , cols / 2
+    crow, ccol = rows / 2, cols / 2
     # create a mask first, center square is 1, remaining all zeros
     mask = np.zeros((rows, cols, 2), np.uint8)
-    mask[crow - 30:crow + 30, ccol - 30:ccol + 30] = 1
+    mask[crow - 30 : crow + 30, ccol - 30 : ccol + 30] = 1
 
     dft_mask = np.fft.ifftshift(np.fft.fftshift(dft) * mask)
     img_back = convert_from_fdomain(dft_mask)
@@ -163,7 +166,7 @@ def fourier_devtest(img):
     print('dft_shift.shape = %r' % (dft.shape,))
 
     if ut.show_was_requested():
-        #import wbia.plottool as pt
+        # import wbia.plottool as pt
         next_pnum = pt.make_pnum_nextgen(nRows=3, nCols=2)
         pt.imshow(nimg, pnum=next_pnum(), title='nimg')
         pt.imshow(20 * get_fdomain_mag(dft), pnum=next_pnum(), title='mag(f)')
@@ -178,4 +181,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.quality_classifier
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

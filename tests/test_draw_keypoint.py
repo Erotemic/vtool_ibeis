@@ -16,10 +16,9 @@ if False:
 
     # Hack these directions to be relative to gravity
     RIGHT = ((0 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
-    DOWN  = ((1 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
-    LEFT  = ((2 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
-    UP    = ((3 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
-
+    DOWN = ((1 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
+    LEFT = ((2 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
+    UP = ((3 * TAU / 4) - ktool.GRAVITY_THETA) % TAU
 
     def test_keypoint(xscale=1, yscale=1, ori=DOWN, skew=0):
         # Test Keypoint
@@ -29,21 +28,21 @@ if False:
 
         # Test SIFT descriptor
         sift = np.zeros(128)
-        sift[ 0: 8]   = 1
-        sift[ 8:16]   = .5
-        sift[16:24]   = .0
-        sift[24:32]   = .5
-        sift[32:40]   = .8
-        sift[40:48]   = .8
-        sift[48:56]   = .1
-        sift[56:64]   = .2
-        sift[64:72]   = .3
-        sift[72:80]   = .4
-        sift[80:88]   = .5
-        sift[88:96]   = .6
-        sift[96:104]  = .7
-        sift[104:112] = .8
-        sift[112:120] = .9
+        sift[0:8] = 1
+        sift[8:16] = 0.5
+        sift[16:24] = 0.0
+        sift[24:32] = 0.5
+        sift[32:40] = 0.8
+        sift[40:48] = 0.8
+        sift[48:56] = 0.1
+        sift[56:64] = 0.2
+        sift[64:72] = 0.3
+        sift[72:80] = 0.4
+        sift[80:88] = 0.5
+        sift[88:96] = 0.6
+        sift[96:104] = 0.7
+        sift[104:112] = 0.8
+        sift[112:120] = 0.9
         sift[120:128] = 1
         sift = sift / np.sqrt((sift ** 2).sum())
         sift = np.round(sift * 255)
@@ -51,7 +50,6 @@ if False:
         kpts = np.array([kp])
         sifts = np.array([sift])
         return kpts, sifts
-
 
     def square_axis(ax, s=3):
         ax.set_xlim(-s, s)
@@ -61,27 +59,40 @@ if False:
         df2.set_xticks([])
         df2.set_yticks([])
 
-
     def test_shape(ori=0, skew=0, xscale=1, yscale=1, pnum=(1, 1, 1), fnum=1):
         df2.figure(fnum=fnum, pnum=pnum)
         kpts, sifts = test_keypoint(ori=ori, skew=skew, xscale=xscale, yscale=yscale)
         ax = df2.gca()
         square_axis(ax)
-        mpl_keypoint.draw_keypoints(ax, kpts, sifts=sifts, ell_color=df2.ORANGE, ori=True,
-                                    rect_color=df2.DARK_RED,
-                                    ori_color=df2.DEEP_PINK, eig_color=df2.PINK,
-                                    rect=True, eig=True, bin_color=df2.RED,
-                                    arm1_color=df2.YELLOW, arm2_color=df2.BLACK)
+        mpl_keypoint.draw_keypoints(
+            ax,
+            kpts,
+            sifts=sifts,
+            ell_color=df2.ORANGE,
+            ori=True,
+            rect_color=df2.DARK_RED,
+            ori_color=df2.DEEP_PINK,
+            eig_color=df2.PINK,
+            rect=True,
+            eig=True,
+            bin_color=df2.RED,
+            arm1_color=df2.YELLOW,
+            arm2_color=df2.BLACK,
+        )
 
         kptsstr = '\n'.join(ktool.get_kpts_strs(kpts))
-        #print(kptsstr)
+        # print(kptsstr)
         df2.upperleft_text(kptsstr)
 
-        title = 'xyscale=(%.1f, %.1f),\n skew=%.1f, ori=%.2ftau' % (xscale, yscale, skew, ori / TAU)
+        title = 'xyscale=(%.1f, %.1f),\n skew=%.1f, ori=%.2ftau' % (
+            xscale,
+            yscale,
+            skew,
+            ori / TAU,
+        )
         df2.set_title(title)
         df2.dark_background()
         return kpts, sifts
-
 
     np.set_printoptions(precision=3)
     px_ = 0
@@ -95,7 +106,6 @@ if False:
     nRows = 2
     nCols = 4
 
-
     def pnum_(px=None):
         global px_
         if px is None:
@@ -104,15 +114,15 @@ if False:
         return (nRows, nCols, px)
 
     MIN_ORI = float(utool.argval('--min-ori', default=DOWN))
-    MAX_ORI = float(utool.argval('--max-ori', default=DOWN + TAU - .2))
+    MAX_ORI = float(utool.argval('--max-ori', default=DOWN + TAU - 0.2))
 
-    MIN_X = .5
+    MIN_X = 0.5
     MAX_X = 2
 
     MIN_SWEW = float(ub.argval('--min-skew', default=0))
     MAX_SKEW = float(ub.argval('--max-skew', default=1))
 
-    MIN_Y = .5
+    MIN_Y = 0.5
     MAX_Y = 2
 
     kp_list = []
@@ -120,39 +130,37 @@ if False:
     if __name__ == '__main__':
 
         for row, col in iprod(range(nRows), range(nCols)):
-            #print((row, col))
+            # print((row, col))
             alpha = col / (nCols)
-            beta  = row / (nRows)
-            xsca = (MIN_X    * (1 - alpha)) + (MAX_X    * (alpha))
-            ori  = (MIN_ORI  * (1 - alpha)) + (MAX_ORI  * (alpha))
-            skew = (MIN_SWEW * (1 - beta))  + (MAX_SKEW * (beta))
-            ysca = (MIN_Y    * (1 - beta))  + (MAX_Y    * (beta))
+            beta = row / (nRows)
+            xsca = (MIN_X * (1 - alpha)) + (MAX_X * (alpha))
+            ori = (MIN_ORI * (1 - alpha)) + (MAX_ORI * (alpha))
+            skew = (MIN_SWEW * (1 - beta)) + (MAX_SKEW * (beta))
+            ysca = (MIN_Y * (1 - beta)) + (MAX_Y * (beta))
 
-            kpts, sifts = test_shape(pnum=pnum_(),
-                                     ori=ori,
-                                     skew=skew,
-                                     xscale=xsca,
-                                     yscale=ysca)
-        #print('+----')
-        #kp_list.append(kpts[0])
-        #S_list = ktool.get_ xy_axis_extents(kpts)
-        #print('xscale=%r yscale=%r, skew=%r' % (xsca, ysca, skew))
-        #print(S_list)
+            kpts, sifts = test_shape(
+                pnum=pnum_(), ori=ori, skew=skew, xscale=xsca, yscale=ysca
+            )
+        # print('+----')
+        # kp_list.append(kpts[0])
+        # S_list = ktool.get_ xy_axis_extents(kpts)
+        # print('xscale=%r yscale=%r, skew=%r' % (xsca, ysca, skew))
+        # print(S_list)
 
-        #scale_factor = 1
-        #offset = (0, 0)
-        #(_xs, _ys, _iv11s, _iv12s, _iv21s, _iv22s, _oris) = ktool.scaled_kpts(kpts, scale_factor, offset)
+        # scale_factor = 1
+        # offset = (0, 0)
+        # (_xs, _ys, _iv11s, _iv12s, _iv21s, _iv22s, _oris) = ktool.scaled_kpts(kpts, scale_factor, offset)
 
-        #invVR_aff2Ds = mpl_keypoint.get_invV_aff2Ds(_xs, _ys, _iv11s, _iv12s, _iv21s, _iv22s)
-        #aff = invVR_aff2Ds[0]
+        # invVR_aff2Ds = mpl_keypoint.get_invV_aff2Ds(_xs, _ys, _iv11s, _iv12s, _iv21s, _iv22s)
+        # aff = invVR_aff2Ds[0]
 
-        #ori = _oris[0]
-        #aff2 = mpl.transforms.Affine2D().rotate(-ori)
+        # ori = _oris[0]
+        # aff2 = mpl.transforms.Affine2D().rotate(-ori)
 
-        #print((aff + aff2).frozen())
-        #print((aff2 + aff).frozen())
+        # print((aff + aff2).frozen())
+        # print((aff2 + aff).frozen())
 
-        #mpl_sift.draw_sift(ax, sift)
-        #df2.update()
+        # mpl_sift.draw_sift(ax, sift)
+        # df2.update()
 
         exec(df2.present())

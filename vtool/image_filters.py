@@ -153,7 +153,7 @@ def histeq_fn(chipBGR):
     return chipBGR
 
 
-def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=.025):
+def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=0.025):
     """ Clean the mask
     (num_erode, num_dilate) = (1, 1)
     (w, h) = (10, 10) """
@@ -174,11 +174,11 @@ def grabcut_fn(chipBGR):
     (h, w) = chipRGB.shape[0:2]
     _mask = np.zeros((h, w), dtype=np.uint8)  # Initialize: mask
     # Set inside to cv2.GC_PR_FGD (probably forground)
-    _mask[ :, :] = cv2.GC_PR_FGD
+    _mask[:, :] = cv2.GC_PR_FGD
     # Set border to cv2.GC_BGD (definitely background)
-    _mask[ 0, :] = cv2.GC_BGD
+    _mask[0, :] = cv2.GC_BGD
     _mask[-1, :] = cv2.GC_BGD
-    _mask[:,  0] = cv2.GC_BGD
+    _mask[:, 0] = cv2.GC_BGD
     _mask[:, -1] = cv2.GC_BGD
     # Grab Cut Parameters
     rect = (0, 0, w, h)
@@ -202,11 +202,11 @@ def grabcut_fn(chipBGR):
     return seg_chipBGR
 
 
-
 if __name__ == '__main__':
     """
     CommandLine:
         xdoctest -m vtool.image_filters
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

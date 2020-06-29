@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, division, print_function
 import ubelt as ub
+
 # import utool
 import numpy as np
 from numpy.random import randint
@@ -125,8 +126,9 @@ def test_pyflann_hkmeans():
     num_branches = 7
     print('HKmeans')
     pts = testdata_points(nPts=1009)
-    hkmean_centroids = flann.hierarchical_kmeans(pts, branch_size, num_branches,
-                                                 max_iterations=1000, dtype=None)
+    hkmean_centroids = flann.hierarchical_kmeans(
+        pts, branch_size, num_branches, max_iterations=1000, dtype=None
+    )
     # print(utool.truncate_str(str(hkmean_centroids)))
     print('hkmean_centroids.shape = %r' % (hkmean_centroids.shape,))
     nHKMeansCentroids = (branch_size - 1) * num_branches + 1
@@ -151,8 +153,7 @@ def test_pyflann_kmeans():
     flann = FLANN_CLS()
     num_clusters = 7
     pts = testdata_points(nPts=1009)
-    kmeans_centroids = flann.kmeans(pts, num_clusters, max_iterations=None,
-                                    dtype=None)
+    kmeans_centroids = flann.kmeans(pts, num_clusters, max_iterations=None, dtype=None)
     # print(utool.truncate_str(str(kmeans_centroids)))
     print('kmeans_centroids.shape = %r' % (kmeans_centroids.shape,))
     target_shape = (num_clusters, pts.shape[1])
@@ -178,16 +179,18 @@ def test_pyflann_add_point():
     print('NN_Index')
     indices1, dists1 = flann.nn_index(qpts, num_neighbors=num_neighbors)
     assert np.all(indices1 < pts.shape[0]), 'indicies should be less than num pts'
-    print(ub.hzcat('indices1, dists1 = ', indices1,  dists1))
+    print(ub.hzcat('indices1, dists1 = ', indices1, dists1))
 
     print('Adding points')
     flann.add_points(newpts, rebuild_threshold=2)
 
     print('NN_Index')
     indices2, dists2 = flann.nn_index(qpts, num_neighbors=num_neighbors)
-    print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
+    print(ub.hzcat('indices2, dists2 = ', indices2, dists2))
     assert np.any(indices2 > pts.shape[0]), 'should be some indexes into new points'
-    assert np.all(indices2 < pts.shape[0] + newpts.shape[0]), 'but not more than the points being added'
+    assert np.all(
+        indices2 < pts.shape[0] + newpts.shape[0]
+    ), 'but not more than the points being added'
 
 
 def test_pyflann_searches():
@@ -198,6 +201,7 @@ def test_pyflann_searches():
         pts = testdata_points(nPts=5743, nDims=2)
         qpts = testdata_points(nPts=7, nDims=2)
         import vtool as vt
+
         # sample a radius
         radius = vt.L2(pts[0:1], qpts[0:1])[0] * 2 + 1
 
@@ -206,31 +210,28 @@ def test_pyflann_searches():
         print('NN_OnTheFly')
         # build nn_index on the fly
         indices1, dists1 = flann.nn(pts, qpts, num_neighbors, algorithm='hierarchical')
-        print(ub.hzcat('indices1, dists1 = ', indices1,  dists1))
+        print(ub.hzcat('indices1, dists1 = ', indices1, dists1))
 
         _build_params = flann.build_index(pts, algorithm='kmeans')
         del _build_params
 
         print('NN_Index')
         indices2, dists2 = flann.nn_index(qpts, num_neighbors=num_neighbors)
-        print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
+        print(ub.hzcat('indices2, dists2 = ', indices2, dists2))
 
         # this can only be called on one query point at a time
         # because the output size is unknown
         print('NN_Radius, radius=%r' % (radius,))
-        indices3, dists3  = flann.nn_radius(pts[0], radius)
+        indices3, dists3 = flann.nn_radius(pts[0], radius)
         print('indices3 = %r ' % (indices3,))
         print('dists3 = %r ' % (dists3,))
 
         assert np.all(dists3 < radius)
     except Exception as ex:
         import utool as ut
-        ut.printex(ex, key_list=[
-            'query',
-            'query.shape',
-            'pts.shape',
-        ], pad_stdout=True)
-        #utool.embed()
+
+        ut.printex(ex, key_list=['query', 'query.shape', 'pts.shape',], pad_stdout=True)
+        # utool.embed()
         raise
 
 
@@ -245,7 +246,7 @@ def test_pyflann_tune():
     pts = testdata_points(nPts=1009)
     qpts = testdata_points(nPts=7)
     num_neighbors = 3
-    #num_data = len(data)
+    # num_data = len(data)
     # untuned query
 
     flann = FLANN_CLS()
@@ -254,18 +255,18 @@ def test_pyflann_tune():
     # tuned query
     flannkw = dict(
         algorithm='autotuned',
-        target_precision=.01,
+        target_precision=0.01,
         build_weight=0.01,
         memory_weight=0.0,
-        sample_fraction=0.001
+        sample_fraction=0.001,
     )
     flann_tuned = FLANN_CLS()
     tuned_params = flann_tuned.build_index(pts, **flannkw)
     index_tuned, dist_tuned = flann_tuned.nn_index(qpts, num_neighbors=num_neighbors)
 
-    print(ub.hzcat('index_tuned, dist_tuned     = ', index_tuned,  dist_tuned))
+    print(ub.hzcat('index_tuned, dist_tuned     = ', index_tuned, dist_tuned))
     print('')
-    print(ub.hzcat('index_untuned, dist_untuned = ', index_untuned,  dist_untuned))
+    print(ub.hzcat('index_untuned, dist_untuned = ', index_untuned, dist_untuned))
 
     print(dist_untuned >= dist_tuned)
 
@@ -314,7 +315,7 @@ def test_pyflann_io():
     flann2 = FLANN_CLS()
     flann2.load_index('test_pyflann_index.flann', pts2)
     indices2, dists2 = flann2.nn_index(qpts, num_neighbors=num_neighbors)
-    #print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
+    # print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
 
     print('Find the same nearest neighbors?')
 
@@ -331,4 +332,5 @@ if __name__ == '__main__':
         xdoctest ~/code/vtool/tests/test_pyflann.py zero
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

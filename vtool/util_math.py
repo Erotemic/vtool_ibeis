@@ -13,7 +13,7 @@ from six.moves import range, zip
 
 TAU = np.pi * 2  # References: tauday.com
 
-eps = 1E-9
+eps = 1e-9
 
 
 def interpolate_nans(arr):
@@ -48,6 +48,7 @@ def interpolate_nans(arr):
         new_arr = [  1.    1.    2.8   4.6   6.4   8.2  10.    7.5   5. ]
     """
     import vtool as vt
+
     new_arr = arr.copy()
     nan_idxs = np.where(np.isnan(arr))[0]
     consecutive_groups = vt.group_consecutive(nan_idxs)
@@ -66,11 +67,18 @@ def interpolate_nans(arr):
                 lower = upper
             if max_ == last_index:
                 upper = lower
-        new_arr[min_:max_ + 1] = np.linspace(lower, upper, len(group) + 2)[1:-1]
+        new_arr[min_ : max_ + 1] = np.linspace(lower, upper, len(group) + 2)[1:-1]
     return new_arr
 
 
-def ensure_monotone_strictly_increasing(arr_, left_endpoint=None, right_endpoint=None, zerohack=False, onehack=False, newmode=True):
+def ensure_monotone_strictly_increasing(
+    arr_,
+    left_endpoint=None,
+    right_endpoint=None,
+    zerohack=False,
+    onehack=False,
+    newmode=True,
+):
     """
 
     Args:
@@ -129,11 +137,11 @@ def ensure_monotone_strictly_increasing(arr_, left_endpoint=None, right_endpoint
         left_endpoint = 0.0
     if onehack:
         right_endpoint = 1.0
-    #print('arr_in = %r' % (arr,))
-    #print('right_endpoint = %r' % (right_endpoint,))
-    #print('left_endpoint = %r' % (left_endpoint,))
+    # print('arr_in = %r' % (arr,))
+    # print('right_endpoint = %r' % (right_endpoint,))
+    # print('left_endpoint = %r' % (left_endpoint,))
     arr = breakup_equal_streak(arr, left_endpoint, right_endpoint)
-    #print('arr_out = %r' % (arr,))
+    # print('arr_out = %r' % (arr,))
     return arr
 
 
@@ -175,7 +183,7 @@ def ensure_monotone_strictly_decreasing(arr_, left_endpoint=None, right_endpoint
         >>> pt.plot2(domain, arr, 'r-', fnum=1, pnum=(3, 1, 3), title='after monotonization (strictly decreasing)', equal_aspect=False)
         >>> ut.show_if_requested()
     """
-    #raise NotImplementedError('unfinished')
+    # raise NotImplementedError('unfinished')
     arr = ensure_monotone_decreasing(arr_)
     # FIXME: doesn't work yet I don't think
     arr = breakup_equal_streak(arr, left_endpoint, right_endpoint)
@@ -215,7 +223,7 @@ def breakup_equal_streak(arr_in, left_endpoint=None, right_endpoint=None):
         >>> result = ('arr = %s' % (str(arr),))
         >>> print(result)
     """
-    #assert non_decreasing(arr), 'ensure monotonic failed'
+    # assert non_decreasing(arr), 'ensure monotonic failed'
     arr = arr_in.copy()
 
     # Find maxish and minish before adjusting
@@ -225,22 +233,22 @@ def breakup_equal_streak(arr_in, left_endpoint=None, right_endpoint=None):
         range_ = np.abs(arr_in[0] - arr_in[-1])
         if arr_in[0] < right_endpoint:
             # increasing arr
-            almost_right = right_endpoint - (range_ * .001)
+            almost_right = right_endpoint - (range_ * 0.001)
             # The second highest value in arr, or close enough
             maxish = min(almost_right, arr[arr < right_endpoint].max())
-            newmax = (right_endpoint * .9 + maxish * .1)
+            newmax = right_endpoint * 0.9 + maxish * 0.1
         else:
             # decreasing arr
-            almost_right = right_endpoint + (range_ * .001)
+            almost_right = right_endpoint + (range_ * 0.001)
             # The second lowest value in arr, or close enough
             minish = max(almost_right, arr[arr > right_endpoint].min())
-            #newmin = (right_endpoint + minish) / 2.0
-            newmin = (right_endpoint * .9 + minish * .1)
+            # newmin = (right_endpoint + minish) / 2.0
+            newmin = right_endpoint * 0.9 + minish * 0.1
 
     size = len(arr)
-    is_same = np.abs(np.diff(arr)) < 1E-8
-    #is_same = np.diff(arr) == 0
-    #index_list = np.nonzero(np.diff(arr) == 0)[0]
+    is_same = np.abs(np.diff(arr)) < 1e-8
+    # is_same = np.diff(arr) == 0
+    # index_list = np.nonzero(np.diff(arr) == 0)[0]
     index_list = np.nonzero(is_same)[0]
     if len(index_list) == 0:
         # If there are no consecutive numbers then arr must be strictly
@@ -248,13 +256,15 @@ def breakup_equal_streak(arr_in, left_endpoint=None, right_endpoint=None):
         return arr
 
     consecutive_groups = group_consecutive(index_list)
-    index_groups = [np.array(group.tolist() + [group.max() + 1]) for group in consecutive_groups]
+    index_groups = [
+        np.array(group.tolist() + [group.max() + 1]) for group in consecutive_groups
+    ]
     # Nope this is right
     # Hack because sometimes things arent't grouped correctly
     # items in index groups are consectuive and breaking things
     # arr[ut.flatten(index_groups)]
-    #index_groups2 = []
-    #for group in index_groups:
+    # index_groups2 = []
+    # for group in index_groups:
     #    if len(index_groups2) == 0:
     #        index_groups2.append(group)
     #    elif index_groups2[-1][-1] + 1 == group[0]:
@@ -266,35 +276,41 @@ def breakup_equal_streak(arr_in, left_endpoint=None, right_endpoint=None):
     runlen_list = [len(group) for group in index_groups]
     # Handle ending corner case
 
-    #isend_list = [(group[-1] + 1) < size for group in index_groups]
+    # isend_list = [(group[-1] + 1) < size for group in index_groups]
     # Error? Should this be less?
-    #isend_list = [(group[-1] + 1) < size for group in index_groups]
+    # isend_list = [(group[-1] + 1) < size for group in index_groups]
     isend_list = [(group[-1] + 1) >= size for group in index_groups]
     isstart_list = [group[0] == 0 for group in index_groups]
 
     min_vals = [
         arr[group[0]]
-        if isstart else
-        (.49 * arr[group[0] - 1] + .51 * arr[group[0]])  # value between previous and this one (bumped to right)
+        if isstart
+        else (
+            0.49 * arr[group[0] - 1] + 0.51 * arr[group[0]]
+        )  # value between previous and this one (bumped to right)
         for group, isstart in zip(index_groups, isstart_list)
     ]
 
     max_vals = [
         arr[group[-1]]  # Max value is the value of the previous group?
-        if isend else
-        (.49 * arr[group[-1] + 1] + .51 * arr[group[-1]])  # value between next and this one (bumped to right)
+        if isend
+        else (
+            0.49 * arr[group[-1] + 1] + 0.51 * arr[group[-1]]
+        )  # value between next and this one (bumped to right)
         for group, isend in zip(index_groups, isend_list)
     ]
 
-    #import vtool as vt
-    #vt.apply_grouping(arr, index_groups)
-    #np.vstack((min_vals, max_vals)).T
+    # import vtool as vt
+    # vt.apply_grouping(arr, index_groups)
+    # np.vstack((min_vals, max_vals)).T
 
-    fill_list = [np.linspace(min_, max_, len_, endpoint=not isend)
-                 for min_, max_, len_, isend in zip(min_vals, max_vals, runlen_list, isend_list)]
+    fill_list = [
+        np.linspace(min_, max_, len_, endpoint=not isend)
+        for min_, max_, len_, isend in zip(min_vals, max_vals, runlen_list, isend_list)
+    ]
 
     for group, fill in zip(index_groups, fill_list):
-        arr[group[0]:group[-1] + 1] = fill
+        arr[group[0] : group[-1] + 1] = fill
 
     if left_endpoint is not None and len(index_groups) > 0:
         # Set the leftmost value to be exactly ``left_endpoint``
@@ -346,12 +362,12 @@ def group_consecutive(arr):
         >>> print(result)
         groups = [array([1, 2, 3]), array([ 5,  6,  7,  8,  9, 10]), array([15]), array([ 99, 100, 101])]
     """
-    #is_nonconsec = np.abs(np.diff(arr)) < 1E-2
-    #split_indicies = np.nonzero(is_nonconsec)[0] + 1
+    # is_nonconsec = np.abs(np.diff(arr)) < 1E-2
+    # split_indicies = np.nonzero(is_nonconsec)[0] + 1
     split_indicies = np.nonzero(np.diff(arr) != 1)[0] + 1
     groups = np.array_split(arr, split_indicies)
     return groups
-    #return np.array_split(arr, np.where(np.diff(arr) != 1)[0] + 1)
+    # return np.array_split(arr, np.where(np.diff(arr) != 1)[0] + 1)
 
 
 def strictly_increasing(L):
@@ -416,6 +432,7 @@ def ensure_monotone_increasing(arr_, fromright=True, fromleft=True, newmode=True
     """
     if newmode:
         from sklearn.isotonic import IsotonicRegression
+
         ir = IsotonicRegression()
         arr = ir.fit_transform(np.arange(len(arr_)), arr_)
     else:
@@ -424,7 +441,7 @@ def ensure_monotone_increasing(arr_, fromright=True, fromleft=True, newmode=True
         # Ensure increasing from right
         if fromright:
             for lx in range(1, size):
-                rx = (size - lx - 1)
+                rx = size - lx - 1
                 if arr[rx] > arr[rx + 1]:
                     arr[rx] = arr[rx + 1]
         if fromleft:
@@ -467,7 +484,7 @@ def ensure_monotone_decreasing(arr_, fromleft=True, fromright=True):
     if fromright:
         # Ensure decreasing from right
         for lx in range(1, size):
-            rx = (size - lx - 1)
+            rx = size - lx - 1
             if arr[rx] < arr[rx + 1]:
                 arr[rx] = arr[rx + 1]
     if fromleft:
@@ -485,6 +502,7 @@ def test_language_modulus():
     """
     import math
     import utool as ut
+
     TAU = math.pi * 2
     num_list = [-8, -1, 0, 1, 2, 6, 7, 29]
     modop_result_list = []
@@ -493,8 +511,12 @@ def test_language_modulus():
         num = float(num)
         modop_result_list.append(num % TAU)
         fmod_result_list.append(math.fmod(num, TAU))
-    table = ut.make_csv_table([num_list, modop_result_list, fmod_result_list],
-                              ['num',  'modop', 'fmod'], 'mods', [float, float, float] )
+    table = ut.make_csv_table(
+        [num_list, modop_result_list, fmod_result_list],
+        ['num', 'modop', 'fmod'],
+        'mods',
+        [float, float, float],
+    )
     print(table)
 
 
@@ -569,7 +591,7 @@ def gauss_func1d(x, mu=0.0, sigma=1.0):
     """
     coeff = np.reciprocal(sigma * np.sqrt(TAU))
     exponent_expr_numer = np.power(np.subtract(x, mu), 2)
-    exponent_expr_denom = (-2 * (sigma ** 2))
+    exponent_expr_denom = -2 * (sigma ** 2)
     exponent_expr = np.divide(exponent_expr_numer, exponent_expr_denom)
     gaussval = coeff * np.exp(exponent_expr)
     return gaussval
@@ -601,7 +623,7 @@ def gauss_func1d_unnormalized(x, sigma=1.0):
         >>> ut.show_if_requested()
         array([ 0.05,  0.24,  0.35,  0.4 ,  0.35,  0.24,  0.05])
     """
-    exponent_expr_denom = (-2 * (sigma ** 2))
+    exponent_expr_denom = -2 * (sigma ** 2)
     tmp = exponent_expr_numer = np.power(x, 2.0)
     exponent_expr = np.divide(exponent_expr_numer, exponent_expr_denom, out=tmp)
     gaussval = np.exp(exponent_expr, out=tmp)
@@ -627,6 +649,7 @@ def logistic_01(x):
         >>> ut.show_if_requested()
     """
     from scipy.special import expit
+
     y = expit(((x * 2) - 1.0) * 6)
     return y
     # return L / (1 + np.exp(-k * (x - x0)))
@@ -634,6 +657,7 @@ def logistic_01(x):
 
 def logit(x):
     from scipy.special import logit
+
     return logit(x)
 
 
@@ -653,7 +677,7 @@ def beaton_tukey_loss(u, a=1):
     is_case1 = np.abs(u) <= a
     u1 = u[is_case1]
     result[is_case1] = ((a ** 2) / 6) * (1 - (1 - (u1 / a) ** 2) ** 3)
-    result[~is_case1] = (a ** 2 / 6)
+    result[~is_case1] = a ** 2 / 6
     return result
 
 
@@ -673,7 +697,7 @@ def beaton_tukey_weight(u, a=1):
     return result
 
 
-def gauss_parzen_est(dist, L=1, sigma=.38):
+def gauss_parzen_est(dist, L=1, sigma=0.38):
     """
     python -m wbia.plottool.draw_func2 --exec-plot_func --show --range=-.2,.2 --func=vt.gauss_parzen_est
     python -m wbia.plottool.draw_func2 --exec-plot_func --show --range=0,1 --func=vt.gauss_parzen_est
@@ -689,4 +713,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.util_math
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

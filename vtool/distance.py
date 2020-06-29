@@ -14,6 +14,7 @@ TEMP_VEC_DTYPE = np.float64
 
 def testdata_hist():
     import vtool as vt
+
     rng = np.random.RandomState(0)
     hist1 = vt.demodata.testdata_dummy_sift(rng=rng)
     hist2 = vt.demodata.testdata_dummy_sift(rng=rng)
@@ -35,12 +36,13 @@ def testdata_sift2():
         # normalize
         sift_norm = sift / np.linalg.norm(sift)
         # clip
-        sift_norm = np.clip(sift_norm, 0, .2)
+        sift_norm = np.clip(sift_norm, 0, 0.2)
         # re-normalize
         sift_norm = sift_norm / np.linalg.norm(sift_norm)
         # cast hack
         sift_norm = np.clip(sift_norm * 512.0, 0, 255).astype(np.uint8)
         return sift_norm
+
     sift1 = normalize_sift(sift1)
     sift2 = normalize_sift(sift2)
     sift3 = normalize_sift(sift3)
@@ -54,11 +56,11 @@ def wrapped_distance(arr1, arr2, base, out=None):
     """
     base = TAU corresponds to ori diff
     """
-    arr_diff  = np.subtract(arr1, arr2)
-    abs_diff  = np.abs(arr_diff)
+    arr_diff = np.subtract(arr1, arr2)
+    abs_diff = np.abs(arr_diff)
     mod_diff1 = np.mod(abs_diff, base)
     mod_diff2 = np.subtract(base, mod_diff1)
-    arr_dist  = np.minimum(mod_diff1, mod_diff2)
+    arr_dist = np.minimum(mod_diff1, mod_diff2)
     if out is not None:
         out[:] = arr_dist
     return arr_dist
@@ -208,7 +210,7 @@ def cyclic_distance(arr1, arr2, modulo, out=None):
     abs_diff = np.abs(arr_diff, out=out)
     mod_diff1 = np.mod(abs_diff, modulo, out=out)
     mod_diff2 = np.subtract(modulo, mod_diff1)
-    arr_dist  = np.minimum(mod_diff1, mod_diff2, out=out)
+    arr_dist = np.minimum(mod_diff1, mod_diff2, out=out)
     return arr_dist
 
 
@@ -299,13 +301,14 @@ def understanding_pseudomax_props(mode=2):
         >>> print(result)
     """
     import vtool as vt
+
     pseudo_max = 512
     rng = np.random.RandomState(0)
     num = 10
     if mode == 0:
         dim = 2
-        p1_01 = (vt.normalize_rows(rng.rand(num, dim)))
-        p2_01 = (vt.normalize_rows(rng.rand(num, dim)))
+        p1_01 = vt.normalize_rows(rng.rand(num, dim))
+        p2_01 = vt.normalize_rows(rng.rand(num, dim))
     elif mode == 1:
         p1_01 = vt.demodata.testdata_dummy_sift(num, rng) / pseudo_max
         p2_01 = vt.demodata.testdata_dummy_sift(num, rng) / pseudo_max
@@ -373,8 +376,10 @@ def understanding_pseudomax_props(mode=2):
     assert np.all(dist_sqrd_256 / const_sqrd == dist_sqrd_01)
     print('Conversions work')
 
-    print('Maximal L2 distance between any two NON-NEGATIVE L2-NORMALIZED'
-          ' vectors should always be sqrt(2)')
+    print(
+        'Maximal L2 distance between any two NON-NEGATIVE L2-NORMALIZED'
+        ' vectors should always be sqrt(2)'
+    )
 
 
 def L2(hist1, hist2):
@@ -390,6 +395,7 @@ def hist_isect(hist1, hist2):
     if len(hisect_dist) == 1:
         hisect_dist = hisect_dist[0]
     return hisect_dist
+
 
 VALID_DISTS = [
     'L1',
@@ -520,7 +526,7 @@ def L2_root_sift(hist1, hist2):
     root_sift2 = np.sqrt(sift2)
     l2_dist = L2(root_sift1, root_sift2)
     # Usure if correct;
-    l2_root_dist =  l2_dist / max_root_l2_dist
+    l2_root_dist = l2_dist / max_root_l2_dist
     return l2_root_dist
 
 
@@ -577,6 +583,7 @@ def cosine_dist(hist1, hist2):
 
 def _assert_siftvec(sift):
     import vtool as vt
+
     assert vt.check_sift_validity(sift)
 
 
@@ -608,6 +615,7 @@ def emd(hist1, hist2, cost_matrix='sift'):
         http://www.cs.huji.ac.il/~ofirpele/publications/ECCV2008.pdf
     """
     import pyemd
+
     if cost_matrix == 'sift':
         # Build cost matrix where bin-to-bin cost is 0,
         # neighbor cost is 1, and other cost is 2
@@ -618,12 +626,15 @@ def emd(hist1, hist2, cost_matrix='sift'):
         absdiff = np.abs(i - j)
         is_neighbor = np.abs(np.minimum(absdiff, N - absdiff)) == 1
         cost_matrix[is_neighbor] = 1.0
-        #print(cost_matrix[0:16, 0:16])
+        # print(cost_matrix[0:16, 0:16])
 
     if len(hist1.shape) == 2:
-        dist = np.array([
-            pyemd.emd(hist1_.astype(np.float), hist2_.astype(np.float), cost_matrix)
-            for hist1_, hist2_ in zip(hist1, hist2)])
+        dist = np.array(
+            [
+                pyemd.emd(hist1_.astype(np.float), hist2_.astype(np.float), cost_matrix)
+                for hist1_, hist2_ in zip(hist1, hist2)
+            ]
+        )
     else:
         dist = pyemd.emd(hist1.astype(np.float), hist2.astype(np.float), cost_matrix)
     return dist
@@ -634,7 +645,7 @@ def nearest_point(x, y, pts, conflict_mode='next', __next_counter=[0]):
 
     TODO: depricate
     """
-    #with ut.embed_on_exception_context:
+    # with ut.embed_on_exception_context:
     dists = (pts.T[0] - x) ** 2 + (pts.T[1] - y) ** 2
     fx = dists.argmin()
     mindist = dists[fx]
@@ -662,7 +673,7 @@ def closest_point(pt, pt_arr, distfunc=L2_sqrd):
     pt_arr = np.array([1.1, 2, .95, 20])[:, None]
     distfunc = vt.L2_sqrd
     """
-    #import vtool as vt
+    # import vtool as vt
     assert len(pt_arr) > 0
     dists = distfunc(pt, pt_arr)
     xlist = dists.argsort()
@@ -777,8 +788,8 @@ def pdist_argsort(x):
         sortx_2d = [(2, 3), (1, 4), (1, 2), (1, 3), (0, 3), (0, 2), (2, 4), (3, 4), (0, 1), (0, 4)]
     """
     OLD = True
-    #compare_idxs = [(r, c) for r, c in itertools.product(range(len(x) / 2),
-    #range(len(x) / 2)) if (c > r)]
+    # compare_idxs = [(r, c) for r, c in itertools.product(range(len(x) / 2),
+    # range(len(x) / 2)) if (c > r)]
     if OLD:
         mat = spdist.squareform(x)
         matu = np.triu(mat)
@@ -787,8 +798,9 @@ def pdist_argsort(x):
         sortx_2d = [(r, c) for r, c in zip(sortx_row, sortx_col) if (c > r)]
     else:
         num_rows = len(x) // 2
-        compare_idxs = ut.flatten([[(r, c)  for c in range(r + 1, num_rows)]
-                                   for r in range(num_rows)])
+        compare_idxs = ut.flatten(
+            [[(r, c) for c in range(r + 1, num_rows)] for r in range(num_rows)]
+        )
         sortx = x.argsort()
         sortx_2d = ut.take(compare_idxs, sortx)
     return sortx_2d
@@ -800,4 +812,5 @@ if __name__ == '__main__':
         python -m vtool.distance all
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

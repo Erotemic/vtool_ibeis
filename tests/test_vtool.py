@@ -29,8 +29,7 @@ def test_get_invR_mats_orientation():
         try:
             assert np.all(passed)
         except AssertionError as ex:
-            ut.printex(ex, 'rotation unequal', key_list=['passed',
-                                                            'error'])
+            ut.printex(ex, 'rotation unequal', key_list=['passed', 'error'])
 
     test_rots(theta1)
     test_rots(theta2)

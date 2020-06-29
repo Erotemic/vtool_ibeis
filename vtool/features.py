@@ -9,6 +9,7 @@ def extract_feature_from_patch(patch):
     import pyhesaff
     import numpy as np
     import vtool as vt
+
     patch = vt.rectify_to_uint8(patch)
     patch = vt.rectify_to_square(patch)
     patch_list = np.ascontiguousarray(patch[None, :])
@@ -64,15 +65,18 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
         >>> pt.show_if_requested()
     """
     import pyhesaff
+
     if feat_type == 'hesaff+sift':
-        #(kpts, vecs) = pyhesaff.detect_feats(img_fpath, **kwargs)
+        # (kpts, vecs) = pyhesaff.detect_feats(img_fpath, **kwargs)
         (kpts, vecs) = pyhesaff.detect_feats2(img_or_fpath, **kwargs)
     elif feat_type == 'hesaff+siam128':
         # hacky
         from wbia_cnn import _plugin
+
         (kpts, sift) = pyhesaff.detect_feats2(img_or_fpath, **kwargs)
         if isinstance(img_or_fpath, six.string_types):
             import vtool as vt
+
             img_or_fpath = vt.imread(img_or_fpath)
         vecs_list = _plugin.extract_siam128_vecs([img_or_fpath], [kpts])
         vecs = vecs_list[0]
@@ -101,6 +105,7 @@ def get_extract_features_default_params():
         >>> print(result)
     """
     import pyhesaff
+
     param_dict = pyhesaff.get_hesaff_default_params()
     return param_dict
 
@@ -110,7 +115,7 @@ def detect_opencv_keypoints():
     import vtool as vt
     import numpy as np  # NOQA
 
-    #img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='lena.png'))
+    # img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='lena.png'))
     img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='zebra.png'))
     imgBGR = vt.imread(img_fpath)
     imgGray = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2GRAY)
@@ -128,7 +133,6 @@ def detect_opencv_keypoints():
         'SURF': cv2.xfeatures2d.SURF_create,  # really harris corners
         'MSER': cv2.MSER_create,
         #'StarDetector_create',
-
     }
 
     extract_factory = {
@@ -165,8 +169,8 @@ def detect_opencv_keypoints():
             fitz_ellipses = [cv2.fitEllipse(mser) for mser in regions]
 
             # http://answers.opencv.org/question/19015/how-to-use-mser-in-python/
-            #hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
-            #hull_ells = [cv2.fitEllipse(hull[:, 0]) for hull in hulls]
+            # hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
+            # hull_ells = [cv2.fitEllipse(hull[:, 0]) for hull in hulls]
             kpts_ = []
             for ell in fitz_ellipses:
                 ((cx, cy), (rx, ry), degrees) = ell
@@ -174,7 +178,7 @@ def detect_opencv_keypoints():
                 S = vt.scale_mat3x3(rx, ry)
                 T = vt.translation_mat3x3(cx, cy)
                 R = vt.rotation_mat3x3(theta)
-                #R = np.eye(3)
+                # R = np.eye(3)
                 invVR = T.dot(R.dot(S))
                 kpt = vt.flatten_invV_mats_to_kpts(np.array([invVR]))[0]
                 kpts_.append(kpt)
@@ -196,7 +200,7 @@ def detect_opencv_keypoints():
 
     cv2_kpts = type_to_kpts['MSER']
     kp = cv2_kpts[0]  # NOQA
-    #cv2.fitEllipse(cv2_kpts[0])
+    # cv2.fitEllipse(cv2_kpts[0])
     cv2_kpts = type_to_kpts['SURF']
 
     for key in extract_factory.keys():
@@ -222,11 +226,14 @@ def test_mser():
     import vtool as vt
     import wbia.plottool as pt
     import numpy as np
+
     pt.qt4ensure()
+
     class Keypoints(ut.NiceRepr):
         """
         Convinence class for dealing with keypoints
         """
+
         def __init__(self, kparr, info=None):
             self.kparr = kparr
             if info is None:
@@ -259,9 +266,9 @@ def test_mser():
     # http://stackoverflow.com/questions/17647500/exact-meaning-of-the-parameters-given-to-initialize-mser-in-opencv-2-4-x
     factory = cv2.MSER_create
     img_area = np.product(np.array(vt.get_size(imgGray)))
-    _max_area = (img_area // 10)
+    _max_area = img_area // 10
     _delta = 8
-    _min_diversity = .5
+    _min_diversity = 0.5
 
     extractor = factory(_delta=_delta, _max_area=_max_area, _min_diversity=_min_diversity)
     # bboxes are x,y,w,h
@@ -275,8 +282,8 @@ def test_mser():
     fitz_ellipses = [cv2.fitEllipse(mser) for mser in regions]
 
     # http://answers.opencv.org/question/19015/how-to-use-mser-in-python/
-    #hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
-    #hull_ells = [cv2.fitEllipse(hull[:, 0]) for hull in hulls]
+    # hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
+    # hull_ells = [cv2.fitEllipse(hull[:, 0]) for hull in hulls]
     invVR_mats = []
     for ell in fitz_ellipses:
         ((cx, cy), (dx, dy), degrees) = ell
@@ -290,40 +297,43 @@ def test_mser():
         invVR = T.dot(R.dot(S))
         invVR_mats.append(invVR)
     invVR_mats = np.array(invVR_mats)
-    #_oris = vt.get_invVR_mats_oris(invVR_mats)
+    # _oris = vt.get_invVR_mats_oris(invVR_mats)
     kpts2_ = vt.flatten_invV_mats_to_kpts(invVR_mats)
 
     self = Keypoints(kpts2_)
     self.add_info('regions', regions)
-    flags = (self.eccentricity < .9)
-    #flags = self.scale < np.mean(self.scale)
-    #flags = self.scale < np.median(self.scale)
+    flags = self.eccentricity < 0.9
+    # flags = self.scale < np.mean(self.scale)
+    # flags = self.scale < np.median(self.scale)
     self = self.compress(flags)
     import wbia.plottool as pt
-    #pt.interact_keypoints.ishow_keypoints(imgBGR, self.kparr, None, ell_alpha=.4, color='distinct', fnum=2)
-    #import wbia.plottool as pt
+
+    # pt.interact_keypoints.ishow_keypoints(imgBGR, self.kparr, None, ell_alpha=.4, color='distinct', fnum=2)
+    # import wbia.plottool as pt
     vis = imgBGR.copy()
 
     for region in self.info['regions']:
         vis[region.T[1], region.T[0], :] = 0
 
-    #regions, bbox = mser.detectRegions(gray)
-    #hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in self.info['regions']]
-    #cv2.polylines(vis, hulls, 1, (0, 255, 0))
-    #for region in self.info['regions']:
+    # regions, bbox = mser.detectRegions(gray)
+    # hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in self.info['regions']]
+    # cv2.polylines(vis, hulls, 1, (0, 255, 0))
+    # for region in self.info['regions']:
     #    ell = cv2.fitEllipse(region)
     #    cv2.ellipse(vis, ell, (255))
-    pt.interact_keypoints.ishow_keypoints(vis, self.kparr, None, ell_alpha=.4, color='distinct', fnum=2)
-    #pt.imshow(vis, fnum=2)
+    pt.interact_keypoints.ishow_keypoints(
+        vis, self.kparr, None, ell_alpha=0.4, color='distinct', fnum=2
+    )
+    # pt.imshow(vis, fnum=2)
     pt.update()
 
-    #extractor = extract_factory['DAISY']()
+    # extractor = extract_factory['DAISY']()
 
-    #desc_type_to_dtype = {
+    # desc_type_to_dtype = {
     #    cv2.CV_8U: np.uint8,
     #    cv2.CV_8s: np.uint,
-    #}
-    #def alloc_desc(extractor):
+    # }
+    # def alloc_desc(extractor):
     #    desc_type = extractor.descriptorType()
     #    desc_size = extractor.descriptorSize()
     #    dtype = desc_type_to_dtype[desc_type]
@@ -331,40 +341,40 @@ def test_mser():
     #    desc = np.empty(shape, dtype=dtype)
     #    return desc
 
-    #ut.search_module(cv2, 'array', recursive=True)
-    #ut.search_module(cv2, 'freak', recursive=True)
-    #ut.search_module(cv2, 'out', recursive=True)
+    # ut.search_module(cv2, 'array', recursive=True)
+    # ut.search_module(cv2, 'freak', recursive=True)
+    # ut.search_module(cv2, 'out', recursive=True)
 
-    #cv2_kpts = cv2_kpts[0:2]
+    # cv2_kpts = cv2_kpts[0:2]
 
-    #for key, factory in just_desc_factory_.items():
+    # for key, factory in just_desc_factory_.items():
     #    extractor = factory()
     #    desc = alloc_desc(extractor)
     #    desc = extractor.compute(imgGray, cv2_kpts)
     #    feats[key] = (desc,)
     #    #extractor.compute(imgGray, cv2_kpts, desc)
     #    pass
-    #kpts = np.array(list(map(from_cv2_kpts, cv2_kpts)))
+    # kpts = np.array(list(map(from_cv2_kpts, cv2_kpts)))
 
-    #orb = cv2.ORB()
-    #kp1, des1 = orb.detectAndCompute(imgGray, None)
-    #blober = cv2.SimpleBlobDetector_create()
-    #haris_kpts = cv2.cornerHarris(imgGray, 2, 3, 0.04)
+    # orb = cv2.ORB()
+    # kp1, des1 = orb.detectAndCompute(imgGray, None)
+    # blober = cv2.SimpleBlobDetector_create()
+    # haris_kpts = cv2.cornerHarris(imgGray, 2, 3, 0.04)
 
-    #[name for name in dir(cv2) if 'mat' in name.lower()]
-    #[name for name in dir(cv2.xfeatures2d) if 'desc' in name.lower()]
+    # [name for name in dir(cv2) if 'mat' in name.lower()]
+    # [name for name in dir(cv2.xfeatures2d) if 'desc' in name.lower()]
 
-    #[name for name in dir(cv2) if 'detect' in name.lower()]
-    #[name for name in dir(cv2) if 'extract' in name.lower()]
-    #[name for name in dir(cv2) if 'ellip' in name.lower()]
+    # [name for name in dir(cv2) if 'detect' in name.lower()]
+    # [name for name in dir(cv2) if 'extract' in name.lower()]
+    # [name for name in dir(cv2) if 'ellip' in name.lower()]
 
-    #sift = cv2.xfeatures2d.SIFT_create()
-    #cv2_kpts = sift.detect(imgGray)
-    #desc = sift.compute(imgGray, cv2_kpts)[1]
+    # sift = cv2.xfeatures2d.SIFT_create()
+    # cv2_kpts = sift.detect(imgGray)
+    # desc = sift.compute(imgGray, cv2_kpts)[1]
 
-    #freak = cv2.xfeatures2d.FREAK_create()
-    #cv2_kpts = freak.detect(imgGray)
-    #desc = freak.compute(imgGray, cv2_kpts)[1]
+    # freak = cv2.xfeatures2d.FREAK_create()
+    # cv2_kpts = freak.detect(imgGray)
+    # desc = freak.compute(imgGray, cv2_kpts)[1]
     pass
 
 
@@ -374,4 +384,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.features
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)

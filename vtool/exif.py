@@ -21,7 +21,7 @@ from vtool import image_shared
 
 # Inverse of PIL.ExifTags.TAGS
 EXIF_TAG_TO_TAGID = {val: key for (key, val) in six.iteritems(TAGS)}
-GPS_TAG_TO_GPSID  = {val: key for (key, val) in six.iteritems(GPSTAGS)}
+GPS_TAG_TO_GPSID = {val: key for (key, val) in six.iteritems(GPSTAGS)}
 
 # Relevant EXIF Tags
 #'GPSInfo': 34853
@@ -51,11 +51,11 @@ ORIENTATION_DICT = {
 }
 
 ORIENTATION_DICT_INVERSE = {
-    ORIENTATION_UNDEFINED : 0,
-    ORIENTATION_000       : 1,
-    ORIENTATION_180       : 3,
-    ORIENTATION_090       : 6,
-    ORIENTATION_270       : 8,
+    ORIENTATION_UNDEFINED: 0,
+    ORIENTATION_000: 1,
+    ORIENTATION_180: 3,
+    ORIENTATION_090: 6,
+    ORIENTATION_270: 8,
 }
 
 ORIENTATION_ORDER_LIST = [
@@ -66,20 +66,21 @@ ORIENTATION_ORDER_LIST = [
 ]
 
 
-GPSLATITUDE_CODE     = GPS_TAG_TO_GPSID['GPSLatitude']
-GPSLATITUDEREF_CODE  = GPS_TAG_TO_GPSID['GPSLatitudeRef']
-GPSLONGITUDE_CODE    = GPS_TAG_TO_GPSID['GPSLongitude']
+GPSLATITUDE_CODE = GPS_TAG_TO_GPSID['GPSLatitude']
+GPSLATITUDEREF_CODE = GPS_TAG_TO_GPSID['GPSLatitudeRef']
+GPSLONGITUDE_CODE = GPS_TAG_TO_GPSID['GPSLongitude']
 GPSLONGITUDEREF_CODE = GPS_TAG_TO_GPSID['GPSLongitudeRef']
-GPSDATE_CODE         = GPS_TAG_TO_GPSID['GPSDateStamp']
-GPSTIME_CODE         = GPS_TAG_TO_GPSID['GPSTimeStamp']
+GPSDATE_CODE = GPS_TAG_TO_GPSID['GPSDateStamp']
+GPSTIME_CODE = GPS_TAG_TO_GPSID['GPSTimeStamp']
 
 
 def read_exif_tags(pil_img, exif_tagid_list, default_list=None):
     if default_list is None:
         default_list = [None for _ in range(len(exif_tagid_list))]
     exif_dict = get_exif_dict(pil_img)
-    exif_val_list = [exif_dict.get(key, default) for key, default in
-                     zip(exif_tagid_list, default_list)]
+    exif_val_list = [
+        exif_dict.get(key, default) for key, default in zip(exif_tagid_list, default_list)
+    ]
     return exif_val_list
 
 
@@ -114,8 +115,7 @@ def get_exif_dict2(pil_img):
 
 
 def make_exif_dict_human_readable(exif_dict):
-    exif_dict2 = {TAGS.get(key, key): val
-                  for (key, val) in six.iteritems(exif_dict)}
+    exif_dict2 = {TAGS.get(key, key): val for (key, val) in six.iteritems(exif_dict)}
     return exif_dict2
 
 
@@ -135,10 +135,11 @@ def check_exif_keys(pil_img):
 
 def read_all_exif_tags(pil_img):
     info_ = pil_img._getexif()
-    exif = {} if info_ is None else {
-        TAGS.get(key, key): val
-        for key, val in six.iteritems(info_)
-    }
+    exif = (
+        {}
+        if info_ is None
+        else {TAGS.get(key, key): val for key, val in six.iteritems(info_)}
+    )
     return exif
 
 
@@ -212,8 +213,7 @@ def get_unixtime_gps(exif_dict, default=-1):
     if GPSINFO_CODE in exif_dict:
         gps_info = exif_dict[GPSINFO_CODE]
 
-        if (GPSDATE_CODE in gps_info and
-             GPSTIME_CODE in gps_info):
+        if GPSDATE_CODE in gps_info and GPSTIME_CODE in gps_info:
             gps_date = gps_info[GPSDATE_CODE]
             gps_time = gps_info[GPSTIME_CODE]
 
@@ -263,13 +263,15 @@ def get_lat_lon(exif_dict, default=(-1, -1)):
         if GPSINFO_CODE in exif_dict:
             gps_info = exif_dict[GPSINFO_CODE]
 
-            if (GPSLATITUDE_CODE in gps_info and
-                 GPSLATITUDEREF_CODE in gps_info and
-                 GPSLONGITUDE_CODE in gps_info and
-                 GPSLONGITUDEREF_CODE in gps_info):
-                gps_latitude      = gps_info[GPSLATITUDE_CODE]
-                gps_latitude_ref  = gps_info[GPSLATITUDEREF_CODE]
-                gps_longitude     = gps_info[GPSLONGITUDE_CODE]
+            if (
+                GPSLATITUDE_CODE in gps_info
+                and GPSLATITUDEREF_CODE in gps_info
+                and GPSLONGITUDE_CODE in gps_info
+                and GPSLONGITUDEREF_CODE in gps_info
+            ):
+                gps_latitude = gps_info[GPSLATITUDE_CODE]
+                gps_latitude_ref = gps_info[GPSLATITUDEREF_CODE]
+                gps_longitude = gps_info[GPSLONGITUDE_CODE]
                 gps_longitude_ref = gps_info[GPSLONGITUDEREF_CODE]
                 try:
                     lat = convert_degrees(gps_latitude)
@@ -371,11 +373,16 @@ def get_unixtime(exif_dict, default=-1):
         >>> pil_img = Image.open(image_fpath)
         >>> exif_dict = get_exif_dict(pil_img)
     """
-    exiftime  = exif_dict.get(DATETIMEORIGINAL_TAGID, default)
+    exiftime = exif_dict.get(DATETIMEORIGINAL_TAGID, default)
     if isinstance(exiftime, tuple) and len(exiftime) == 1:
         # hack, idk why
         exiftime = exiftime[0]
-    if exiftime != -1 and len(exiftime) == 19 and exiftime[-1] != ' ' and exiftime[-3:-1] == ': ':
+    if (
+        exiftime != -1
+        and len(exiftime) == 19
+        and exiftime[-1] != ' '
+        and exiftime[-3:-1] == ': '
+    ):
         # Hack for weird fluke exif times '2009:10:01 11:52: 1'
         exiftime = list(exiftime)
         exiftime[-2] = '0'
@@ -425,4 +432,5 @@ if __name__ == '__main__':
         xdoctest -m vtool.exif
     """
     import xdoctest
+
     xdoctest.doctest_module(__file__)
