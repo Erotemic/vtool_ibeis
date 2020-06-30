@@ -3,9 +3,6 @@ name: Build and upload to PyPI
 # Build on every branch push, tag push, and pull request change:
 on: push
 
-env:
-  WBIA_PYPKG_BUILD_MACPORTS_VERSION: v1.0.0
-
 jobs:
   build_wheels:
     name: Build on ${{ matrix.os }}
@@ -23,7 +20,7 @@ jobs:
         with:
           python-version: '3.6'
 
-      - name: [macOS] Prepare MacPorts - Prefer Xcode 11.5
+      - name: macOS - Prepare MacPorts - Prefer Xcode 11.5
         if: ${{ runner.os == 'macOS' }}
         run: |
           xcode-select -p
@@ -31,7 +28,7 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_11.5.app/Contents/Developer
           xcodebuild -version
 
-      - name: [macOS] Cache MacPorts and OpenCV dependencies for macOS
+      - name: macOS - Cache MacPorts and OpenCV dependencies for macOS
         if: ${{ runner.os == 'macOS' }}
         uses: actions/cache@v2
         env:
@@ -42,7 +39,7 @@ jobs:
             /opt/opencv
           # The key based on the file hash of the build script
           # i.e. changing OPENCV_VERSION within the script will invalidate the cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-macports-${{ env.WBIA_PYPKG_BUILD_MACPORTS_VERSION }}-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-macports-v1.0.0-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
 
       - name: Check MacPorts existence
         id: check_macports
@@ -50,11 +47,11 @@ jobs:
         with:
           files: "/opt/local"
 
-      - name: [macOS] Install MacPorts
+      - name: macOS - Install MacPorts
         if: ${{ runner.os == 'macOS' && steps.check_macports.outputs.files_exists == 'false' }}
-        uses: WildbookOrg/wbia-pypkg-build/actions/macports@${{ env.WBIA_PYPKG_BUILD_MACPORTS_VERSION }}
+        uses: WildbookOrg/wbia-pypkg-build/actions/macports@v1.0.0
 
-      - name: [Release] Autobump version preparation
+      - name: Release - Autobump version preparation
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
         run: |
           # from refs/tags/vX.Y.Z get X.Y.Z
@@ -66,13 +63,13 @@ jobs:
           grep "${PLACEHOLDER}" "${VERSION_FILE}"
         shell: bash
 
-      - name: [macOS Release] Autobump version for Mac
+      - name: Release macOS - Autobump version for Mac
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'macOS' }}
         run: |
           sed -i "" "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
 
-      - name: [Linux Release] Autobump version for Linux
+      - name: Release Linux - Autobump version for Linux
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'Linux' }}
         run: |
           sed -i "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
@@ -93,7 +90,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_sdist:
-    name: Build source
+    name: Build sdist
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
