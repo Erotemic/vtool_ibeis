@@ -3,9 +3,12 @@ name: Build and upload to PyPI
 # Build on every branch push, tag push, and pull request change:
 on: push
 
+env:
+  WBIA_PYPKG_BUILD_MACPORTS_VERSION: v1.0.0
+
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 2
@@ -20,12 +23,39 @@ jobs:
         with:
           python-version: '3.6'
 
-      - name: Install cibuildwheel
+      - name: [macOS] Prepare MacPorts - Prefer Xcode 11.5
+        if: ${{ runner.os == 'macOS' }}
         run: |
-          python -m pip install cibuildwheel==1.4.2
+          xcode-select -p
+          xcodebuild -version
+          sudo xcode-select -s /Applications/Xcode_11.5.app/Contents/Developer
+          xcodebuild -version
 
-      - name: Autobump version preparation
-        if : ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
+      - name: [macOS] Cache MacPorts and OpenCV dependencies for macOS
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-opencv
+        with:
+          path: |
+            /opt/local
+            /opt/opencv
+          # The key based on the file hash of the build script
+          # i.e. changing OPENCV_VERSION within the script will invalidate the cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-macports-${{ env.WBIA_PYPKG_BUILD_MACPORTS_VERSION }}-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
+
+      - name: Check MacPorts existence
+        id: check_macports
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "/opt/local"
+
+      - name: [macOS] Install MacPorts
+        if: ${{ runner.os == 'macOS' && steps.check_macports.outputs.files_exists == 'false' }}
+        uses: WildbookOrg/wbia-pypkg-build/actions/macports@${{ env.WBIA_PYPKG_BUILD_MACPORTS_VERSION }}
+
+      - name: [Release] Autobump version preparation
+        if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
         run: |
           # from refs/tags/vX.Y.Z get X.Y.Z
           echo ${GITHUB_REF}
@@ -36,58 +66,26 @@ jobs:
           grep "${PLACEHOLDER}" "${VERSION_FILE}"
         shell: bash
 
-      - name: Autobump version for Mac
+      - name: [macOS Release] Autobump version for Mac
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'macOS' }}
         run: |
           sed -i "" "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
 
-      - name: Autobump version for Linux
+      - name: [Linux Release] Autobump version for Linux
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'Linux' }}
         run: |
           sed -i "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
 
-      - name: Prepare MacPorts - Prefer Xcode 11.5
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          xcode-select -p
-          xcodebuild -version
-          sudo xcode-select -s /Applications/Xcode_11.5.app/Contents/Developer
-          xcodebuild -version
-
-      - name: Install MacPorts
-        if: ${{ runner.os == 'macOS' }}
-        uses: WildbookOrg/wbia-pypkg-build/actions/macports@v1.0.0
-
-      - name: Update MacPorts and check version
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          sudo port selfupdate
-          port version
-
-      - name: Cache OpenCV dependency for macOS
-        if: ${{ runner.os == 'macOS' }}
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-opencv
-        with:
-          path: |
-            /opt/opencv
-            ~/opencv
-            ~/opencv_contrib
-          # The key based on the file hash of the build script
-          # i.e. changing OPENCV_VERSION within the script will invalidate the cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
-
       - name: Build wheels
         env:
           CIBW_MANYLINUX_X86_64_IMAGE: wildme/manylinux:latest
           CIBW_BUILD: cp36-manylinux_x86_64 cp36-macosx_x86_64
-          # Script to prepare the macos environment
           CIBW_BEFORE_BUILD_LINUX: bash scripts/ci_prepare_centos_for_build.sh
           CIBW_BEFORE_BUILD_MACOS: bash scripts/ci_prepare_macos_for_build.sh
         run: |
+          python -m pip install cibuildwheel==1.4.2
           python -m cibuildwheel --output-dir wheelhouse
 
       - uses: actions/upload-artifact@v2
@@ -95,7 +93,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_sdist:
-    name: Build source distribution
+    name: Build source
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -115,12 +113,10 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
+    name: Upload to PyPI
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    # upload to PyPI on every tag starting with 'v'
     if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
-    # alternatively, to publish when a GitHub Release is created, use the following rule:
-    # if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -131,4 +127,3 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_PASSWORD }}
-          # To test: repository_url: https://test.pypi.org/legacy/

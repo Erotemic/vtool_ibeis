@@ -1,9 +1,12 @@
 #!/bin/bash
-################################
-# Install OpenCV dependencies
+###############################
+# Install MacPorts dependencies
 
 set -ex
 
+sudo port selfupdate
+
+# Install ports if MacPorts install location is not present
 sudo port install \
      clang-5.0 \
      clang_select \
