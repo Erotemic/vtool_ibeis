@@ -20,6 +20,32 @@ jobs:
         with:
           python-version: '3.6'
 
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install cibuildwheel==1.4.2
+
+      - name: Autobump version preparation
+        run: |
+          # from refs/tags/vX.Y.Z get X.Y.Z
+          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
+          PLACEHOLDER="__version__ = '.*'"E
+          VERSION_FILE="vtool/__init__.py"
+
+          grep "$PLACEHOLDER" "$VERSION_FILE"
+        shell: bash
+
+      - name: Autobump version for Mac
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          sed -i "" "s/$PLACEHOLDER/__version__ = \'${VERSION}\'/g" "$VERSION_FILE"
+        shell: bash
+
+      - name: Autobump version for Linux
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sed -i "s/$PLACEHOLDER/__version__ = \'${VERSION}\'/g" "$VERSION_FILE"
+        shell: bash
+
       - name: Prepare MacPorts - Prefer Xcode 11.5
         if: ${{ runner.os == 'macOS' }}
         run: |
