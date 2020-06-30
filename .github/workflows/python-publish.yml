@@ -25,7 +25,7 @@ jobs:
           python -m pip install cibuildwheel==1.4.2
 
       - name: Autobump version preparation
-        if : github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+        if : ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
         run: |
           # from refs/tags/vX.Y.Z get X.Y.Z
           echo ${GITHUB_REF}
@@ -37,13 +37,13 @@ jobs:
         shell: bash
 
       - name: Autobump version for Mac
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && ${{ runner.os == 'macOS' }}
+        if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'macOS' }}
         run: |
           sed -i "" "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
 
       - name: Autobump version for Linux
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && ${{ runner.os == 'Linux' }}
+        if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'Linux' }}
         run: |
           sed -i "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
@@ -118,7 +118,7 @@ jobs:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     # upload to PyPI on every tag starting with 'v'
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
     # alternatively, to publish when a GitHub Release is created, use the following rule:
     # if: github.event_name == 'release' && github.event.action == 'published'
     steps:
