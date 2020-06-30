@@ -5,6 +5,7 @@ import sys
 from os.path import exists
 from collections import OrderedDict
 from setuptools import find_packages
+from skbuild import setup
 
 
 def native_mb_python_tag(plat_impl=None, version_info=None):
@@ -253,6 +254,4 @@ if __name__ == '__main__':
     """
     python -c "import vtool; print(vtool.__file__)"
     """
-    import skbuild
-
-    skbuild.setup(**KWARGS)
+    setup(**KWARGS)
