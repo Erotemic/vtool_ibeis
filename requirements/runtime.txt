@@ -8,6 +8,6 @@ scipy
 six >= 1.10.0
 statsmodels
 ubelt
-wbia-pyflann
-wbia-pyhesaff
 wbia-utool
+# wbia-pyflann
+# wbia-pyhesaff
