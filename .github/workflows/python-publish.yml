@@ -25,25 +25,27 @@ jobs:
           python -m pip install cibuildwheel==1.4.2
 
       - name: Autobump version preparation
+        if : github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
         run: |
           # from refs/tags/vX.Y.Z get X.Y.Z
-          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
-          PLACEHOLDER="__version__ = '.*'"E
+          echo ${GITHUB_REF}
+          VERSION=$(echo ${GITHUB_REF} | sed 's#.*/v##')
+          PLACEHOLDER="__version__ = '.*'"
           VERSION_FILE="vtool/__init__.py"
 
-          grep "$PLACEHOLDER" "$VERSION_FILE"
+          grep "${PLACEHOLDER}" "${VERSION_FILE}"
         shell: bash
 
       - name: Autobump version for Mac
-        if: ${{ runner.os == 'macOS' }}
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && ${{ runner.os == 'macOS' }}
         run: |
-          sed -i "" "s/$PLACEHOLDER/__version__ = \'${VERSION}\'/g" "$VERSION_FILE"
+          sed -i "" "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
 
       - name: Autobump version for Linux
-        if: ${{ runner.os == 'Linux' }}
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && ${{ runner.os == 'Linux' }}
         run: |
-          sed -i "s/$PLACEHOLDER/__version__ = \'${VERSION}\'/g" "$VERSION_FILE"
+          sed -i "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
         shell: bash
 
       - name: Prepare MacPorts - Prefer Xcode 11.5
