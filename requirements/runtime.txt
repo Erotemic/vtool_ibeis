@@ -1,6 +1,7 @@
 annoy
 networkx
 numpy >= 1.11.1
+opencv-python >= 4.2.0
 Pillow >= 5.2.0
 scikit-image
 scikit-learn
