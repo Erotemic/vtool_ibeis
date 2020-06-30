@@ -102,7 +102,7 @@ jobs:
           CIBW_SKIP: cp27-* pp27-* *-win32 *-win_amd64 *-manylinux_i686 *-manylinux_aarch64 *-manylinux_ppc64le *-manylinux_s390x
           CIBW_BEFORE_BUILD_LINUX: bash scripts/ci_prepare_centos_for_build.sh
           CIBW_BEFORE_BUILD_MACOS: bash scripts/ci_prepare_macos_for_build.sh
-          CIBW_TEST_COMMAND: python -c "import cv2; print(cv2.__file__); print(cv2.__version__); import vtool; print(vtool.__file__); print(vtool.__version__); from vtool import sver_c_wrapper; print(vtool.sver_c_wrapper.c_sver)"
+          CIBW_TEST_COMMAND: python -c "import vtool; from vtool.__main__ import main; main()"
         run: |
           python -m pip install cibuildwheel==1.4.2
           python -m cibuildwheel --output-dir wheelhouse

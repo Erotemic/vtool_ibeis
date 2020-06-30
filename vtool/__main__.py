@@ -10,10 +10,18 @@ def main():  # nocover
     from vtool._pyflann_backend import pyflann
 
     print('pyflann = {!r}'.format(pyflann))
+
     from vtool import sver_c_wrapper
 
     print('sver_c_wrapper.lib_fname = {!r}'.format(sver_c_wrapper.lib_fname))
     print('sver_c_wrapper.lib_fname_cand = {!r}'.format(sver_c_wrapper.lib_fname_cand))
+    print('sver_c_wrapper.c_sver = {!r}'.format(sver_c_wrapper.c_sver))
+
+    import cv2
+
+    print('cv2 = {!r}'.format(cv2))
+    print('cv2.__file__ = {!r}'.format(cv2.__file__))
+    print('cv2.__version__ = {!r}'.format(cv2.__version__))
 
 
 if __name__ == '__main__':
