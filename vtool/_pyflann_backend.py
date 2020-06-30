@@ -13,6 +13,7 @@ try:
     import pyflann
 
     FLANN_CLS = pyflann.FLANN
+    print('VTOOL BACKEND FOR pyflann = {!r}'.format(pyflann))
 except ImportError:
     print('no pyflann, using cv2.flann_Index')
     import cv2
@@ -45,6 +46,6 @@ except ImportError:
 
         FLANN_CLS = _DUMMY_FLANN_CLS
 
+    print('VTOOL BACKEND FOR pyflann = {!r}'.format(cv2.flann_Index))
 
-print('VTOOL BACKEND FOR pyflann = {!r}'.format(pyflann))
 print('VTOOL BACKEND FOR FLANN_CLS = {!r}'.format(FLANN_CLS))
