@@ -52,6 +52,7 @@ jobs:
         uses: WildbookOrg/wbia-pypkg-build/actions/macports@v1.0.0
 
       - name: Release - Autobump version preparation
+        id: autobump
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}
         run: |
           # from refs/tags/vX.Y.Z get X.Y.Z
@@ -61,18 +62,22 @@ jobs:
           VERSION_FILE="vtool/__init__.py"
 
           grep "${PLACEHOLDER}" "${VERSION_FILE}"
+
+          echo "::set-output name=version::${VERSION}"
+          echo "::set-output name=placeholder::${PLACEHOLDER}"
+          echo "::set-output name=version_file::${VERSION_FILE}"
         shell: bash
 
       - name: Release macOS - Autobump version for Mac
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'macOS' }}
         run: |
-          sed -i "" "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
+          sed -i "" "s/${{ steps.autobump.outputs.placeholder }}/__version__ = \'${{ steps.autobump.outputs.version }}\'/g" "${{ steps.autobump.outputs.version_file }}"
         shell: bash
 
       - name: Release Linux - Autobump version for Linux
         if: ${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && runner.os == 'Linux' }}
         run: |
-          sed -i "s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g" "${VERSION_FILE}"
+          sed -i "s/${{ steps.autobump.outputs.placeholder }}/__version__ = \'${{ steps.autobump.outputs.version }}\'/g" "${{ steps.autobump.outputs.version_file }}"
         shell: bash
 
       - name: Build wheels
