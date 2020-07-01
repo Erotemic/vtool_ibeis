@@ -151,13 +151,13 @@ def force_quit_akmeans(signal, frame):
     try:
         print(
             ut.unindedent(
-                '''
+                """
                               --- algos ---
                               Caught Ctrl+C in:
                               function: %r
                               stacksize: %r
                               line_no: %r
-                              '''
+                              """
             )
             % (frame.f_code.co_name, frame.f_code.co_stacksize, frame.f_lineno)
         )
