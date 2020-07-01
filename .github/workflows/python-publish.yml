@@ -9,10 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release: ${{ needs.setup.outputs.release }}
-      version: ${{ needs.setup.outputs.version }}
-      placeholder: ${{ needs.setup.outputs.placeholder }}
-      version_file: ${{ needs.setup.outputs.version_file }}
       search_replace: ${{ needs.setup.outputs.search_replace }}
+      version_file: ${{ needs.setup.outputs.version_file }}
     steps:
       - uses: actions/checkout@v2
 
@@ -25,21 +23,19 @@ jobs:
             echo "Release ${GITHUB_REF}"
             VERSION=$(echo ${GITHUB_REF} | sed 's#.*/v##')
             PLACEHOLDER="__version__ = '.*'"
-            VERSION_FILE="vtool/__init__.py"
             SEARCH_REPLACE="s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g"
+            VERSION_FILE="vtool/__init__.py"
 
             grep "${PLACEHOLDER}" "${VERSION_FILE}"
           else
             VERSION=""
             PLACEHOLDER=""
-            VERSION_FILE=""
             SEARCH_REPLACE=""
+            VERSION_FILE=""
           fi
 
-          echo "::set-output name=version::${VERSION}"
-          echo "::set-output name=placeholder::${PLACEHOLDER}"
-          echo "::set-output name=version_file::${VERSION_FILE}"
           echo "::set-output name=search_replace::${SEARCH_REPLACE}"
+          echo "::set-output name=version_file::${VERSION_FILE}"
         shell: bash
 
 
@@ -85,13 +81,13 @@ jobs:
         uses: WildbookOrg/wbia-pypkg-build/actions/macports@v1.0.0
 
       - name: Release macOS - Autobump version for Mac
-        if: ${{ needs.setup.outputs.release && runner.os == 'macOS' }}
+        if: ${{ needs.setup.outputs.release == "true" && runner.os == 'macOS' }}
         run: |
           sed -i "" "${{ needs.setup.outputs.search_replace }}" "${{ needs.setup.outputs.version_file }}"
         shell: bash
 
       - name: Release Linux - Autobump version for Linux
-        if: ${{ needs.setup.outputs.release && runner.os == 'Linux' }}
+        if: ${{ needs.setup.outputs.release == "true" && runner.os == 'Linux' }}
         run: |
           sed -i "${{ needs.setup.outputs.search_replace }}" "${{ needs.setup.outputs.version_file }}"
         shell: bash
@@ -129,7 +125,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Release Linux - Autobump version for Linux
-        if: ${{ needs.setup.outputs.release }}
+        if: ${{ needs.setup.outputs.release == "true" }}
         run: |
           sed -i "${{ needs.setup.outputs.search_replace }}" "${{ needs.setup.outputs.version_file }}"
         shell: bash
@@ -147,7 +143,7 @@ jobs:
     name: Upload to PyPI
     needs: [setup, build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.release }}
+    if: ${{ needs.setup.outputs.release == "true" }}
 
     steps:
       - uses: actions/download-artifact@v2
