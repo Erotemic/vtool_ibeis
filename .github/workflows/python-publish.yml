@@ -33,9 +33,11 @@ jobs:
             VERSION_FILE=""
           fi
 
+          echo "RELEASE=${RELEASE}"
           echo "SEARCH_REPLACE=${SEARCH_REPLACE}"
           echo "VERSION_FILE=${VERSION_FILE}"
 
+          echo "::set-output name=release::${RELEASE}"
           echo "::set-output name=search_replace::${SEARCH_REPLACE}"
           echo "::set-output name=version_file::${VERSION_FILE}"
         shell: bash
