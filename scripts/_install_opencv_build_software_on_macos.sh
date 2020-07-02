@@ -41,7 +41,7 @@ if [ ! -d /opt/opencv ]; then
         -D BUILD_DOCS=OFF \
         -D BUILD_EXAMPLES=OFF \
         -D BUILD_opencv_apps=OFF \
-        -D BIILD_opencv_freetype=OFF \
+        -D BUILD_opencv_freetype=OFF \
         -D BUILD_opencv_hdf=OFF \
         -D BUILD_opencv_java=OFF \
         -D BUILD_opencv_python2=OFF \
