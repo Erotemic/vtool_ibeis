@@ -4,10 +4,6 @@
 
 set -ex
 
-if [ -d /opt/local ]; then
-    alias clang="/opt/local/bin/clang-mp-5.0"
-fi
-
 export OPENCV_VERSION=4.2.0
 export WORKSPACE=$PWD
 export VIRTUAL_ENV="/opt/opencv"
@@ -24,12 +20,9 @@ fi
 
 # Build OpenCV, only if it's not already installed
 if [ ! -d /opt/opencv ]; then
-    # Create a new build space
     rm -rf $WORKSPACE/opencv/build
     mkdir -p $WORKSPACE/opencv/build
     cd $WORKSPACE/opencv/build
-    # -D CMAKE_C_COMPILER=clang \
-    # -D CMAKE_CXX_COMPILER=clang \
     cmake \
         -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_INSTALL_PREFIX=${VIRTUAL_ENV} \
@@ -62,7 +55,11 @@ if [ ! -d /opt/opencv ]; then
         -D WITH_CUDA=OFF \
         -D WITH_CUBLAS=0 \
         -D WITH_EIGEN=ON \
-        -D WITH_AVFOUNDATION=ON \
+        -D WITH_1394=OFF \
+        -D WITH_FFMPEG=OFF \
+        -D WITH_GSTREAMER=OFF \
+        -D WITH_AVFOUNDATION=OFF \
+        -D WITH_TESSERACT=OFF \
         -D WITH_HDR=ON \
         -D WITH_GDAL=OFF \
         -D WITH_WIN32UI=OFF \
