@@ -73,11 +73,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            /opt/local
             /opt/opencv
           # The key based on the file hash of the build script
           # i.e. changing OPENCV_VERSION within the script will invalidate the cache
-          key: ${{ runner.os }}-build-opencv-macports-v1.0.0-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
+          key: ${{ runner.os }}-build-opencv-${{ hashFiles('scripts/_install_opencv_*_on_macos.sh') }}
 
       - name: macOS - Install MacPorts
         if: ${{ runner.os == 'macOS' && steps.caching.outputs.cache-hit != 'true' }}
