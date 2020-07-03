@@ -8,9 +8,8 @@ Autogenerate Command:
 # flake8: noqa
 from __future__ import absolute_import, division, print_function
 
-__version__ = '3.0.1'
-
 __submodules__ = [
+    '_version',
     'histogram',
     'features',
     'linalg',
@@ -37,6 +36,11 @@ __submodules__ = [
     'symbolic',
     'demodata',
 ]
+
+try:
+    from vtool._version import __version__
+except ImportError:
+    __version__ = '0.0.0'
 
 from vtool import histogram
 from vtool import features

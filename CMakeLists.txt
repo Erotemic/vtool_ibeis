@@ -12,15 +12,15 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 include(${PROJECT_SOURCE_DIR}/CMake/vtool-utils.cmake)
 
-function(_pycmd outvar cmd)
+function(get_version outvar)
   execute_process(
-    COMMAND python -c "${cmd}"
+    COMMAND python setup.py --version
     RESULT_VARIABLE _exitcode
     OUTPUT_VARIABLE _output
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   if(NOT ${_exitcode} EQUAL 0)
     message(ERROR "Failed when running python code: \"\"\"
-${cmd}\"\"\"")
+python setup.py --version\"\"\"")
     message(FATAL_ERROR "Python command failed with error code: ${_exitcode}")
   endif()
   # Remove supurflous newlines (artifacts of print)
@@ -29,7 +29,7 @@ ${cmd}\"\"\"")
       "${_output}"
       PARENT_SCOPE)
 endfunction()
-_pycmd(VTOOL_VERSION "import setup; print(setup.version)")
+get_version(VTOOL_VERSION)
 
 message(STATUS "VTOOL_VERSION = ${VTOOL_VERSION}")
 
