@@ -4,47 +4,9 @@ name: Build and upload to PyPI
 on: push
 
 jobs:
-  setup:
-    name: Check Release
-    runs-on: ubuntu-latest
-    outputs:
-      release: ${{ steps.autobump.outputs.release }}
-      search_replace: ${{ steps.autobump.outputs.search_replace }}
-      version_file: ${{ steps.autobump.outputs.version_file }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Release - Autobump version preparation
-        id: autobump
-        run: |
-          # from refs/tags/vX.Y.Z get X.Y.Z
-          RELEASE="${{ github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') }}"
-          if [ "${RELEASE}" == "true" ]; then
-            echo "Release ${GITHUB_REF}"
-            VERSION=$(echo ${GITHUB_REF} | sed 's#.*/v##')
-            PLACEHOLDER="__version__ = '.*'"
-            SEARCH_REPLACE="s/${PLACEHOLDER}/__version__ = \'${VERSION}\'/g"
-            VERSION_FILE="vtool/__init__.py"
-
-            grep "${PLACEHOLDER}" "${VERSION_FILE}"
-          else
-            echo "Not Release"
-            SEARCH_REPLACE=""
-            VERSION_FILE=""
-          fi
-
-          echo "RELEASE=${RELEASE}"
-          echo "SEARCH_REPLACE=${SEARCH_REPLACE}"
-          echo "VERSION_FILE=${VERSION_FILE}"
-
-          echo "::set-output name=release::${RELEASE}"
-          echo "::set-output name=search_replace::${SEARCH_REPLACE}"
-          echo "::set-output name=version_file::${VERSION_FILE}"
-        shell: bash
 
   build_wheels:
     name: Build on ${{ matrix.os }}
-    needs: [setup]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -82,18 +44,6 @@ jobs:
         if: ${{ runner.os == 'macOS' && steps.caching.outputs.cache-hit != 'true' }}
         uses: WildbookOrg/wbia-pypkg-build/actions/macports@v1.0.0
 
-      - name: Release macOS - Autobump version for Mac
-        if: ${{ needs.setup.outputs.release == 'true' && runner.os == 'macOS' }}
-        run: |
-          sed -i "" "${{ needs.setup.outputs.search_replace }}" "${{ needs.setup.outputs.version_file }}"
-        shell: bash
-
-      - name: Release Linux - Autobump version for Linux
-        if: ${{ needs.setup.outputs.release == 'true' && runner.os == 'Linux' }}
-        run: |
-          sed -i "${{ needs.setup.outputs.search_replace }}" "${{ needs.setup.outputs.version_file }}"
-        shell: bash
-
       - name: Build wheel
         env:
           CIBW_MANYLINUX_X86_64_IMAGE: wildme/manylinux:latest
@@ -110,27 +60,15 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_sdist:
-    name: Build sdist
-    needs: [setup]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [3.7]
-
+    name: Build source distribution
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Release Linux - Autobump version for Linux
-        if: ${{ needs.setup.outputs.release == 'true' }}
-        run: |
-          sed -i "${{ needs.setup.outputs.search_replace }}" "${{ needs.setup.outputs.version_file }}"
-        shell: bash
+          python-version: '3.8'
 
       - name: Build sdist
         run: |
@@ -142,11 +80,10 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
-    name: Upload to PyPI
-    needs: [setup, build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.release == 'true' }}
-
+    # upload to PyPI on every tag starting with 'v'
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -157,3 +94,4 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_PASSWORD }}
+          # To test: repository_url: https://test.pypi.org/legacy/
