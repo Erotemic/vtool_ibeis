@@ -114,7 +114,7 @@ endif()
 
 find_package(OpenCV REQUIRED)
 if(OpenCV_FOUND)
-  include_directories(${OpenCV_INCLUDE_DIR})
+  include_directories(${OpenCV_INCLUDE_DIRS})
 else()
   message(FATAL_ERROR "OpenCV NOT found")
 endif()
