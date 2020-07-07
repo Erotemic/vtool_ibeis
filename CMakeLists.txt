@@ -46,7 +46,6 @@ if(OS_IS_MACOS)
 
   set(CMAKE_INSTALL_RPATH "/opt/local/lib")
 
-  # Add flags to support clang2
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lc++")
