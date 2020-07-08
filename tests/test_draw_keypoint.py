@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, print_function
+
 if False:
-    from __future__ import absolute_import, division, print_function
     from six.moves import range
     from wbia.plottool import draw_func2 as df2
     from wbia.plottool import mpl_keypoint
@@ -12,6 +13,7 @@ if False:
     from itertools import product as iprod
     import vtool  # NOQA
     import ubelt as ub
+    import utool
 
     TAU = 2 * np.pi  # References: tauday.com
 

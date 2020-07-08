@@ -1,3 +1,4 @@
+alabaster
 brunette
 codecov >= 2.0.15
 coverage >= 4.3.4

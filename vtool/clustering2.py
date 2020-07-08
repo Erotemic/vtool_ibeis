@@ -784,7 +784,7 @@ def unsupervised_multicut_labeling(cost_matrix, thresh=0):
     # prob_annots2 = prob_annots.copy()
     # finite_probs = (prob_annots2[np.isfinite(prob_annots2)])
     # mean = finite_probs.mean()
-    ## make symmetric
+    # # make symmetric
     # prob_annots2[~np.isfinite(prob_annots2)] = finite_probs.max() * 2
     # prob_annots2 = (prob_annots2.T + prob_annots2) / 2
     # int_factor = 100 / mean

@@ -1,0 +1,291 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.quality_classifier &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.quality_classifier</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">References:</span>
+<span class="sd">    % Single-image noise level estimation for blind denoising.</span>
+<span class="sd">    % http://www.ok.ctrl.titech.ac.jp/res/NLE/TIP2013-noise-level-estimation06607209.pdfhttp://www.ok.ctrl.titech.ac.jp/res/NLE/TIP2013-noise-level-estimation06607209.pdf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+
+<div class="viewcode-block" id="compute_average_contrast"><a class="viewcode-back" href="../../vtool.html#vtool.quality_classifier.compute_average_contrast">[docs]</a><span class="k">def</span> <span class="nf">compute_average_contrast</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.quality_classifier --exec-compute_average_contrast --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.quality_classifier import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; img_fpath = ut.grab_test_imgpath(&#39;carl.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; img = vt.imread(img_fpath, grayscale=True)</span>
+<span class="sd">        &gt;&gt;&gt; average_contrast, gradmag_sqrd = compute_average_contrast(img)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:plottool)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; pt.figure(fnum=1)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.imshow(gradmag_sqrd)</span>
+<span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ksize</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+    <span class="n">img_</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+    <span class="n">gradx</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">img_</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">)</span>
+    <span class="n">grady</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">img_</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">)</span>
+    <span class="n">gradmag_sqrd</span> <span class="o">=</span> <span class="p">(</span><span class="n">gradx</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">grady</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">total_contrast</span> <span class="o">=</span> <span class="n">gradmag_sqrd</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">average_contrast</span> <span class="o">=</span> <span class="n">total_contrast</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">gradmag_sqrd</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">average_contrast</span><span class="p">,</span> <span class="n">gradmag_sqrd</span></div>
+
+
+<div class="viewcode-block" id="contrast_measures"><a class="viewcode-back" href="../../vtool.html#vtool.quality_classifier.contrast_measures">[docs]</a><span class="k">def</span> <span class="nf">contrast_measures</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="n">ksize</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+    <span class="n">img_</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+    <span class="n">gradx</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">img_</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">)</span>
+    <span class="n">grady</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">img_</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">)</span>
+    <span class="n">gradmag_sqrd</span> <span class="o">=</span> <span class="p">(</span><span class="n">gradx</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">grady</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">total_contrast</span> <span class="o">=</span> <span class="n">gradmag_sqrd</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">average_contrast</span> <span class="o">=</span> <span class="n">total_contrast</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">gradmag_sqrd</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">std_dev</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+    <span class="n">bin_count</span><span class="p">,</span> <span class="n">bin_lbls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">bin_count</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">bin_count</span><span class="p">))</span>
+
+    <span class="kn">import</span> <span class="nn">skimage.morphology</span>
+    <span class="kn">import</span> <span class="nn">skimage.filters.rank</span>
+
+    <span class="n">entropyimg</span> <span class="o">=</span> <span class="n">skimage</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">rank</span><span class="o">.</span><span class="n">entropy</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">skimage</span><span class="o">.</span><span class="n">morphology</span><span class="o">.</span><span class="n">disk</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">ave_local_entropy</span> <span class="o">=</span> <span class="n">entropyimg</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">entropyimg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">contrast_measures</span> <span class="o">=</span> <span class="p">[</span><span class="n">average_contrast</span><span class="p">,</span> <span class="n">std_dev</span><span class="p">,</span> <span class="n">entropy</span><span class="p">,</span> <span class="n">ave_local_entropy</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">contrast_measures</span></div>
+
+
+<div class="viewcode-block" id="test_average_contrast"><a class="viewcode-back" href="../../vtool.html#vtool.quality_classifier.test_average_contrast">[docs]</a><span class="k">def</span> <span class="nf">test_average_contrast</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">ut</span><span class="o">.</span><span class="n">get_valid_test_imgkeys</span><span class="p">()</span>
+    <span class="n">img_fpath_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_valid_test_imgkeys</span><span class="p">()]</span>
+    <span class="n">img_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">grayscale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">img_fpath_list</span><span class="p">]</span>
+    <span class="n">avecontrast_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">compute_average_contrast</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">img_list</span><span class="p">])</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+    <span class="n">nCols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">img_list</span><span class="p">)</span>
+    <span class="n">fnum</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">fnum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fnum</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">next_fnum</span><span class="p">()</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fnum</span><span class="o">=</span><span class="n">fnum</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">sortx</span> <span class="o">=</span> <span class="n">avecontrast_list</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">y_list</span> <span class="o">=</span> <span class="n">avecontrast_list</span><span class="p">[</span><span class="n">sortx</span><span class="p">]</span>
+    <span class="n">x_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nCols</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="s1">&#39;bo-&#39;</span><span class="p">)</span>
+    <span class="n">sorted_imgs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">img_list</span><span class="p">,</span> <span class="n">sortx</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">px</span><span class="p">,</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">ub</span><span class="o">.</span><span class="n">ProgIter</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_imgs</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">)):</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">fnum</span><span class="o">=</span><span class="n">fnum</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">nCols</span><span class="p">,</span> <span class="n">nCols</span> <span class="o">+</span> <span class="n">px</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="fourier_devtest"><a class="viewcode-back" href="../../vtool.html#vtool.quality_classifier.fourier_devtest">[docs]</a><span class="k">def</span> <span class="nf">fourier_devtest</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        img (ndarray[uint8_t, ndim=2]):  image data</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.quality_classifier --test-fourier_devtest --show</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html</span>
+<span class="sd">        http://cns-alumni.bu.edu/~slehar/fourier/fourier.html</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.quality_classifier import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; img_fpath = ut.grab_test_imgpath(&#39;carl.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; img = vt.imread(img_fpath, grayscale=True)</span>
+<span class="sd">        &gt;&gt;&gt; magnitude_spectrum = fourier_devtest(img)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+    <span class="k">def</span> <span class="nf">pad_img</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getOptimalDFTSize</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="n">ncols</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getOptimalDFTSize</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">ncols</span> <span class="o">-</span> <span class="n">cols</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">nrows</span> <span class="o">-</span> <span class="n">rows</span>
+        <span class="n">bordertype</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span>
+        <span class="n">nimg</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">copyMakeBorder</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bordertype</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nimg</span>
+
+    <span class="k">def</span> <span class="nf">convert_to_fdomain</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+        <span class="n">dft</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">dft</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">flags</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">DFT_COMPLEX_OUTPUT</span><span class="p">)</span>
+        <span class="c1"># dft_shift = np.fft.fftshift(dft)</span>
+        <span class="k">return</span> <span class="n">dft</span>
+
+    <span class="k">def</span> <span class="nf">convert_from_fdomain</span><span class="p">(</span><span class="n">dft</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">idft</span><span class="p">(</span><span class="n">dft</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">magnitude</span><span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">img</span> <span class="o">/=</span> <span class="n">img</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">img</span> <span class="o">*</span> <span class="mf">255.0</span>
+
+    <span class="k">def</span> <span class="nf">get_fdomain_mag</span><span class="p">(</span><span class="n">dft_shift</span><span class="p">):</span>
+        <span class="n">magnitude_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">magnitude</span><span class="p">(</span><span class="n">dft_shift</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dft_shift</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">magnitude_spectrum</span>
+
+    <span class="k">def</span> <span class="nf">imgstats</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stats:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    dtype = </span><span class="si">%r</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">dtype</span><span class="p">,))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_stats_str</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+
+    <span class="n">nimg</span> <span class="o">=</span> <span class="n">pad_img</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">dft</span> <span class="o">=</span> <span class="n">convert_to_fdomain</span><span class="p">(</span><span class="n">nimg</span><span class="p">)</span>
+    <span class="c1"># freq_domain = np.fft.fft2(img)</span>
+    <span class="c1"># freq_domain_shift = np.fft.fftshift(freq_domain)</span>
+
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">nimg</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">crow</span><span class="p">,</span> <span class="n">ccol</span> <span class="o">=</span> <span class="n">rows</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">cols</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="c1"># create a mask first, center square is 1, remaining all zeros</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">crow</span> <span class="o">-</span> <span class="mi">30</span> <span class="p">:</span> <span class="n">crow</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">ccol</span> <span class="o">-</span> <span class="mi">30</span> <span class="p">:</span> <span class="n">ccol</span> <span class="o">+</span> <span class="mi">30</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">dft_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">dft</span><span class="p">)</span> <span class="o">*</span> <span class="n">mask</span><span class="p">)</span>
+    <span class="n">img_back</span> <span class="o">=</span> <span class="n">convert_from_fdomain</span><span class="p">(</span><span class="n">dft_mask</span><span class="p">)</span>
+
+    <span class="n">imgstats</span><span class="p">(</span><span class="n">dft</span><span class="p">)</span>
+    <span class="n">imgstats</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">imgstats</span><span class="p">(</span><span class="n">nimg</span><span class="p">)</span>
+    <span class="n">imgstats</span><span class="p">(</span><span class="n">nimg</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nimg.shape = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nimg</span><span class="o">.</span><span class="n">shape</span><span class="p">,))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dft_shift.shape = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dft</span><span class="o">.</span><span class="n">shape</span><span class="p">,))</span>
+
+    <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">show_was_requested</span><span class="p">():</span>
+        <span class="c1"># import wbia.plottool as pt</span>
+        <span class="n">next_pnum</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">make_pnum_nextgen</span><span class="p">(</span><span class="n">nRows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nCols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">nimg</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="n">next_pnum</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;nimg&#39;</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">get_fdomain_mag</span><span class="p">(</span><span class="n">dft</span><span class="p">),</span> <span class="n">pnum</span><span class="o">=</span><span class="n">next_pnum</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;mag(f)&#39;</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">get_fdomain_mag</span><span class="p">(</span><span class="n">dft_mask</span><span class="p">),</span> <span class="n">pnum</span><span class="o">=</span><span class="n">next_pnum</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;dft_mask&#39;</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_back</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="n">next_pnum</span><span class="p">(),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;img_back&#39;</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">show_if_requested</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.quality_classifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

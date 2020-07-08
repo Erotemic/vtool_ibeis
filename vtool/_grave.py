@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from vtool.inspect_matches import lazy_test_annot
+from vtool.score_normalization import check_unused_kwargs
+from vtool.inspect_matches import INSPECT_BASE, MatchInspector
+import wbia.guitool as gt
 import utool as ut
 import numpy as np
 import six

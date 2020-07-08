@@ -3647,6 +3647,7 @@ def testdata_ratio_matches(fname1='easy1.png', fname2='easy2.png', **kwargs):
     rchip1 = gtool.imread(fpath1)
     rchip2 = gtool.imread(fpath2)
     # Run Algorithm
+
     def assign_nearest_neighbors(vecs1, vecs2, K=2):
         checks = 800
         flann_params = {'algorithm': 'kdtree', 'trees': 8}

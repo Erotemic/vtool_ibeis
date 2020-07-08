@@ -1,0 +1,951 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.nearest_neighbors &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.nearest_neighbors</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Wrapper around flann (with caching)</span>
+
+<span class="sd">python -c &quot;import vtool, doctest; print(doctest.testmod(vtool.nearest_neighbors))&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">normpath</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">annoy</span> <span class="k">as</span> <span class="nn">ann</span>
+<span class="kn">from</span> <span class="nn">vtool._pyflann_backend</span> <span class="k">import</span> <span class="n">FLANN_CLS</span><span class="p">,</span> <span class="n">pyflann</span>
+
+
+<div class="viewcode-block" id="AnnoyWrapper"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.AnnoyWrapper">[docs]</a><span class="k">class</span> <span class="nc">AnnoyWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper for annoy to use the FLANN api</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ann</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;trees&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s1">&#39;checks&#39;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="AnnoyWrapper.build_index"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.AnnoyWrapper.build_index">[docs]</a>    <span class="k">def</span> <span class="nf">build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dvecs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">annoy</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ann</span> <span class="o">=</span> <span class="n">annoy</span><span class="o">.</span><span class="n">AnnoyIndex</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">dvecs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dvec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dvecs</span><span class="p">):</span>
+            <span class="n">ann</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dvec</span><span class="p">)</span>
+        <span class="n">ann</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">n_trees</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;trees&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="AnnoyWrapper.nn_index"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.AnnoyWrapper.nn_index">[docs]</a>    <span class="k">def</span> <span class="nf">nn_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qvecs</span><span class="p">,</span> <span class="n">num_neighbs</span><span class="p">,</span> <span class="n">checks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">checks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">checks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;checks&#39;</span><span class="p">]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">qvecs</span><span class="p">),</span> <span class="n">num_neighbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">qvecs</span><span class="p">),</span> <span class="n">num_neighbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">qvec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">qvecs</span><span class="p">):</span>
+            <span class="n">idxs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ann</span><span class="o">.</span><span class="n">get_nns_by_vector</span><span class="p">(</span>
+                <span class="n">qvec</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">num_neighbs</span><span class="p">,</span> <span class="n">search_k</span><span class="o">=</span><span class="n">checks</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">idxs</span><span class="p">,</span> <span class="n">dists</span></div></div>
+
+
+<div class="viewcode-block" id="test_annoy"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.test_annoy">[docs]</a><span class="k">def</span> <span class="nf">test_annoy</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">demodata</span>
+    <span class="kn">import</span> <span class="nn">annoy</span>
+    <span class="kn">import</span> <span class="nn">utool</span>
+
+    <span class="n">qvecs</span> <span class="o">=</span> <span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">dvecs</span> <span class="o">=</span> <span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">dvecs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">checks</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">num_neighbs</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_trees</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="n">trials</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timerit</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;build annoy&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">ann</span> <span class="o">=</span> <span class="n">annoy</span><span class="o">.</span><span class="n">AnnoyIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dvecs</span><span class="p">):</span>
+                <span class="n">ann</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">vec</span><span class="p">)</span>
+            <span class="n">ann</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">n_trees</span><span class="o">=</span><span class="n">num_trees</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timerit</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;annoy query&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">qvec</span> <span class="ow">in</span> <span class="n">qvecs</span><span class="p">:</span>
+                <span class="n">ann</span><span class="o">.</span><span class="n">get_nns_by_vector</span><span class="p">(</span>
+                    <span class="n">qvec</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">num_neighbs</span><span class="p">,</span> <span class="n">search_k</span><span class="o">=</span><span class="n">checks</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+
+    <span class="c1"># ---------------</span>
+
+    <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timerit</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;build flann&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span>
+            <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span>
+                <span class="n">dvecs</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;kdtree&#39;</span><span class="p">,</span> <span class="n">trees</span><span class="o">=</span><span class="n">num_trees</span><span class="p">,</span> <span class="n">checks</span><span class="o">=</span><span class="n">checks</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timerit</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;flann query&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">flann</span><span class="o">.</span><span class="n">nn_index</span><span class="p">(</span><span class="n">qvecs</span><span class="p">,</span> <span class="n">num_neighbs</span><span class="p">,</span> <span class="n">checks</span><span class="o">=</span><span class="n">checks</span><span class="p">)</span>
+
+    <span class="c1"># ---------------</span>
+
+    <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timerit</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;build annoy wrapper&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">AnnoyWrapper</span><span class="p">()</span>
+            <span class="n">index</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">dvecs</span><span class="p">,</span> <span class="n">trees</span><span class="o">=</span><span class="n">num_trees</span><span class="p">,</span> <span class="n">checks</span><span class="o">=</span><span class="n">checks</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">timer</span> <span class="ow">in</span> <span class="n">utool</span><span class="o">.</span><span class="n">Timerit</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;query annoy wrapper&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">index</span><span class="o">.</span><span class="n">nn_index</span><span class="p">(</span><span class="n">qvecs</span><span class="p">,</span> <span class="n">num_neighbs</span><span class="p">,</span> <span class="n">checks</span><span class="o">=</span><span class="n">checks</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_cv2_flann"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.test_cv2_flann">[docs]</a><span class="k">def</span> <span class="nf">test_cv2_flann</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ignore:</span>
+<span class="sd">        [name for name in dir(cv2) if &#39;create&#39; in name.lower()]</span>
+<span class="sd">        [name for name in dir(cv2) if &#39;stereo&#39; in name.lower()]</span>
+
+<span class="sd">        ut.grab_zipped_url(&#39;https://priithon.googlecode.com/archive/a6117f5e81ec00abcfb037f0f9da2937bb2ea47f.tar.gz&#39;, download_dir=&#39;.&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">demodata</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">img1</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="s1">&#39;easy1.png&#39;</span><span class="p">))</span>
+    <span class="n">img2</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="s1">&#39;easy2.png&#39;</span><span class="p">))</span>
+
+    <span class="n">stereo</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">StereoBM_create</span><span class="p">(</span><span class="n">numDisparities</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">blockSize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">disparity</span> <span class="o">=</span> <span class="n">stereo</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">disparity</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1"># cv2.estima</span>
+
+    <span class="n">flow</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">createOptFlow_DualTVL1</span><span class="p">()</span>
+    <span class="n">img1</span><span class="p">,</span> <span class="n">img2</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">convert_image_list_colorspace</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">],</span> <span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">src_colorspace</span><span class="o">=</span><span class="s1">&#39;bgr&#39;</span>
+    <span class="p">)</span>
+    <span class="n">img2</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="n">img1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">img1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">flow</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+
+    <span class="n">orb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">ORB_create</span><span class="p">()</span>
+    <span class="n">kp1</span><span class="p">,</span> <span class="n">vecs1</span> <span class="o">=</span> <span class="n">orb</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">kp2</span><span class="p">,</span> <span class="n">vecs2</span> <span class="o">=</span> <span class="n">orb</span><span class="o">.</span><span class="n">detectAndCompute</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FeatureDetector_create</span><span class="p">(</span><span class="s1">&#39;SIFT&#39;</span><span class="p">)</span>
+    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">DescriptorExtractor_create</span><span class="p">(</span><span class="s1">&#39;SIFT&#39;</span><span class="p">)</span>
+
+    <span class="n">skp</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">img1</span><span class="p">)</span>
+    <span class="n">skp</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">skp</span><span class="p">)</span>
+
+    <span class="n">tkp</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">img2</span><span class="p">)</span>
+    <span class="n">tkp</span><span class="p">,</span> <span class="n">td</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="n">tkp</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">img1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">drawKeypoints</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">kp1</span><span class="p">,</span> <span class="n">outImage</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="n">vecs1</span> <span class="o">=</span> <span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">vecs2</span> <span class="o">=</span> <span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># NOQA</span>
+
+    <span class="n">FLANN_INDEX_KDTREE</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># bug: flann enums are missing</span>
+    <span class="c1"># flann_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=4)</span>
+    <span class="n">index_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="n">FLANN_INDEX_KDTREE</span><span class="p">,</span> <span class="n">trees</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">search_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">checks</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>  <span class="c1"># or pass empty dictionary</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FlannBasedMatcher</span><span class="p">(</span><span class="n">index_params</span><span class="p">,</span> <span class="n">search_params</span><span class="p">)</span>  <span class="c1"># NOQA</span>
+
+    <span class="n">cv2</span><span class="o">.</span><span class="n">flann</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">vecs1</span><span class="p">,</span> <span class="n">index_params</span><span class="p">)</span>
+
+    <span class="c1"># cv2.FlannBasedMatcher(flann_params)</span>
+
+    <span class="n">cv2</span><span class="o">.</span><span class="n">flann</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">vecs1</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">)</span>  <span class="c1"># NOQA</span></div>
+
+    <span class="c1"># def match_flann(desc1, desc2, r_threshold = 0.6):</span>
+    <span class="c1">#    flann = cv2.flann_Index(desc2, flann_params)</span>
+    <span class="c1">#    idx2, dist = flann.knnSearch(desc1, 2, params = {}) # bug: need to provide empty dict</span>
+    <span class="c1">#    mask = dist[:,0] / dist[:,1] &lt; r_threshold</span>
+    <span class="c1">#    idx1 = np.arange(len(desc1))</span>
+    <span class="c1">#    pairs = np.int32( zip(idx1, idx2[:,0]) )</span>
+    <span class="c1">#    return pairs[mask]</span>
+
+
+<div class="viewcode-block" id="ann_flann_once"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.ann_flann_once">[docs]</a><span class="k">def</span> <span class="nf">ann_flann_once</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the approximate nearest neighbors of qpts in dpts</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m ~/code/vtool/vtool/nearest_neighbors.py ann_flann_once:0</span>
+
+<span class="sd">    Example0:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; np.random.seed(1)</span>
+<span class="sd">        &gt;&gt;&gt; dpts = np.random.randint(0, 255, (5, 128)).astype(np.uint8)</span>
+<span class="sd">        &gt;&gt;&gt; qpts = np.random.randint(0, 255, (5, 128)).astype(np.uint8)</span>
+<span class="sd">        &gt;&gt;&gt; qx2_dx, qx2_dist = ann_flann_once(dpts, qpts, 2)</span>
+<span class="sd">        &gt;&gt;&gt; import ubelt as ub</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2((qx2_dx.T, qx2_dist.T), precision=2, with_dtype=True, nl=2)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        (</span>
+<span class="sd">            np.array([[3, 3, 3, 3, 0],</span>
+<span class="sd">                      [2, 0, 1, 4, 4]], dtype=np.int32),</span>
+<span class="sd">            np.array([[1037329., 1235876., 1168550., 1286435., 1075507.],</span>
+<span class="sd">                      [1038324., 1243690., 1304896., 1320598., 1369036.]], dtype=np.float32),</span>
+<span class="sd">        )</span>
+
+
+<span class="sd">    Example1:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # Test upper bounds on sift descriptors</span>
+<span class="sd">        &gt;&gt;&gt; # SeeAlso distance.understanding_pseudomax_props</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; np.random.seed(1)</span>
+<span class="sd">        &gt;&gt;&gt; # get points on unit sphere</span>
+<span class="sd">        &gt;&gt;&gt; nDpts = 5000 # 5</span>
+<span class="sd">        &gt;&gt;&gt; nQpts = 10000 # 10</span>
+<span class="sd">        &gt;&gt;&gt; dpts = vt.normalize_rows(np.random.rand(nDpts, 128))</span>
+<span class="sd">        &gt;&gt;&gt; qpts = vt.normalize_rows(np.random.rand(nQpts, 128))</span>
+<span class="sd">        &gt;&gt;&gt; qmag = np.sqrt(np.power(qpts, 2).sum(1))</span>
+<span class="sd">        &gt;&gt;&gt; dmag = np.sqrt(np.power(dpts, 2).sum(1))</span>
+<span class="sd">        &gt;&gt;&gt; assert np.all(np.allclose(qmag, 1)), &#39;not on unit sphere&#39;</span>
+<span class="sd">        &gt;&gt;&gt; assert np.all(np.allclose(dmag, 1)), &#39;not on unit sphere&#39;</span>
+<span class="sd">        &gt;&gt;&gt; # cast to uint8</span>
+<span class="sd">        &gt;&gt;&gt; uint8_max = 512  # hack</span>
+<span class="sd">        &gt;&gt;&gt; uint8_min = 0  # hack</span>
+<span class="sd">        &gt;&gt;&gt; K = 100 # 2</span>
+
+<span class="sd">        &gt;&gt;&gt; qpts8 = np.clip(np.round(qpts * uint8_max), uint8_min, uint8_max).astype(np.uint8)</span>
+<span class="sd">        &gt;&gt;&gt; dpts8 = np.clip(np.round(dpts * uint8_max), uint8_min, uint8_max).astype(np.uint8)</span>
+<span class="sd">        &gt;&gt;&gt; qmag8 = np.sqrt(np.power(qpts8.astype(np.float32), 2).sum(1))</span>
+<span class="sd">        &gt;&gt;&gt; dmag8 = np.sqrt(np.power(dpts8.astype(np.float32), 2).sum(1))</span>
+<span class="sd">        &gt;&gt;&gt; # test</span>
+<span class="sd">        &gt;&gt;&gt; qx2_dx, qx2_dist = ann_flann_once(dpts8, qpts8, K)</span>
+<span class="sd">        &gt;&gt;&gt; biggest_dist = np.sqrt(qx2_dist.max())</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;biggest_dist = %r&#39; % (biggest_dist))</span>
+<span class="sd">        &gt;&gt;&gt; # Get actual distance by hand</span>
+<span class="sd">        &gt;&gt;&gt; hand_dist = np.sum((qpts8 - dpts8[qx2_dx.T[0]]) ** 2, 0)</span>
+<span class="sd">        &gt;&gt;&gt; # Seems like flann returns squared distance. makes sense</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.hash_data(repr((qx2_dx, qx2_dist)))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">     Example2:</span>
+<span class="sd">        &gt;&gt;&gt; # Build theoretically maximally distant vectors</span>
+<span class="sd">        &gt;&gt;&gt; b = 512</span>
+<span class="sd">        &gt;&gt;&gt; D = 128</span>
+<span class="sd">        &gt;&gt;&gt; x = np.sqrt((float(b) ** 2) / float(D - 1))</span>
+<span class="sd">        &gt;&gt;&gt; dpts = np.ones((2, 128)) * x</span>
+<span class="sd">        &gt;&gt;&gt; qpts = np.zeros((2, 128))</span>
+<span class="sd">        &gt;&gt;&gt; dpts[:, 0] = 0</span>
+<span class="sd">        &gt;&gt;&gt; qpts[:, 0] = 512</span>
+<span class="sd">        &gt;&gt;&gt; qpts[:, 0::2] = 1</span>
+<span class="sd">        &gt;&gt;&gt; dpts[:, 1::2] = 1</span>
+<span class="sd">        &gt;&gt;&gt; qpts[:, 1::2] = 0</span>
+<span class="sd">        &gt;&gt;&gt; dpts[:, 0::2] = 0</span>
+<span class="sd">        &gt;&gt;&gt; qmag = np.sqrt(np.power(qpts.astype(np.float64), 2).sum(1))</span>
+<span class="sd">        &gt;&gt;&gt; dmag = np.sqrt(np.power(dpts.astype(np.float64), 2).sum(1))</span>
+<span class="sd">        &gt;&gt;&gt; # FIX TO ACTUALLY BE AT THE RIGHT NORM</span>
+<span class="sd">        &gt;&gt;&gt; dpts = (dpts * (512 / np.linalg.norm(dpts, axis=1))[:, None]).astype(np.float32)</span>
+<span class="sd">        &gt;&gt;&gt; qpts = (qpts * (512 / np.linalg.norm(qpts, axis=1))[:, None]).astype(np.float32)</span>
+<span class="sd">        &gt;&gt;&gt; print(np.linalg.norm(dpts))</span>
+<span class="sd">        &gt;&gt;&gt; print(np.linalg.norm(qpts))</span>
+<span class="sd">        &gt;&gt;&gt; dist = np.sqrt(np.sum((qpts - dpts) ** 2, 1))</span>
+<span class="sd">        &gt;&gt;&gt; # Because of norm condition another maximally disant pair of vectors</span>
+<span class="sd">        &gt;&gt;&gt; # is [1, 0, 0, ... 0] and [0, 1, .. 0, 0, 0]</span>
+<span class="sd">        &gt;&gt;&gt; # verifythat this gives you same dist.</span>
+<span class="sd">        &gt;&gt;&gt; dist2 = np.sqrt((512 ** 2 + 512 ** 2))</span>
+<span class="sd">        &gt;&gt;&gt; print(dist2)</span>
+<span class="sd">        &gt;&gt;&gt; print(dist)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># qx2_dx   = query_index -&gt; nearest database index</span>
+    <span class="c1"># qx2_dist = query_index -&gt; distance</span>
+    <span class="c1"># import cv2</span>
+
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span>
+    <span class="c1"># obj = cv2.flann_Index()</span>
+    <span class="k">if</span> <span class="s1">&#39;algorithm&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flann_params</span><span class="p">:</span>
+        <span class="n">flann_params</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># flann_params[&#39;trees&#39;] = 5</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">qx2_dx</span><span class="p">,</span> <span class="n">qx2_dist</span><span class="p">)</span> <span class="o">=</span> <span class="n">flann</span><span class="o">.</span><span class="n">nn_index</span><span class="p">(</span><span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">)</span>
+    <span class="c1"># flann.build_index(dpts, **flann_params)</span>
+    <span class="c1"># (qx2_dx, qx2_dist) = .nn_index(qpts, num_neighbors)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">qx2_dx</span><span class="p">,</span> <span class="n">qx2_dist</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="assign_to_centroids"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.assign_to_centroids">[docs]</a><span class="k">def</span> <span class="nf">assign_to_centroids</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">flann_params</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot; Helper for akmeans &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">qx2_dx</span><span class="p">,</span> <span class="n">qx2_dist</span><span class="p">)</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span><span class="o">.</span><span class="n">nn_index</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">qpts</span><span class="p">,</span> <span class="n">num_neighbors</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">qx2_dx</span></div>
+
+
+<div class="viewcode-block" id="get_flann_params_cfgstr"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_flann_params_cfgstr">[docs]</a><span class="k">def</span> <span class="nf">get_flann_params_cfgstr</span><span class="p">(</span><span class="n">flann_params</span><span class="p">):</span>
+    <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Ensure consistent ordering</span>
+        <span class="n">flann_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">flann_params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">flann_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">flann_params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="c1"># reverse to maintain backwards compatibility</span>
+        <span class="n">flann_valsig_</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">sortedby</span><span class="p">(</span><span class="n">flann_vals</span><span class="p">,</span> <span class="n">flann_keys</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">flann_valsig_</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">flann_params</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">flann_valsig</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">remove_chars</span><span class="p">(</span><span class="n">flann_valsig_</span><span class="p">,</span> <span class="s2">&quot;, &#39;[]&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flann_valsig</span></div>
+
+
+<div class="viewcode-block" id="get_flann_cfgstr"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_flann_cfgstr">[docs]</a><span class="k">def</span> <span class="nf">get_flann_cfgstr</span><span class="p">(</span>
+    <span class="n">dpts</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">cfgstr</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">use_params_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_data_hash</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.nearest_neighbors --test-get_flann_cfgstr</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(1)</span>
+<span class="sd">        &gt;&gt;&gt; dpts = rng.randint(0, 255, (10, 128)).astype(np.uint8)</span>
+<span class="sd">        &gt;&gt;&gt; cache_dir = &#39;.&#39;</span>
+<span class="sd">        &gt;&gt;&gt; cfgstr = &#39;_FEAT(alg=heshes)&#39;</span>
+<span class="sd">        &gt;&gt;&gt; flann_params = get_kdtree_flann_params()</span>
+<span class="sd">        &gt;&gt;&gt; result = get_flann_cfgstr(dpts, flann_params, cfgstr)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        _FEAT(alg=heshes)_FLANN(4kdtree)_DPTS((10,128)xxaotseonmfjkzcr)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flann_cfgstr</span> <span class="o">=</span> <span class="n">cfgstr</span>
+    <span class="k">if</span> <span class="n">use_params_hash</span><span class="p">:</span>
+        <span class="n">flann_valsig</span> <span class="o">=</span> <span class="n">get_flann_params_cfgstr</span><span class="p">(</span><span class="n">flann_params</span><span class="p">)</span>
+        <span class="n">flann_cfgstr</span> <span class="o">+=</span> <span class="s1">&#39;_FLANN(&#39;</span> <span class="o">+</span> <span class="n">flann_valsig</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="c1"># Generate a unique filename for dpts and flann parameters</span>
+    <span class="k">if</span> <span class="n">use_data_hash</span><span class="p">:</span>
+        <span class="c1"># flann is dependent on the dpts</span>
+        <span class="n">data_hashstr</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">hashstr_arr27</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="s1">&#39;_DPTS&#39;</span><span class="p">)</span>
+        <span class="n">flann_cfgstr</span> <span class="o">+=</span> <span class="n">data_hashstr</span>
+    <span class="k">return</span> <span class="n">flann_cfgstr</span></div>
+
+
+<div class="viewcode-block" id="get_flann_fpath"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_flann_fpath">[docs]</a><span class="k">def</span> <span class="nf">get_flann_fpath</span><span class="p">(</span>
+    <span class="n">dpts</span><span class="p">,</span>
+    <span class="n">cache_dir</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+    <span class="n">cfgstr</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">use_params_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_data_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">appname</span><span class="o">=</span><span class="s1">&#39;vtool&#39;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns filepath for flann index &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cache_dir</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[flann] using default cache dir&#39;</span><span class="p">)</span>
+        <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">ub</span><span class="o">.</span><span class="n">ensure_app_cache_dir</span><span class="p">(</span><span class="n">appname</span><span class="p">)</span>
+        <span class="n">ub</span><span class="o">.</span><span class="n">ensuredir</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
+    <span class="n">flann_cfgstr</span> <span class="o">=</span> <span class="n">get_flann_cfgstr</span><span class="p">(</span>
+        <span class="n">dpts</span><span class="p">,</span>
+        <span class="n">flann_params</span><span class="p">,</span>
+        <span class="n">cfgstr</span><span class="p">,</span>
+        <span class="n">use_params_hash</span><span class="o">=</span><span class="n">use_params_hash</span><span class="p">,</span>
+        <span class="n">use_data_hash</span><span class="o">=</span><span class="n">use_data_hash</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...flann_cache cfgstr = </span><span class="si">%r</span><span class="s1">: &#39;</span> <span class="o">%</span> <span class="n">flann_cfgstr</span><span class="p">)</span>
+    <span class="c1"># Append any user labels</span>
+    <span class="n">flann_fname</span> <span class="o">=</span> <span class="s1">&#39;flann_index&#39;</span> <span class="o">+</span> <span class="n">flann_cfgstr</span> <span class="o">+</span> <span class="s1">&#39;.flann&#39;</span>
+    <span class="n">flann_fpath</span> <span class="o">=</span> <span class="n">normpath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">flann_fname</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">flann_fpath</span></div>
+
+
+<div class="viewcode-block" id="flann_cache"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.flann_cache">[docs]</a><span class="k">def</span> <span class="nf">flann_cache</span><span class="p">(</span>
+    <span class="n">dpts</span><span class="p">,</span>
+    <span class="n">cache_dir</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+    <span class="n">cfgstr</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">flann_params</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_params_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_data_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">appname</span><span class="o">=</span><span class="s1">&#39;vtool&#39;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tries to load a cached flann index before doing anything</span>
+<span class="sd">    from vtool.nn</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">NOT_QUIET</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;+--- START CACHED FLANN INDEX &#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;cannot build flann when len(dpts) == 0. (prevents a segfault)&#39;</span><span class="p">)</span>
+    <span class="n">flann_fpath</span> <span class="o">=</span> <span class="n">get_flann_fpath</span><span class="p">(</span>
+        <span class="n">dpts</span><span class="p">,</span>
+        <span class="n">cache_dir</span><span class="p">,</span>
+        <span class="n">cfgstr</span><span class="p">,</span>
+        <span class="n">flann_params</span><span class="p">,</span>
+        <span class="n">use_params_hash</span><span class="o">=</span><span class="n">use_params_hash</span><span class="p">,</span>
+        <span class="n">use_data_hash</span><span class="o">=</span><span class="n">use_data_hash</span><span class="p">,</span>
+        <span class="n">appname</span><span class="o">=</span><span class="n">appname</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Load the index if it exists</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">flann_fpath</span> <span class="o">=</span> <span class="n">flann_fpath</span>
+
+    <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">exists</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">flann</span><span class="o">.</span><span class="n">load_index</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">,</span> <span class="n">dpts</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...flann cache hit: </span><span class="si">%d</span><span class="s1"> vectors&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dpts</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;L___ END FLANN INDEX &#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">flann</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s1">&#39;... cannot load index&#39;</span><span class="p">,</span> <span class="n">iswarning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Rebuild the index otherwise</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...flann cache miss.&#39;</span><span class="p">)</span>
+    <span class="n">num_dpts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flann</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_dpts</span> <span class="o">&gt;</span> <span class="mf">1e6</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...building kdtree over </span><span class="si">%d</span><span class="s1"> points (this may take a sec).&#39;</span> <span class="o">%</span> <span class="n">num_dpts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_dpts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s1">&#39;WARNING: CANNOT BUILD FLANN INDEX OVER 0 POINTS. THIS MAY BE A SIGN OF A DEEPER ISSUE&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">flann</span>
+
+    <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;flann.save_index(</span><span class="si">%r</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">ut</span><span class="o">.</span><span class="n">path_ndir_split</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">flann</span><span class="o">.</span><span class="n">save_index</span><span class="p">(</span><span class="n">flann_fpath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;L___ END CACHED FLANN INDEX &#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flann</span></div>
+
+
+<div class="viewcode-block" id="flann_augment"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.flann_augment">[docs]</a><span class="k">def</span> <span class="nf">flann_augment</span><span class="p">(</span>
+    <span class="n">dpts</span><span class="p">,</span> <span class="n">new_dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">new_cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool.demodata as demodata  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; dpts = demodata.get_dummy_dpts(ut.get_nth_prime(10))</span>
+<span class="sd">        &gt;&gt;&gt; new_dpts = demodata.get_dummy_dpts(ut.get_nth_prime(9))</span>
+<span class="sd">        &gt;&gt;&gt; cache_dir = ut.get_app_resource_dir(&#39;vtool&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; cfgstr = &#39;_testcfg&#39;</span>
+<span class="sd">        &gt;&gt;&gt; new_cfgstr = &#39;_new_testcfg&#39;</span>
+<span class="sd">        &gt;&gt;&gt; flann_params = get_kdtree_flann_params()</span>
+<span class="sd">        &gt;&gt;&gt; use_cache = False</span>
+<span class="sd">        &gt;&gt;&gt; save = False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">flann_cache</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">)</span>
+    <span class="n">flann</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span><span class="n">new_dpts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">aug_dpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">dpts</span><span class="p">,</span> <span class="n">new_dpts</span><span class="p">))</span>
+        <span class="n">new_flann_fpath</span> <span class="o">=</span> <span class="n">get_flann_fpath</span><span class="p">(</span><span class="n">aug_dpts</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">new_cfgstr</span><span class="p">,</span> <span class="n">flann_params</span><span class="p">)</span>
+        <span class="n">flann</span><span class="o">.</span><span class="n">save_index</span><span class="p">(</span><span class="n">new_flann_fpath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flann</span></div>
+
+
+<div class="viewcode-block" id="get_kdtree_flann_params"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_kdtree_flann_params">[docs]</a><span class="k">def</span> <span class="nf">get_kdtree_flann_params</span><span class="p">():</span>
+    <span class="n">flann_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s1">&#39;kdtree&#39;</span><span class="p">,</span> <span class="s1">&#39;trees&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">flann_params</span></div>
+
+
+<div class="viewcode-block" id="get_flann_params"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.get_flann_params">[docs]</a><span class="k">def</span> <span class="nf">get_flann_params</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;kdtree&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns flann params that are relvant tothe algorithm</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann_manual-1.8.4.pdf</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        algorithm (str): (default = &#39;kdtree&#39;)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: flann_params</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.nearest_neighbors --test-get_flann_params --algo=kdtree</span>
+<span class="sd">        python -m vtool.nearest_neighbors --test-get_flann_params --algo=kmeans</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; algorithm = ut.get_argval(&#39;--algo&#39;, default=&#39;kdtree&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; flann_params = get_flann_params(algorithm)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;flann_params = %s&#39; % (ub.repr2(flann_params),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_algorithm_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;kdtree&#39;</span><span class="p">,</span> <span class="s1">&#39;kmeans&#39;</span><span class="p">,</span> <span class="s1">&#39;composite&#39;</span><span class="p">,</span> <span class="s1">&#39;kdtree_single&#39;</span><span class="p">]</span>
+    <span class="n">_centersinit_options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;random&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;gonzales&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;kmeanspp&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="c1"># Search params (for all algos)</span>
+    <span class="k">assert</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="n">_algorithm_options</span>
+    <span class="n">flann_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="n">algorithm</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">algorithm</span> <span class="o">!=</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">flann_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;random_seed&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;kdtree&#39;</span><span class="p">,</span> <span class="s1">&#39;composite&#39;</span><span class="p">]:</span>
+        <span class="c1"># kdtree index parameters</span>
+        <span class="n">flann_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="n">_algorithm_options</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s1">&#39;trees&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="s1">&#39;checks&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># how many leafs (features) to check in one search</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">algorithm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;kmeans&#39;</span><span class="p">,</span> <span class="s1">&#39;composite&#39;</span><span class="p">]:</span>
+        <span class="c1"># Kmeans index parametrs</span>
+        <span class="n">flann_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;branching&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                <span class="s1">&#39;iterations&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="s1">&#39;centers_init&#39;</span><span class="p">:</span> <span class="n">_centersinit_options</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="s1">&#39;cb_index&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># cluster boundary index for searching kmeanms tree</span>
+                <span class="s1">&#39;checks&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>  <span class="c1"># how many leafs (features) to check in one search</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s1">&#39;autotuned&#39;</span><span class="p">:</span>
+        <span class="n">flann_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s1">&#39;autotuned&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;target_precision&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>  <span class="c1"># precision desired (used for autotuning, -1 otherwise)</span>
+                <span class="s1">&#39;build_weight&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>  <span class="c1"># build tree time weighting factor</span>
+                <span class="s1">&#39;memory_weight&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># index memory weigthing factor</span>
+                <span class="s1">&#39;sample_fraction&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>  <span class="c1"># what fraction of the dataset to use for autotuning</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s1">&#39;lsh&#39;</span><span class="p">:</span>
+        <span class="n">flann_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;table_number_&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;key_size_&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;multi_probe_level_&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="n">flann_params</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">update_existing</span><span class="p">(</span><span class="n">flann_params</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">assert_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flann_params</span></div>
+
+
+<div class="viewcode-block" id="tune_flann"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.tune_flann">[docs]</a><span class="k">def</span> <span class="nf">tune_flann</span><span class="p">(</span>
+    <span class="n">dpts</span><span class="p">,</span>
+    <span class="n">target_precision</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span>
+    <span class="n">build_weight</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span>
+    <span class="n">memory_weight</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span>
+    <span class="n">sample_fraction</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann_pami2014.pdf</span>
+<span class="sd">        http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann_manual-1.8.4.pdf</span>
+<span class="sd">        http://docs.opencv.org/trunk/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html</span>
+
+<span class="sd">    Math::</span>
+<span class="sd">        cost of an algorithm is:</span>
+
+<span class="sd">        LaTeX:</span>
+<span class="sd">            \cost = \frac</span>
+<span class="sd">                {\search + build_weight * \build }</span>
+<span class="sd">                { \minoverparams( \search + build_weight \build)} +</span>
+<span class="sd">                memory_weight * \memory</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dpts (ndarray):</span>
+
+<span class="sd">        target_precision (float): number between 0 and 1 representing desired</span>
+<span class="sd">            accuracy. Higher values are more accurate.</span>
+
+<span class="sd">        build_weight (float): importance weight given to minimizing build time</span>
+<span class="sd">            relative to search time. This number can range from 0 to infinity.</span>
+<span class="sd">            typically because building is a more complex computation you want</span>
+<span class="sd">            to keep the number relatively low, (less than 1) otherwise you&#39;ll</span>
+<span class="sd">            end up getting a linear search (no build time).</span>
+
+<span class="sd">        memory_weight (float): Importance of memory relative to total speed.</span>
+<span class="sd">            A value less than 1 gives more importance to the time spent and a</span>
+<span class="sd">            value greater than 1 gives more importance to the memory usage.</span>
+
+<span class="sd">        sample_fraction (float): number between 0 and 1 representing the</span>
+<span class="sd">            fraction of the input data to use in the optimization. A higher</span>
+<span class="sd">            number uses more data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: tuned_params</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.nearest_neighbors --test-tune_flann</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">ut</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;tuning flann&#39;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Autotuning flann with </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1">D vectors&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s1">&#39;a sample of </span><span class="si">%d</span><span class="s1"> vectors will be used&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">sample_fraction</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span>
+        <span class="c1"># num_data = len(dpts)</span>
+        <span class="n">flann_atkwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;autotuned&#39;</span><span class="p">,</span>
+            <span class="n">target_precision</span><span class="o">=</span><span class="n">target_precision</span><span class="p">,</span>
+            <span class="n">build_weight</span><span class="o">=</span><span class="n">build_weight</span><span class="p">,</span>
+            <span class="n">memory_weight</span><span class="o">=</span><span class="n">memory_weight</span><span class="p">,</span>
+            <span class="n">sample_fraction</span><span class="o">=</span><span class="n">sample_fraction</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+        <span class="n">badchar_list</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="si">{}</span><span class="s2">&#39;: &quot;</span>
+        <span class="k">for</span> <span class="n">badchar</span> <span class="ow">in</span> <span class="n">badchar_list</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">badchar</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;flann_atkwargs:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">flann_atkwargs</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;starting optimization&#39;</span><span class="p">)</span>
+        <span class="n">tuned_params</span> <span class="o">=</span> <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">dpts</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;finished optimization&#39;</span><span class="p">)</span>
+
+        <span class="c1"># The algorithm is sometimes returned as default which is</span>
+        <span class="c1"># very unuseful as the default name is embeded in the pyflann</span>
+        <span class="c1"># module where most would not care to look. This finds the default</span>
+        <span class="c1"># name for you.</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">,</span> <span class="s1">&#39;centers_init&#39;</span><span class="p">,</span> <span class="s1">&#39;log_level&#39;</span><span class="p">]:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">tuned_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+                <span class="n">dict_</span> <span class="o">=</span> <span class="n">pyflann</span><span class="o">.</span><span class="n">FLANNParameters</span><span class="o">.</span><span class="n">_translation_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">other_algs</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">dict_find_other_sameval_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_algs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;more than 1 default for key=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,)</span>
+                <span class="n">tuned_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">other_algs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">common_params</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;algorithm&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;checks&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">relevant_params_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">linear</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">],</span>
+            <span class="c1"># ---</span>
+            <span class="n">kdtree</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;trees&#39;</span><span class="p">],</span>
+            <span class="c1"># ---</span>
+            <span class="n">kmeans</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;branching&#39;</span><span class="p">,</span> <span class="s1">&#39;iterations&#39;</span><span class="p">,</span> <span class="s1">&#39;centers_init&#39;</span><span class="p">,</span> <span class="s1">&#39;cb_index&#39;</span><span class="p">],</span>
+            <span class="c1"># ---</span>
+            <span class="n">lsh</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;table_number&#39;</span><span class="p">,</span> <span class="s1">&#39;key_size&#39;</span><span class="p">,</span> <span class="s1">&#39;multi_probe_level&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">relevant_params_dict</span><span class="p">[</span><span class="s1">&#39;composite&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">relevant_params_dict</span><span class="p">[</span><span class="s1">&#39;kmeans&#39;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">relevant_params_dict</span><span class="p">[</span><span class="s1">&#39;kdtree&#39;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">common_params</span>
+        <span class="p">)</span>
+        <span class="n">relevant_params_dict</span><span class="p">[</span><span class="s1">&#39;kmeans&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">common_params</span>
+        <span class="n">relevant_params_dict</span><span class="p">[</span><span class="s1">&#39;kdtree&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">common_params</span>
+        <span class="n">relevant_params_dict</span><span class="p">[</span><span class="s1">&#39;lsh&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">common_params</span>
+
+        <span class="c1"># kdtree_single_params = [</span>
+        <span class="c1">#    &#39;leaf_max_size&#39;,</span>
+        <span class="c1"># ]</span>
+        <span class="c1"># other_params = [</span>
+        <span class="c1">#    &#39;build_weight&#39;,</span>
+        <span class="c1">#    &#39;sorted&#39;,</span>
+        <span class="c1"># ]</span>
+        <span class="n">out_file</span> <span class="o">=</span> <span class="s1">&#39;flann_tuned&#39;</span> <span class="o">+</span> <span class="n">suffix</span>
+        <span class="n">ut</span><span class="o">.</span><span class="n">write_to</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">tuned_params</span><span class="p">,</span> <span class="n">sorted_</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">flann</span><span class="o">.</span><span class="n">delete_index</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tuned_params</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">relevant_params_dict</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;relevant_params=&#39;</span><span class="p">)</span>
+            <span class="n">relevant_params</span> <span class="o">=</span> <span class="n">relevant_params_dict</span><span class="p">[</span><span class="n">tuned_params</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">]]</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span>
+                    <span class="n">ut</span><span class="o">.</span><span class="n">dict_subset</span><span class="p">(</span><span class="n">tuned_params</span><span class="p">,</span> <span class="n">relevant_params</span><span class="p">),</span>
+                    <span class="n">sorted_</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;irrelevant_params=&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span>
+                    <span class="n">ut</span><span class="o">.</span><span class="n">dict_setdiff</span><span class="p">(</span><span class="n">tuned_params</span><span class="p">,</span> <span class="n">relevant_params</span><span class="p">),</span>
+                    <span class="n">sorted_</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;unknown tuned algorithm=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tuned_params</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">],))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;all_tuned_params=&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">tuned_params</span><span class="p">,</span> <span class="n">sorted_</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tuned_params</span></div>
+
+
+<div class="viewcode-block" id="flann_index_time_experiment"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.flann_index_time_experiment">[docs]</a><span class="k">def</span> <span class="nf">flann_index_time_experiment</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Shows a plot of how long it takes to build a flann index for a given number of KD-trees</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.nearest_neighbors --test-flann_index_time_experiment</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # SLOW_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; result = flann_index_time_experiment()</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+    <span class="kn">import</span> <span class="nn">itertools</span>
+
+    <span class="k">class</span> <span class="nc">TestDataPool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform only a few allocations of test data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="mi">10000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_pool</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alloc_pool</span><span class="p">(</span><span class="mi">1000000</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">alloc_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[alloc] num = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_pool</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s1">&#39;[alloc] object size &#39;</span>
+                <span class="o">+</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_object_size_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pool</span><span class="p">,</span> <span class="s1">&#39;data_pool&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_testdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_pool</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">alloc_pool</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_pool</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">num</span><span class="p">]</span>
+
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">TestDataPool</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_buildtime_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">flann_params</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">get_flann_params</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;flann_params = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">flann_params</span><span class="p">),))</span>
+        <span class="n">data_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">ProgIter</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="n">length</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;num = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,))</span>
+            <span class="c1"># if num &gt; 1E6:</span>
+            <span class="c1">#    break</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">get_testdata</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;object size &#39;</span> <span class="o">+</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_object_size_str</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">))</span>
+            <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">(</span><span class="o">**</span><span class="n">flann_params</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">ut</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+                <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;t.ellapsed = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">ellapsed</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">ellapsed</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">data_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">count</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">ellapsed</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_list</span><span class="p">,</span> <span class="n">flann_params</span>
+
+    <span class="n">data_list1</span><span class="p">,</span> <span class="n">params1</span> <span class="o">=</span> <span class="n">get_buildtime_data</span><span class="p">(</span><span class="n">trees</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">data_list2</span><span class="p">,</span> <span class="n">params2</span> <span class="o">=</span> <span class="n">get_buildtime_data</span><span class="p">(</span><span class="n">trees</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">data_list4</span><span class="p">,</span> <span class="n">params4</span> <span class="o">=</span> <span class="n">get_buildtime_data</span><span class="p">(</span><span class="n">trees</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">data_list8</span><span class="p">,</span> <span class="n">params8</span> <span class="o">=</span> <span class="n">get_buildtime_data</span><span class="p">(</span><span class="n">trees</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+    <span class="n">data_list16</span><span class="p">,</span> <span class="n">params16</span> <span class="o">=</span> <span class="n">get_buildtime_data</span><span class="p">(</span><span class="n">trees</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+    <span class="k">def</span> <span class="nf">plotdata</span><span class="p">(</span><span class="n">data_list</span><span class="p">):</span>
+        <span class="n">count_arr</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_list_column</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">time_arr</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_list_column</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">plot2</span><span class="p">(</span>
+            <span class="n">count_arr</span><span class="p">,</span>
+            <span class="n">time_arr</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span>
+            <span class="n">equal_aspect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">x_label</span><span class="o">=</span><span class="s1">&#39;num_vectors&#39;</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="o">=</span><span class="s1">&#39;FLANN build time&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">plotdata</span><span class="p">(</span><span class="n">data_list1</span><span class="p">)</span>
+    <span class="n">plotdata</span><span class="p">(</span><span class="n">data_list2</span><span class="p">)</span>
+    <span class="n">plotdata</span><span class="p">(</span><span class="n">data_list4</span><span class="p">)</span>
+    <span class="n">plotdata</span><span class="p">(</span><span class="n">data_list8</span><span class="p">)</span>
+    <span class="n">plotdata</span><span class="p">(</span><span class="n">data_list16</span><span class="p">)</span>
+
+    <span class="n">pt</span><span class="o">.</span><span class="n">iup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="invertible_stack"><a class="viewcode-back" href="../../vtool.html#vtool.nearest_neighbors.invertible_stack">[docs]</a><span class="k">def</span> <span class="nf">invertible_stack</span><span class="p">(</span><span class="n">vecs_list</span><span class="p">,</span> <span class="n">label_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stacks descriptors into a flat structure and returns inverse mapping from</span>
+<span class="sd">    flat database descriptor indexes (dx) to annotation ids (label) and feature</span>
+<span class="sd">    indexes (fx). Feature indexes are w.r.t. annotation indexes.</span>
+
+<span class="sd">    Output:</span>
+<span class="sd">        idx2_desc - flat descriptor stack</span>
+<span class="sd">        idx2_label  - inverted index into annotations</span>
+<span class="sd">        idx2_fx   - inverted index into features</span>
+
+<span class="sd">    # Example with 2D Descriptors</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; DESC_TYPE = np.uint8</span>
+<span class="sd">        &gt;&gt;&gt; label_list  = [1, 2, 3, 4, 5]</span>
+<span class="sd">        &gt;&gt;&gt; vecs_list = [</span>
+<span class="sd">        ...     np.array([[0, 0], [0, 1]], dtype=DESC_TYPE),</span>
+<span class="sd">        ...     np.array([[5, 3], [2, 30], [1, 1]], dtype=DESC_TYPE),</span>
+<span class="sd">        ...     np.empty((0, 2), dtype=DESC_TYPE),</span>
+<span class="sd">        ...     np.array([[5, 3], [2, 30], [1, 1]], dtype=DESC_TYPE),</span>
+<span class="sd">        ...     np.array([[3, 3], [42, 42], [2, 6]], dtype=DESC_TYPE),</span>
+<span class="sd">        ...     ]</span>
+<span class="sd">        &gt;&gt;&gt; idx2_vec, idx2_label, idx2_fx = invertible_stack(vecs_list, label_list)</span>
+<span class="sd">        &gt;&gt;&gt; print(repr(idx2_vec.T))</span>
+<span class="sd">        array([[ 0,  0,  5,  2,  1,  5,  2,  1,  3, 42,  2],</span>
+<span class="sd">               [ 0,  1,  3, 30,  1,  3, 30,  1,  3, 42,  6]], dtype=uint8)</span>
+<span class="sd">        &gt;&gt;&gt; print(repr(idx2_label))</span>
+<span class="sd">        array([1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 5])</span>
+<span class="sd">        &gt;&gt;&gt; print(repr(idx2_fx))</span>
+<span class="sd">        array([0, 1, 0, 1, 2, 0, 1, 2, 0, 1, 2])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># INFER DTYPE? dtype = vecs_list[0].dtype</span>
+    <span class="c1"># Build inverted index of (label, fx) pairs</span>
+    <span class="n">nFeats</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">vecs_list</span><span class="p">)))</span>
+    <span class="n">nFeat_iter</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">vecs_list</span><span class="p">)</span>
+    <span class="n">label_nFeat_iter</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">label_list</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">vecs_list</span><span class="p">))</span>
+    <span class="c1"># generate featx inverted index for each feature in each annotation</span>
+    <span class="n">_ax2_fx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nFeat</span><span class="p">))</span> <span class="k">for</span> <span class="n">nFeat</span> <span class="ow">in</span> <span class="n">nFeat_iter</span><span class="p">]</span>
+    <span class="c1"># generate label inverted index for each feature in each annotation</span>
+    <span class="n">_ax2_label</span> <span class="o">=</span> <span class="p">[[</span><span class="n">label</span><span class="p">]</span> <span class="o">*</span> <span class="n">nFeat</span> <span class="k">for</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">nFeat</span><span class="p">)</span> <span class="ow">in</span> <span class="n">label_nFeat_iter</span><span class="p">]</span>
+    <span class="c1"># Flatten generators into the inverted index</span>
+    <span class="n">_flatlabels</span> <span class="o">=</span> <span class="n">ub</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">_ax2_label</span><span class="p">)</span>
+    <span class="n">_flatfeatxs</span> <span class="o">=</span> <span class="n">ub</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">_ax2_fx</span><span class="p">)</span>
+
+    <span class="n">idx2_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">_flatlabels</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">nFeats</span><span class="p">)</span>
+    <span class="n">idx2_fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">_flatfeatxs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">nFeats</span><span class="p">)</span>
+    <span class="c1"># Stack vecsriptors into numpy array corresponding to inverted inexed</span>
+    <span class="c1"># This might throw a MemoryError</span>
+    <span class="n">idx2_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">vecs_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">idx2_vec</span><span class="p">,</span> <span class="n">idx2_label</span><span class="p">,</span> <span class="n">idx2_fx</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.nearest_neighbors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

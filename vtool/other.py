@@ -2196,7 +2196,7 @@ def compare_implementations(
     except AssertionError as ex:
         # prints out a nested list corresponding to nested structure
         ut.printex(
-            ex, 'IMPLEMENTATIONS DO NOT AGREE', keys=[('func1_name'), ('func2_name'),]
+            ex, 'IMPLEMENTATIONS DO NOT AGREE', keys=[('func1_name'), ('func2_name')]
         )
         raise
     finally:

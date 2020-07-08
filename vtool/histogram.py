@@ -5,7 +5,6 @@ import warnings
 import scipy.signal
 import numpy as np
 import utool as ut
-import ubelt as ub
 from .util_math import TAU
 
 

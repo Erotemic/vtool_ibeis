@@ -96,3 +96,7 @@ timeings.txt
 Dockerfile*
 _skbuild/*
 opencv-docker-tag.txt
+
+_doc/_build
+_doc/_static
+_doc/_templates

@@ -588,7 +588,7 @@ def imwrite(img_fpath, imgBGR, fallback=False):
         if fallback:
             try:
                 imwrite_fallback(img_fpath, imgBGR)
-            except Exception as ex:
+            except Exception:
                 pass
         msg = '[vt.image] ERROR writing: %s' % (img_fpath,)
         ut.printex(ex, msg, keys=['imgBGR.shape'])
@@ -1666,7 +1666,7 @@ def embed_in_square_image(
     # print('target_origin = %r' % (target_origin,))
     # print('target_origin_abs = %r' % (target_origin_abs,))
 
-    ## Find start slice in the target image
+    # # Find start slice in the target image
     target_diff = np.floor(target_origin_abs - img_origin_abs)
     target_rc_start = np.maximum(target_diff, 0).astype(np.int)
 
@@ -1692,7 +1692,7 @@ def embed_in_square_image(
     ##-np.minimum(np.floor(img_origin_abs - target_origin_abs), 0)
     ##img_origin_abs - target_rc_overhang
 
-    ## Find start slice in the given image
+    # # Find start slice in the given image
     # img_rc_start = img_rc - target_rc_overhang
     # cliped_img_rc = img_rc - img_rc_start
 

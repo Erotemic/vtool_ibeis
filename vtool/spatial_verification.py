@@ -230,7 +230,7 @@ def build_affine_lstsqrs_Mx6(xy1_man, xy2_man):
     Sinv = np.zeros((len(Vt), len(U)))
     Sinv[np.diag_indices(len(s))] = 1 / s
     a = Vt.T.dot(Sinv).dot(U.T).dot(b).T[0]
-    A = np.array([[a[0], a[1], a[4]], [a[2], a[3], a[5]], [0, 0, 1],])
+    A = np.array([[a[0], a[1], a[4]], [a[2], a[3], a[5]], [0, 0, 1]])
     return A
     # TODO FIXME
     # return Mx6
@@ -451,7 +451,7 @@ def _test_hypothesis_inliers(
     _xy1_mt = ktool.get_invVR_mats_xys(invVR1s_mt)
     _det1_mt = ktool.get_invVR_mats_sqrd_scale(invVR1s_mt)
     _ori1_mt = ktool.get_invVR_mats_oris(invVR1s_mt)
-    ## Check for projection errors
+    # # Check for projection errors
     xy_err = vtool.distance.L2_sqrd(xy2_m.T, _xy1_mt.T, dtype=SV_DTYPE)
     scale_err = vtool.distance.det_distance(_det1_mt, det2_m)
     ori_err = vtool.distance.ori_distance(_ori1_mt, ori2_m)

@@ -139,7 +139,7 @@ def get_no_symbol(variant='symbol', size=(100, 100)):
 
 def get_star_patch(jitter=False):
     """ test data patch """
-    _, O = 0.1, 0.8
+    _, O = 0.1, 0.8  # NOQA
     patch = np.array(
         [
             [_, _, _, O, _, _, _],
@@ -161,7 +161,7 @@ def get_star_patch(jitter=False):
 
 def get_star2_patch(jitter=False):
     """ test data patch """
-    _, i, O = 0.1, 0.8, 0.5
+    _, i, O = 0.1, 0.8, 0.5  # NOQA
     patch = np.array(
         [
             [_, _, _, _, _, _, _, O, O, _, _, _, _, _, _, _],
@@ -190,7 +190,7 @@ def get_star2_patch(jitter=False):
 
 def get_cross_patch(jitter=False):
     """ test data patch """
-    _, O = 0.1, 0.8
+    _, O = 0.1, 0.8  # NOQA
     patch = np.array(
         [
             [_, _, O, O, O, _, _],
@@ -212,7 +212,7 @@ def get_cross_patch(jitter=False):
 
 def get_stripe_patch(jitter=False):
     """ test data patch """
-    _, O = 0.1, 0.8
+    _, O = 0.1, 0.8  # NOQA
     patch = np.array(
         [
             [O, O, O, _, _, _, _],

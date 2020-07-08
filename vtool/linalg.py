@@ -37,7 +37,6 @@ from __future__ import absolute_import, division, print_function
 import cv2
 import numpy as np
 import numpy.linalg as npl
-import utool as ut
 import ubelt as ub
 import warnings  # NOQA
 from .util_math import TAU

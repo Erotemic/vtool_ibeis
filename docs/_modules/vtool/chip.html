@@ -1,0 +1,606 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.chip &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.chip</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># LICENCE</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="k">as</span> <span class="nn">npl</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">image</span> <span class="k">as</span> <span class="n">gtool</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR: import cv2 is failing!&#39;</span><span class="p">)</span>
+    <span class="n">cv2</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">DynStruct</span><span class="p">()</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_image_to_chip_transform"><a class="viewcode-back" href="../../vtool.html#vtool.chip.get_image_to_chip_transform">[docs]</a><span class="k">def</span> <span class="nf">get_image_to_chip_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    transforms image space into chipspace</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bbox   - bounding box of chip in image space</span>
+<span class="sd">        chipsz - size of the chip</span>
+<span class="sd">        theta  - rotation of the bounding box</span>
+
+<span class="sd">    Sympy:</span>
+<span class="sd">        # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA</span>
+<span class="sd">        from vtool.patch import *  # NOQA</span>
+<span class="sd">        import sympy</span>
+<span class="sd">        import sympy.abc</span>
+<span class="sd">        theta = sympy.abc.theta</span>
+
+<span class="sd">        x, y, w, h, target_area  = sympy.symbols(&#39;x y w h, a&#39;)</span>
+<span class="sd">        gx, gy  = sympy.symbols(&#39;gx, gy&#39;)</span>
+
+<span class="sd">        round = sympy.floor  # hack</span>
+
+<span class="sd">        ht = sympy.sqrt(target_area * h / w)</span>
+<span class="sd">        wt = w * ht / h</span>
+<span class="sd">        cw_, ch_ = round(wt), round(ht)</span>
+
+<span class="sd">        from vtool import ltool</span>
+<span class="sd">        T1 = ltool.translation_mat3x3(tx1, ty1, dtype=None)</span>
+<span class="sd">        S  = ltool.scale_mat3x3(sx, sy, dtype=None)</span>
+<span class="sd">        R  = ltool.rotation_mat3x3(-theta, sympy.sin, sympy.cos)</span>
+<span class="sd">        T2 = ltool.translation_mat3x3(tx2, ty2, dtype=None)</span>
+
+<span class="sd">        def add_matmul_hold_prop(mat):</span>
+<span class="sd">            #import functools</span>
+<span class="sd">            mat = sympy.Matrix(mat)</span>
+<span class="sd">            def matmul_hold(other, hold=False):</span>
+<span class="sd">                new = sympy.MatMul(mat, other, hold=hold)</span>
+<span class="sd">                add_matmul_hold_prop(new)</span>
+<span class="sd">                return new</span>
+<span class="sd">            setattr(mat, &#39;matmul_hold&#39;, matmul_hold)</span>
+<span class="sd">            return mat</span>
+
+<span class="sd">        T1 = add_matmul_hold_prop(T1)</span>
+<span class="sd">        T2 = add_matmul_hold_prop(T2)</span>
+<span class="sd">        R = add_matmul_hold_prop(R)</span>
+<span class="sd">        S = add_matmul_hold_prop(S)</span>
+
+<span class="sd">        C = T2.multiply(R.multiply(S.multiply(T1)))</span>
+<span class="sd">        sympy.simplify(C)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">=</span> <span class="n">bbox</span>
+    <span class="p">(</span><span class="n">cw_</span><span class="p">,</span> <span class="n">ch_</span><span class="p">)</span> <span class="o">=</span> <span class="n">chipsz</span>
+    <span class="n">tx1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">w</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+    <span class="n">ty1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+    <span class="n">sx</span> <span class="o">=</span> <span class="n">cw_</span> <span class="o">/</span> <span class="n">w</span>
+    <span class="n">sy</span> <span class="o">=</span> <span class="n">ch_</span> <span class="o">/</span> <span class="n">h</span>
+    <span class="n">tx2</span> <span class="o">=</span> <span class="n">cw_</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">ty2</span> <span class="o">=</span> <span class="n">ch_</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="c1"># Translate from bbox center to (0, 0)</span>
+    <span class="n">T1</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">tx1</span><span class="p">,</span> <span class="n">ty1</span><span class="p">)</span>
+    <span class="c1"># Scale to chip height</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+    <span class="c1"># Rotate to chip orientation</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">rotation_mat3x3</span><span class="p">(</span><span class="o">-</span><span class="n">theta</span><span class="p">)</span>
+    <span class="c1"># Translate from (0, 0) to chip center</span>
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">ltool</span><span class="o">.</span><span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">tx2</span><span class="p">,</span> <span class="n">ty2</span><span class="p">)</span>
+    <span class="c1"># Merge into single transformation (operate left-to-right aka data on left)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">T2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">C</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_chip_to_image_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; transforms chip space into imgspace</span>
+<span class="sd">        bbox   - bounding box of chip in image space</span>
+<span class="sd">        chipsz - size of the chip</span>
+<span class="sd">        theta  - rotation of the bounding box</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">get_image_to_chip_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">chipsz</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">invC</span> <span class="o">=</span> <span class="n">npl</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">invC</span>
+
+
+<div class="viewcode-block" id="extract_chip_from_gpath"><a class="viewcode-back" href="../../vtool.html#vtool.chip.extract_chip_from_gpath">[docs]</a><span class="k">def</span> <span class="nf">extract_chip_from_gpath</span><span class="p">(</span>
+    <span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span>
+<span class="p">):</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">gfpath</span><span class="p">)</span>  <span class="c1"># Read parent image</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">extract_chip_from_img</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chipBGR</span></div>
+
+
+<div class="viewcode-block" id="extract_chip_into_square"><a class="viewcode-back" href="../../vtool.html#vtool.chip.extract_chip_into_square">[docs]</a><span class="k">def</span> <span class="nf">extract_chip_into_square</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">target_size</span><span class="p">):</span>
+    <span class="n">bbox_size</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">unpadded_dsize</span><span class="p">,</span> <span class="n">ratio</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">resized_dims_and_ratio</span><span class="p">(</span><span class="n">bbox_size</span><span class="p">,</span> <span class="n">target_size</span><span class="p">)</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">extract_chip_from_img</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">unpadded_dsize</span><span class="p">)</span>
+    <span class="n">chipBGR_square</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">embed_in_square_image</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">,</span> <span class="n">target_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chipBGR_square</span></div>
+
+
+<div class="viewcode-block" id="extract_chip_from_gpath_into_square"><a class="viewcode-back" href="../../vtool.html#vtool.chip.extract_chip_from_gpath_into_square">[docs]</a><span class="k">def</span> <span class="nf">extract_chip_from_gpath_into_square</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">target_size</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">gfpath</span><span class="p">)</span>  <span class="c1"># Read parent image</span>
+    <span class="k">return</span> <span class="n">extract_chip_into_square</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">target_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="extract_chip_from_img"><a class="viewcode-back" href="../../vtool.html#vtool.chip.extract_chip_from_img">[docs]</a><span class="k">def</span> <span class="nf">extract_chip_from_img</span><span class="p">(</span>
+    <span class="n">imgBGR</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Crops chip from image ; Rotates and scales;</span>
+
+<span class="sd">    ibs.show_annot_image(aid)[0].pt_save_and_view()</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gfpath (str):</span>
+<span class="sd">        bbox (tuple):  xywh</span>
+<span class="sd">        theta (float):</span>
+<span class="sd">        new_size (tuple): wy</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: chipBGR</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.chip --test-extract_chip_from_img</span>
+<span class="sd">        python -m vtool.chip --test-extract_chip_from_img --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.chip import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; imgBGR = gtool.imread(ut.grab_test_imgpath(&#39;carl.jpg&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; bbox = (100, 3, 100, 100)</span>
+<span class="sd">        &gt;&gt;&gt; theta = 0.0</span>
+<span class="sd">        &gt;&gt;&gt; new_size = (58, 34)</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; chipBGR = extract_chip_from_img(imgBGR, bbox, theta, new_size)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; assert chipBGR.shape[0:2] == new_size[::-1], &#39;did not resize correctly&#39;</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; pt.imshow(chipBGR)</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># THE CULPRIT FOR MULTIPROCESSING FREEZES</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="n">interpolation</span>
+    <span class="c1"># if True:</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">get_image_to_chip_transform</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>  <span class="c1"># Build transformation</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">warpAffine</span><span class="p">(</span>
+        <span class="n">imgBGR</span><span class="p">,</span> <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">,</span> <span class="n">borderMode</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span>
+    <span class="p">)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#    # if theta == 0, not sure if this is better. Certainly not more general</span>
+    <span class="c1">#    x, y, w, h = bbox</span>
+    <span class="c1">#    roiBGR = imgBGR[y:y + h, x:x + w, :]</span>
+    <span class="c1">#    chipBGR = cv2.resize(roiBGR, tuple(new_size), interpolation=interpolation)</span>
+    <span class="c1"># chipBGR = gtool.warpAffine(imgBGR, M, new_size)  # Rotate and scale</span>
+    <span class="k">return</span> <span class="n">chipBGR</span></div>
+
+
+<div class="viewcode-block" id="gridsearch_chipextract"><a class="viewcode-back" href="../../vtool.html#vtool.chip.gridsearch_chipextract">[docs]</a><span class="k">def</span> <span class="nf">gridsearch_chipextract</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m ~/code/vtool/vtool/chip.py gridsearch_chipextract --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # GRIDSEARCH</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.chip import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; gridsearch_chipextract()</span>
+<span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+
+    <span class="n">test_func</span> <span class="o">=</span> <span class="n">extract_chip_from_img</span>
+    <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">gpath</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="s1">&#39;carl.jpg&#39;</span><span class="p">)</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">new_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">58</span><span class="p">,</span> <span class="mi">34</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gpath</span> <span class="o">=</span> <span class="s1">&#39;/media/raid/work/GZ_Master1/_ibsdb/images/1524525d-2131-8770-d27c-3a5f9922e9e9.jpg&#39;</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="mi">450</span><span class="p">,</span> <span class="mi">373</span><span class="p">,</span> <span class="mi">2062</span><span class="p">,</span> <span class="mi">1124</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">old_size</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="c1"># target_area = 700 ** 2</span>
+        <span class="n">target_area</span> <span class="o">=</span> <span class="mi">1200</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">new_size</span> <span class="o">=</span> <span class="n">ScaleStrat</span><span class="o">.</span><span class="n">area</span><span class="p">(</span><span class="n">target_area</span><span class="p">,</span> <span class="n">old_size</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;old_size = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">old_size</span><span class="p">,))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;new_size = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">new_size</span><span class="p">,))</span>
+        <span class="c1"># new_size = (677, 369)</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">gtool</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">gpath</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">)</span>
+    <span class="n">param_info</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfoList</span><span class="p">(</span>
+        <span class="s1">&#39;extract_params&#39;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span>
+                <span class="s1">&#39;interpolation&#39;</span><span class="p">,</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span><span class="p">,</span>
+                <span class="n">varyvals</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span><span class="p">,</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_CUBIC</span><span class="p">,</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LINEAR</span><span class="p">,</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">,</span>
+                    <span class="c1"># cv2.INTER_AREA</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">show_func</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Generalize</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">)</span>  <span class="c1"># HACK</span>
+    <span class="n">cfgdict_list</span><span class="p">,</span> <span class="n">cfglbl_list</span> <span class="o">=</span> <span class="n">param_info</span><span class="o">.</span><span class="n">get_gridsearch_input</span><span class="p">(</span><span class="n">defaultslice</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">fnum</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">ensure_fnum</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">show_func</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span>
+    <span class="n">lbl</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_funcname</span><span class="p">(</span><span class="n">test_func</span><span class="p">)</span>
+    <span class="n">cfgresult_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">test_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">cfgdict</span><span class="p">)</span> <span class="k">for</span> <span class="n">cfgdict</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">ProgressIter</span><span class="p">(</span><span class="n">cfgdict_list</span><span class="p">,</span> <span class="n">lbl</span><span class="o">=</span><span class="n">lbl</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">onclick_func</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">interact_gridsearch_result_images</span><span class="p">(</span>
+        <span class="n">show_func</span><span class="p">,</span>
+        <span class="n">cfgdict_list</span><span class="p">,</span>
+        <span class="n">cfglbl_list</span><span class="p">,</span>
+        <span class="n">cfgresult_list</span><span class="p">,</span>
+        <span class="n">fnum</span><span class="o">=</span><span class="n">fnum</span><span class="p">,</span>
+        <span class="n">figtitle</span><span class="o">=</span><span class="n">lbl</span><span class="p">,</span>
+        <span class="n">unpack</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">max_plots</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">onclick_func</span><span class="o">=</span><span class="n">onclick_func</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">iup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ScaleStrat"><a class="viewcode-back" href="../../vtool.html#vtool.chip.ScaleStrat">[docs]</a><span class="k">class</span> <span class="nc">ScaleStrat</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scaling strategies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ScaleStrat.maxwh"><a class="viewcode-back" href="../../vtool.html#vtool.chip.ScaleStrat.maxwh">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">maxwh</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">orig_wh</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The maximum dimension becomes target</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (int): target size</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">            &gt;&gt;&gt; import utool as ut</span>
+<span class="sd">            &gt;&gt;&gt; ut.assert_eq(ScaleStrat.maxwh(800, (190, 220)), (691, 800))</span>
+<span class="sd">            &gt;&gt;&gt; ut.assert_eq(ScaleStrat.maxwh(800, (220, 190)), (800, 691))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">orig_wh</span><span class="p">)</span>
+        <span class="n">orig_dim_size</span> <span class="o">=</span> <span class="n">orig_wh</span><span class="p">[</span><span class="n">max_idx</span><span class="p">]</span>
+        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">tol</span><span class="p">,</span> <span class="n">target</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">orig_dim_size</span> <span class="ow">and</span> <span class="n">orig_dim_size</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">:</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="n">orig_wh</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="n">orig_dim_size</span>
+            <span class="n">wt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">orig_wh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">))</span>
+            <span class="n">ht</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">orig_wh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">))</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">wt</span><span class="p">,</span> <span class="n">ht</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_size</span></div>
+
+<div class="viewcode-block" id="ScaleStrat.width"><a class="viewcode-back" href="../../vtool.html#vtool.chip.ScaleStrat.width">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">orig_wh</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The width becomes target</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (int): target size</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">            &gt;&gt;&gt; import utool as ut</span>
+<span class="sd">            &gt;&gt;&gt; ut.assert_eq(ScaleStrat.width(800, (190, 220)), (800, 926))</span>
+<span class="sd">            &gt;&gt;&gt; ut.assert_eq(ScaleStrat.width(800, (220, 190)), (800, 691))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">orig_dim_size</span> <span class="o">=</span> <span class="n">orig_wh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">tol</span><span class="p">,</span> <span class="n">target</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">orig_dim_size</span> <span class="ow">and</span> <span class="n">orig_dim_size</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">:</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="n">orig_wh</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">target</span> <span class="o">/</span> <span class="n">orig_dim_size</span>
+            <span class="n">wt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">orig_wh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">))</span>
+            <span class="n">ht</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">orig_wh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale_factor</span><span class="p">))</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">wt</span><span class="p">,</span> <span class="n">ht</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_size</span></div>
+
+<div class="viewcode-block" id="ScaleStrat.area"><a class="viewcode-back" href="../../vtool.html#vtool.chip.ScaleStrat.area">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">orig_wh</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The area becomes target</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (int): target size</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">            &gt;&gt;&gt; import utool as ut</span>
+<span class="sd">            &gt;&gt;&gt; ut.assert_eq(ScaleStrat.area(800 ** 2, (190, 220)), (743, 861))</span>
+<span class="sd">            &gt;&gt;&gt; ut.assert_eq(ScaleStrat.area(800 ** 2, (220, 190)), (861, 743))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">orig_wh</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">h</span>
+        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">tol</span><span class="p">,</span> <span class="n">target</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">area</span> <span class="ow">and</span> <span class="n">area</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="p">:</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="n">orig_wh</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ht</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">target</span> <span class="o">*</span> <span class="n">h</span> <span class="o">/</span> <span class="n">w</span><span class="p">)</span>
+            <span class="n">wt</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">ht</span> <span class="o">/</span> <span class="n">h</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">wt</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ht</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">new_size</span></div></div>
+
+
+<div class="viewcode-block" id="get_scaled_size_with_dlen"><a class="viewcode-back" href="../../vtool.html#vtool.chip.get_scaled_size_with_dlen">[docs]</a><span class="k">def</span> <span class="nf">get_scaled_size_with_dlen</span><span class="p">(</span><span class="n">target_dlen</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns new_size which scales (w, h) as close to target_dlen as possible</span>
+<span class="sd">    and maintains aspect ratio</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ht = np.sqrt(target_area * h / w)</span>
+    <span class="c1"># wt = w * ht / h</span>
+    <span class="c1"># new_size = (int(round(wt)), int(round(ht)))</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+    <span class="c1"># return new_size</span>
+
+
+<div class="viewcode-block" id="compute_chip"><a class="viewcode-back" href="../../vtool.html#vtool.chip.compute_chip">[docs]</a><span class="k">def</span> <span class="nf">compute_chip</span><span class="p">(</span>
+    <span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">filter_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span>
+<span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Extracts a chip and applies filters</span>
+
+<span class="sd">    DEPRICATE</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gfpath (str):  image file path string</span>
+<span class="sd">        bbox (tuple):  bounding box in the format (x, y, w, h)</span>
+<span class="sd">        theta (float):  angle in radians</span>
+<span class="sd">        new_size (tuple): must maintain the same aspect ratio or else you will get weirdness</span>
+<span class="sd">        filter_list (list):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: chipBGR -  cropped image</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.chip --test-compute_chip --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.chip import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.util_math import TAU</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; gfpath = ut.grab_test_imgpath(&#39;carl.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; bbox = (100, 3, 100, 100)</span>
+<span class="sd">        &gt;&gt;&gt; theta = TAU / 8</span>
+<span class="sd">        &gt;&gt;&gt; new_size = (32, 32)</span>
+<span class="sd">        &gt;&gt;&gt; filter_list = []</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; chipBGR = compute_chip(gfpath, bbox, theta, new_size, filter_list)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; assert chipBGR.shape[0:2] == new_size[::-1], &#39;did not resize correctly&#39;</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; pt.imshow(vt.draw_verts(vt.imread(gfpath), vt.scaled_verts_from_bbox(bbox, theta, 1, 1)), pnum=(1, 2, 1))</span>
+<span class="sd">        &gt;&gt;&gt; pt.imshow(chipBGR, pnum=(1, 2, 2))</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">extract_chip_from_gpath</span><span class="p">(</span><span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">)</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">apply_filter_funcs</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">,</span> <span class="n">filter_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chipBGR</span></div>
+
+
+<div class="viewcode-block" id="apply_filter_funcs"><a class="viewcode-back" href="../../vtool.html#vtool.chip.apply_filter_funcs">[docs]</a><span class="k">def</span> <span class="nf">apply_filter_funcs</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">,</span> <span class="n">filter_funcs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; applies a list of preprocessing filters to a chip</span>
+
+<span class="sd">    DEPRICATE</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chipBGR_</span> <span class="o">=</span> <span class="n">chipBGR</span>
+    <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">filter_funcs</span><span class="p">:</span>
+        <span class="n">chipBGR_</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chipBGR_</span></div>
+
+
+<div class="viewcode-block" id="get_extramargin_measures"><a class="viewcode-back" href="../../vtool.html#vtool.chip.get_extramargin_measures">[docs]</a><span class="k">def</span> <span class="nf">get_extramargin_measures</span><span class="p">(</span><span class="n">bbox_gs</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">halfoffset_ms</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes a detection chip with a bit of spatial context so the detection</span>
+<span class="sd">    algorithm doesn&#39;t clip boundaries</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        mbbox_gs, margin_size -</span>
+<span class="sd">            margin bounding box in image size,</span>
+<span class="sd">            size of entire margined chip,</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.chip --test-get_extramargin_measures --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.chip import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; gfpath = ut.grab_test_imgpath(&#39;carl.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; bbox_gs = [40, 40, 150, 150]</span>
+<span class="sd">        &gt;&gt;&gt; theta = .15 * (np.pi * 2)</span>
+<span class="sd">        &gt;&gt;&gt; new_size = (150, 150)</span>
+<span class="sd">        &gt;&gt;&gt; halfoffset_ms = (32, 32)</span>
+<span class="sd">        &gt;&gt;&gt; mbbox_gs, margin_size = get_extramargin_measures(bbox_gs, new_size, halfoffset_ms)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; testshow_extramargin_info(gfpath, bbox_gs, theta, new_size, halfoffset_ms, mbbox_gs, margin_size)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># _ex denotes an expanded version</span>
+    <span class="c1"># There are three spaces we are working in here</span>
+    <span class="c1"># chip _cs (the space of the original chip)</span>
+    <span class="c1"># margin _ms (the margin chip has the scale of chip space with padding)</span>
+    <span class="c1"># imagespace _gs (the space using in bbox_gs specification)</span>
+    <span class="n">x_gs</span><span class="p">,</span> <span class="n">y_gs</span><span class="p">,</span> <span class="n">w_gs</span><span class="p">,</span> <span class="n">h_gs</span> <span class="o">=</span> <span class="n">bbox_gs</span>
+    <span class="k">if</span> <span class="n">w_gs</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">h_gs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Bounding box has no area&#39;</span><span class="p">)</span>
+    <span class="n">w_cs</span><span class="p">,</span> <span class="n">h_cs</span> <span class="o">=</span> <span class="n">new_size</span>
+    <span class="c1"># Extra margin in chip space</span>
+    <span class="n">xo_ms</span><span class="p">,</span> <span class="n">yo_ms</span> <span class="o">=</span> <span class="n">halfoffset_ms</span>
+    <span class="c1"># Compute size of margin chip</span>
+    <span class="n">mw</span><span class="p">,</span> <span class="n">mh</span> <span class="o">=</span> <span class="p">(</span><span class="n">w_cs</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xo_ms</span><span class="p">),</span> <span class="n">h_cs</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">yo_ms</span><span class="p">))</span>
+    <span class="n">margin_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="n">mh</span><span class="p">)</span>
+    <span class="c1"># Get the conversion from chip to image space</span>
+    <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span> <span class="o">=</span> <span class="p">(</span><span class="n">w_gs</span> <span class="o">/</span> <span class="n">w_cs</span><span class="p">,</span> <span class="n">h_gs</span> <span class="o">/</span> <span class="n">h_cs</span><span class="p">)</span>
+    <span class="c1"># Convert the chip offsets to image space</span>
+    <span class="n">halfoffset_gs</span> <span class="o">=</span> <span class="p">((</span><span class="n">sx</span> <span class="o">*</span> <span class="n">xo_ms</span><span class="p">),</span> <span class="p">(</span><span class="n">sy</span> <span class="o">*</span> <span class="n">yo_ms</span><span class="p">))</span>
+    <span class="n">xo_gs</span><span class="p">,</span> <span class="n">yo_gs</span> <span class="o">=</span> <span class="n">halfoffset_gs</span>
+    <span class="c1"># Find the size of the expanded margin bbox in image space</span>
+    <span class="n">mbbox_gs</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_gs</span> <span class="o">-</span> <span class="n">xo_gs</span><span class="p">,</span> <span class="n">y_gs</span> <span class="o">-</span> <span class="n">yo_gs</span><span class="p">,</span> <span class="n">w_gs</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xo_gs</span><span class="p">),</span> <span class="n">h_gs</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">yo_gs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">mbbox_gs</span><span class="p">,</span> <span class="n">margin_size</span></div>
+
+
+<div class="viewcode-block" id="testshow_extramargin_info"><a class="viewcode-back" href="../../vtool.html#vtool.chip.testshow_extramargin_info">[docs]</a><span class="k">def</span> <span class="nf">testshow_extramargin_info</span><span class="p">(</span>
+    <span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox_gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="n">halfoffset_ms</span><span class="p">,</span> <span class="n">mbbox_gs</span><span class="p">,</span> <span class="n">margin_size</span>
+<span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">gfpath</span><span class="p">)</span>
+    <span class="n">chipBGR</span> <span class="o">=</span> <span class="n">compute_chip</span><span class="p">(</span><span class="n">gfpath</span><span class="p">,</span> <span class="n">bbox_gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">new_size</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">mchipBGR</span> <span class="o">=</span> <span class="n">compute_chip</span><span class="p">(</span><span class="n">gfpath</span><span class="p">,</span> <span class="n">mbbox_gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">margin_size</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="c1"># index = 0</span>
+    <span class="n">w_cs</span><span class="p">,</span> <span class="n">h_cs</span> <span class="o">=</span> <span class="n">new_size</span>
+    <span class="n">xo_ms</span><span class="p">,</span> <span class="n">yo_ms</span> <span class="o">=</span> <span class="n">halfoffset_ms</span>
+    <span class="n">bbox_ms</span> <span class="o">=</span> <span class="p">[</span><span class="n">xo_ms</span><span class="p">,</span> <span class="n">yo_ms</span><span class="p">,</span> <span class="n">w_cs</span><span class="p">,</span> <span class="n">h_cs</span><span class="p">]</span>
+
+    <span class="n">verts_gs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">scaled_verts_from_bbox</span><span class="p">(</span><span class="n">bbox_gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">expanded_verts_gs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">scaled_verts_from_bbox</span><span class="p">(</span><span class="n">mbbox_gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">expanded_verts_ms</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">scaled_verts_from_bbox</span><span class="p">(</span><span class="n">bbox_ms</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># topheavy</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">draw_verts</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">verts_gs</span><span class="p">)</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">draw_verts</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">expanded_verts_gs</span><span class="p">)</span>
+
+    <span class="n">mchipBGR</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">draw_verts</span><span class="p">(</span><span class="n">mchipBGR</span><span class="p">,</span> <span class="n">expanded_verts_ms</span><span class="p">)</span>
+
+    <span class="n">fnum</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">fnum</span><span class="o">=</span><span class="n">fnum</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;original image&#39;</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">imgBGR</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">chipBGR</span><span class="p">,</span> <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">fnum</span><span class="o">=</span><span class="n">fnum</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;original chip&#39;</span><span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">chipBGR</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+        <span class="n">mchipBGR</span><span class="p">,</span>
+        <span class="n">pnum</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">fnum</span><span class="o">=</span><span class="n">fnum</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;scaled chip with expanded margin.</span><span class="se">\n</span><span class="s1">(orig margin drawn in orange)&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mchipBGR</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="n">pt</span><span class="o">.</span><span class="n">show_if_requested</span><span class="p">()</span></div>
+    <span class="c1"># pt.imshow(chipBGR)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.chip</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

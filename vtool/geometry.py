@@ -4,7 +4,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from six.moves import zip
 import numpy as np
 import utool as ut
-import ubelt as ub
 import cv2
 
 

@@ -1,0 +1,921 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.distance &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.distance</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">scipy.spatial.distance</span> <span class="k">as</span> <span class="nn">spdist</span>
+<span class="kn">from</span> <span class="nn">.util_math</span> <span class="k">import</span> <span class="n">TAU</span>
+
+<span class="n">TEMP_VEC_DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+
+<div class="viewcode-block" id="testdata_hist"><a class="viewcode-back" href="../../vtool.html#vtool.distance.testdata_hist">[docs]</a><span class="k">def</span> <span class="nf">testdata_hist</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">hist1</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+    <span class="n">hist2</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span></div>
+
+
+<div class="viewcode-block" id="testdata_sift2"><a class="viewcode-back" href="../../vtool.html#vtool.distance.testdata_sift2">[docs]</a><span class="k">def</span> <span class="nf">testdata_sift2</span><span class="p">():</span>
+    <span class="n">sift1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">sift2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">sift3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">sift4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">sift5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">sift1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">sift3</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">sift4</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">sift5</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">normalize_sift</span><span class="p">(</span><span class="n">sift</span><span class="p">):</span>
+        <span class="c1"># normalize</span>
+        <span class="n">sift_norm</span> <span class="o">=</span> <span class="n">sift</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">sift</span><span class="p">)</span>
+        <span class="c1"># clip</span>
+        <span class="n">sift_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">sift_norm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+        <span class="c1"># re-normalize</span>
+        <span class="n">sift_norm</span> <span class="o">=</span> <span class="n">sift_norm</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">sift_norm</span><span class="p">)</span>
+        <span class="c1"># cast hack</span>
+        <span class="n">sift_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">sift_norm</span> <span class="o">*</span> <span class="mf">512.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sift_norm</span>
+
+    <span class="n">sift1</span> <span class="o">=</span> <span class="n">normalize_sift</span><span class="p">(</span><span class="n">sift1</span><span class="p">)</span>
+    <span class="n">sift2</span> <span class="o">=</span> <span class="n">normalize_sift</span><span class="p">(</span><span class="n">sift2</span><span class="p">)</span>
+    <span class="n">sift3</span> <span class="o">=</span> <span class="n">normalize_sift</span><span class="p">(</span><span class="n">sift3</span><span class="p">)</span>
+    <span class="n">sift4</span> <span class="o">=</span> <span class="n">normalize_sift</span><span class="p">(</span><span class="n">sift4</span><span class="p">)</span>
+    <span class="n">sift5</span> <span class="o">=</span> <span class="n">normalize_sift</span><span class="p">(</span><span class="n">sift5</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sift1</span><span class="p">,</span> <span class="n">sift2</span><span class="p">,</span> <span class="n">sift3</span><span class="p">,</span> <span class="n">sift4</span><span class="p">,</span> <span class="n">sift5</span></div>
+
+
+<div class="viewcode-block" id="wrapped_distance"><a class="viewcode-back" href="../../vtool.html#vtool.distance.wrapped_distance">[docs]</a><span class="k">def</span> <span class="nf">wrapped_distance</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    base = TAU corresponds to ori diff</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">)</span>
+    <span class="n">abs_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr_diff</span><span class="p">)</span>
+    <span class="n">mod_diff1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">abs_diff</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="n">mod_diff2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">mod_diff1</span><span class="p">)</span>
+    <span class="n">arr_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">mod_diff1</span><span class="p">,</span> <span class="n">mod_diff2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">arr_dist</span>
+    <span class="k">return</span> <span class="n">arr_dist</span></div>
+
+
+<div class="viewcode-block" id="signed_ori_distance"><a class="viewcode-back" href="../../vtool.html#vtool.distance.signed_ori_distance">[docs]</a><span class="k">def</span> <span class="nf">signed_ori_distance</span><span class="p">(</span><span class="n">ori1</span><span class="p">,</span> <span class="n">ori2</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        ori1 (ndarray):</span>
+<span class="sd">        ori2 (ndarray):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: ori_dist</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --exec-signed_ori_distance</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; ori1 = np.array([0,  0, 3, 4, 0, 0])</span>
+<span class="sd">        &gt;&gt;&gt; ori2 = np.array([3,  4, 0, 0, np.pi, np.pi - .1])</span>
+<span class="sd">        &gt;&gt;&gt; ori_dist = signed_ori_distance(ori1, ori2)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;ori_dist = %s&#39; % (ub.repr2(ori_dist, precision=3),))</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ori_dist</span> <span class="o">=</span> <span class="n">ori2</span> <span class="o">-</span> <span class="n">ori1</span>
+    <span class="n">ori_dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">ori_dist</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">%</span> <span class="n">TAU</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">return</span> <span class="n">ori_dist</span></div>
+
+
+<div class="viewcode-block" id="ori_distance"><a class="viewcode-back" href="../../vtool.html#vtool.distance.ori_distance">[docs]</a><span class="k">def</span> <span class="nf">ori_distance</span><span class="p">(</span><span class="n">ori1</span><span class="p">,</span> <span class="n">ori2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the unsigned distance between two angles</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles</span>
+
+<span class="sd">    Timeit:</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; import utool as ut</span>
+<span class="sd">        &gt;&gt;&gt; setup = ub.codeblock(</span>
+<span class="sd">        &gt;&gt;&gt;     r&#39;&#39;&#39;</span>
+<span class="sd">                # STARTBLOCK</span>
+<span class="sd">                import numpy as np</span>
+<span class="sd">                tau = np.pi * 2</span>
+<span class="sd">                rng = np.random.RandomState(53)</span>
+<span class="sd">                ori1 = (rng.rand(100000) * tau) - np.pi</span>
+<span class="sd">                ori2 = (rng.rand(100000) * tau) - np.pi</span>
+
+<span class="sd">                def func_outvars():</span>
+<span class="sd">                    ori_dist = np.abs(ori1 - ori2)</span>
+<span class="sd">                    np.mod(ori_dist, tau, out=ori_dist)</span>
+<span class="sd">                    np.minimum(ori_dist, np.subtract(tau, ori_dist), out=ori_dist)</span>
+<span class="sd">                    return ori_dist</span>
+
+<span class="sd">                def func_orig():</span>
+<span class="sd">                    ori_dist = np.abs(ori1 - ori2) % tau</span>
+<span class="sd">                    ori_dist = np.minimum(ori_dist, tau - ori_dist)</span>
+<span class="sd">                    return ori_dist</span>
+<span class="sd">                # ENDBLOCK</span>
+<span class="sd">                &#39;&#39;&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; stmt_list = ub.codeblock(</span>
+<span class="sd">        &gt;&gt;&gt;    &#39;&#39;&#39;</span>
+<span class="sd">                func_outvars()</span>
+<span class="sd">                func_orig()</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+<span class="sd">        &gt;&gt;&gt; ).split(&#39;\n&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ut.util_dev.rrr()</span>
+<span class="sd">        &gt;&gt;&gt; ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-ori_distance</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(0)</span>
+<span class="sd">        &gt;&gt;&gt; ori1 = (rng.rand(10) * TAU) - np.pi</span>
+<span class="sd">        &gt;&gt;&gt; ori2 = (rng.rand(10) * TAU) - np.pi</span>
+<span class="sd">        &gt;&gt;&gt; dist_ = ori_distance(ori1, ori2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(ori1, precision=1)</span>
+<span class="sd">        &gt;&gt;&gt; result += &#39;\n&#39; + ub.repr2(ori2, precision=1)</span>
+<span class="sd">        &gt;&gt;&gt; result += &#39;\n&#39; + ub.repr2(dist_, precision=1)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">    Example2:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; ori1 = np.array([ 0.3,  7.0,  0.0,  3.1], dtype=np.float64)</span>
+<span class="sd">        &gt;&gt;&gt; ori2 = np.array([ 6.8, -1.0,  0.0, -3.1], dtype=np.float64)</span>
+<span class="sd">        &gt;&gt;&gt; dist_ = ori_distance(ori1, ori2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(dist_, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">    Example3:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; ori1 = .3</span>
+<span class="sd">        &gt;&gt;&gt; ori2 = 6.8</span>
+<span class="sd">        &gt;&gt;&gt; dist_ = ori_distance(ori1, ori2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(dist_, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">    Ignore:</span>
+<span class="sd">        # This also works</span>
+<span class="sd">        ori_dist = np.abs(np.arctan2(np.sin(ori1 - ori2), np.cos(ori1 - ori2)))</span>
+<span class="sd">        %timeit np.abs(np.arctan2(np.sin(ori1 - ori2), np.cos(ori1 - ori2)))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cyclic_distance</span><span class="p">(</span><span class="n">ori1</span><span class="p">,</span> <span class="n">ori2</span><span class="p">,</span> <span class="n">modulo</span><span class="o">=</span><span class="n">TAU</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cyclic_distance"><a class="viewcode-back" href="../../vtool.html#vtool.distance.cyclic_distance">[docs]</a><span class="k">def</span> <span class="nf">cyclic_distance</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">modulo</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns an unsigned distance</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arr1 (ndarray):</span>
+<span class="sd">        arr2 (ndarray):</span>
+<span class="sd">        modulo (float or int):</span>
+<span class="sd">        out (ndarray): (default = None)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: arr_dist</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance cyclic_distance</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; out = None</span>
+<span class="sd">        &gt;&gt;&gt; modulo = 8</span>
+<span class="sd">        &gt;&gt;&gt; offset = 0  # doesnt matter what offset is</span>
+<span class="sd">        &gt;&gt;&gt; arr1 = np.hstack([np.arange(offset, modulo + offset), np.nan])</span>
+<span class="sd">        &gt;&gt;&gt; arr2 = arr1[:, None]</span>
+<span class="sd">        &gt;&gt;&gt; arr_dist = cyclic_distance(arr1, arr2, modulo, out)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;arr_dist =\n%s&#39; % (ub.repr2(arr_dist),))</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">abs_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">arr_diff</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">mod_diff1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">abs_diff</span><span class="p">,</span> <span class="n">modulo</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">mod_diff2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">modulo</span><span class="p">,</span> <span class="n">mod_diff1</span><span class="p">)</span>
+    <span class="n">arr_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">mod_diff1</span><span class="p">,</span> <span class="n">mod_diff2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arr_dist</span></div>
+
+
+<div class="viewcode-block" id="signed_cyclic_distance"><a class="viewcode-back" href="../../vtool.html#vtool.distance.signed_cyclic_distance">[docs]</a><span class="k">def</span> <span class="nf">signed_cyclic_distance</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">modulo</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">arr_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">half_mod</span> <span class="o">=</span> <span class="n">modulo</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">arr_dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr_diff</span> <span class="o">+</span> <span class="n">half_mod</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulo</span> <span class="o">-</span> <span class="n">half_mod</span>
+    <span class="k">return</span> <span class="n">arr_dist</span></div>
+
+
+<div class="viewcode-block" id="det_distance"><a class="viewcode-back" href="../../vtool.html#vtool.distance.det_distance">[docs]</a><span class="k">def</span> <span class="nf">det_distance</span><span class="p">(</span><span class="n">det1</span><span class="p">,</span> <span class="n">det2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns how far off determinants are from one another</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(53)</span>
+<span class="sd">        &gt;&gt;&gt; det1 = rng.rand(5)</span>
+<span class="sd">        &gt;&gt;&gt; det2 = rng.rand(5)</span>
+<span class="sd">        &gt;&gt;&gt; scaledist = det_distance(det1, det2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(scaledist, precision=2, threshold=2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">det_dist</span> <span class="o">=</span> <span class="n">det1</span> <span class="o">/</span> <span class="n">det2</span>
+    <span class="c1"># Flip ratios that are less than 1</span>
+    <span class="n">_flip_flag</span> <span class="o">=</span> <span class="n">det_dist</span> <span class="o">&lt;</span> <span class="mi">1</span>
+    <span class="n">det_dist</span><span class="p">[</span><span class="n">_flip_flag</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">det_dist</span><span class="p">[</span><span class="n">_flip_flag</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">det_dist</span></div>
+
+
+<div class="viewcode-block" id="L1"><a class="viewcode-back" href="../../vtool.html#vtool.distance.L1">[docs]</a><span class="k">def</span> <span class="nf">L1</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns L1 (aka manhatten or grid) distance between two histograms &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hist2</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="L2_sqrd"><a class="viewcode-back" href="../../vtool.html#vtool.distance.L2_sqrd">[docs]</a><span class="k">def</span> <span class="nf">L2_sqrd</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns the squared L2 distance</span>
+
+<span class="sd">    # FIXME:</span>
+<span class="sd">        if hist1.shape = (0,) and hist.shape = (0,) then result=0.0</span>
+
+<span class="sd">    SeeAlso:</span>
+<span class="sd">        L2</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import numpy</span>
+<span class="sd">        &gt;&gt;&gt; ut.exec_funckw(L2_sqrd, globals())</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(53)</span>
+<span class="sd">        &gt;&gt;&gt; hist1 = rng.rand(5, 2)</span>
+<span class="sd">        &gt;&gt;&gt; hist2 = rng.rand(5, 2)</span>
+<span class="sd">        &gt;&gt;&gt; l2dist = L2_sqrd(hist1, hist2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(l2dist, precision=2, threshold=2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; hist1 = 3</span>
+<span class="sd">        &gt;&gt;&gt; hist2 = 0</span>
+<span class="sd">        &gt;&gt;&gt; result = L2_sqrd(hist1, hist2)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Carefull, this will not return the correct result if the types are unsigned.</span>
+    <span class="n">hist1_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">hist2_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hist2</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">hist1_</span> <span class="o">-</span> <span class="n">hist2_</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># this is faster</span></div>
+
+
+<div class="viewcode-block" id="understanding_pseudomax_props"><a class="viewcode-back" href="../../vtool.html#vtool.distance.understanding_pseudomax_props">[docs]</a><span class="k">def</span> <span class="nf">understanding_pseudomax_props</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function showing some properties of distances between normalized pseudomax vectors</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-understanding_pseudomax_props</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; for mode in [0, 1, 2, 3]:</span>
+<span class="sd">        ...     print(&#39;+---&#39;)</span>
+<span class="sd">        ...     print(&#39;mode = %r&#39; % (mode,))</span>
+<span class="sd">        ...     result = understanding_pseudomax_props(mode)</span>
+<span class="sd">        ...     print(&#39;L___&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">pseudo_max</span> <span class="o">=</span> <span class="mi">512</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">p1_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+        <span class="n">p2_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">p1_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span> <span class="o">/</span> <span class="n">pseudo_max</span>
+        <span class="n">p2_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">demodata</span><span class="o">.</span><span class="n">testdata_dummy_sift</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span> <span class="o">/</span> <span class="n">pseudo_max</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Build theoretically maximally distant normalized vectors (type 1)</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">128</span>
+        <span class="n">p1_01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+        <span class="n">p2_01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+        <span class="n">p2_01</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">p1_01</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">p1_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">p1_01</span><span class="p">)</span>
+        <span class="n">p2_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">p2_01</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c1"># Build theoretically maximally distant vectors (type 2)</span>
+        <span class="c1"># This mode will clip if cast to uint8, thus failing the test</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">128</span>
+        <span class="n">p1_01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+        <span class="n">p2_01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+        <span class="n">p2_01</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">p1_01</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">p1_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">p1_01</span><span class="p">)</span>
+        <span class="n">p2_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">p2_01</span><span class="p">)</span>
+        <span class="k">pass</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ndims = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">p1_01</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">p1_01</span> <span class="o">=</span> <span class="n">p1_01</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span>
+    <span class="n">p2_01</span> <span class="o">=</span> <span class="n">p2_01</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span>
+
+    <span class="n">p1_256</span> <span class="o">=</span> <span class="n">p1_01</span> <span class="o">*</span> <span class="n">pseudo_max</span>
+    <span class="n">p2_256</span> <span class="o">=</span> <span class="n">p2_01</span> <span class="o">*</span> <span class="n">pseudo_max</span>
+
+    <span class="n">dist_sqrd_01</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">L2_sqrd</span><span class="p">(</span><span class="n">p1_01</span><span class="p">,</span> <span class="n">p2_01</span><span class="p">)</span>
+    <span class="n">dist_sqrd_256</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">L2_sqrd</span><span class="p">(</span><span class="n">p1_256</span><span class="p">,</span> <span class="n">p2_256</span><span class="p">)</span>
+
+    <span class="n">dist_01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist_sqrd_01</span><span class="p">)</span>
+    <span class="n">dist_256</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist_sqrd_256</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dist_sqrd_01  = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">dist_sqrd_01</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">),))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dist_sqrd_256 = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">dist_sqrd_256</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">),))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dist_01       = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">dist_01</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">),))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dist_256      = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">dist_256</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">),))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sqrt(2)       = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dist_01</span> <span class="o">==</span> <span class="n">vt</span><span class="o">.</span><span class="n">L2</span><span class="p">(</span><span class="n">p1_01</span><span class="p">,</span> <span class="n">p2_01</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dist_256</span> <span class="o">==</span> <span class="n">vt</span><span class="o">.</span><span class="n">L2</span><span class="p">(</span><span class="n">p1_256</span><span class="p">,</span> <span class="n">p2_256</span><span class="p">))</span>
+
+    <span class="n">const_sqrd</span> <span class="o">=</span> <span class="n">dist_sqrd_256</span> <span class="o">/</span> <span class="n">dist_sqrd_01</span>
+    <span class="n">const</span> <span class="o">=</span> <span class="n">dist_256</span> <span class="o">/</span> <span class="n">dist_01</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;const = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">const</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;const_sqrd = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">const_sqrd</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 / const = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">const</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1 / const_sqrd = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">const_sqrd</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+
+    <span class="k">assert</span> <span class="n">ub</span><span class="o">.</span><span class="n">allsame</span><span class="p">(</span><span class="n">const</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">ub</span><span class="o">.</span><span class="n">allsame</span><span class="p">(</span><span class="n">const_sqrd</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">const</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">const_sqrd</span><span class="p">))</span>
+
+    <span class="c1"># Assert that distance conversions work</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dist_256</span> <span class="o">/</span> <span class="n">const</span> <span class="o">==</span> <span class="n">dist_01</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dist_sqrd_256</span> <span class="o">/</span> <span class="n">const_sqrd</span> <span class="o">==</span> <span class="n">dist_sqrd_01</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Conversions work&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s1">&#39;Maximal L2 distance between any two NON-NEGATIVE L2-NORMALIZED&#39;</span>
+        <span class="s1">&#39; vectors should always be sqrt(2)&#39;</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="L2"><a class="viewcode-back" href="../../vtool.html#vtool.distance.L2">[docs]</a><span class="k">def</span> <span class="nf">L2</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns L2 (aka euclidean or standard) distance between two histograms &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L2_sqrd</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="hist_isect"><a class="viewcode-back" href="../../vtool.html#vtool.distance.hist_isect">[docs]</a><span class="k">def</span> <span class="nf">hist_isect</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns histogram intersection distance between two histograms &quot;&quot;&quot;</span>
+    <span class="n">numer</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">]))</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">hist2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">hisect_dist</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hisect_dist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">hisect_dist</span> <span class="o">=</span> <span class="n">hisect_dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">hisect_dist</span></div>
+
+
+<span class="n">VALID_DISTS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;L1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;L2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;L2_sift&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;L2_sqrd&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bar_L2_sift&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bar_cos_sift&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cos_sift&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;det_distance&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;emd&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hist_isect&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nearest_point&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ori_distance&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="compute_distances"><a class="viewcode-back" href="../../vtool.html#vtool.distance.compute_distances">[docs]</a><span class="k">def</span> <span class="nf">compute_distances</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">,</span> <span class="n">dist_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L1&#39;</span><span class="p">,</span> <span class="s1">&#39;L2&#39;</span><span class="p">]):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        hist1 (ndarray):</span>
+<span class="sd">        hist2 (ndarray):</span>
+<span class="sd">        dist_list (list): (default = [&#39;L1&#39;, &#39;L2&#39;])</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: dist_dict</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-compute_distances</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; hist1 = np.array([[1, 2], [2, 1], [0, 0]])</span>
+<span class="sd">        &gt;&gt;&gt; hist2 = np.array([[1, 2], [3, 1], [2, 2]])</span>
+<span class="sd">        &gt;&gt;&gt; dist_list = [&#39;L1&#39;, &#39;L2&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; dist_dict = compute_distances(hist1, hist2, dist_list)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(dist_dict, precision=3)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtype_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="n">hist1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
+    <span class="n">hist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hist2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
+    <span class="c1"># TODO: enumerate value distances</span>
+    <span class="n">dist_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">globals</span><span class="p">()[</span><span class="n">type_</span><span class="p">]</span> <span class="k">for</span> <span class="n">type_</span> <span class="ow">in</span> <span class="n">dist_list</span><span class="p">]</span>
+    <span class="n">val_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">func</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">)</span> <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">dist_funcs</span><span class="p">]</span>
+    <span class="n">dist_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dist_list</span><span class="p">,</span> <span class="n">val_list</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">dist_dict</span></div>
+
+
+<div class="viewcode-block" id="bar_L2_sift"><a class="viewcode-back" href="../../vtool.html#vtool.distance.bar_L2_sift">[docs]</a><span class="k">def</span> <span class="nf">bar_L2_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized SIFT L2</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hist1 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+<span class="sd">        hist2 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-bar_L2_sift</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; hist1, hist2 = testdata_hist()</span>
+<span class="sd">        &gt;&gt;&gt; barl2_dist = bar_L2_sift(hist1, hist2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(barl2_dist, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">L2_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="L2_sift"><a class="viewcode-back" href="../../vtool.html#vtool.distance.L2_sift">[docs]</a><span class="k">def</span> <span class="nf">L2_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized SIFT L2</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hist1 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+<span class="sd">        hist2 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: euclidean distance between 0-1 normalized sift descriptors</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-L2_sift</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; hist1, hist2 = testdata_hist()</span>
+<span class="sd">        &gt;&gt;&gt; sift1, sift2, sift3, sift4, sift5 = testdata_sift2()</span>
+<span class="sd">        &gt;&gt;&gt; l2_dist = L2_sift(hist1, hist2)</span>
+<span class="sd">        &gt;&gt;&gt; max_dist = L2_sift(sift4, sift5)</span>
+<span class="sd">        &gt;&gt;&gt; assert np.isclose(max_dist, 1.0)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(l2_dist, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The corret number is 512, because thats what is used in siftdesc.cpp</span>
+    <span class="c1"># remove the pseudo max hack</span>
+    <span class="n">psuedo_max</span> <span class="o">=</span> <span class="mf">512.0</span>
+    <span class="n">max_l2_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># maximum L2 distance should always be sqrt 2</span>
+    <span class="n">sift1</span> <span class="o">=</span> <span class="n">hist1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">sift2</span> <span class="o">=</span> <span class="n">hist2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">l2_dist</span> <span class="o">=</span> <span class="n">L2</span><span class="p">(</span><span class="n">sift1</span><span class="p">,</span> <span class="n">sift2</span><span class="p">)</span>
+    <span class="n">sift_dist</span> <span class="o">=</span> <span class="n">l2_dist</span> <span class="o">/</span> <span class="n">max_l2_dist</span>
+    <span class="k">return</span> <span class="n">sift_dist</span></div>
+
+
+<div class="viewcode-block" id="L2_root_sift"><a class="viewcode-back" href="../../vtool.html#vtool.distance.L2_root_sift">[docs]</a><span class="k">def</span> <span class="nf">L2_root_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized Root-SIFT L2</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hist1 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+<span class="sd">        hist2 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: euclidean distance between 0-1 normalized sift descriptors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># remove the pseudo max hack</span>
+    <span class="n">psuedo_max</span> <span class="o">=</span> <span class="mf">512.0</span>
+    <span class="n">max_root_l2_dist</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># This is a guess</span>
+    <span class="n">sift1</span> <span class="o">=</span> <span class="n">hist1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">sift2</span> <span class="o">=</span> <span class="n">hist2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">root_sift1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sift1</span><span class="p">)</span>
+    <span class="n">root_sift2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sift2</span><span class="p">)</span>
+    <span class="n">l2_dist</span> <span class="o">=</span> <span class="n">L2</span><span class="p">(</span><span class="n">root_sift1</span><span class="p">,</span> <span class="n">root_sift2</span><span class="p">)</span>
+    <span class="c1"># Usure if correct;</span>
+    <span class="n">l2_root_dist</span> <span class="o">=</span> <span class="n">l2_dist</span> <span class="o">/</span> <span class="n">max_root_l2_dist</span>
+    <span class="k">return</span> <span class="n">l2_root_dist</span></div>
+
+
+<div class="viewcode-block" id="L2_sift_sqrd"><a class="viewcode-back" href="../../vtool.html#vtool.distance.L2_sift_sqrd">[docs]</a><span class="k">def</span> <span class="nf">L2_sift_sqrd</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalized SIFT L2**2</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hist1 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+<span class="sd">        hist2 (ndarray): Nx128 array of uint8 with pseudomax trick</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: squared euclidean distance between 0-1 normalized sift descriptors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># remove the pseudo max hack</span>
+    <span class="n">psuedo_max</span> <span class="o">=</span> <span class="mf">512.0</span>
+    <span class="n">max_l2_dist_sqrd</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">sift1</span> <span class="o">=</span> <span class="n">hist1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">sift2</span> <span class="o">=</span> <span class="n">hist2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">l2_sqrd_dist</span> <span class="o">=</span> <span class="n">L2_sqrd</span><span class="p">(</span><span class="n">sift1</span><span class="p">,</span> <span class="n">sift2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">l2_sqrd_dist</span> <span class="o">/</span> <span class="n">max_l2_dist_sqrd</span></div>
+
+
+<div class="viewcode-block" id="bar_cos_sift"><a class="viewcode-back" href="../../vtool.html#vtool.distance.bar_cos_sift">[docs]</a><span class="k">def</span> <span class="nf">bar_cos_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; 1 - cos dist  &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">cos_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cos_sift"><a class="viewcode-back" href="../../vtool.html#vtool.distance.cos_sift">[docs]</a><span class="k">def</span> <span class="nf">cos_sift</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    cos dist</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-cos_sift</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; hist1, hist2 = testdata_hist()</span>
+<span class="sd">        &gt;&gt;&gt; l2_dist = cos_sift(hist1, hist2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(l2_dist, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">psuedo_max</span> <span class="o">=</span> <span class="mf">512.0</span>
+    <span class="n">sift1</span> <span class="o">=</span> <span class="n">hist1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="n">sift2</span> <span class="o">=</span> <span class="n">hist2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TEMP_VEC_DTYPE</span><span class="p">)</span> <span class="o">/</span> <span class="n">psuedo_max</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sift1</span> <span class="o">*</span> <span class="n">sift2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cosine_dist"><a class="viewcode-back" href="../../vtool.html#vtool.distance.cosine_dist">[docs]</a><span class="k">def</span> <span class="nf">cosine_dist</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">hist1</span> <span class="o">*</span> <span class="n">hist2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_assert_siftvec</span><span class="p">(</span><span class="n">sift</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="k">assert</span> <span class="n">vt</span><span class="o">.</span><span class="n">check_sift_validity</span><span class="p">(</span><span class="n">sift</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="emd"><a class="viewcode-back" href="../../vtool.html#vtool.distance.emd">[docs]</a><span class="k">def</span> <span class="nf">emd</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">,</span> <span class="n">cost_matrix</span><span class="o">=</span><span class="s1">&#39;sift&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    earth mover&#39;s distance by robjects(lpSovle::lp.transport)</span>
+<span class="sd">    require: lpsolve55-5.5.0.9.win32-py2.7.exe</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-emd</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; hist1, hist2 = testdata_hist()</span>
+<span class="sd">        &gt;&gt;&gt; emd_dists = emd(hist1, hist2)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(emd_dists, precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        np.array([ 2063.99,  2078.02,  2109.03,  2011.99,  2130.99,  2089.01,</span>
+<span class="sd">                   2030.99,  2294.98,  2026.02,  2426.01])</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        pip install pyemd</span>
+<span class="sd">        https://github.com/andreasjansson/python-emd</span>
+<span class="sd">        http://www.cs.huji.ac.il/~werman/Papers/ECCV2008.pdf</span>
+<span class="sd">        http://stackoverflow.com/questions/15706339/compute-emd-2umpy-arrays-using-opencv</span>
+<span class="sd">        http://www.cs.huji.ac.il/~ofirpele/FastEMD/code/</span>
+<span class="sd">        http://www.cs.huji.ac.il/~ofirpele/publications/ECCV2008.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyemd</span>
+
+    <span class="k">if</span> <span class="n">cost_matrix</span> <span class="o">==</span> <span class="s1">&#39;sift&#39;</span><span class="p">:</span>
+        <span class="c1"># Build cost matrix where bin-to-bin cost is 0,</span>
+        <span class="c1"># neighbor cost is 1, and other cost is 2</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="n">cost_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">128</span><span class="p">))</span>
+        <span class="n">cost_matrix</span><span class="p">[</span><span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">absdiff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">is_neighbor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">absdiff</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="n">absdiff</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">cost_matrix</span><span class="p">[</span><span class="n">is_neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="c1"># print(cost_matrix[0:16, 0:16])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hist1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">pyemd</span><span class="o">.</span><span class="n">emd</span><span class="p">(</span><span class="n">hist1_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">),</span> <span class="n">hist2_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">),</span> <span class="n">cost_matrix</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">hist1_</span><span class="p">,</span> <span class="n">hist2_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">hist1</span><span class="p">,</span> <span class="n">hist2</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">pyemd</span><span class="o">.</span><span class="n">emd</span><span class="p">(</span><span class="n">hist1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">),</span> <span class="n">hist2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">),</span> <span class="n">cost_matrix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+<div class="viewcode-block" id="nearest_point"><a class="viewcode-back" href="../../vtool.html#vtool.distance.nearest_point">[docs]</a><span class="k">def</span> <span class="nf">nearest_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">pts</span><span class="p">,</span> <span class="n">conflict_mode</span><span class="o">=</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="n">__next_counter</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot; finds the nearest point(s) in pts to (x, y)</span>
+
+<span class="sd">    TODO: depricate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># with ut.embed_on_exception_context:</span>
+    <span class="n">dists</span> <span class="o">=</span> <span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">pts</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">fx</span> <span class="o">=</span> <span class="n">dists</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">mindist</span> <span class="o">=</span> <span class="n">dists</span><span class="p">[</span><span class="n">fx</span><span class="p">]</span>
+    <span class="n">other_fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mindist</span> <span class="o">==</span> <span class="n">dists</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_fx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">conflict_mode</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">other_fx</span><span class="p">)</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="n">other_fx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">conflict_mode</span> <span class="o">==</span> <span class="s1">&#39;next&#39;</span><span class="p">:</span>
+            <span class="n">__next_counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">__next_counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_fx</span><span class="p">)</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="n">other_fx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">conflict_mode</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="n">other_fx</span>
+        <span class="k">elif</span> <span class="n">conflict_mode</span> <span class="o">==</span> <span class="s1">&#39;first&#39;</span><span class="p">:</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="n">fx</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;unknown conflict_mode=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">conflict_mode</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="n">fx</span><span class="p">,</span> <span class="n">mindist</span></div>
+
+
+<div class="viewcode-block" id="closest_point"><a class="viewcode-back" href="../../vtool.html#vtool.distance.closest_point">[docs]</a><span class="k">def</span> <span class="nf">closest_point</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">pt_arr</span><span class="p">,</span> <span class="n">distfunc</span><span class="o">=</span><span class="n">L2_sqrd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; finds the nearest point(s) in pts to (x, y)</span>
+<span class="sd">    pt = np.array([1])</span>
+<span class="sd">    pt_arr = np.array([1.1, 2, .95, 20])[:, None]</span>
+<span class="sd">    distfunc = vt.L2_sqrd</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># import vtool as vt</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pt_arr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">dists</span> <span class="o">=</span> <span class="n">distfunc</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">pt_arr</span><span class="p">)</span>
+    <span class="n">xlist</span> <span class="o">=</span> <span class="n">dists</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xlist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dists</span><span class="p">[</span><span class="n">xlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="n">dists</span><span class="p">[</span><span class="n">xlist</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;conflict&#39;</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">dists</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">index</span><span class="p">,</span> <span class="n">dist</span></div>
+
+
+<div class="viewcode-block" id="haversine"><a class="viewcode-back" href="../../vtool.html#vtool.distance.haversine">[docs]</a><span class="k">def</span> <span class="nf">haversine</span><span class="p">(</span><span class="n">latlon1</span><span class="p">,</span> <span class="n">latlon2</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the great circle distance between two points</span>
+<span class="sd">    on the earth (specified in decimal degrees)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latlon1 (ndarray):</span>
+<span class="sd">        latlon2 (ndarray):</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        en.wikipedia.org/wiki/Haversine_formula</span>
+<span class="sd">        gis.stackexchange.com/questions/81551/matching-gps-tracks</span>
+<span class="sd">        stackoverflow.com/questions/4913349/haversine-distance-gps-points</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --exec-haversine</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import scipy.spatial.distance as spdist</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; import functools</span>
+<span class="sd">        &gt;&gt;&gt; gpsarr_track_list_ = [</span>
+<span class="sd">        ...    np.array([[ -80.21895315, -158.81099213],</span>
+<span class="sd">        ...              [ -12.08338926,   67.50368014],</span>
+<span class="sd">        ...              [ -11.08338926,   67.50368014],</span>
+<span class="sd">        ...              [ -11.08338926,   67.50368014],]</span>
+<span class="sd">        ...    ),</span>
+<span class="sd">        ...    np.array([[   9.77816711,  -17.27471498],</span>
+<span class="sd">        ...              [ -51.67678814, -158.91065495],])</span>
+<span class="sd">        ...    ]</span>
+<span class="sd">        &gt;&gt;&gt; latlon1 = gpsarr_track_list_[0][0]</span>
+<span class="sd">        &gt;&gt;&gt; latlon2 = gpsarr_track_list_[0][1]</span>
+<span class="sd">        &gt;&gt;&gt; kilometers = vt.haversine(latlon1, latlon2)</span>
+<span class="sd">        &gt;&gt;&gt; haversin_pdist = functools.partial(spdist.pdist, metric=vt.haversine)</span>
+<span class="sd">        &gt;&gt;&gt; dist_vector_list = list(map(haversin_pdist, gpsarr_track_list_))</span>
+<span class="sd">        &gt;&gt;&gt; dist_matrix_list = list(map(spdist.squareform, dist_vector_list))</span>
+<span class="sd">        &gt;&gt;&gt; #xdoctest: +IGNORE_WHITESPACE</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;dist_matrix_list = %s&#39; % (ut.repr3(dist_matrix_list, precision=2, with_dtype=True),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># FIXME; lat, lon should be different columns not different rows</span>
+    <span class="c1"># convert decimal degrees to radians</span>
+    <span class="n">lat1</span><span class="p">,</span> <span class="n">lon1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">latlon1</span><span class="p">)</span>
+    <span class="n">lat2</span><span class="p">,</span> <span class="n">lon2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">latlon2</span><span class="p">)</span>
+    <span class="c1"># haversine formula</span>
+    <span class="n">dlon</span> <span class="o">=</span> <span class="n">lon2</span> <span class="o">-</span> <span class="n">lon1</span>
+    <span class="n">dlat</span> <span class="o">=</span> <span class="n">lat2</span> <span class="o">-</span> <span class="n">lat1</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dlat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dlon</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+    <span class="n">EARTH_RADIUS_KM</span> <span class="o">=</span> <span class="mf">6367.0</span>
+    <span class="n">kilometers</span> <span class="o">=</span> <span class="n">EARTH_RADIUS_KM</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="n">kilometers</span></div>
+
+
+<div class="viewcode-block" id="safe_pdist"><a class="viewcode-back" href="../../vtool.html#vtool.distance.safe_pdist">[docs]</a><span class="k">def</span> <span class="nf">safe_pdist</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Kwargs:</span>
+<span class="sd">        metric = ut.absdiff</span>
+
+<span class="sd">    SeeAlso:</span>
+<span class="sd">        scipy.spatial.distance.pdist</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">spdist</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">spdist</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pdist_indicies"><a class="viewcode-back" href="../../vtool.html#vtool.distance.pdist_indicies">[docs]</a><span class="k">def</span> <span class="nf">pdist_indicies</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="pdist_argsort"><a class="viewcode-back" href="../../vtool.html#vtool.distance.pdist_argsort">[docs]</a><span class="k">def</span> <span class="nf">pdist_argsort</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sorts 2d indicies by their distnace matrix output from scipy.spatial.distance</span>
+<span class="sd">    x = np.array([  3.05555556e-03,   1.47619797e+04,   1.47619828e+04])</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (ndarray):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: sortx_2d</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance --test-pdist_argsort</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.distance import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; x = np.array([ 21695.78, 10943.76, 10941.44, 25867.64, 10752.03,</span>
+<span class="sd">        &gt;&gt;&gt;               10754.35, 4171.86, 2.32, 14923.89, 14926.2 ],</span>
+<span class="sd">        &gt;&gt;&gt;              dtype=np.float64)</span>
+<span class="sd">        &gt;&gt;&gt; sortx_2d = pdist_argsort(x)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;sortx_2d = %s&#39; % (str(sortx_2d),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        sortx_2d = [(2, 3), (1, 4), (1, 2), (1, 3), (0, 3), (0, 2), (2, 4), (3, 4), (0, 1), (0, 4)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">OLD</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># compare_idxs = [(r, c) for r, c in itertools.product(range(len(x) / 2),</span>
+    <span class="c1"># range(len(x) / 2)) if (c &gt; r)]</span>
+    <span class="k">if</span> <span class="n">OLD</span><span class="p">:</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">spdist</span><span class="o">.</span><span class="n">squareform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">matu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+        <span class="n">sortx_row</span><span class="p">,</span> <span class="n">sortx_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">matu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">argsort</span><span class="p">(),</span> <span class="n">matu</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="c1"># only take where col is larger than row due to upper triu</span>
+        <span class="n">sortx_2d</span> <span class="o">=</span> <span class="p">[(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sortx_row</span><span class="p">,</span> <span class="n">sortx_col</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">&gt;</span> <span class="n">r</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">compare_idxs</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span>
+            <span class="p">[[(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">)]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">sortx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+        <span class="n">sortx_2d</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">compare_idxs</span><span class="p">,</span> <span class="n">sortx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sortx_2d</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.distance all</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

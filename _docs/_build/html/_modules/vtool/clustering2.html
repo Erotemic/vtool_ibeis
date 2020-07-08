@@ -1,0 +1,971 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.clustering2 &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.clustering2</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># LICENCE</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO:</span>
+<span class="sd">    Does HDBSCAN work on 128 dim vectors?</span>
+<span class="sd">    http://nbviewer.jupyter.org/github/lmcinnes/hdbscan/blob/master/notebooks/Comparing%20Clustering%20Algorithms.ipynb</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">map</span>  <span class="c1"># NOQA</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+
+<span class="kn">from</span> <span class="nn">vtool._pyflann_backend</span> <span class="k">import</span> <span class="n">FLANN_CLS</span>
+
+
+<div class="viewcode-block" id="tune_flann2"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.tune_flann2">[docs]</a><span class="k">def</span> <span class="nf">tune_flann2</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">flann</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span>
+    <span class="n">flann_atkwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;autotuned&#39;</span><span class="p">,</span>
+        <span class="n">target_precision</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">build_weight</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">memory_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">sample_fraction</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Autotuning flann&#39;</span><span class="p">)</span>
+    <span class="n">tuned_params</span> <span class="o">=</span> <span class="n">flann</span><span class="o">.</span><span class="n">build_index</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">flann_atkwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tuned_params</span></div>
+
+
+<div class="viewcode-block" id="AnnoyWraper"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.AnnoyWraper">[docs]</a><span class="k">class</span> <span class="nc">AnnoyWraper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    flann-like interface to annnoy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="AnnoyWraper.build_annoy"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.AnnoyWraper.build_annoy">[docs]</a>    <span class="k">def</span> <span class="nf">build_annoy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">trees</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">annoy</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">annoy</span><span class="o">.</span><span class="n">AnnoyIndex</span><span class="p">(</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">centroids</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnnoyWraper.query_annoy"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.AnnoyWraper.query_annoy">[docs]</a>    <span class="k">def</span> <span class="nf">query_annoy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_vecs</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">checks</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+        <span class="n">index_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dist_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">query_vecs</span><span class="p">:</span>
+            <span class="n">idx</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get_nns_by_vector</span><span class="p">(</span>
+                <span class="n">v</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">search_k</span><span class="o">=</span><span class="n">checks</span><span class="p">,</span> <span class="n">include_distances</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">index_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="n">dist_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index_list</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dist_list</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="AnnoyWraper.nn"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.AnnoyWraper.nn">[docs]</a>    <span class="k">def</span> <span class="nf">nn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_vecs</span><span class="p">,</span> <span class="n">query_vecs</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">trees</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">checks</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_annoy</span><span class="p">(</span><span class="n">data_vecs</span><span class="p">,</span> <span class="n">trees</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_annoy</span><span class="p">(</span><span class="n">query_vecs</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">checks</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="jagged_group"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.jagged_group">[docs]</a><span class="k">def</span> <span class="nf">jagged_group</span><span class="p">(</span><span class="n">groupids_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; flattens and returns group indexes into the flattened list &quot;&quot;&quot;</span>
+    <span class="c1"># flatx2_itemx = np.array(list(ub.flatten(itemxs_iter)))</span>
+    <span class="n">flatids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">groupids_list</span><span class="p">)))</span>
+    <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span> <span class="o">=</span> <span class="n">group_indices</span><span class="p">(</span><span class="n">flatids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span></div>
+
+
+<div class="viewcode-block" id="apply_jagged_grouping"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_jagged_grouping">[docs]</a><span class="k">def</span> <span class="nf">apply_jagged_grouping</span><span class="p">(</span><span class="n">unflat_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; takes unflat_list and flat group indices. Returns the unflat grouping &quot;&quot;&quot;</span>
+    <span class="n">flat_items</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">unflat_items</span><span class="p">)))</span>
+    <span class="n">item_groups</span> <span class="o">=</span> <span class="n">apply_grouping</span><span class="p">(</span><span class="n">flat_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">item_groups</span></div>
+    <span class="c1"># itemxs_iter = [[count] * len(idx2_groupid) for count, idx2_groupid in enumerate(groupids_list)]</span>
+
+
+<div class="viewcode-block" id="groupedzip"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupedzip">[docs]</a><span class="k">def</span> <span class="nf">groupedzip</span><span class="p">(</span><span class="n">id_list</span><span class="p">,</span> <span class="n">datas_list</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for grouping multiple lists of data (stored in ``datas_list``)</span>
+<span class="sd">    using ``id_list``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id_list (list):</span>
+<span class="sd">        datas_list (list):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        iterator: _iter</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.clustering2 --test-groupedzip</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; id_list = np.array([1, 2, 1, 2, 1, 2, 3])</span>
+<span class="sd">        &gt;&gt;&gt; datas_list = [</span>
+<span class="sd">        ...     [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;, &#39;f&#39;, &#39;g&#39;],</span>
+<span class="sd">        ...     [&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;],</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; groupxs, grouped_iter = groupedzip(id_list, datas_list)</span>
+<span class="sd">        &gt;&gt;&gt; grouped_tuples = list(grouped_iter)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; result = str(groupxs) + &#39;\n&#39;</span>
+<span class="sd">        &gt;&gt;&gt; result += ub.repr2(grouped_tuples, nl=1)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [1 2 3]</span>
+<span class="sd">        [</span>
+<span class="sd">            ([&#39;a&#39;, &#39;c&#39;, &#39;e&#39;], [&#39;A&#39;, &#39;C&#39;, &#39;E&#39;]),</span>
+<span class="sd">            ([&#39;b&#39;, &#39;d&#39;, &#39;f&#39;], [&#39;B&#39;, &#39;D&#39;, &#39;F&#39;]),</span>
+<span class="sd">            ([&#39;g&#39;], [&#39;G&#39;]),</span>
+<span class="sd">        ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_ids</span><span class="p">,</span> <span class="n">groupxs</span> <span class="o">=</span> <span class="n">group_indices</span><span class="p">(</span><span class="n">id_list</span><span class="p">)</span>
+    <span class="n">grouped_datas_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">apply_grouping_</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas_list</span><span class="p">]</span>
+    <span class="n">grouped_iter</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">grouped_datas_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">unique_ids</span><span class="p">,</span> <span class="n">grouped_iter</span></div>
+
+
+<div class="viewcode-block" id="group_indices"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.group_indices">[docs]</a><span class="k">def</span> <span class="nf">group_indices</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">,</span> <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    group_indices</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        idx2_groupid (ndarray): numpy array of group ids (must be numeric)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple (ndarray, list of ndarrays): (keys, groupxs)</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m ~/code/vtool/vtool/clustering2.py group_indices</span>
+<span class="sd">        xdoctest -m ~/code/vtool/vtool/clustering2.py group_indices:0</span>
+<span class="sd">        xdoctest -m ~/code/vtool/vtool/clustering2.py group_indices:1</span>
+
+<span class="sd">    Example0:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; idx2_groupid = np.array([2, 1, 2, 1, 2, 1, 2, 3, 3, 3, 3])</span>
+<span class="sd">        &gt;&gt;&gt; (keys, groupxs) = group_indices(idx2_groupid)</span>
+<span class="sd">        &gt;&gt;&gt; result = ut.repr2((keys, groupxs), nl=2, nobr=True, with_dtype=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        np.array([1, 2, 3], dtype=np.int64),</span>
+<span class="sd">        [</span>
+<span class="sd">            np.array([1, 3, 5], dtype=np.int64),</span>
+<span class="sd">            np.array([0, 2, 4, 6], dtype=np.int64),</span>
+<span class="sd">            np.array([ 7,  8,  9, 10], dtype=np.int64),</span>
+<span class="sd">        ],</span>
+
+<span class="sd">    Example1:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; idx2_groupid = np.array([[  24], [ 129], [ 659], [ 659], [ 24],</span>
+<span class="sd">        ...       [659], [ 659], [ 822], [ 659], [ 659], [24]])</span>
+<span class="sd">        &gt;&gt;&gt; # 2d arrays must be flattened before coming into this function so</span>
+<span class="sd">        &gt;&gt;&gt; # information is on the last axis</span>
+<span class="sd">        &gt;&gt;&gt; (keys, groupxs) = group_indices(idx2_groupid.T[0])</span>
+<span class="sd">        &gt;&gt;&gt; result = ut.repr2((keys, groupxs), nl=2, nobr=True, with_dtype=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        np.array([ 24, 129, 659, 822], dtype=np.int64),</span>
+<span class="sd">        [</span>
+<span class="sd">            np.array([ 0,  4, 10], dtype=np.int64),</span>
+<span class="sd">            np.array([1], dtype=np.int64),</span>
+<span class="sd">            np.array([2, 3, 5, 6, 8, 9], dtype=np.int64),</span>
+<span class="sd">            np.array([7], dtype=np.int64),</span>
+<span class="sd">        ],</span>
+
+<span class="sd">    Example2:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; idx2_groupid = np.array([True, True, False, True, False, False, True])</span>
+<span class="sd">        &gt;&gt;&gt; (keys, groupxs) = group_indices(idx2_groupid)</span>
+<span class="sd">        &gt;&gt;&gt; result = ut.repr2((keys, groupxs), nl=2, nobr=True, with_dtype=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        np.array([False,  True], dtype=np.bool),</span>
+<span class="sd">        [</span>
+<span class="sd">            np.array([2, 4, 5], dtype=np.int64),</span>
+<span class="sd">            np.array([0, 1, 3, 6], dtype=np.int64),</span>
+<span class="sd">        ],</span>
+
+<span class="sd">    Time:</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; setup = ut.extract_timeit_setup(vt.group_indices, 2, &#39;groupxs =&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(setup)</span>
+<span class="sd">        &gt;&gt;&gt; stmt_list = ut.codeblock(</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+<span class="sd">                [sortx[lx:rx] for lx, rx in ut.itertwo(idxs)]</span>
+<span class="sd">                [sortx[lx:rx] for lx, rx in zip(idxs, idxs[1:])]</span>
+<span class="sd">                #[sortx[lx:rx] for lx, rx in ut.iter_window(idxs)]</span>
+<span class="sd">                #[sortx[slice(*_)] for _ in ut.itertwo(idxs)]</span>
+<span class="sd">                #[sortx[slice(lr, lx)] for lr, lx in ut.itertwo(idxs)]</span>
+<span class="sd">                #np.split(sortx, idxs[1:-1])</span>
+<span class="sd">                #np.hsplit(sortx, idxs[1:-1])</span>
+<span class="sd">                np.array_split(sortx, idxs[1:-1])</span>
+<span class="sd">                &#39;&#39;&#39;).split(&#39;\n&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; stmt_list = [x for x in stmt_list if not x.startswith(&#39;#&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; passed, times, outputs = ut.timeit_compare(stmt_list, setup, iterations=10000)</span>
+
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; stmt_list = ut.codeblock(</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+<span class="sd">                np.diff(groupids_sorted)</span>
+<span class="sd">                np.ediff1d(groupids_sorted)</span>
+<span class="sd">                np.subtract(groupids_sorted[1:], groupids_sorted[:-1])</span>
+<span class="sd">                &#39;&#39;&#39;).split(&#39;\n&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; stmt_list = [x for x in stmt_list if not x.startswith(&#39;#&#39;)]</span>
+<span class="sd">        &gt;&gt;&gt; passed, times, outputs = ut.timeit_compare(stmt_list, setup, iterations=10000)</span>
+
+<span class="sd">    Timeit:</span>
+<span class="sd">        import numba</span>
+<span class="sd">        group_indices_numba = numba.jit(group_indices)</span>
+<span class="sd">        group_indices_numba(idx2_groupid)</span>
+
+<span class="sd">    SeeAlso:</span>
+<span class="sd">        apply_grouping</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/4651683/</span>
+<span class="sd">        numpy-grouping-using-itertools-groupby-performance</span>
+
+<span class="sd">    TODO:</span>
+<span class="sd">        Look into np.split</span>
+<span class="sd">        http://stackoverflow.com/questions/21888406/</span>
+<span class="sd">        getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Sort items and idx2_groupid by groupid</span>
+    <span class="k">if</span> <span class="n">assume_sorted</span><span class="p">:</span>
+        <span class="n">sortx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">))</span>
+        <span class="n">groupids_sorted</span> <span class="o">=</span> <span class="n">idx2_groupid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sortx</span> <span class="o">=</span> <span class="n">idx2_groupid</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+        <span class="n">groupids_sorted</span> <span class="o">=</span> <span class="n">idx2_groupid</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">sortx</span><span class="p">)</span>
+
+    <span class="c1"># Ensure bools are internally cast to integers</span>
+    <span class="k">if</span> <span class="n">groupids_sorted</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+        <span class="n">cast_groupids</span> <span class="o">=</span> <span class="n">groupids_sorted</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cast_groupids</span> <span class="o">=</span> <span class="n">groupids_sorted</span>
+
+    <span class="n">num_items</span> <span class="o">=</span> <span class="n">idx2_groupid</span><span class="o">.</span><span class="n">size</span>
+    <span class="c1"># Find the boundaries between groups</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_items</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cast_groupids</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">cast_groupids</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">cast_groupids</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">num_items</span><span class="p">])</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+    <span class="c1"># Groups are between bounding indexes</span>
+    <span class="c1"># &lt;len(keys) bottlneck&gt;</span>
+    <span class="n">groupxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">sortx</span><span class="p">[</span><span class="n">lx</span><span class="p">:</span><span class="n">rx</span><span class="p">]</span> <span class="k">for</span> <span class="n">lx</span><span class="p">,</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">itertwo</span><span class="p">(</span><span class="n">idxs</span><span class="p">)]</span>  <span class="c1"># 34.5%</span>
+    <span class="c1"># Unique group keys</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">groupids_sorted</span><span class="p">[</span><span class="n">idxs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span></div>
+
+
+<div class="viewcode-block" id="sorted_indices_ranges"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.sorted_indices_ranges">[docs]</a><span class="k">def</span> <span class="nf">sorted_indices_ranges</span><span class="p">(</span><span class="n">groupids_sorted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Like group sorted indices but returns a list of slices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_items</span> <span class="o">=</span> <span class="n">groupids_sorted</span><span class="o">.</span><span class="n">size</span>
+    <span class="c1"># Ensure bools are cast to integers</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">find_common_type</span><span class="p">([],</span> <span class="p">[</span><span class="n">groupids_sorted</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">])</span>
+    <span class="c1"># Find the boundaries between groups</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_items</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">groupids_sorted</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">groupids_sorted</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">num_items</span><span class="p">])</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+    <span class="n">group_ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="n">lx</span><span class="p">,</span> <span class="n">rx</span><span class="p">)</span> <span class="k">for</span> <span class="n">lx</span><span class="p">,</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">itertwo</span><span class="p">(</span><span class="n">idxs</span><span class="p">)]</span>  <span class="c1"># 34.5%</span>
+    <span class="k">return</span> <span class="n">group_ranges</span></div>
+
+
+<div class="viewcode-block" id="find_duplicate_items"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.find_duplicate_items">[docs]</a><span class="k">def</span> <span class="nf">find_duplicate_items</span><span class="p">(</span><span class="n">item_arr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        item_arr (?):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ?: duplicate_items</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.clustering2 --test-find_duplicate_items</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/21888406/getting-the-indexes-to-the-duplicate-columns-of-a-numpy-array</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; np.random.seed(0)</span>
+<span class="sd">        &gt;&gt;&gt; item_arr = np.random.randint(100, size=30)</span>
+<span class="sd">        &gt;&gt;&gt; duplicate_items = find_duplicate_items(item_arr)</span>
+<span class="sd">        &gt;&gt;&gt; assert duplicate_items == list(six.iterkeys(ut.find_duplicate_items(item_arr)))</span>
+<span class="sd">        &gt;&gt;&gt; result = str(duplicate_items)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [9, 67, 87, 88]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sortx</span> <span class="o">=</span> <span class="n">item_arr</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">groupids_sorted</span> <span class="o">=</span> <span class="n">item_arr</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">sortx</span><span class="p">)</span>
+
+    <span class="c1"># duplicate_idxs = np.flatnonzero(~np.diff(groupids_sorted).astype(np.bool))</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">groupids_sorted</span><span class="p">)</span>
+    <span class="c1"># notdiff = np.bitwise_not(diff.astype(np.bool))</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">duplicate_items</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">groupids_sorted</span><span class="p">,</span> <span class="n">edges</span><span class="p">)</span> <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+    <span class="p">]</span>
+    <span class="c1"># duplicate_items = groupids_sorted.take(duplicate_idxs)</span>
+    <span class="k">return</span> <span class="n">duplicate_items</span></div>
+
+
+<div class="viewcode-block" id="apply_grouping"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_grouping">[docs]</a><span class="k">def</span> <span class="nf">apply_grouping</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    applies grouping from group_indicies</span>
+<span class="sd">    apply_grouping</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        items (ndarray):</span>
+<span class="sd">        groupxs (list of ndarrays):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of ndarrays: grouped items</span>
+
+<span class="sd">    SeeAlso:</span>
+<span class="sd">        group_indices</span>
+<span class="sd">        invert_apply_grouping</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.clustering2 --test-apply_grouping</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; idx2_groupid = np.array([2, 1, 2, 1, 2, 1, 2, 3, 3, 3, 3])</span>
+<span class="sd">        &gt;&gt;&gt; items        = np.array([1, 8, 5, 5, 8, 6, 7, 5, 3, 0, 9])</span>
+<span class="sd">        &gt;&gt;&gt; (keys, groupxs) = group_indices(idx2_groupid)</span>
+<span class="sd">        &gt;&gt;&gt; grouped_items = apply_grouping(items, groupxs)</span>
+<span class="sd">        &gt;&gt;&gt; result = str(grouped_items)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [array([8, 5, 6]), array([1, 5, 8, 7]), array([5, 3, 0, 9])]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># SHOULD DO A CONTIGUOUS CHECK HERE</span>
+    <span class="c1"># items_ = np.ascontiguousarray(items)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">items</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">groupxs</span><span class="p">]</span></div>
+    <span class="c1"># return [items[idxs] for idxs in groupxs]</span>
+
+
+<div class="viewcode-block" id="apply_grouping_"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_grouping_">[docs]</a><span class="k">def</span> <span class="nf">apply_grouping_</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; non-optimized version &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ut</span><span class="o">.</span><span class="n">apply_grouping</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="invert_apply_grouping"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.invert_apply_grouping">[docs]</a><span class="k">def</span> <span class="nf">invert_apply_grouping</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        grouped_items (list): of lists</span>
+<span class="sd">        groupxs (list): of lists</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: items</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.clustering2 --test-invert_apply_grouping</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; grouped_items = [[8, 5, 6], [1, 5, 8, 7], [5, 3, 0, 9]]</span>
+<span class="sd">        &gt;&gt;&gt; groupxs = [np.array([1, 3, 5]), np.array([0, 2, 4, 6]), np.array([ 7,  8,  9, 10])]</span>
+<span class="sd">        &gt;&gt;&gt; items = invert_apply_grouping(grouped_items, groupxs)</span>
+<span class="sd">        &gt;&gt;&gt; result = items</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [1, 8, 5, 5, 8, 6, 7, 5, 3, 0, 9]</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; grouped_items, groupxs = [], []</span>
+<span class="sd">        &gt;&gt;&gt; result = invert_apply_grouping(grouped_items, groupxs)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        []</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">groupxs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s1">&#39;inconsistant. len(grouped_items)=</span><span class="si">%d</span><span class="s1">, len(groupxs)=</span><span class="si">%d</span><span class="s1">&#39;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">groupxs</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="c1"># maxval = max(map(max, groupxs))</span>
+    <span class="n">maxval</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_max</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)))</span>
+    <span class="n">ungrouped_items</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">maxval</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># np.full((maxval + 1,), None)</span>
+    <span class="k">for</span> <span class="n">itemgroup</span><span class="p">,</span> <span class="n">xs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">itemgroup</span><span class="p">,</span> <span class="n">xs</span><span class="p">):</span>
+            <span class="n">ungrouped_items</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+    <span class="k">return</span> <span class="n">ungrouped_items</span></div>
+
+
+<div class="viewcode-block" id="invert_apply_grouping3"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.invert_apply_grouping3">[docs]</a><span class="k">def</span> <span class="nf">invert_apply_grouping3</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">,</span> <span class="n">maxval</span><span class="p">):</span>
+    <span class="n">ungrouped_items</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">maxval</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># np.full((maxval + 1,), None)</span>
+    <span class="k">for</span> <span class="n">itemgroup</span><span class="p">,</span> <span class="n">xs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">itemgroup</span><span class="p">,</span> <span class="n">xs</span><span class="p">):</span>
+            <span class="n">ungrouped_items</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+    <span class="k">return</span> <span class="n">ungrouped_items</span></div>
+
+
+<span class="k">def</span> <span class="nf">_max</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+
+<div class="viewcode-block" id="invert_apply_grouping2"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.invert_apply_grouping2">[docs]</a><span class="k">def</span> <span class="nf">invert_apply_grouping2</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; use only when ungrouping will be complete &quot;&quot;&quot;</span>
+    <span class="n">maxval</span> <span class="o">=</span> <span class="n">_max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_max</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)))</span>
+    <span class="n">ungrouped_items</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">maxval</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">itemgroup</span><span class="p">,</span> <span class="n">ix_list</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grouped_items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+        <span class="n">ungrouped_items</span><span class="p">[</span><span class="n">ix_list</span><span class="p">]</span> <span class="o">=</span> <span class="n">itemgroup</span>
+    <span class="k">return</span> <span class="n">ungrouped_items</span></div>
+
+
+<div class="viewcode-block" id="apply_grouping_iter"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_grouping_iter">[docs]</a><span class="k">def</span> <span class="nf">apply_grouping_iter</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">items</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">groupxs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="apply_grouping_iter2"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.apply_grouping_iter2">[docs]</a><span class="k">def</span> <span class="nf">apply_grouping_iter2</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">items</span><span class="p">))</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">groupxs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="groupby"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupby">[docs]</a><span class="k">def</span> <span class="nf">groupby</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; items    = np.array(np.arange(100))</span>
+<span class="sd">    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 4, size=100))</span>
+<span class="sd">    &gt;&gt;&gt; items = idx2_groupid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keys</span><span class="p">,</span> <span class="n">groupxs</span> <span class="o">=</span> <span class="n">group_indices</span><span class="p">(</span><span class="n">idx2_groupid</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">items</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="k">for</span> <span class="n">idxs</span> <span class="ow">in</span> <span class="n">groupxs</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">keys</span><span class="p">,</span> <span class="n">vals</span></div>
+
+
+<div class="viewcode-block" id="groupby_gen"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupby_gen">[docs]</a><span class="k">def</span> <span class="nf">groupby_gen</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; items    = np.array(np.arange(100))</span>
+<span class="sd">    &gt;&gt;&gt; idx2_groupid = np.array(np.random.randint(0, 4, size=100))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">groupby</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">)):</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="groupby_dict"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.groupby_dict">[docs]</a><span class="k">def</span> <span class="nf">groupby_dict</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">):</span>
+    <span class="c1"># Build a dict</span>
+    <span class="n">grouped</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">groupby_gen</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">idx2_groupid</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">grouped</span></div>
+
+
+<span class="c1"># ---------------</span>
+<span class="c1"># Plotting Code</span>
+<span class="c1"># ---------------</span>
+
+
+<div class="viewcode-block" id="plot_centroids"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.plot_centroids">[docs]</a><span class="k">def</span> <span class="nf">plot_centroids</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">num_pca_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="s1">&#39;centroids&#39;</span><span class="p">,</span> <span class="n">fnum</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots centroids and datapoints. Plots accurately up to 3 dimensions.</span>
+<span class="sd">    If there are more than 3 dimensions, PCA is used to recude the dimenionality</span>
+<span class="sd">    to the &lt;num_pca_dims&gt; principal components</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># http://www.janeriksolem.net/2012/03/isomap-with-scikit-learn.html</span>
+    <span class="kn">from</span> <span class="nn">wbia.plottool</span> <span class="k">import</span> <span class="n">draw_func2</span> <span class="k">as</span> <span class="n">df2</span>
+
+    <span class="n">data_dims</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">show_dims</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_pca_dims</span><span class="p">,</span> <span class="n">data_dims</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data_dims</span> <span class="o">!=</span> <span class="n">show_dims</span><span class="p">:</span>
+        <span class="c1"># we can&#39;t physiologically see the data, so look at a projection</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[akmeans] Doing PCA&#39;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">decomposition</span>
+
+        <span class="n">pcakw</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">show_dims</span><span class="p">,</span> <span class="n">whiten</span><span class="o">=</span><span class="n">whiten</span><span class="p">)</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="o">**</span><span class="n">pcakw</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">pca_data</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">pca_centroids</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[akmeans] ...Finished PCA&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># pca is not necessary</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[akmeans] No need for PCA&#39;</span><span class="p">)</span>
+        <span class="n">pca_data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">pca_centroids</span> <span class="o">=</span> <span class="n">centroids</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pca_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c1"># Make a color for each centroid</span>
+    <span class="n">data_x</span> <span class="o">=</span> <span class="n">pca_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">data_y</span> <span class="o">=</span> <span class="n">pca_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">clus_x</span> <span class="o">=</span> <span class="n">pca_centroids</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">clus_y</span> <span class="o">=</span> <span class="n">pca_centroids</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">nCentroids</span> <span class="o">=</span> <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels</span> <span class="o">==</span> <span class="s1">&#39;centroids&#39;</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">datax2_label</span><span class="p">,</span> <span class="n">dists</span><span class="p">)</span> <span class="o">=</span> <span class="n">FLANN_CLS</span><span class="p">()</span><span class="o">.</span><span class="n">nn</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">datax2_label</span> <span class="o">=</span> <span class="n">labels</span>
+    <span class="n">datax2_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">datax2_label</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">datax2_label</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c1"># if datax2_centroids is None:</span>
+    <span class="c1">#    (datax2_centroidx, _) = p FLANN_CLS().nn(centroids, data, 1)</span>
+    <span class="c1"># data_colors = colors[np.array(datax2_centroidx, dtype=np.int32)]</span>
+    <span class="n">nColors</span> <span class="o">=</span> <span class="n">datax2_label</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">datax2_label</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nColors=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nColors</span><span class="p">,))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;K=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">K</span><span class="p">,))</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">distinct_colors</span><span class="p">(</span><span class="n">nColors</span><span class="p">,</span> <span class="n">brightness</span><span class="o">=</span><span class="mf">0.95</span><span class="p">))</span>
+    <span class="n">clus_colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">distinct_colors</span><span class="p">(</span><span class="n">nCentroids</span><span class="p">,</span> <span class="n">brightness</span><span class="o">=</span><span class="mf">0.95</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">labels</span> <span class="o">!=</span> <span class="s1">&#39;centroids&#39;</span> <span class="ow">or</span> <span class="n">nColors</span> <span class="o">==</span> <span class="n">K</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">datax2_label</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">data_colors</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">datax2_label</span><span class="p">]</span>
+    <span class="c1"># Create a figure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fnum</span><span class="p">,</span> <span class="n">doclf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">docla</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_x</span><span class="p">,</span> <span class="n">data_y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">data_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># df2.plt.scatter(data_x, data_y, s=20,  c=data_colors, marker=&#39;o&#39;, alpha=.2)</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">clus_x</span><span class="p">,</span> <span class="n">clus_y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">clus_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">autoscale</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">dark_background</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+        <span class="n">data_z</span> <span class="o">=</span> <span class="n">pca_data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">clus_z</span> <span class="o">=</span> <span class="n">pca_centroids</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># ax.scatter(data_x, data_y, data_z, s=20,  c=data_colors, marker=&#39;o&#39;, alpha=.2)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_x</span><span class="p">,</span> <span class="n">data_y</span><span class="p">,</span> <span class="n">data_z</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">data_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">clus_x</span><span class="p">,</span> <span class="n">clus_y</span><span class="p">,</span> <span class="n">clus_z</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">clus_colors</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">autoscale</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">df2</span><span class="o">.</span><span class="n">dark_background</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="c1"># ax.set_alpha(.1)</span>
+        <span class="c1"># ax.set_frame_on(False)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">waswhitestr</span> <span class="o">=</span> <span class="s1">&#39; +whitening&#39;</span> <span class="o">*</span> <span class="n">whiten</span>
+    <span class="n">titlestr</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;</span><span class="si">{prefix}</span><span class="s1">AKmeans: K=</span><span class="si">{K}</span><span class="s1">.&#39;</span>
+        <span class="s1">&#39;PCA projection </span><span class="si">{data_dims}</span><span class="s1">D -&gt; </span><span class="si">{show_dims}</span><span class="s1">D&#39;</span>
+        <span class="s1">&#39;</span><span class="si">{waswhitestr}</span><span class="s1">&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">locals</span><span class="p">())</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">titlestr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="uniform_sample_hypersphere"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.uniform_sample_hypersphere">[docs]</a><span class="k">def</span> <span class="nf">uniform_sample_hypersphere</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">only_quadrent_1</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Not quite done yet</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Regular_polytope</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Platonic_solid#Higher_dimensions</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Cross-polytope</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        num (?):</span>
+<span class="sd">        ndim (int): (default = 2)</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.clustering2 --test-uniform_sampe_hypersphere</span>
+
+<span class="sd">    Ignore:</span>
+<span class="sd">        #pip install polytope</span>
+<span class="sd">        sudo pip install cvxopt  --no-deps</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; num = 100</span>
+<span class="sd">        &gt;&gt;&gt; ndim = 3</span>
+<span class="sd">        &gt;&gt;&gt; pts = uniform_sampe_hypersphere(num, ndim)</span>
+<span class="sd">        &gt;&gt;&gt; print(pts)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; if ndim == 2:</span>
+<span class="sd">        &gt;&gt;&gt;     pt.plot(pts.T[0], pts.T[1], &#39;gx&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; elif ndim == 3:</span>
+<span class="sd">        &gt;&gt;&gt;     #pt.plot_surface3d(pts.T[0], pts.T[1], pts.T[2])</span>
+<span class="sd">        &gt;&gt;&gt;     from mpl_toolkits.mplot3d import Axes3D  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt;     fig = pt.figure(1, doclf=True, docla=True)</span>
+<span class="sd">        &gt;&gt;&gt;     ax = fig.add_subplot(111, projection=&#39;3d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt;     ax.scatter(pts.T[0], pts.T[1], pts.T[2], s=20, marker=&#39;o&#39;, alpha=1)</span>
+<span class="sd">        &gt;&gt;&gt;     ax.autoscale(enable=False)</span>
+<span class="sd">        &gt;&gt;&gt;     ax.set_aspect(&#39;equal&#39;)</span>
+<span class="sd">        &gt;&gt;&gt;     df2.dark_background(ax)</span>
+<span class="sd">        &gt;&gt;&gt; pt.dark_background()</span>
+<span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">only_quadrent_1</span><span class="p">:</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">pts</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">pass</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">normalize_rows</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pts</span></div>
+
+
+<div class="viewcode-block" id="unsupervised_multicut_labeling"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.unsupervised_multicut_labeling">[docs]</a><span class="k">def</span> <span class="nf">unsupervised_multicut_labeling</span><span class="p">(</span><span class="n">cost_matrix</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Notes:</span>
+<span class="sd">        requires CPLEX</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.clustering2 unsupervised_multicut_labeling --show</span>
+
+<span class="sd">    Ignore:</span>
+
+<span class="sd">        &gt;&gt;&gt; # synthetic data</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; size = 100</span>
+<span class="sd">        &gt;&gt;&gt; thresh = 50</span>
+<span class="sd">        &gt;&gt;&gt; np.random.randint(0, 1)</span>
+<span class="sd">        &gt;&gt;&gt; np.zeros((size, size))</span>
+<span class="sd">        &gt;&gt;&gt; #np.random.rand(size, size)</span>
+<span class="sd">        &gt;&gt;&gt; size = 45</span>
+<span class="sd">        &gt;&gt;&gt; #size = 10</span>
+<span class="sd">        &gt;&gt;&gt; size = 5</span>
+<span class="sd">        &gt;&gt;&gt; aids = np.arange(size)</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(443284320)</span>
+<span class="sd">        &gt;&gt;&gt; encounter_lbls = rng.randint(0, size, size)</span>
+<span class="sd">        &gt;&gt;&gt; separation = 5.0</span>
+<span class="sd">        &gt;&gt;&gt; separation = 1.10</span>
+<span class="sd">        &gt;&gt;&gt; grid1 = np.tile(encounter_lbls, (size, 1))</span>
+<span class="sd">        &gt;&gt;&gt; is_match = grid1.T == grid1</span>
+<span class="sd">        &gt;&gt;&gt; good_pos = np.where(is_match)</span>
+<span class="sd">        &gt;&gt;&gt; bad_pos = np.where(~s_match)</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix_ = np.zeros((size, size))</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix_[good_pos] = rng.randn(len(good_pos[0])) + separation</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix_[bad_pos] = rng.randn(len(bad_pos[0])) - separation</span>
+<span class="sd">        &gt;&gt;&gt; false_val = min(cost_matrix_.min(), np.min(rng.randn(1000) - separation))</span>
+<span class="sd">        &gt;&gt;&gt; true_val = max(cost_matrix_.max(), np.max(rng.randn(500) + separation))</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix_[np.diag_indices_from(cost_matrix_)] = true_val</span>
+<span class="sd">        &gt;&gt;&gt; #cost_matrix_[np.diag_indices_from(cost_matrix_)] = np.inf</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix = (cost_matrix_ - false_val) / (true_val - false_val)</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix = 2 * (cost_matrix - .5)</span>
+<span class="sd">        &gt;&gt;&gt; thresh = 0</span>
+<span class="sd">        &gt;&gt;&gt; labels = vt.unsupervised_multicut_labeling(cost_matrix, thresh)</span>
+<span class="sd">        &gt;&gt;&gt; diff = ut.find_group_differences(</span>
+<span class="sd">        &gt;&gt;&gt;     list(ut.group_items(aids, encounter_lbls).values()),</span>
+<span class="sd">        &gt;&gt;&gt;     list(ut.group_items(aids, labels).values()))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;diff = %r&#39; % (diff,))</span>
+
+<span class="sd">        #gm, = ut.exec_func_src(vt.unsupervised_multicut_labeling,</span>
+<span class="sd">        #key_list=[&#39;gm&#39;], sentinal=&#39;inf = opengm&#39;)</span>
+<span class="sd">        #parameter = opengm.InfParam()</span>
+<span class="sd">        #%timeit opengm.inference.Multicut(gm, parameter=parameter).infer()</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # SCRIPT</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.clustering2 import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import networkx as nx</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(443284320)</span>
+<span class="sd">        &gt;&gt;&gt; pt.ensureqt()</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; def make_test_costmatrix(name_labels, view_labels, separation=2):</span>
+<span class="sd">        &gt;&gt;&gt;     is_same = name_labels == name_labels[:, None]</span>
+<span class="sd">        &gt;&gt;&gt;     is_comp = np.abs(view_labels - view_labels[:, None]) &lt;= 1</span>
+<span class="sd">        &gt;&gt;&gt;     good_pos = np.where(is_same)</span>
+<span class="sd">        &gt;&gt;&gt;     bad_pos = np.where(~is_same)</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix_ = np.zeros((len(name_labels), len(name_labels)))</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix_[good_pos] = rng.randn(len(good_pos[0])) + separation</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix_[bad_pos] = rng.randn(len(bad_pos[0])) - separation</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix_ = (cost_matrix_.T + cost_matrix_) / 2</span>
+<span class="sd">        &gt;&gt;&gt;     false_val = min(cost_matrix_.min(), np.min(rng.randn(1000) - separation))</span>
+<span class="sd">        &gt;&gt;&gt;     true_val = max(cost_matrix_.max(), np.max(rng.randn(500) + separation))</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix_[np.diag_indices_from(cost_matrix_)] = true_val</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix = (cost_matrix_ - false_val) / (true_val - false_val)</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix = 2 * (cost_matrix - .5)</span>
+<span class="sd">        &gt;&gt;&gt;     cost_matrix[np.where(~is_comp)] = 0</span>
+<span class="sd">        &gt;&gt;&gt;     return cost_matrix</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; view_labels = np.array([0, 0, 2, 2, 1, 0, 0, 0])</span>
+<span class="sd">        &gt;&gt;&gt; name_labels = np.array([0, 0, 0, 0, 0, 1, 1, 1])</span>
+<span class="sd">        &gt;&gt;&gt; #cost_matrix = make_test_costmatrix(name_labels, view_labels, 2)</span>
+<span class="sd">        &gt;&gt;&gt; cost_matrix = make_test_costmatrix(name_labels, view_labels, .9)</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; def multicut_value(cost_matrix, name_labels):</span>
+<span class="sd">        &gt;&gt;&gt;     grid1 = np.tile(name_labels, (len(name_labels), 1))</span>
+<span class="sd">        &gt;&gt;&gt;     isdiff = grid1.T != grid1</span>
+<span class="sd">        &gt;&gt;&gt;     cut_value = cost_matrix[isdiff].sum()</span>
+<span class="sd">        &gt;&gt;&gt;     return cut_value</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; aids = np.arange(len(name_labels))</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; graph = ut.nx_from_matrix(cost_matrix)</span>
+<span class="sd">        &gt;&gt;&gt; weights = nx.get_edge_attributes(graph, &#39;weight&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; floatfmt1 = ut.partial(ub.map_vals, lambda x: &#39;w=%.2f&#39; % x)</span>
+<span class="sd">        &gt;&gt;&gt; floatfmt2 = ut.partial(ub.map_vals, lambda x: &#39;l=%.2f&#39; % x)</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; lens = ub.map_vals(lambda x: (1 - ((x + 1) / 2)) / 2, weights)</span>
+<span class="sd">        &gt;&gt;&gt; labels = floatfmt1(weights)</span>
+<span class="sd">        &gt;&gt;&gt; #labels = floatfmt2(lens)</span>
+<span class="sd">        &gt;&gt;&gt; nx.set_edge_attributes(graph, name=&#39;label&#39;, values=labels)</span>
+<span class="sd">        &gt;&gt;&gt; #nx.set_edge_attributes(graph, name=&#39;len&#39;, values=lens)</span>
+<span class="sd">        &gt;&gt;&gt; nx.set_node_attributes(graph, name=&#39;shape&#39;, values=&#39;ellipse&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; encounter_lbls_str = [str(x) for x in name_labels]</span>
+<span class="sd">        &gt;&gt;&gt; node_name_lbls = dict(zip(aids, encounter_lbls_str))</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; mcut_labels = vt.unsupervised_multicut_labeling(cost_matrix, thresh=vt.eps)</span>
+<span class="sd">        &gt;&gt;&gt; diff = ut.find_group_differences(</span>
+<span class="sd">        &gt;&gt;&gt;     list(ut.group_items(aids, name_labels).values()),</span>
+<span class="sd">        &gt;&gt;&gt;     list(ut.group_items(aids, mcut_labels).values()))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;diff = %r&#39; % (diff,))</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; nx.set_node_attributes(graph, name=&#39;label&#39;, values=node_name_lbls)</span>
+<span class="sd">        &gt;&gt;&gt; node_mcut_lbls = dict(zip(aids, mcut_labels))</span>
+<span class="sd">        &gt;&gt;&gt; nx.set_node_attributes(graph, name=&#39;mcut_label&#39;, values=node_mcut_lbls)</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;mc_val(name) &#39; + str(multicut_value(cost_matrix, name_labels)))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;mc_val(mcut) &#39; + str(multicut_value(cost_matrix, mcut_labels)))</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; ut.color_nodes(graph, &#39;mcut_label&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; # remove noncomparable edges</span>
+<span class="sd">        &gt;&gt;&gt; is_comp = np.abs(view_labels - view_labels[:, None]) &lt;= 1</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; noncomp_edges = list(zip(*np.where(~is_comp)))</span>
+<span class="sd">        &gt;&gt;&gt; graph.remove_edges_from(noncomp_edges)</span>
+<span class="sd">        &gt;&gt;&gt; #</span>
+<span class="sd">        &gt;&gt;&gt; layoutkw = {</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;sep&#39; : 5,</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;prog&#39;: &#39;neato&#39;,</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;overlap&#39;: &#39;false&#39;,</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;splines&#39;: &#39;spline&#39;,</span>
+<span class="sd">        &gt;&gt;&gt; }</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_nx(graph, layoutkw=layoutkw)</span>
+<span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">opengm</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="c1"># import wbia.plottool as pt</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">product</span>
+
+    <span class="n">cost_matrix_</span> <span class="o">=</span> <span class="n">cost_matrix</span> <span class="o">-</span> <span class="n">thresh</span>
+    <span class="n">num_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cost_matrix_</span><span class="p">)</span>
+
+    <span class="c1"># Enumerate undirected edges (node index pairs)</span>
+    <span class="n">var_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_vars</span><span class="p">)</span>
+    <span class="n">varindex_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">var_indices</span><span class="p">,</span> <span class="n">var_indices</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">a1</span> <span class="o">!=</span> <span class="n">a2</span> <span class="ow">and</span> <span class="n">a1</span> <span class="o">&gt;</span> <span class="n">a2</span>
+        <span class="p">],</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">varindex_pairs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Create nodes in the graphical model.  In this case there are &lt;num_vars&gt;</span>
+    <span class="c1"># nodes and each node can be assigned to one of &lt;num_vars&gt; possible labels</span>
+    <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">num_vars</span>
+    <span class="n">space</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">num_nodes</span><span class="p">,),</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">num_vars</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">opengm</span><span class="o">.</span><span class="n">index_type</span><span class="p">)</span>
+    <span class="n">gm</span> <span class="o">=</span> <span class="n">opengm</span><span class="o">.</span><span class="n">gm</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+    <span class="c1"># Use one potts function for each edge</span>
+    <span class="k">for</span> <span class="n">varx1</span><span class="p">,</span> <span class="n">varx2</span> <span class="ow">in</span> <span class="n">varindex_pairs</span><span class="p">:</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">cost_matrix_</span><span class="p">[</span><span class="n">varx1</span><span class="p">,</span> <span class="n">varx2</span><span class="p">]</span>
+        <span class="n">potts_func</span> <span class="o">=</span> <span class="n">opengm</span><span class="o">.</span><span class="n">PottsFunction</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">num_vars</span><span class="p">,</span> <span class="n">num_vars</span><span class="p">),</span> <span class="n">valueEqual</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">valueNotEqual</span><span class="o">=</span><span class="n">cost</span>
+        <span class="p">)</span>
+        <span class="n">potts_func_id</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">addFunction</span><span class="p">(</span><span class="n">potts_func</span><span class="p">)</span>
+        <span class="n">var_indicies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">varx1</span><span class="p">,</span> <span class="n">varx2</span><span class="p">])</span>
+        <span class="n">gm</span><span class="o">.</span><span class="n">addFactor</span><span class="p">(</span><span class="n">potts_func_id</span><span class="p">,</span> <span class="n">var_indicies</span><span class="p">)</span>
+
+    <span class="c1"># pt.ensureqt()</span>
+    <span class="c1"># opengm.visualizeGm(gm=gm)</span>
+
+    <span class="c1"># Not sure what parameters are allowed to be passed here.</span>
+    <span class="n">parameter</span> <span class="o">=</span> <span class="n">opengm</span><span class="o">.</span><span class="n">InfParam</span><span class="p">()</span>
+    <span class="n">inf</span> <span class="o">=</span> <span class="n">opengm</span><span class="o">.</span><span class="n">inference</span><span class="o">.</span><span class="n">Multicut</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="n">parameter</span><span class="p">)</span>
+    <span class="n">inf</span><span class="o">.</span><span class="n">infer</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">inf</span><span class="o">.</span><span class="n">arg</span><span class="p">()</span>
+    <span class="c1"># print(labels)</span>
+    <span class="k">return</span> <span class="n">labels</span>
+
+    <span class="c1"># def alpha_expansion_cut(graph):</span>
+    <span class="c1"># https://github.com/amueller/gco_python/blob/master/example.py</span>
+    <span class="c1">#    import pygco</span>
+    <span class="c1"># prob_annots2 = prob_annots.copy()</span>
+    <span class="c1"># finite_probs = (prob_annots2[np.isfinite(prob_annots2)])</span>
+    <span class="c1"># mean = finite_probs.mean()</span>
+    <span class="c1">## make symmetric</span>
+    <span class="c1"># prob_annots2[~np.isfinite(prob_annots2)] = finite_probs.max() * 2</span>
+    <span class="c1"># prob_annots2 = (prob_annots2.T + prob_annots2) / 2</span>
+    <span class="c1"># int_factor = 100 / mean</span>
+    <span class="c1"># pairwise_cost = (prob_annots2 * int_factor).astype(np.int32)</span>
+    <span class="c1"># n_labels = 2</span>
+    <span class="c1"># unary_cost = np.ones((prob_annots.shape[0], n_labels)).astype(np.int32)</span>
+    <span class="c1"># u, v = np.meshgrid(np.arange(prob_annots.shape[0]).astype(np.int32), np.arange(len(prob_annots)).astype(np.int32))</span>
+    <span class="c1"># edges = np.vstack((u.flatten(), v.flatten(), pairwise_cost.flatten())).T.astype(np.int32)</span>
+
+    <span class="c1"># import pygco</span>
+    <span class="c1"># n_iter = 5</span>
+    <span class="c1"># algorithm = &#39;expansion&#39;</span>
+    <span class="c1"># unary_cost = np.ascontiguousarray(unary_cost)</span>
+    <span class="c1">##pairwise_cost = np.ascontiguousarray(pairwise_cost)</span>
+    <span class="c1"># pairwise_cost = np.eye(n_labels).astype(np.int32)</span>
+    <span class="c1"># edges = np.ascontiguousarray(edges)</span>
+    <span class="c1"># pygco.cut_from_graph(edges, unary_cost, pairwise_cost, n_iter, algorithm)</span>
+    <span class="c1"># pairwise_cost = prob_annots</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="example_binary"><a class="viewcode-back" href="../../vtool.html#vtool.clustering2.example_binary">[docs]</a><span class="k">def</span> <span class="nf">example_binary</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">pygco</span> <span class="k">import</span> <span class="n">cut_simple</span><span class="p">,</span> <span class="n">cut_from_graph</span>
+
+    <span class="c1"># generate trivial data</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">x</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">x_noisy</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">x_thresh</span> <span class="o">=</span> <span class="n">x_noisy</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+
+    <span class="c1"># create unaries</span>
+    <span class="n">unaries</span> <span class="o">=</span> <span class="n">x_noisy</span>
+    <span class="c1"># as we convert to int, we need to multipy to get sensible values</span>
+    <span class="n">unaries</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">unaries</span><span class="p">,</span> <span class="o">-</span><span class="n">unaries</span><span class="p">])</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">unaries</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># create potts pairwise</span>
+    <span class="n">pairwise</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="c1"># do simple cut</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">cut_simple</span><span class="p">(</span><span class="n">unaries</span><span class="p">,</span> <span class="n">pairwise</span><span class="p">)</span>
+
+    <span class="c1"># use the gerneral graph algorithm</span>
+    <span class="c1"># first, we construct the grid graph</span>
+    <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">horz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">inds</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">inds</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span>
+    <span class="n">vert</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">inds</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">inds</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">horz</span><span class="p">,</span> <span class="n">vert</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="c1"># we flatten the unaries</span>
+    <span class="n">result_graph</span> <span class="o">=</span> <span class="n">cut_from_graph</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">unaries</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">pairwise</span><span class="p">)</span>
+
+    <span class="c1"># plot results</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">231</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;original&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">232</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;noisy version&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x_noisy</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">233</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;rounded to integers&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">unaries</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">234</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;thresholding result&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x_thresh</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">235</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;cut_simple&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">236</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;cut_from_graph&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">result_graph</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python ~/code/vtool/vtool/clustering2.py all</span>
+<span class="sd">        python -m vtool.clustering2 all</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

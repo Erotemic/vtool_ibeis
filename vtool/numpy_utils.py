@@ -4,8 +4,6 @@ These functions might be PR quality for numpy.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-import utool as ut
-import ubelt as ub
 from six import next
 from six.moves import zip, range
 

@@ -1,0 +1,471 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.numpy_utils &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.numpy_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">These functions might be PR quality for numpy.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="nb">next</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
+
+
+<div class="viewcode-block" id="atleast_nd"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.atleast_nd">[docs]</a><span class="k">def</span> <span class="nf">atleast_nd</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tofront</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View inputs as arrays with at least n dimensions.</span>
+<span class="sd">    TODO: Submit as a PR to numpy</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arr (array_like): One array-like object.  Non-array inputs are</span>
+<span class="sd">                converted to arrays.  Arrays that already have n or more</span>
+<span class="sd">                dimensions are preserved.</span>
+<span class="sd">        n (int): number of dimensions to ensure</span>
+<span class="sd">        tofront (bool): if True new dimensions are added to the front of the</span>
+<span class="sd">            array.  otherwise they are added to the back.</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.numpy_utils atleast_nd</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray :</span>
+<span class="sd">            An array with ``a.ndim &gt;= n``.  Copies are avoided where possible,</span>
+<span class="sd">            and views with three or more dimensions are returned.  For example,</span>
+<span class="sd">            a 1-D array of shape ``(N,)`` becomes a view of shape</span>
+<span class="sd">            ``(1, N, 1)``, and a 2-D array of shape ``(M, N)`` becomes a view</span>
+<span class="sd">            of shape ``(M, N, 1)``.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        ensure_shape, np.atleast_1d, np.atleast_2d, np.atleast_3d</span>
+
+<span class="sd">    Example0:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; n = 2</span>
+<span class="sd">        &gt;&gt;&gt; arr = np.array([1, 1, 1])</span>
+<span class="sd">        &gt;&gt;&gt; arr_ = atleast_nd(arr, n)</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(arr_.tolist())</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; n = 4</span>
+<span class="sd">        &gt;&gt;&gt; arr1 = [1, 1, 1]</span>
+<span class="sd">        &gt;&gt;&gt; arr2 = np.array(0)</span>
+<span class="sd">        &gt;&gt;&gt; arr3 = np.array([[[[[1]]]]])</span>
+<span class="sd">        &gt;&gt;&gt; arr1_ = atleast_nd(arr1, n)</span>
+<span class="sd">        &gt;&gt;&gt; arr2_ = atleast_nd(arr2, n)</span>
+<span class="sd">        &gt;&gt;&gt; arr3_ = atleast_nd(arr3, n)</span>
+<span class="sd">        &gt;&gt;&gt; result1 = ub.repr2(arr1_.tolist())</span>
+<span class="sd">        &gt;&gt;&gt; result2 = ub.repr2(arr2_.tolist())</span>
+<span class="sd">        &gt;&gt;&gt; result3 = ub.repr2(arr3_.tolist())</span>
+<span class="sd">        &gt;&gt;&gt; result = &#39;\n&#39;.join([result1, result2, result3])</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arr_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr_</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ndims</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="c1"># append the required number of dimensions to the front or back</span>
+        <span class="k">if</span> <span class="n">tofront</span><span class="p">:</span>
+            <span class="n">expander</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">ndims</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">expander</span> <span class="o">=</span> <span class="p">(</span><span class="bp">Ellipsis</span><span class="p">,)</span> <span class="o">+</span> <span class="p">(</span><span class="kc">None</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">ndims</span><span class="p">)</span>
+        <span class="n">arr_</span> <span class="o">=</span> <span class="n">arr_</span><span class="p">[</span><span class="n">expander</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">arr_</span></div>
+
+
+<div class="viewcode-block" id="ensure_shape"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.ensure_shape">[docs]</a><span class="k">def</span> <span class="nf">ensure_shape</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dimshape</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO: Submit as a PR to numpy?</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; ensure_shape(np.array([[1, 2]]), (None, 2))</span>
+<span class="sd">        &gt;&gt;&gt; ensure_shape(np.array([]), (None, 2))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dimshape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimshape</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">dimshape</span>
+        <span class="n">dimshape</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">arr_</span> <span class="o">=</span> <span class="n">atleast_nd</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dimshape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">newshape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">d1</span> <span class="k">if</span> <span class="n">d2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">d2</span> <span class="k">for</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">arr_</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dimshape</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">arr_</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">newshape</span>
+    <span class="k">return</span> <span class="n">arr_</span></div>
+
+
+<div class="viewcode-block" id="fromiter_nd"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.fromiter_nd">[docs]</a><span class="k">def</span> <span class="nf">fromiter_nd</span><span class="p">(</span><span class="n">iter_</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Like np.fromiter but handles iterators that generated</span>
+<span class="sd">    n-dimensional arrays. Slightly faster than np.array.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        np.vstack(list_) is still faster than</span>
+<span class="sd">        vt.fromiter_nd(ut.iflatten(list_))</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        iter_ (iter): an iterable that generates homogenous ndarrays</span>
+<span class="sd">        shape (tuple): the expected output shape</span>
+<span class="sd">        dtype (dtype): the numpy datatype of the generated ndarrays</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The iterable must yeild a numpy array. It cannot yeild a Python list.</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.numpy_utils fromiter_nd</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; dtype = np.float</span>
+<span class="sd">        &gt;&gt;&gt; total = 11</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(0)</span>
+<span class="sd">        &gt;&gt;&gt; iter_ = (rng.rand(5, 7, 3) for _ in range(total))</span>
+<span class="sd">        &gt;&gt;&gt; shape = (total, 5, 7, 3)</span>
+<span class="sd">        &gt;&gt;&gt; result = fromiter_nd(iter_, shape, dtype)</span>
+<span class="sd">        &gt;&gt;&gt; assert result.shape == shape</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; dtype = np.int</span>
+<span class="sd">        &gt;&gt;&gt; qfxs = np.array([1, 2, 3])</span>
+<span class="sd">        &gt;&gt;&gt; dfxs = np.array([4, 5, 6])</span>
+<span class="sd">        &gt;&gt;&gt; iter_ = (np.array(x) for x in ut.product(qfxs, dfxs))</span>
+<span class="sd">        &gt;&gt;&gt; total = len(qfxs) * len(dfxs)</span>
+<span class="sd">        &gt;&gt;&gt; shape = (total, 2)</span>
+<span class="sd">        &gt;&gt;&gt; result = fromiter_nd(iter_, shape, dtype)</span>
+<span class="sd">        &gt;&gt;&gt; assert result.shape == shape</span>
+
+<span class="sd">    Timeit:</span>
+<span class="sd">        &gt;&gt;&gt; dtype = np.uint8</span>
+<span class="sd">        &gt;&gt;&gt; feat_dim = 128</span>
+<span class="sd">        &gt;&gt;&gt; mu = 1000</span>
+<span class="sd">        &gt;&gt;&gt; sigma = 500</span>
+<span class="sd">        &gt;&gt;&gt; n_data = 1000</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(42)</span>
+<span class="sd">        &gt;&gt;&gt; n_feat_list = np.clip(rng.randn(n_data) * sigma + mu, 0, np.inf).astype(np.int)</span>
+<span class="sd">        &gt;&gt;&gt; # Make a large list of vectors of various sizes</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;Making random vectors&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; vecs_list = [(rng.rand(num, feat_dim) * 255).astype(dtype) for num in n_feat_list]</span>
+<span class="sd">        &gt;&gt;&gt; mega_bytes = sum([x.nbytes for x in vecs_list]) / 2 ** 20</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;mega_bytes = %r&#39; % (mega_bytes,))</span>
+<span class="sd">        &gt;&gt;&gt; import itertools as it</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; n_total = n_feat_list.sum()</span>
+<span class="sd">        &gt;&gt;&gt; target1 = np.vstack(vecs_list)</span>
+<span class="sd">        &gt;&gt;&gt; iter_ = it.chain.from_iterable(vecs_list)</span>
+<span class="sd">        &gt;&gt;&gt; shape = (n_total, feat_dim)</span>
+<span class="sd">        &gt;&gt;&gt; target2 = vt.fromiter_nd(it.chain.from_iterable(vecs_list), shape, dtype=dtype)</span>
+<span class="sd">        &gt;&gt;&gt; assert np.all(target1 == target2)</span>
+
+<span class="sd">        %timeit np.vstack(vecs_list)</span>
+<span class="sd">        20.4ms</span>
+<span class="sd">        %timeit vt.fromiter_nd(it.chain.from_iterable(vecs_list), shape, dtype)</span>
+<span class="sd">        102ms</span>
+
+<span class="sd">        iter_ = it.chain.from_iterable(vecs_list)</span>
+<span class="sd">        %time vt.fromiter_nd(iter_, shape, dtype)</span>
+<span class="sd">        %time np.vstack(vecs_list)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_rows</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">chunksize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">itemsize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">itemsize</span>
+    <span class="c1"># Create dtype that makes an entire ndarray appear as a single item</span>
+    <span class="n">chunk_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">void</span><span class="p">,</span> <span class="n">itemsize</span> <span class="o">*</span> <span class="n">chunksize</span><span class="p">))</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">iter_</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">chunk_dtype</span><span class="p">)</span>
+    <span class="c1"># Convert back to original dtype and shape</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+    <span class="k">return</span> <span class="n">arr</span></div>
+
+
+<div class="viewcode-block" id="index_to_boolmask"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.index_to_boolmask">[docs]</a><span class="k">def</span> <span class="nf">index_to_boolmask</span><span class="p">(</span><span class="n">index_list</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">isflat</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    transforms a list of indicies into a boolean mask</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        index_list (ndarray):</span>
+<span class="sd">        maxval (None): (default = None)</span>
+
+<span class="sd">    Kwargs:</span>
+<span class="sd">        maxval</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: mask</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.util_numpy index_to_boolmask</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.util_numpy import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; index_list = np.array([(0, 0), (1, 1), (2, 1)])</span>
+<span class="sd">        &gt;&gt;&gt; maxval = (3, 3)</span>
+<span class="sd">        &gt;&gt;&gt; mask = vt.index_to_boolmask(index_list, maxval, isflat=False)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;mask =\n%s&#39; % (str(mask.astype(np.uint8)),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [[1 0 0]</span>
+<span class="sd">         [0 1 0]</span>
+<span class="sd">         [0 1 0]]</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.util_numpy import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; index_list = np.array([0, 1, 4])</span>
+<span class="sd">        &gt;&gt;&gt; maxval = 5</span>
+<span class="sd">        &gt;&gt;&gt; mask = vt.index_to_boolmask(index_list, maxval, isflat=True)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;mask = %s&#39; % (str(mask.astype(np.uint8)),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        mask = [1 1 0 0 1]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># assert index_list.min() &gt;= 0</span>
+    <span class="k">if</span> <span class="n">maxval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">maxval</span> <span class="o">=</span> <span class="n">index_list</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">maxval</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">isflat</span><span class="p">:</span>
+        <span class="c1"># assumes non-flat</span>
+        <span class="n">mask</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">index_list</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># mask.__getitem__(tuple(index_list.T))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">index_list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+<div class="viewcode-block" id="multiaxis_reduce"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.multiaxis_reduce">[docs]</a><span class="k">def</span> <span class="nf">multiaxis_reduce</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">startaxis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    used to get max/min over all axes after &lt;startaxis&gt;</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.numpy_utils --test-multiaxis_reduce</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(0)</span>
+<span class="sd">        &gt;&gt;&gt; arr = (rng.rand(4, 3, 2, 1) * 255).astype(np.uint8)</span>
+<span class="sd">        &gt;&gt;&gt; ufunc = np.amax</span>
+<span class="sd">        &gt;&gt;&gt; startaxis = 1</span>
+<span class="sd">        &gt;&gt;&gt; out_ = multiaxis_reduce(ufunc, arr, startaxis)</span>
+<span class="sd">        &gt;&gt;&gt; result = out_</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [182 245 236 249]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_iters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="n">startaxis</span>
+    <span class="n">out_</span> <span class="o">=</span> <span class="n">ufunc</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">startaxis</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">out_</span> <span class="o">=</span> <span class="n">ufunc</span><span class="p">(</span><span class="n">out_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out_</span></div>
+
+
+<div class="viewcode-block" id="iter_reduce_ufunc"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.iter_reduce_ufunc">[docs]</a><span class="k">def</span> <span class="nf">iter_reduce_ufunc</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">arr_iter</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    constant memory iteration and reduction</span>
+
+<span class="sd">    applys ufunc from left to right over the input arrays</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; arr_list = [</span>
+<span class="sd">        ...     np.array([0, 1, 2, 3, 8, 9]),</span>
+<span class="sd">        ...     np.array([4, 1, 2, 3, 4, 5]),</span>
+<span class="sd">        ...     np.array([0, 5, 2, 3, 4, 5]),</span>
+<span class="sd">        ...     np.array([1, 1, 6, 3, 4, 5]),</span>
+<span class="sd">        ...     np.array([0, 1, 2, 7, 4, 5])</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt; memory = np.array([9, 9, 9, 9, 9, 9])</span>
+<span class="sd">        &gt;&gt;&gt; gen_memory = memory.copy()</span>
+<span class="sd">        &gt;&gt;&gt; def arr_gen(arr_list, gen_memory):</span>
+<span class="sd">        ...     for arr in arr_list:</span>
+<span class="sd">        ...         gen_memory[:] = arr</span>
+<span class="sd">        ...         yield gen_memory</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;memory = %r&#39; % (memory,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;gen_memory = %r&#39; % (gen_memory,))</span>
+<span class="sd">        &gt;&gt;&gt; ufunc = np.maximum</span>
+<span class="sd">        &gt;&gt;&gt; res1 = iter_reduce_ufunc(ufunc, iter(arr_list), out=None)</span>
+<span class="sd">        &gt;&gt;&gt; res2 = iter_reduce_ufunc(ufunc, iter(arr_list), out=memory)</span>
+<span class="sd">        &gt;&gt;&gt; res3 = iter_reduce_ufunc(ufunc, arr_gen(arr_list, gen_memory), out=memory)</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;res1       = %r&#39; % (res1,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;res2       = %r&#39; % (res2,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;res3       = %r&#39; % (res3,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;memory     = %r&#39; % (memory,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;gen_memory = %r&#39; % (gen_memory,))</span>
+<span class="sd">        &gt;&gt;&gt; assert np.all(res1 == res2)</span>
+<span class="sd">        &gt;&gt;&gt; assert np.all(res2 == res3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get first item in iterator</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">arr_iter</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="c1"># Populate the outvariable if specified otherwise make a copy of the first</span>
+    <span class="c1"># item to be the output memory</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">initial</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># Iterate and reduce</span>
+    <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arr_iter</span><span class="p">:</span>
+        <span class="n">ufunc</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="unique_row_indexes"><a class="viewcode-back" href="../../vtool.html#vtool.numpy_utils.unique_row_indexes">[docs]</a><span class="k">def</span> <span class="nf">unique_row_indexes</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; np.unique on rows</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arr (ndarray): 2d array</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: unique_rowx</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://stackoverflow.com/questions/16970982/find-unique-rows-in-numpy-array</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.numpy_utils --test-unique_row_indexes</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.numpy_utils import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; arr = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 0], [.534, .432], [.534, .432], [1, 0], [0, 1]])</span>
+<span class="sd">        &gt;&gt;&gt; unique_rowx = unique_row_indexes(arr)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;unique_rowx = %s&#39; % (ub.repr2(unique_rowx),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        unique_rowx = np.array([0, 1, 2, 3, 5], dtype=np.int64)</span>
+
+<span class="sd">    Ignore:</span>
+<span class="sd">        %timeit unique_row_indexes(arr)</span>
+<span class="sd">        %timeit compute_unique_data_ids(arr)</span>
+<span class="sd">        %timeit compute_unique_integer_data_ids(arr)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">void_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">void</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">*</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">arr_void_view</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">void_dtype</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">unique_rowx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">arr_void_view</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># cast back to original dtype</span>
+    <span class="n">unique_rowx</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">unique_rowx</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.numpy_utils</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

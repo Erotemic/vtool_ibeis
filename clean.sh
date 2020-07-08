@@ -5,6 +5,7 @@ rm -rf _skbuild
 rm -rf vtool/lib
 rm -rf dist
 rm -rf build
+rm -rf htmlcov
 rm -rf *.egg-info
 
 rm -rf mb_work

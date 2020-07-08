@@ -1,0 +1,704 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.geometry &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.geometry</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># LICENCE</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+
+<div class="viewcode-block" id="bboxes_from_vert_list"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bboxes_from_vert_list">[docs]</a><span class="k">def</span> <span class="nf">bboxes_from_vert_list</span><span class="p">(</span><span class="n">verts_list</span><span class="p">,</span> <span class="n">castint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Fit the bounding polygon inside a rectangle &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">bbox_from_verts</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">castint</span><span class="o">=</span><span class="n">castint</span><span class="p">)</span> <span class="k">for</span> <span class="n">verts</span> <span class="ow">in</span> <span class="n">verts_list</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="verts_list_from_bboxes_list"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.verts_list_from_bboxes_list">[docs]</a><span class="k">def</span> <span class="nf">verts_list_from_bboxes_list</span><span class="p">(</span><span class="n">bboxes_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a four-vertex polygon from the bounding rectangle &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span> <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">bboxes_list</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="verts_from_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.verts_from_bbox">[docs]</a><span class="k">def</span> <span class="nf">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        bbox (tuple):  bounding box in the format (x, y, w, h)</span>
+<span class="sd">        close (bool): (default = False)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: verts</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.geometry --test-verts_from_bbox</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; bbox = (10, 10, 50, 50)</span>
+<span class="sd">        &gt;&gt;&gt; close = False</span>
+<span class="sd">        &gt;&gt;&gt; verts = verts_from_bbox(bbox, close)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;verts = %s&#39; % (str(verts),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        verts = ((10, 10), (60, 10), (60, 60), (10, 60))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">bbox</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">w</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">h</span>
+    <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
+        <span class="c1"># Close the verticies list (for drawing lines)</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">verts</span></div>
+
+
+<div class="viewcode-block" id="bbox_from_verts"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bbox_from_verts">[docs]</a><span class="k">def</span> <span class="nf">bbox_from_verts</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">castint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span>
+    <span class="k">if</span> <span class="n">castint</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="draw_border"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.draw_border">[docs]</a><span class="k">def</span> <span class="nf">draw_border</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        img_in (ndarray[uint8_t, ndim=2]):  image data</span>
+<span class="sd">        color (tuple): in bgr</span>
+<span class="sd">        thickness (int):</span>
+<span class="sd">        out (None):</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.geometry --test-draw_border --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; img_in = vt.imread(ut.grab_test_imgpath(&#39;carl.jpg&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; color = (0, 128, 255)</span>
+<span class="sd">        &gt;&gt;&gt; thickness = 20</span>
+<span class="sd">        &gt;&gt;&gt; out = None</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:plottool)</span>
+<span class="sd">        &gt;&gt;&gt; img = draw_border(img_in, color, thickness, out)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; pt.imshow(img)</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img_in</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c1"># verts = verts_from_bbox((0, 0, w, h))</span>
+    <span class="c1"># verts = verts_from_bbox((0, 0, w - 1, h - 1))</span>
+    <span class="n">half_thickness</span> <span class="o">=</span> <span class="n">thickness</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">verts_from_bbox</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">half_thickness</span><span class="p">,</span> <span class="n">half_thickness</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="n">thickness</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># FIXME: adjust verts and draw lines here to fill in the corners correctly</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">draw_verts</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">verts</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">thickness</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="draw_verts"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.draw_verts">[docs]</a><span class="k">def</span> <span class="nf">draw_verts</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="n">verts</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        img_in (?):</span>
+<span class="sd">        verts (?):</span>
+<span class="sd">        color (tuple):</span>
+<span class="sd">        thickness (int):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray[uint8_t, ndim=2]: img -  image data</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.geometry --test-draw_verts --show</span>
+<span class="sd">        python -m vtool.geometry --test-draw_verts:0 --show</span>
+<span class="sd">        python -m vtool.geometry --test-draw_verts:1 --show</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://docs.opencv.org/modules/core/doc/drawing_functions.html#line</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; img_in = vt.imread(ut.grab_test_imgpath(&#39;carl.jpg&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; verts = ((10, 10), (10, 100), (100, 100), (100, 10))</span>
+<span class="sd">        &gt;&gt;&gt; color = (0, 128, 255)</span>
+<span class="sd">        &gt;&gt;&gt; thickness = 2</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; out = None</span>
+<span class="sd">        &gt;&gt;&gt; img = draw_verts(img_in, verts, color, thickness, out)</span>
+<span class="sd">        &gt;&gt;&gt; assert img_in is not img</span>
+<span class="sd">        &gt;&gt;&gt; assert out is not img</span>
+<span class="sd">        &gt;&gt;&gt; assert out is not img_in</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; pt.imshow(img)</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+
+<span class="sd">    Example1:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; img_in = vt.imread(ut.grab_test_imgpath(&#39;carl.jpg&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; verts = ((10, 10), (10, 100), (100, 100), (100, 10))</span>
+<span class="sd">        &gt;&gt;&gt; color = (0, 128, 255)</span>
+<span class="sd">        &gt;&gt;&gt; thickness = 2</span>
+<span class="sd">        &gt;&gt;&gt; out = img_in</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; img = draw_verts(img_in, verts, color, thickness, out)</span>
+<span class="sd">        &gt;&gt;&gt; assert img_in is img, &#39;should be in place&#39;</span>
+<span class="sd">        &gt;&gt;&gt; assert out is img, &#39;should be in place&#39;</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; pt.imshow(img)</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+
+
+<span class="sd">    out = img_in = np.zeros((500, 500, 3), dtype=np.uint8)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img_in</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="n">verts</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">connect</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">connect</span><span class="p">:</span>
+        <span class="n">line_list_sequence</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">verts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">verts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">line_tuple_sequence</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">p1_</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p2_</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">p1_</span><span class="p">,</span> <span class="n">p2_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">line_list_sequence</span>
+        <span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">verts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">line_tuple_sequence</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+            <span class="c1"># print(&#39;p1, p2: (%r, %r)&#39; % (p1, p2))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">count</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="closest_point_on_line_segment"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.closest_point_on_line_segment">[docs]</a><span class="k">def</span> <span class="nf">closest_point_on_line_segment</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the closet point from p on line segment (e1, e2)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p (ndarray): and xy point</span>
+<span class="sd">        e1 (ndarray): the first xy endpoint of the segment</span>
+<span class="sd">        e2 (ndarray): the second xy endpoint of the segment</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: pt_on_seg - the closest xy point on (e1, e2) from p</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line</span>
+<span class="sd">        http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.geometry --exec-closest_point_on_line_segment --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; #bbox = np.array([10, 10, 10, 10], dtype=np.float)</span>
+<span class="sd">        &gt;&gt;&gt; #verts_ = np.array(vt.verts_from_bbox(bbox, close=True))</span>
+<span class="sd">        &gt;&gt;&gt; #R = vt.rotation_around_bbox_mat3x3(vt.TAU / 3, bbox)</span>
+<span class="sd">        &gt;&gt;&gt; #verts = vt.transform_points_with_homography(R, verts_.T).T</span>
+<span class="sd">        &gt;&gt;&gt; verts = np.array([[ 21.83012702,  13.16987298],</span>
+<span class="sd">        &gt;&gt;&gt;                   [ 16.83012702,  21.83012702],</span>
+<span class="sd">        &gt;&gt;&gt;                   [  8.16987298,  16.83012702],</span>
+<span class="sd">        &gt;&gt;&gt;                   [ 13.16987298,   8.16987298],</span>
+<span class="sd">        &gt;&gt;&gt;                   [ 21.83012702,  13.16987298]])</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(0)</span>
+<span class="sd">        &gt;&gt;&gt; p_list = rng.rand(64, 2) * 20 + 5</span>
+<span class="sd">        &gt;&gt;&gt; close_pts = np.array([closest_point_on_vert_segments(p, verts) for p in p_list])</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; pt.ensureqt()</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.plot(p_list.T[0], p_list.T[1], &#39;ro&#39;, label=&#39;original point&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.plot(close_pts.T[0], close_pts.T[1], &#39;rx&#39;, label=&#39;closest point on shape&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; for x, y in list(zip(p_list, close_pts)):</span>
+<span class="sd">        &gt;&gt;&gt;     z = np.array(list(zip(x, y)))</span>
+<span class="sd">        &gt;&gt;&gt;     pt.plt.plot(z[0], z[1], &#39;r--&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.legend()</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.plot(verts.T[0], verts.T[1], &#39;b-&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.xlim(0, 30)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.ylim(0, 30)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.axis(&#39;equal&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># shift e1 to origin</span>
+    <span class="n">de</span> <span class="o">=</span> <span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">=</span> <span class="n">e2</span> <span class="o">-</span> <span class="n">e1</span>
+    <span class="c1"># make point vector wrt orgin</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">e1</span>
+    <span class="c1"># Project pv onto de</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">de</span><span class="p">)</span>
+    <span class="n">pt_on_line_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">de</span> <span class="o">/</span> <span class="n">mag</span><span class="p">)</span> <span class="o">*</span> <span class="n">de</span> <span class="o">/</span> <span class="n">mag</span>
+    <span class="c1"># Check if normalized dot product is between 0 and 1</span>
+    <span class="c1"># Determines if pt is between 0,0 and de</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">de</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">pt_on_line_</span><span class="p">)</span> <span class="o">/</span> <span class="n">mag</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="c1"># t is an interpolation factor indicating how far past the line segment we</span>
+    <span class="c1"># are. We are on the line segment if it is in the range 0 to 1.</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pt_on_seg</span> <span class="o">=</span> <span class="n">e1</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">pt_on_seg</span> <span class="o">=</span> <span class="n">e2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pt_on_seg</span> <span class="o">=</span> <span class="n">pt_on_line_</span> <span class="o">+</span> <span class="n">e1</span>
+    <span class="k">return</span> <span class="n">pt_on_seg</span></div>
+
+
+<div class="viewcode-block" id="distance_to_lineseg"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.distance_to_lineseg">[docs]</a><span class="k">def</span> <span class="nf">distance_to_lineseg</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">close_pt</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">closest_point_on_line_segment</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span>
+    <span class="n">dist_to_lineseg</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">L2</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">close_pt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist_to_lineseg</span></div>
+
+
+<div class="viewcode-block" id="closest_point_on_line"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.closest_point_on_line">[docs]</a><span class="k">def</span> <span class="nf">closest_point_on_line</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    e1 and e2 define two points on the line.</span>
+<span class="sd">    Does not clip to the segment.</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.geometry closest_point_on_line --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; verts = np.array([[ 21.83012702,  13.16987298],</span>
+<span class="sd">        &gt;&gt;&gt;                   [ 16.83012702,  21.83012702],</span>
+<span class="sd">        &gt;&gt;&gt;                   [  8.16987298,  16.83012702],</span>
+<span class="sd">        &gt;&gt;&gt;                   [ 13.16987298,   8.16987298],</span>
+<span class="sd">        &gt;&gt;&gt;                   [ 21.83012702,  13.16987298]])</span>
+<span class="sd">        &gt;&gt;&gt; rng = np.random.RandomState(0)</span>
+<span class="sd">        &gt;&gt;&gt; p_list = rng.rand(64, 2) * 20 + 5</span>
+<span class="sd">        &gt;&gt;&gt; close_pts = []</span>
+<span class="sd">        &gt;&gt;&gt; for p in p_list:</span>
+<span class="sd">        &gt;&gt;&gt;     candidates = [closest_point_on_line(p, e1, e2) for e1, e2 in ut.itertwo(verts)]</span>
+<span class="sd">        &gt;&gt;&gt;     dists = np.array([vt.L2_sqrd(p, new_pt) for new_pt in candidates])</span>
+<span class="sd">        &gt;&gt;&gt;     close_pts.append(candidates[dists.argmin()])</span>
+<span class="sd">        &gt;&gt;&gt; close_pts = np.array(close_pts)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; pt.ensureqt()</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.plot(p_list.T[0], p_list.T[1], &#39;ro&#39;, label=&#39;original point&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.plot(close_pts.T[0], close_pts.T[1], &#39;rx&#39;, label=&#39;closest point on shape&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; for x, y in list(zip(p_list, close_pts)):</span>
+<span class="sd">        &gt;&gt;&gt;     z = np.array(list(zip(x, y)))</span>
+<span class="sd">        &gt;&gt;&gt;     pt.plt.plot(z[0], z[1], &#39;r--&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.legend()</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.plot(verts.T[0], verts.T[1], &#39;b-&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.xlim(0, 30)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.ylim(0, 30)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.axis(&#39;equal&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># shift e1 to origin</span>
+    <span class="n">de</span> <span class="o">=</span> <span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">=</span> <span class="n">e2</span> <span class="o">-</span> <span class="n">e1</span>
+    <span class="c1"># make point vector wrt orgin</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">e1</span>
+    <span class="c1"># Project pv onto de</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">de</span><span class="p">)</span>
+    <span class="n">pt_on_line_</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">de</span> <span class="o">/</span> <span class="n">mag</span><span class="p">)</span> <span class="o">*</span> <span class="n">de</span> <span class="o">/</span> <span class="n">mag</span>
+    <span class="n">pt_on_line</span> <span class="o">=</span> <span class="n">pt_on_line_</span> <span class="o">+</span> <span class="n">e1</span>
+    <span class="k">return</span> <span class="n">pt_on_line</span></div>
+
+
+<div class="viewcode-block" id="closest_point_on_vert_segments"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.closest_point_on_vert_segments">[docs]</a><span class="k">def</span> <span class="nf">closest_point_on_vert_segments</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">verts</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">closest_point_on_line_segment</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span> <span class="k">for</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">itertwo</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">dists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vt</span><span class="o">.</span><span class="n">L2_sqrd</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">new_pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">new_pt</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">])</span>
+    <span class="n">new_pts</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="n">dists</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">new_pts</span></div>
+
+
+<div class="viewcode-block" id="closest_point_on_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.closest_point_on_bbox">[docs]</a><span class="k">def</span> <span class="nf">closest_point_on_bbox</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">bbox</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Example1:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; p_list = np.array([[19, 7], [7, 14], [14, 11], [8, 7], [23, 21]], dtype=np.float)</span>
+<span class="sd">        &gt;&gt;&gt; bbox = np.array([10, 10, 10, 10], dtype=np.float)</span>
+<span class="sd">        &gt;&gt;&gt; [closest_point_on_bbox(p, bbox) for p in p_list]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">new_pts</span> <span class="o">=</span> <span class="n">closest_point_on_vert_segments</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">verts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_pts</span></div>
+
+
+<div class="viewcode-block" id="bbox_from_xywh"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bbox_from_xywh">[docs]</a><span class="k">def</span> <span class="nf">bbox_from_xywh</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">wh</span><span class="p">,</span> <span class="n">xy_rel_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot; need to specify xy_rel_pos if xy is not in tl already &quot;&quot;&quot;</span>
+    <span class="n">to_tlx</span> <span class="o">=</span> <span class="n">xy_rel_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">wh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">to_tly</span> <span class="o">=</span> <span class="n">xy_rel_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">wh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tl_x</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">to_tlx</span>
+    <span class="n">tl_y</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">to_tly</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="p">[</span><span class="n">tl_x</span><span class="p">,</span> <span class="n">tl_y</span><span class="p">,</span> <span class="n">wh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wh</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">bbox</span></div>
+
+
+<div class="viewcode-block" id="extent_from_verts"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.extent_from_verts">[docs]</a><span class="k">def</span> <span class="nf">extent_from_verts</span><span class="p">(</span><span class="n">verts</span><span class="p">):</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">bbox_from_verts</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span>
+    <span class="n">extent</span> <span class="o">=</span> <span class="n">extent_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extent</span></div>
+
+
+<div class="viewcode-block" id="union_extents"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.union_extents">[docs]</a><span class="k">def</span> <span class="nf">union_extents</span><span class="p">(</span><span class="n">extents</span><span class="p">):</span>
+    <span class="n">extents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">extents</span><span class="p">)</span>
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">extents</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">xmax</span> <span class="o">=</span> <span class="n">extents</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">extents</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">ymax</span> <span class="o">=</span> <span class="n">extents</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="extent_from_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.extent_from_bbox">[docs]</a><span class="k">def</span> <span class="nf">extent_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        bbox (ndarray): tl_x, tl_y, w, h</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        extent (ndarray): tl_x, br_x, tl_y, br_y</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m ~/code/vtool/vtool/geometry.py extent_from_bbox</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; bbox = [0, 0, 10, 10]</span>
+<span class="sd">        &gt;&gt;&gt; extent = extent_from_bbox(bbox)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;extent = %s&#39; % (ub.repr2(extent, nl=0),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        extent = [0, 10, 0, 10]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tl_x</span><span class="p">,</span> <span class="n">tl_y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">bbox</span>
+    <span class="n">br_x</span> <span class="o">=</span> <span class="n">tl_x</span> <span class="o">+</span> <span class="n">w</span>
+    <span class="n">br_y</span> <span class="o">=</span> <span class="n">tl_y</span> <span class="o">+</span> <span class="n">h</span>
+    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">tl_x</span><span class="p">,</span> <span class="n">br_x</span><span class="p">,</span> <span class="n">tl_y</span><span class="p">,</span> <span class="n">br_y</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">extent</span></div>
+
+
+<span class="c1"># def tlbr_from_bbox(bbox):</span>
+<div class="viewcode-block" id="bbox_from_extent"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bbox_from_extent">[docs]</a><span class="k">def</span> <span class="nf">bbox_from_extent</span><span class="p">(</span><span class="n">extent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        extent (ndarray): tl_x, br_x, tl_y, br_y</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bbox (ndarray): tl_x, tl_y, w, h</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; extent = [0, 10, 0, 10]</span>
+<span class="sd">        &gt;&gt;&gt; bbox = bbox_from_extent(extent)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;bbox = %s&#39; % (ub.repr2(bbox, nl=0),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        bbox = [0, 0, 10, 10]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tl_x</span><span class="p">,</span> <span class="n">br_x</span><span class="p">,</span> <span class="n">tl_y</span><span class="p">,</span> <span class="n">br_y</span> <span class="o">=</span> <span class="n">extent</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">br_x</span> <span class="o">-</span> <span class="n">tl_x</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">br_y</span> <span class="o">-</span> <span class="n">tl_y</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="p">[</span><span class="n">tl_x</span><span class="p">,</span> <span class="n">tl_y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">bbox</span></div>
+
+
+<div class="viewcode-block" id="bbox_from_center_wh"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bbox_from_center_wh">[docs]</a><span class="k">def</span> <span class="nf">bbox_from_center_wh</span><span class="p">(</span><span class="n">center_xy</span><span class="p">,</span> <span class="n">wh</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">bbox_from_xywh</span><span class="p">(</span><span class="n">center_xy</span><span class="p">,</span> <span class="n">wh</span><span class="p">,</span> <span class="n">xy_rel_pos</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="bbox_center"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bbox_center">[docs]</a><span class="k">def</span> <span class="nf">bbox_center</span><span class="p">(</span><span class="n">bbox</span><span class="p">):</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">=</span> <span class="n">bbox</span>
+    <span class="n">centerx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">w</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">centery</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">centerx</span><span class="p">,</span> <span class="n">centery</span></div>
+
+
+<div class="viewcode-block" id="get_pointset_extents"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.get_pointset_extents">[docs]</a><span class="k">def</span> <span class="nf">get_pointset_extents</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="n">minx</span><span class="p">,</span> <span class="n">miny</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">minx</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">miny</span><span class="p">,</span> <span class="n">maxy</span>
+    <span class="k">return</span> <span class="n">bounds</span></div>
+
+
+<div class="viewcode-block" id="get_pointset_extent_wh"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.get_pointset_extent_wh">[docs]</a><span class="k">def</span> <span class="nf">get_pointset_extent_wh</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="n">minx</span><span class="p">,</span> <span class="n">miny</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">extent_w</span> <span class="o">=</span> <span class="n">maxx</span> <span class="o">-</span> <span class="n">minx</span>
+    <span class="n">extent_h</span> <span class="o">=</span> <span class="n">maxy</span> <span class="o">-</span> <span class="n">miny</span>
+    <span class="k">return</span> <span class="n">extent_w</span><span class="p">,</span> <span class="n">extent_h</span></div>
+
+
+<div class="viewcode-block" id="cvt_bbox_xywh_to_pt1pt2"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.cvt_bbox_xywh_to_pt1pt2">[docs]</a><span class="k">def</span> <span class="nf">cvt_bbox_xywh_to_pt1pt2</span><span class="p">(</span><span class="n">xywh</span><span class="p">,</span> <span class="n">sx</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">round_</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Converts bbox to thumb format with a scale factor&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">_w</span><span class="p">,</span> <span class="n">_h</span><span class="p">)</span> <span class="o">=</span> <span class="n">xywh</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">_w</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">_h</span>
+    <span class="k">if</span> <span class="n">round_</span><span class="p">:</span>
+        <span class="n">pt1</span> <span class="o">=</span> <span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="n">vt</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">y1</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+        <span class="n">pt2</span> <span class="o">=</span> <span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">x2</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="n">vt</span><span class="o">.</span><span class="n">iround</span><span class="p">(</span><span class="n">y2</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pt1</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="p">(</span><span class="n">y1</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+        <span class="n">pt2</span> <span class="o">=</span> <span class="p">((</span><span class="n">x2</span> <span class="o">*</span> <span class="n">sx</span><span class="p">),</span> <span class="p">(</span><span class="n">y2</span> <span class="o">*</span> <span class="n">sy</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="scale_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.scale_bbox">[docs]</a><span class="k">def</span> <span class="nf">scale_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">sy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sy</span> <span class="o">=</span> <span class="n">sx</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span>
+
+    <span class="n">centerx</span><span class="p">,</span> <span class="n">centery</span> <span class="o">=</span> <span class="n">bbox_center</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">scale_around_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">centerx</span><span class="p">,</span> <span class="n">centery</span><span class="p">)</span>
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">))</span>
+    <span class="n">vertsT</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">transform_points_with_homography</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">verts</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">bboxT</span> <span class="o">=</span> <span class="n">bbox_from_verts</span><span class="p">(</span><span class="n">vertsT</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bboxT</span></div>
+
+
+<div class="viewcode-block" id="scale_extents"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.scale_extents">[docs]</a><span class="k">def</span> <span class="nf">scale_extents</span><span class="p">(</span><span class="n">extents</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        extent (ndarray): tl_x, br_x, tl_y, br_y</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">bbox_from_extent</span><span class="p">(</span><span class="n">extents</span><span class="p">)</span>
+    <span class="n">bboxT</span> <span class="o">=</span> <span class="n">scale_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+    <span class="n">extentsT</span> <span class="o">=</span> <span class="n">extent_from_bbox</span><span class="p">(</span><span class="n">bboxT</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extentsT</span></div>
+
+
+<div class="viewcode-block" id="scaled_verts_from_bbox_gen"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.scaled_verts_from_bbox_gen">[docs]</a><span class="k">def</span> <span class="nf">scaled_verts_from_bbox_gen</span><span class="p">(</span><span class="n">bbox_list</span><span class="p">,</span> <span class="n">theta_list</span><span class="p">,</span> <span class="n">sx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helps with drawing scaled bbounding boxes on thumbnails</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bbox_list (list): bboxes in x,y,w,h format</span>
+<span class="sd">        theta_list (list): rotation of bounding boxes</span>
+<span class="sd">        sx (float): x scale factor</span>
+<span class="sd">        sy (float): y scale factor</span>
+
+<span class="sd">    Yeilds:</span>
+<span class="sd">        new_verts - vertices of scaled bounding box for every input</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.image --test-scaled_verts_from_bbox_gen</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; bbox_list = [(10, 10, 100, 100)]</span>
+<span class="sd">        &gt;&gt;&gt; theta_list = [0]</span>
+<span class="sd">        &gt;&gt;&gt; sx = .5</span>
+<span class="sd">        &gt;&gt;&gt; sy = .5</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; new_verts_list = list(scaled_verts_from_bbox_gen(bbox_list, theta_list, sx, sy))</span>
+<span class="sd">        &gt;&gt;&gt; result = str(new_verts_list)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        [[[5, 5], [55, 5], [55, 55], [5, 55], [5, 5]]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: input verts support and better name</span>
+    <span class="k">for</span> <span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bbox_list</span><span class="p">,</span> <span class="n">theta_list</span><span class="p">):</span>
+        <span class="n">new_verts</span> <span class="o">=</span> <span class="n">scaled_verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">new_verts</span></div>
+
+
+<div class="viewcode-block" id="scaled_verts_from_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.scaled_verts_from_bbox">[docs]</a><span class="k">def</span> <span class="nf">scaled_verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helps with drawing scaled bbounding boxes on thumbnails</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span>
+
+    <span class="c1"># Transformation matrixes</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">rotation_around_bbox_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span>
+    <span class="c1"># Get verticies of the annotation polygon</span>
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Rotate and transform to thumbnail space</span>
+    <span class="n">xyz_pts</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">add_homogenous_coordinate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">trans_pts</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">remove_homogenous_coordinate</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">xyz_pts</span><span class="p">))</span>
+    <span class="n">new_verts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">trans_pts</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">new_verts</span></div>
+
+
+<div class="viewcode-block" id="point_inside_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.point_inside_bbox">[docs]</a><span class="k">def</span> <span class="nf">point_inside_bbox</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">bbox</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Flags points that are strictly inside a bounding box.</span>
+<span class="sd">    Points on the boundary are not considered inside.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        point (ndarray): one or more points to test (2xN)</span>
+<span class="sd">        bbox (tuple): a bounding box in  (x, y, w, h) format</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool or ndarray: True if the point is in the bbox</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.geometry point_inside_bbox --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; point = np.array([</span>
+<span class="sd">        &gt;&gt;&gt;     [3, 2], [4, 1], [2, 3], [1, 1], [0, 0],</span>
+<span class="sd">        &gt;&gt;&gt;     [4, 9.5], [9, 9.5], [7, 2], [7, 8], [9, 3]</span>
+<span class="sd">        &gt;&gt;&gt; ]).T</span>
+<span class="sd">        &gt;&gt;&gt; bbox = (3, 2, 5, 7)</span>
+<span class="sd">        &gt;&gt;&gt; flag = point_inside_bbox(point, bbox)</span>
+<span class="sd">        &gt;&gt;&gt; flag = flag.astype(np.int)</span>
+<span class="sd">        &gt;&gt;&gt; result = (&#39;flag = %s&#39; % (ub.repr2(flag),))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; verts = np.array(verts_from_bbox(bbox, close=True))</span>
+<span class="sd">        &gt;&gt;&gt; pt.plot(verts.T[0], verts.T[1], &#39;b-&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plot(point[0][flag], point[1][flag], &#39;go&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plot(point[0][~flag], point[1][~flag], &#39;rx&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.plt.xlim(0, 10); pt.plt.ylim(0, 10)</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+<span class="sd">        flag = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">point</span>
+    <span class="n">tl_x</span><span class="p">,</span> <span class="n">br_x</span><span class="p">,</span> <span class="n">tl_y</span><span class="p">,</span> <span class="n">br_y</span> <span class="o">=</span> <span class="n">extent_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
+    <span class="n">inside_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">tl_x</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">br_x</span><span class="p">)</span>
+    <span class="n">inside_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">tl_y</span> <span class="o">&lt;</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">br_y</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">inside_x</span><span class="p">,</span> <span class="n">inside_y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flag</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.geometry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

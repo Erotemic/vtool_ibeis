@@ -204,9 +204,7 @@ def sparse_grid_coverage(
         neighbor_subbin_sqrddist_arr, weights, grid_sigma
     )
     # convert to rowcol
-    neighbor_bin_indices = neighbor_bin_rc_indices = neighbor_bin_xy_indices[
-        :, :, ::-1
-    ]  # NOQA
+    neighbor_bin_indices = neighbor_bin_xy_indices[:, :, ::-1]  # NOQA
 
     coverage_gridtup = (
         num_rows,

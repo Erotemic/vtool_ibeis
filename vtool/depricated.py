@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import utool as ut
 from os.path import join, exists
+from vtool.image import resize_thumb, cvt_BGR2RGB, _trimread, imwrite
 
 
 class ThumbnailCacheContext(object):

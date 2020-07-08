@@ -1,0 +1,485 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.inspect_matches &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.inspect_matches</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">wbia.guitool</span> <span class="k">as</span> <span class="nn">gt</span>
+    <span class="kn">from</span> <span class="nn">wbia.guitool</span> <span class="k">import</span> <span class="n">mpl_widget</span>
+
+    <span class="n">INSPECT_BASE</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">GuitoolWidget</span>
+    <span class="n">MatplotlibWidget</span> <span class="o">=</span> <span class="n">mpl_widget</span><span class="o">.</span><span class="n">MatplotlibWidget</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">warnings</span>
+
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;WARNING: guitool not available&#39;</span><span class="p">)</span>
+    <span class="n">MatplotlibWidget</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="n">INSPECT_BASE</span> <span class="o">=</span> <span class="nb">object</span>
+
+
+<div class="viewcode-block" id="lazy_test_annot"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.lazy_test_annot">[docs]</a><span class="k">def</span> <span class="nf">lazy_test_annot</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="n">rchip_fpath</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">annot</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">LazyDict</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;aid&#39;</span><span class="p">:</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;nid&#39;</span><span class="p">:</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span>
+            <span class="s1">&#39;rchip_fpath&#39;</span><span class="p">:</span> <span class="n">rchip_fpath</span><span class="p">,</span>
+            <span class="s1">&#39;gps&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
+            <span class="s1">&#39;yaw&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s1">&#39;view&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s1">&#39;qual&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">annot</span></div>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">wbia.dtool</span>
+
+    <span class="n">MatchDisplayConfig</span> <span class="o">=</span> <span class="n">wbia</span><span class="o">.</span><span class="n">dtool</span><span class="o">.</span><span class="n">from_param_info_list</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;overlay&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_all_kpts&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;mask_blend&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;heatmask&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_homog&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_ori&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_ell&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_pts&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_lines&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="ow">not</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;overlay&#39;</span><span class="p">]),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_rect&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;show_eig&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;ell_alpha&#39;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">ParamInfo</span><span class="p">(</span><span class="s1">&#39;line_alpha&#39;</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">hideif</span><span class="o">=</span><span class="s1">&#39;:not overlay&#39;</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="MatchInspector"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector">[docs]</a><span class="k">class</span> <span class="nc">MatchInspector</span><span class="p">(</span><span class="n">INSPECT_BASE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A widget that contains</span>
+<span class="sd">        (1) a viewport that displays an annotation pair with matches overlayed.</span>
+<span class="sd">        (2) a control panel for tuning matching parameters</span>
+<span class="sd">        (3) a text area displaying information about the match vector</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.inspect_matches MatchInspector:0 --show</span>
+<span class="sd">        python -m vtool.inspect_matches MatchInspector:1 --show</span>
+
+<span class="sd">        python -m vtool.inspect_matches MatchInspector:1 --db GZ_Master1 --aids=1041,1045 --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # SCRIPT</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.inspect_matches import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; gt.ensure_qapp()</span>
+<span class="sd">        &gt;&gt;&gt; ut.qtensure()</span>
+<span class="sd">        &gt;&gt;&gt; annot1 = lazy_test_annot(&#39;easy1.png&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; annot2 = lazy_test_annot(&#39;easy2.png&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; match = vt.PairwiseMatch(annot1, annot2)</span>
+<span class="sd">        &gt;&gt;&gt; self = MatchInspector(match=match)</span>
+<span class="sd">        &gt;&gt;&gt; self.show()</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; #self.update()</span>
+<span class="sd">        &gt;&gt;&gt; gt.qtapp_loop(qwin=self, freq=10)</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # SCRIPT</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.inspect_matches import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; import wbia</span>
+<span class="sd">        &gt;&gt;&gt; gt.ensure_qapp()</span>
+<span class="sd">        &gt;&gt;&gt; ut.qtensure()</span>
+<span class="sd">        &gt;&gt;&gt; ibs = wbia.opendb(defaultdb=&#39;PZ_MTEST&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; aids = ub.argval(&#39;--aids&#39;, default=[1, 2])</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;aids = %r&#39; % (aids,))</span>
+<span class="sd">        &gt;&gt;&gt; annots = ibs.annots(aids)</span>
+<span class="sd">        &gt;&gt;&gt; annot1 = annots[0]._make_lazy_dict()</span>
+<span class="sd">        &gt;&gt;&gt; annot2 = annots[1]._make_lazy_dict()</span>
+<span class="sd">        &gt;&gt;&gt; cfgdict = MatchDisplayConfig().asdict()</span>
+<span class="sd">        &gt;&gt;&gt; cfgdict = ut.argparse_dict(cfgdict)</span>
+<span class="sd">        &gt;&gt;&gt; match = vt.PairwiseMatch(annot1, annot2)</span>
+<span class="sd">        &gt;&gt;&gt; self = MatchInspector(match=match, cfgdict=cfgdict)</span>
+<span class="sd">        &gt;&gt;&gt; self.show()</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; #self.update()</span>
+<span class="sd">        &gt;&gt;&gt; gt.qtapp_loop(qwin=self, freq=10)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MatchInspector.showEvent"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.showEvent">[docs]</a>    <span class="k">def</span> <span class="nf">showEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatchInspector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">showEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="c1"># Fire initialize event after we show the GUI</span>
+        <span class="c1"># QtCore.QTimer.singleShot(50, self.init_inference)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatchInspector.first_show"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.first_show">[docs]</a>    <span class="k">def</span> <span class="nf">first_show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Show the match if updating is on, otherwise just draw the annot</span>
+            <span class="c1"># pair</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoupdate_cb</span><span class="o">.</span><span class="n">checkState</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">draw_pair</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatchInspector.set_match"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.set_match">[docs]</a>    <span class="k">def</span> <span class="nf">set_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info_text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info_text</span> <span class="o">=</span> <span class="n">info_text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_context</span> <span class="o">=</span> <span class="n">on_context</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">first_show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatchInspector.initialize"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">autoupdate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">info_text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfgdict</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">wbia.plottool</span> <span class="k">import</span> <span class="n">abstract_interaction</span>
+        <span class="kn">from</span> <span class="nn">wbia.guitool.__PYQT__</span> <span class="k">import</span> <span class="n">QtCore</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_match</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="n">on_context</span><span class="p">,</span> <span class="n">info_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_configs</span><span class="p">(</span><span class="n">cfgdict</span><span class="o">=</span><span class="n">cfgdict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_layout</span><span class="p">(</span><span class="n">autoupdate</span><span class="o">=</span><span class="n">autoupdate</span><span class="p">)</span>
+        <span class="n">abstract_interaction</span><span class="o">.</span><span class="n">register_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CustomContextMenu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">customContextMenuRequested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">execContextMenu</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatchInspector.execContextMenu"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.execContextMenu">[docs]</a>    <span class="k">def</span> <span class="nf">execContextMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qpoint</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_context</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_context</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;No context set&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+        <span class="n">gt</span><span class="o">.</span><span class="n">popup_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qpoint</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatchInspector.screenshot"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.screenshot">[docs]</a>    <span class="k">def</span> <span class="nf">screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+        <span class="k">with</span> <span class="n">pt</span><span class="o">.</span><span class="n">RenderingContext</span><span class="p">()</span> <span class="k">as</span> <span class="n">render</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">disp_config</span><span class="p">)</span>
+        <span class="n">fpaths</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">newFileDialog</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;save&#39;</span><span class="p">,</span> <span class="n">exec_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fpaths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fpaths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">fpath</span> <span class="o">=</span> <span class="n">fpaths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">):</span>
+                <span class="n">fpath</span> <span class="o">+=</span> <span class="s1">&#39;.jpg&#39;</span>
+            <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+            <span class="n">vt</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">render</span><span class="o">.</span><span class="n">image</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatchInspector.embed"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.embed">[docs]</a>    <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span>  <span class="c1"># NOQA</span>
+        <span class="kn">import</span> <span class="nn">utool</span>
+
+        <span class="n">utool</span><span class="o">.</span><span class="n">embed</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_new_config_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">wbia.guitool</span> <span class="k">import</span> <span class="n">PrefWidget2</span>
+
+        <span class="n">user_mode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cfg_widget</span> <span class="o">=</span> <span class="n">PrefWidget2</span><span class="o">.</span><span class="n">EditConfigWidget</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">user_mode</span><span class="o">=</span><span class="n">user_mode</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="n">changed</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cfg_widget</span>
+
+<div class="viewcode-block" id="MatchInspector.closeEvent"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">wbia.plottool</span> <span class="k">import</span> <span class="n">abstract_interaction</span>
+
+        <span class="n">abstract_interaction</span><span class="o">.</span><span class="n">unregister_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatchInspector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">closeEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_setup_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfgdict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">matching</span>
+        <span class="kn">import</span> <span class="nn">wbia.dtool</span>
+
+        <span class="c1"># import pyhesaff</span>
+
+        <span class="c1"># default_dict = pyhesaff.get_hesaff_default_params()</span>
+        <span class="c1"># default_dict = vt.get_extract_features_default_params()</span>
+        <span class="n">TmpFeatConfig</span> <span class="o">=</span> <span class="n">wbia</span><span class="o">.</span><span class="n">dtool</span><span class="o">.</span><span class="n">from_param_info_list</span><span class="p">(</span><span class="n">matching</span><span class="o">.</span><span class="n">VSONE_FEAT_CONFIG</span><span class="p">)</span>
+
+        <span class="n">TmpNChipConfig</span> <span class="o">=</span> <span class="n">wbia</span><span class="o">.</span><span class="n">dtool</span><span class="o">.</span><span class="n">from_param_info_list</span><span class="p">(</span><span class="n">matching</span><span class="o">.</span><span class="n">NORM_CHIP_CONFIG</span><span class="p">)</span>
+        <span class="c1"># [</span>
+        <span class="c1">#     ut.ParamInfo(key, val) for key, val in default_dict.items()</span>
+        <span class="c1">#     # ut.ParamInfo(&#39;affine_invariance&#39;, True),</span>
+        <span class="c1">#     # ut.ParamInfo(&#39;rotation_invariance&#39;, False),</span>
+        <span class="c1"># ])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">featconfig</span> <span class="o">=</span> <span class="n">TmpFeatConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chipconfig</span> <span class="o">=</span> <span class="n">TmpNChipConfig</span><span class="p">()</span>
+
+        <span class="n">TmpVsOneConfig</span> <span class="o">=</span> <span class="n">wbia</span><span class="o">.</span><span class="n">dtool</span><span class="o">.</span><span class="n">from_param_info_list</span><span class="p">(</span><span class="n">matching</span><span class="o">.</span><span class="n">VSONE_DEFAULT_CONFIG</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">TmpVsOneConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp_config</span> <span class="o">=</span> <span class="n">MatchDisplayConfig</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cfgdict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[inspect_match] default cfgdict = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cfgdict</span><span class="p">,))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">cfgdict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">featconfig</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">cfgdict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chipconfig</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">cfgdict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disp_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">cfgdict</span><span class="p">)</span>
+
+        <span class="c1"># Make config widgets after setting defaults</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chipconfig_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_config_widget</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chipconfig</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_chip_cfg_changed</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">featconfig_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_config_widget</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">featconfig</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_feat_cfg_changed</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_config_widget</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_cfg_changed</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp_config_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_config_widget</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disp_config</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_cfg_changed</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">autoupdate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">wbia.guitool.__PYQT__</span> <span class="k">import</span> <span class="n">QtWidgets</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">newMenubar</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">newMenu</span><span class="p">(</span><span class="s1">&#39;Dev&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">newAction</span><span class="p">(</span><span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menuFile</span><span class="o">.</span><span class="n">newAction</span><span class="p">(</span><span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshot</span><span class="p">)</span>
+        <span class="n">splitter1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addNewSplitter</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horiz&#39;</span><span class="p">)</span>
+        <span class="n">config_vframe</span> <span class="o">=</span> <span class="n">splitter1</span><span class="o">.</span><span class="n">newWidget</span><span class="p">()</span>
+        <span class="n">splitter2</span> <span class="o">=</span> <span class="n">splitter1</span><span class="o">.</span><span class="n">addNewSplitter</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;vert&#39;</span><span class="p">)</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Chip Config&#39;</span><span class="p">))</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chipconfig_widget</span><span class="p">)</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Feat Config&#39;</span><span class="p">))</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">featconfig_widget</span><span class="p">)</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Query Config&#39;</span><span class="p">))</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_widget</span><span class="p">)</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Display Config&#39;</span><span class="p">))</span>
+        <span class="n">config_vframe</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disp_config_widget</span><span class="p">)</span>
+        <span class="c1"># update_hframe = config_vframe.addNewWidget(orientation=&#39;horiz&#39;)</span>
+        <span class="c1"># update_hframe.addNewButton(&#39;Update&#39;, pressed=self.update)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">autoupdate_cb</span> <span class="o">=</span> <span class="n">config_vframe</span><span class="o">.</span><span class="n">addNewCheckBox</span><span class="p">(</span>
+            <span class="s1">&#39;auto-update&#39;</span><span class="p">,</span> <span class="n">checked</span><span class="o">=</span><span class="n">autoupdate</span><span class="p">,</span> <span class="n">changed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">first_show</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span> <span class="o">=</span> <span class="n">MatplotlibWidget</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">splitter2</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">infobox</span> <span class="o">=</span> <span class="n">splitter2</span><span class="o">.</span><span class="n">addNewTextEdit</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MatchInspector.execute_vsone"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.execute_vsone">[docs]</a>    <span class="k">def</span> <span class="nf">execute_vsone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">matching</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[inspect_match] Execute vsone&#39;</span><span class="p">)</span>
+
+        <span class="n">cfgdict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">cfgdict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">featconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">())</span>
+        <span class="n">cfgdict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chipconfig</span><span class="o">.</span><span class="n">asdict</span><span class="p">())</span>
+
+        <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span>
+        <span class="n">match</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">match</span><span class="o">.</span><span class="n">_inplace_default</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">matching</span><span class="o">.</span><span class="n">ensure_metadata_vsone</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="p">,</span> <span class="n">cfgdict</span><span class="o">=</span><span class="n">cfgdict</span><span class="p">)</span>
+
+        <span class="n">match_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+        <span class="n">match</span><span class="o">.</span><span class="n">apply_all</span><span class="p">(</span><span class="n">match_config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MatchInspector.draw_pair"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.draw_pair">[docs]</a>    <span class="k">def</span> <span class="nf">draw_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="o">.</span><span class="n">ax</span>
+        <span class="n">info_html</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info_html</span> <span class="o">=</span> <span class="s1">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_text</span> <span class="o">+</span> <span class="s1">&#39;&lt;/pre&gt;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infobox</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">info_html</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">overlay</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatchInspector.draw_vsone"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.draw_vsone">[docs]</a>    <span class="k">def</span> <span class="nf">draw_vsone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">_make_local_summary_feature_vector</span><span class="p">(</span><span class="n">summary_ops</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sum&#39;</span><span class="p">})</span>
+        <span class="n">info_html</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info_html</span> <span class="o">=</span> <span class="s1">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">info_text</span> <span class="o">+</span> <span class="s1">&#39;&lt;/pre&gt;&#39;</span>
+        <span class="n">feat_html</span> <span class="o">=</span> <span class="s1">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="n">ut</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">summary</span><span class="p">),</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/pre&gt;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infobox</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">info_html</span> <span class="o">+</span> <span class="n">feat_html</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="o">.</span><span class="n">ax</span>
+        <span class="n">match</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">disp_config</span><span class="p">)</span>
+        <span class="c1"># fig.show()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpl_widget</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatchInspector.update"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoupdate_cb</span><span class="o">.</span><span class="n">checkState</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute_vsone</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_vsone</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MatchInspector.on_cfg_changed"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.on_cfg_changed">[docs]</a>    <span class="k">def</span> <span class="nf">on_cfg_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg_needs_update</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="MatchInspector.on_chip_cfg_changed"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.on_chip_cfg_changed">[docs]</a>    <span class="k">def</span> <span class="nf">on_chip_cfg_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Update feats&#39;</span><span class="p">)</span>
+        <span class="n">feat_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nchip&#39;</span><span class="p">,</span> <span class="s1">&#39;vecs&#39;</span><span class="p">,</span> <span class="s1">&#39;kpts&#39;</span><span class="p">,</span> <span class="s1">&#39;_feats&#39;</span><span class="p">,</span> <span class="s1">&#39;flann&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="o">.</span><span class="n">_mutable</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="o">.</span><span class="n">_mutable</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">feat_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg_needs_update</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="MatchInspector.on_feat_cfg_changed"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.MatchInspector.on_feat_cfg_changed">[docs]</a>    <span class="k">def</span> <span class="nf">on_feat_cfg_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Update feats&#39;</span><span class="p">)</span>
+        <span class="n">feat_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vecs&#39;</span><span class="p">,</span> <span class="s1">&#39;kpts&#39;</span><span class="p">,</span> <span class="s1">&#39;_feats&#39;</span><span class="p">,</span> <span class="s1">&#39;flann&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="o">.</span><span class="n">_mutable</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="o">.</span><span class="n">_mutable</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">feat_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">annot2</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg_needs_update</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="make_match_interaction"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.make_match_interaction">[docs]</a><span class="k">def</span> <span class="nf">make_match_interaction</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;RAT+SV&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool.interact_matches</span>
+
+    <span class="c1"># import wbia.plottool as pt</span>
+    <span class="n">fm</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="n">type_</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">H1</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;H_&#39;</span> <span class="o">+</span> <span class="n">type_</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">H1</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># fm, fs = matches[&#39;RAT&#39;][0:2]</span>
+    <span class="n">annot1</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;annot1&#39;</span><span class="p">]</span>
+    <span class="n">annot2</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;annot2&#39;</span><span class="p">]</span>
+    <span class="n">rchip1</span><span class="p">,</span> <span class="n">kpts1</span><span class="p">,</span> <span class="n">vecs1</span> <span class="o">=</span> <span class="n">ub</span><span class="o">.</span><span class="n">dict_take</span><span class="p">(</span><span class="n">annot1</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nchip&#39;</span><span class="p">,</span> <span class="s1">&#39;kpts&#39;</span><span class="p">,</span> <span class="s1">&#39;vecs&#39;</span><span class="p">])</span>
+    <span class="n">rchip2</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">vecs2</span> <span class="o">=</span> <span class="n">ub</span><span class="o">.</span><span class="n">dict_take</span><span class="p">(</span><span class="n">annot2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nchip&#39;</span><span class="p">,</span> <span class="s1">&#39;kpts&#39;</span><span class="p">,</span> <span class="s1">&#39;vecs&#39;</span><span class="p">])</span>
+    <span class="c1"># pt.show_chipmatch2(rchip1, rchip2, kpts1, kpts2, fm=fm, fs=fs)</span>
+    <span class="n">fsv</span> <span class="o">=</span> <span class="n">fs</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">interact</span> <span class="o">=</span> <span class="n">wbia</span><span class="o">.</span><span class="n">plottool</span><span class="o">.</span><span class="n">interact_matches</span><span class="o">.</span><span class="n">MatchInteraction2</span><span class="p">(</span>
+        <span class="n">rchip1</span><span class="p">,</span> <span class="n">rchip2</span><span class="p">,</span> <span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">fm</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fsv</span><span class="p">,</span> <span class="n">vecs1</span><span class="p">,</span> <span class="n">vecs2</span><span class="p">,</span> <span class="n">H1</span><span class="o">=</span><span class="n">H1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">interact</span></div>
+
+
+<div class="viewcode-block" id="show_matching_dict"><a class="viewcode-back" href="../../vtool.html#vtool.inspect_matches.show_matching_dict">[docs]</a><span class="k">def</span> <span class="nf">show_matching_dict</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">interact</span> <span class="o">=</span> <span class="n">make_match_interaction</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">interact</span><span class="o">.</span><span class="n">show_page</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">interact</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.inspect_matches</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

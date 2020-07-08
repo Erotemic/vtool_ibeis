@@ -231,7 +231,7 @@ def test_pyflann_searches():
     except Exception as ex:
         import utool as ut
 
-        ut.printex(ex, key_list=['query', 'query.shape', 'pts.shape',], pad_stdout=True)
+        ut.printex(ex, key_list=['query', 'query.shape', 'pts.shape'], pad_stdout=True)
         # utool.embed()
         raise
 

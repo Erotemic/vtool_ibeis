@@ -445,6 +445,7 @@ def get_coverage_kpts_gridsearch_configs():
     }
     slice_dict = None
     # Make configuration for every parameter setting
+
     def constrain_func(cfgdict):
         if cfgdict['cov_remove_shape']:
             cfgdict['cov_remove_scale'] = False

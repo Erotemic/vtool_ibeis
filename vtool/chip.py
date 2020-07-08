@@ -9,7 +9,7 @@ import utool as ut
 
 try:
     import cv2
-except ImportError as ex:
+except ImportError:
     print('ERROR: import cv2 is failing!')
     cv2 = ut.DynStruct()
     cv2.INTER_LANCZOS4 = None
@@ -87,7 +87,8 @@ def get_image_to_chip_transform(bbox, chipsz, theta):
 
 
 def _get_chip_to_image_transform(bbox, chipsz, theta):
-    """ transforms chip space into imgspace
+    """
+    transforms chip space into imgspace
         bbox   - bounding box of chip in image space
         chipsz - size of the chip
         theta  - rotation of the bounding box

@@ -1848,7 +1848,7 @@ def get_kpts_wh(kpts, outer=True):
     if outer:
         # Either use bbox or elliptical points
         invV_mats2x2 = get_invVR_mats2x2(kpts)
-        corners = np.array([[-1, 1, 1, -1], [-1, -1, 1, 1],])
+        corners = np.array([[-1, 1, 1, -1], [-1, -1, 1, 1]])
         warped_corners = np.array([invV.dot(corners) for invV in invV_mats2x2])
         maxx = warped_corners[:, 0, :].max(axis=1)
         minx = warped_corners[:, 0, :].min(axis=1)

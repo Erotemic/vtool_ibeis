@@ -10,7 +10,7 @@ endif(COMMAND cmake_policy)
 project(vtool LANGUAGES C CXX)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
-include(${PROJECT_SOURCE_DIR}/CMake/vtool-utils.cmake)
+include(${PROJECT_SOURCE_DIR}/CMake/vtool_utils.cmake)
 
 function(get_version outvar)
   execute_process(

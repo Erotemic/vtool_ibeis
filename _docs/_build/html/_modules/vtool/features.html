@@ -1,0 +1,493 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>vtool.features &#8212; wbia-vtool 3.2.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for vtool.features</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+
+<div class="viewcode-block" id="extract_feature_from_patch"><a class="viewcode-back" href="../../vtool.html#vtool.features.extract_feature_from_patch">[docs]</a><span class="k">def</span> <span class="nf">extract_feature_from_patch</span><span class="p">(</span><span class="n">patch</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pyhesaff</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">patch</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">rectify_to_uint8</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+    <span class="n">patch</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">rectify_to_square</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+    <span class="n">patch_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">patch</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">pyhesaff</span><span class="o">.</span><span class="n">extract_desc_from_patches</span><span class="p">(</span><span class="n">patch_list</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">vec</span></div>
+
+
+<div class="viewcode-block" id="extract_features"><a class="viewcode-back" href="../../vtool.html#vtool.features.extract_features">[docs]</a><span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="n">img_or_fpath</span><span class="p">,</span> <span class="n">feat_type</span><span class="o">=</span><span class="s1">&#39;hesaff+sift&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calls pyhesaff&#39;s main driver function for detecting hessian affine keypoints.</span>
+<span class="sd">    extra parameters can be passed to the hessian affine detector by using</span>
+<span class="sd">    kwargs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img_or_fpath (str): image file path on disk</span>
+<span class="sd">        use_adaptive_scale (bool):</span>
+<span class="sd">        nogravity_hack (bool):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple : (kpts, vecs)</span>
+
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.features --test-extract_features</span>
+<span class="sd">        python -m vtool.features --test-extract_features --show</span>
+<span class="sd">        python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show</span>
+<span class="sd">        python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show</span>
+<span class="sd">        python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show --no-affine-invariance</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.features import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; img_fpath = ut.grab_test_imgpath(ut.get_argval(&#39;--fname&#39;, default=&#39;lena.png&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; imgBGR = vt.imread(img_fpath)</span>
+<span class="sd">        &gt;&gt;&gt; feat_type = ub.argval(&#39;--feat_type&#39;, default=&#39;hesaff+sift&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; import pyhesaff</span>
+<span class="sd">        &gt;&gt;&gt; kwargs = ut.parse_dict_from_argv(pyhesaff.get_hesaff_default_params())</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; #(kpts, vecs) = extract_features(img_fpath)</span>
+<span class="sd">        &gt;&gt;&gt; (kpts, vecs) = extract_features(imgBGR, feat_type, **kwargs)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; result = str((kpts, vecs))</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">        &gt;&gt;&gt; # Show keypoints</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
+<span class="sd">        &gt;&gt;&gt; #pt.figure(fnum=1, doclf=True, docla=True)</span>
+<span class="sd">        &gt;&gt;&gt; #pt.imshow(imgBGR)</span>
+<span class="sd">        &gt;&gt;&gt; #pt.draw_kpts2(kpts, ori=True)</span>
+<span class="sd">        &gt;&gt;&gt; pt.interact_keypoints.ishow_keypoints(imgBGR, kpts, vecs, ori=True, ell_alpha=.4, color=&#39;distinct&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyhesaff</span>
+
+    <span class="k">if</span> <span class="n">feat_type</span> <span class="o">==</span> <span class="s1">&#39;hesaff+sift&#39;</span><span class="p">:</span>
+        <span class="c1"># (kpts, vecs) = pyhesaff.detect_feats(img_fpath, **kwargs)</span>
+        <span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">vecs</span><span class="p">)</span> <span class="o">=</span> <span class="n">pyhesaff</span><span class="o">.</span><span class="n">detect_feats2</span><span class="p">(</span><span class="n">img_or_fpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">feat_type</span> <span class="o">==</span> <span class="s1">&#39;hesaff+siam128&#39;</span><span class="p">:</span>
+        <span class="c1"># hacky</span>
+        <span class="kn">from</span> <span class="nn">wbia_cnn</span> <span class="k">import</span> <span class="n">_plugin</span>
+
+        <span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">sift</span><span class="p">)</span> <span class="o">=</span> <span class="n">pyhesaff</span><span class="o">.</span><span class="n">detect_feats2</span><span class="p">(</span><span class="n">img_or_fpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img_or_fpath</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+            <span class="n">img_or_fpath</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_or_fpath</span><span class="p">)</span>
+        <span class="n">vecs_list</span> <span class="o">=</span> <span class="n">_plugin</span><span class="o">.</span><span class="n">extract_siam128_vecs</span><span class="p">([</span><span class="n">img_or_fpath</span><span class="p">],</span> <span class="p">[</span><span class="n">kpts</span><span class="p">])</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="n">vecs_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;Unknown feat_type=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">feat_type</span><span class="p">,))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">kpts</span><span class="p">,</span> <span class="n">vecs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_extract_features_default_params"><a class="viewcode-back" href="../../vtool.html#vtool.features.get_extract_features_default_params">[docs]</a><span class="k">def</span> <span class="nf">get_extract_features_default_params</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict:</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.features --test-get_extract_features_default_params</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.features import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; # build test data</span>
+<span class="sd">        &gt;&gt;&gt; # execute function</span>
+<span class="sd">        &gt;&gt;&gt; param_dict = get_extract_features_default_params()</span>
+<span class="sd">        &gt;&gt;&gt; result = ub.repr2(param_dict)</span>
+<span class="sd">        &gt;&gt;&gt; # verify results</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyhesaff</span>
+
+    <span class="n">param_dict</span> <span class="o">=</span> <span class="n">pyhesaff</span><span class="o">.</span><span class="n">get_hesaff_default_params</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">param_dict</span></div>
+
+
+<div class="viewcode-block" id="detect_opencv_keypoints"><a class="viewcode-back" href="../../vtool.html#vtool.features.detect_opencv_keypoints">[docs]</a><span class="k">def</span> <span class="nf">detect_opencv_keypoints</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>  <span class="c1"># NOQA</span>
+
+    <span class="c1"># img_fpath = ut.grab_test_imgpath(ub.argval(&#39;--fname&#39;, default=&#39;lena.png&#39;))</span>
+    <span class="n">img_fpath</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">argval</span><span class="p">(</span><span class="s1">&#39;--fname&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;zebra.png&#39;</span><span class="p">))</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">)</span>
+    <span class="n">imgGray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">from_cv2_kpts</span><span class="p">(</span><span class="n">cv2_kp</span><span class="p">):</span>
+        <span class="n">kp</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv2_kp</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cv2_kp</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cv2_kp</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cv2_kp</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">cv2_kp</span><span class="o">.</span><span class="n">angle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kp</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">search_module</span><span class="p">(</span><span class="n">cv2</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+
+    <span class="n">detect_factory</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1">#&#39;BLOB&#39;: cv2.SimpleBlobDetector_create,</span>
+        <span class="c1">#&#39;HARRIS&#39; : HarrisWrapper.create,</span>
+        <span class="c1">#&#39;SIFT&#39;: cv2.xfeatures2d.SIFT_create,  # really DoG</span>
+        <span class="s1">&#39;SURF&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">xfeatures2d</span><span class="o">.</span><span class="n">SURF_create</span><span class="p">,</span>  <span class="c1"># really harris corners</span>
+        <span class="s1">&#39;MSER&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MSER_create</span><span class="p">,</span>
+        <span class="c1">#&#39;StarDetector_create&#39;,</span>
+    <span class="p">}</span>
+
+    <span class="n">extract_factory</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;SIFT&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">xfeatures2d</span><span class="o">.</span><span class="n">SIFT_create</span><span class="p">,</span>
+        <span class="s1">&#39;SURF&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">xfeatures2d</span><span class="o">.</span><span class="n">SURF_create</span><span class="p">,</span>
+        <span class="c1">#&#39;DAISY&#39;: cv2.xfeatures2d.DAISY_create,</span>
+        <span class="s1">&#39;FREAK&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">xfeatures2d</span><span class="o">.</span><span class="n">FREAK_create</span><span class="p">,</span>
+        <span class="c1">#&#39;LATCH&#39;: cv2.xfeatures2d.LATCH_create,</span>
+        <span class="c1">#&#39;LUCID&#39;: cv2.xfeatures2d.LUCID_create,</span>
+        <span class="c1">#&#39;ORB&#39;: cv2.ORB_create,</span>
+    <span class="p">}</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">type_to_kpts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">type_to_desc</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;BLOB&#39;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;MSER&#39;</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">detect_factory</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">factory</span> <span class="o">=</span> <span class="n">detect_factory</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">extractor</span> <span class="o">=</span> <span class="n">factory</span><span class="p">()</span>
+
+        <span class="c1"># For MSERS need to adapt shape and then convert into a keypoint repr</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">extractor</span><span class="p">,</span> <span class="s1">&#39;detectRegions&#39;</span><span class="p">):</span>
+            <span class="c1"># bboxes are x,y,w,h</span>
+            <span class="n">regions</span><span class="p">,</span> <span class="n">bboxes</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">detectRegions</span><span class="p">(</span><span class="n">imgGray</span><span class="p">)</span>
+            <span class="c1"># ellipse definition from [Fitzgibbon95]</span>
+            <span class="c1"># http://www.bmva.org/bmvc/1995/bmvc-95-050.pdf p518</span>
+            <span class="c1"># ell = [c_x, c_y, R_x, R_y, theta]</span>
+            <span class="c1"># (cx, cy) = conic center</span>
+            <span class="c1"># Rx and Ry = conic radii</span>
+            <span class="c1"># theta is the counterclockwise angle</span>
+            <span class="n">fitz_ellipses</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">fitEllipse</span><span class="p">(</span><span class="n">mser</span><span class="p">)</span> <span class="k">for</span> <span class="n">mser</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">]</span>
+
+            <span class="c1"># http://answers.opencv.org/question/19015/how-to-use-mser-in-python/</span>
+            <span class="c1"># hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]</span>
+            <span class="c1"># hull_ells = [cv2.fitEllipse(hull[:, 0]) for hull in hulls]</span>
+            <span class="n">kpts_</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ell</span> <span class="ow">in</span> <span class="n">fitz_ellipses</span><span class="p">:</span>
+                <span class="p">((</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">),</span> <span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">),</span> <span class="n">degrees</span><span class="p">)</span> <span class="o">=</span> <span class="n">ell</span>
+                <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">degrees</span><span class="p">)</span>  <span class="c1"># opencv lives in radians</span>
+                <span class="n">S</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">)</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span>
+                <span class="n">R</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">rotation_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+                <span class="c1"># R = np.eye(3)</span>
+                <span class="n">invVR</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+                <span class="n">kpt</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">flatten_invV_mats_to_kpts</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">invVR</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">kpts_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kpt</span><span class="p">)</span>
+            <span class="n">kpts_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kpts_</span><span class="p">)</span>
+
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">tic</span><span class="p">(</span><span class="s1">&#39;Computing </span><span class="si">%r</span><span class="s1"> keypoints&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cv2_kpts</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">imgGray</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s1">&#39;Failed to computed </span><span class="si">%r</span><span class="s1"> keypoints&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,),</span> <span class="n">iswarning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">toc</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
+            <span class="n">type_to_kpts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv2_kpts</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">type_to_kpts</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">depth_profile</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">type_to_kpts</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;type_to_kpts = &#39;</span> <span class="o">+</span> <span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">type_to_kpts</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+    <span class="n">cv2_kpts</span> <span class="o">=</span> <span class="n">type_to_kpts</span><span class="p">[</span><span class="s1">&#39;MSER&#39;</span><span class="p">]</span>
+    <span class="n">kp</span> <span class="o">=</span> <span class="n">cv2_kpts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># NOQA</span>
+    <span class="c1"># cv2.fitEllipse(cv2_kpts[0])</span>
+    <span class="n">cv2_kpts</span> <span class="o">=</span> <span class="n">type_to_kpts</span><span class="p">[</span><span class="s1">&#39;SURF&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">extract_factory</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">factory</span> <span class="o">=</span> <span class="n">extract_factory</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">extractor</span> <span class="o">=</span> <span class="n">factory</span><span class="p">()</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">tic</span><span class="p">(</span><span class="s1">&#39;Computing </span><span class="si">%r</span><span class="s1"> descriptors&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">filtered_cv2_kpts</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">imgGray</span><span class="p">,</span> <span class="n">cv2_kpts</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s1">&#39;Failed to computed </span><span class="si">%r</span><span class="s1"> descriptors&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,),</span> <span class="n">iswarning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">toc</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
+            <span class="n">type_to_desc</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">type_to_desc</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">depth_profile</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">type_to_desc</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;type_to_desc = &#39;</span> <span class="o">+</span> <span class="n">ub</span><span class="o">.</span><span class="n">repr2</span><span class="p">(</span><span class="n">type_to_desc</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_mser"><a class="viewcode-back" href="../../vtool.html#vtool.features.test_mser">[docs]</a><span class="k">def</span> <span class="nf">test_mser</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="n">pt</span><span class="o">.</span><span class="n">qt4ensure</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Keypoints</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">NiceRepr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convinence class for dealing with keypoints</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kparr</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kparr</span> <span class="o">=</span> <span class="n">kparr</span>
+            <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+
+        <span class="k">def</span> <span class="nf">add_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">def</span> <span class="nf">__nice__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kparr</span><span class="p">))</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">vt</span><span class="o">.</span><span class="n">get_scales</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kparr</span><span class="p">)</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">eccentricity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">vt</span><span class="o">.</span><span class="n">get_kpts_eccentricity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kparr</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">subarr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kparr</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">flags</span><span class="p">))</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">return</span> <span class="n">Keypoints</span><span class="p">(</span><span class="n">subarr</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+
+    <span class="n">img_fpath</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">grab_test_imgpath</span><span class="p">(</span><span class="n">ub</span><span class="o">.</span><span class="n">argval</span><span class="p">(</span><span class="s1">&#39;--fname&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;zebra.png&#39;</span><span class="p">))</span>
+    <span class="n">imgBGR</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">)</span>
+    <span class="n">imgGray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">imgBGR</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+    <span class="c1"># http://docs.opencv.org/master/d3/d28/classcv_1_1MSER.html#gsc.tab=0</span>
+    <span class="c1"># http://stackoverflow.com/questions/17647500/exact-meaning-of-the-parameters-given-to-initialize-mser-in-opencv-2-4-x</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MSER_create</span>
+    <span class="n">img_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">get_size</span><span class="p">(</span><span class="n">imgGray</span><span class="p">)))</span>
+    <span class="n">_max_area</span> <span class="o">=</span> <span class="n">img_area</span> <span class="o">//</span> <span class="mi">10</span>
+    <span class="n">_delta</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">_min_diversity</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="n">extractor</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="n">_delta</span><span class="o">=</span><span class="n">_delta</span><span class="p">,</span> <span class="n">_max_area</span><span class="o">=</span><span class="n">_max_area</span><span class="p">,</span> <span class="n">_min_diversity</span><span class="o">=</span><span class="n">_min_diversity</span><span class="p">)</span>
+    <span class="c1"># bboxes are x,y,w,h</span>
+    <span class="n">regions</span><span class="p">,</span> <span class="n">bboxes</span> <span class="o">=</span> <span class="n">extractor</span><span class="o">.</span><span class="n">detectRegions</span><span class="p">(</span><span class="n">imgGray</span><span class="p">)</span>
+    <span class="c1"># ellipse definition from [Fitzgibbon95]</span>
+    <span class="c1"># http://www.bmva.org/bmvc/1995/bmvc-95-050.pdf p518</span>
+    <span class="c1"># ell = [c_x, c_y, R_x, R_y, theta]</span>
+    <span class="c1"># (cx, cy) = conic center</span>
+    <span class="c1"># Rx and Ry = conic radii</span>
+    <span class="c1"># theta is the counterclockwise angle</span>
+    <span class="n">fitz_ellipses</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">fitEllipse</span><span class="p">(</span><span class="n">mser</span><span class="p">)</span> <span class="k">for</span> <span class="n">mser</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">]</span>
+
+    <span class="c1"># http://answers.opencv.org/question/19015/how-to-use-mser-in-python/</span>
+    <span class="c1"># hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]</span>
+    <span class="c1"># hull_ells = [cv2.fitEllipse(hull[:, 0]) for hull in hulls]</span>
+    <span class="n">invVR_mats</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ell</span> <span class="ow">in</span> <span class="n">fitz_ellipses</span><span class="p">:</span>
+        <span class="p">((</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">),</span> <span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">),</span> <span class="n">degrees</span><span class="p">)</span> <span class="o">=</span> <span class="n">ell</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">degrees</span><span class="p">)</span>  <span class="c1"># opencv lives in radians</span>
+        <span class="c1"># Convert diameter to radians</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">ry</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">rotation_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+        <span class="n">invVR</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+        <span class="n">invVR_mats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">invVR</span><span class="p">)</span>
+    <span class="n">invVR_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+    <span class="c1"># _oris = vt.get_invVR_mats_oris(invVR_mats)</span>
+    <span class="n">kpts2_</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">flatten_invV_mats_to_kpts</span><span class="p">(</span><span class="n">invVR_mats</span><span class="p">)</span>
+
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">Keypoints</span><span class="p">(</span><span class="n">kpts2_</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_info</span><span class="p">(</span><span class="s1">&#39;regions&#39;</span><span class="p">,</span> <span class="n">regions</span><span class="p">)</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eccentricity</span> <span class="o">&lt;</span> <span class="mf">0.9</span>
+    <span class="c1"># flags = self.scale &lt; np.mean(self.scale)</span>
+    <span class="c1"># flags = self.scale &lt; np.median(self.scale)</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+    <span class="c1"># pt.interact_keypoints.ishow_keypoints(imgBGR, self.kparr, None, ell_alpha=.4, color=&#39;distinct&#39;, fnum=2)</span>
+    <span class="c1"># import wbia.plottool as pt</span>
+    <span class="n">vis</span> <span class="o">=</span> <span class="n">imgBGR</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;regions&#39;</span><span class="p">]:</span>
+        <span class="n">vis</span><span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">region</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># regions, bbox = mser.detectRegions(gray)</span>
+    <span class="c1"># hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in self.info[&#39;regions&#39;]]</span>
+    <span class="c1"># cv2.polylines(vis, hulls, 1, (0, 255, 0))</span>
+    <span class="c1"># for region in self.info[&#39;regions&#39;]:</span>
+    <span class="c1">#    ell = cv2.fitEllipse(region)</span>
+    <span class="c1">#    cv2.ellipse(vis, ell, (255))</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">interact_keypoints</span><span class="o">.</span><span class="n">ishow_keypoints</span><span class="p">(</span>
+        <span class="n">vis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kparr</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ell_alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;distinct&#39;</span><span class="p">,</span> <span class="n">fnum</span><span class="o">=</span><span class="mi">2</span>
+    <span class="p">)</span>
+    <span class="c1"># pt.imshow(vis, fnum=2)</span>
+    <span class="n">pt</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="c1"># extractor = extract_factory[&#39;DAISY&#39;]()</span>
+
+    <span class="c1"># desc_type_to_dtype = {</span>
+    <span class="c1">#    cv2.CV_8U: np.uint8,</span>
+    <span class="c1">#    cv2.CV_8s: np.uint,</span>
+    <span class="c1"># }</span>
+    <span class="c1"># def alloc_desc(extractor):</span>
+    <span class="c1">#    desc_type = extractor.descriptorType()</span>
+    <span class="c1">#    desc_size = extractor.descriptorSize()</span>
+    <span class="c1">#    dtype = desc_type_to_dtype[desc_type]</span>
+    <span class="c1">#    shape = (len(cv2_kpts), desc_size)</span>
+    <span class="c1">#    desc = np.empty(shape, dtype=dtype)</span>
+    <span class="c1">#    return desc</span>
+
+    <span class="c1"># ut.search_module(cv2, &#39;array&#39;, recursive=True)</span>
+    <span class="c1"># ut.search_module(cv2, &#39;freak&#39;, recursive=True)</span>
+    <span class="c1"># ut.search_module(cv2, &#39;out&#39;, recursive=True)</span>
+
+    <span class="c1"># cv2_kpts = cv2_kpts[0:2]</span>
+
+    <span class="c1"># for key, factory in just_desc_factory_.items():</span>
+    <span class="c1">#    extractor = factory()</span>
+    <span class="c1">#    desc = alloc_desc(extractor)</span>
+    <span class="c1">#    desc = extractor.compute(imgGray, cv2_kpts)</span>
+    <span class="c1">#    feats[key] = (desc,)</span>
+    <span class="c1">#    #extractor.compute(imgGray, cv2_kpts, desc)</span>
+    <span class="c1">#    pass</span>
+    <span class="c1"># kpts = np.array(list(map(from_cv2_kpts, cv2_kpts)))</span>
+
+    <span class="c1"># orb = cv2.ORB()</span>
+    <span class="c1"># kp1, des1 = orb.detectAndCompute(imgGray, None)</span>
+    <span class="c1"># blober = cv2.SimpleBlobDetector_create()</span>
+    <span class="c1"># haris_kpts = cv2.cornerHarris(imgGray, 2, 3, 0.04)</span>
+
+    <span class="c1"># [name for name in dir(cv2) if &#39;mat&#39; in name.lower()]</span>
+    <span class="c1"># [name for name in dir(cv2.xfeatures2d) if &#39;desc&#39; in name.lower()]</span>
+
+    <span class="c1"># [name for name in dir(cv2) if &#39;detect&#39; in name.lower()]</span>
+    <span class="c1"># [name for name in dir(cv2) if &#39;extract&#39; in name.lower()]</span>
+    <span class="c1"># [name for name in dir(cv2) if &#39;ellip&#39; in name.lower()]</span>
+
+    <span class="c1"># sift = cv2.xfeatures2d.SIFT_create()</span>
+    <span class="c1"># cv2_kpts = sift.detect(imgGray)</span>
+    <span class="c1"># desc = sift.compute(imgGray, cv2_kpts)[1]</span>
+
+    <span class="c1"># freak = cv2.xfeatures2d.FREAK_create()</span>
+    <span class="c1"># cv2_kpts = freak.detect(imgGray)</span>
+    <span class="c1"># desc = freak.compute(imgGray, cv2_kpts)[1]</span>
+    <span class="k">pass</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CommandLine:</span>
+<span class="sd">        xdoctest -m vtool.features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xdoctest</span>
+
+    <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Wild Me.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
