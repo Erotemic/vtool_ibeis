@@ -20,7 +20,7 @@ Repos relevant to the ibeis project:
 * https://github.com/WildbookOrg/wildbook-ia
 
 
-![Build and upload to PyPI](https://github.com/WildbookOrg/wbia-vtool/workflows/Build%20and%20upload%20to%20PyPI/badge.svg)
+.. image:: https://img.shields.io/github/workflow/status/WildbookOrg/wbia-vtool/Build%20and%20upload%20to%20PyPI/master   :alt: Build and upload to PyPI (master)
 
 .. |Pypi| image:: https://img.shields.io/pypi/v/wbia-vtool.svg
    :target: https://pypi.python.org/pypi/wbia-vtool
