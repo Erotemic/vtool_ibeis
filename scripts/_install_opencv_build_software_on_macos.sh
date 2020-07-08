@@ -5,24 +5,26 @@
 set -ex
 
 export OPENCV_VERSION=4.2.0
+
 export WORKSPACE=$PWD
+
 export VIRTUAL_ENV="/opt/opencv"
 
 # Checkout source, only if it isn't already laying around
-if [ ! -d $WORKSPACE/opencv ]; then
-    git clone https://github.com/opencv/opencv.git $WORKSPACE/opencv
-    git clone https://github.com/opencv/opencv_contrib.git $WORKSPACE/opencv_contrib
-    cd $WORKSPACE/opencv
-    git checkout $OPENCV_VERSION
-    cd $WORKSPACE/opencv_contrib
-    git checkout $OPENCV_VERSION
+if [ ! -d ${WORKSPACE}/opencv ]; then
+    git clone https://github.com/opencv/opencv.git ${WORKSPACE}/opencv
+    git clone https://github.com/opencv/opencv_contrib.git ${WORKSPACE}/opencv_contrib
+    cd ${WORKSPACE}/opencv
+    git checkout ${OPENCV_VERSION}
+    cd ${WORKSPACE}/opencv_contrib
+    git checkout ${OPENCV_VERSION}
 fi
 
 # Build OpenCV, only if it's not already installed
 if [ ! -d /opt/opencv ]; then
-    rm -rf $WORKSPACE/opencv/build
-    mkdir -p $WORKSPACE/opencv/build
-    cd $WORKSPACE/opencv/build
+    rm -rf ${WORKSPACE}/opencv/build
+    mkdir -p ${WORKSPACE}/opencv/build
+    cd ${WORKSPACE}/opencv/build
     cmake \
         -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_INSTALL_PREFIX=${VIRTUAL_ENV} \
@@ -77,7 +79,7 @@ if [ ! -d /opt/opencv ]; then
         -D ENABLE_FAST_MATH=1 \
         -D CUDA_FAST_MATH=1 \
         -D OPENCV_ENABLE_NONFREE=ON \
-        -D OPENCV_EXTRA_MODULES_PATH=$WORKSPACE/opencv_contrib/modules \
+        -D OPENCV_EXTRA_MODULES_PATH=${WORKSPACE}/opencv_contrib/modules \
         ..
     make -j9
     sudo make install
@@ -85,4 +87,4 @@ if [ ! -d /opt/opencv ]; then
 fi
 
 # Return to the workspace
-cd $WORKSPACE
+cd ${WORKSPACE}

@@ -12,10 +12,7 @@ sudo port install \
     libomp-devel \
     gflags \
     eigen3-devel \
-    gtk2 \
-    # libdc1394 \
-    # ffmpeg \
-    # gstreamer1-gst-plugins-base
+    gtk2
 
 #: needed for python3 bindings
 python -m pip install numpy
