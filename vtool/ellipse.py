@@ -6,7 +6,6 @@ This module should handle all things elliptical
 """
 from __future__ import absolute_import, division, print_function
 from six.moves import zip, range
-from numpy.core.umath_tests import matrix_multiply
 import scipy.signal as spsignal
 import numpy as np
 from vtool import keypoint as ktool
@@ -216,7 +215,7 @@ def sample_uniform(kpts, nSamples=128):
     assert circle_pts.shape == (nSamples, 3)
     # -------------------------------
     # Get uneven points sample (get_uneven_point_sample)
-    polygon1_list = matrix_multiply(invV_mats3x3, circle_pts.T).transpose(0, 2, 1)
+    polygon1_list = np.matmul(invV_mats3x3, circle_pts.T).transpose(0, 2, 1)
     assert polygon1_list.shape == (nKp, nSamples, 3)
     # -------------------------------
     # The transformed points are not sampled uniformly... Bummer

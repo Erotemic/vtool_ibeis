@@ -21,7 +21,7 @@ def test_get_invR_mats_orientation():
         return np.array([ltool.rotation_mat2x2(theta) for _ in range(len(invV_mats))])
 
     def test_rots(theta):
-        invVR_mats = ltool.matrix_multiply(invV_mats, R_mats(theta))
+        invVR_mats = np.matmul(invV_mats, R_mats(theta))
         _oris = ktool.get_invVR_mats_oris(invVR_mats)
         print('________')
         print('theta = %r' % (theta % TAU,))

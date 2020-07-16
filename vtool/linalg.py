@@ -44,10 +44,6 @@ from .util_math import TAU
 TRANSFORM_DTYPE = np.float64
 
 
-# Function which multiplies many matrices at once
-from numpy.core.umath_tests import matrix_multiply  # NOQA
-
-
 def svd(M):
     r"""
     Args:
@@ -438,7 +434,7 @@ def transform_points_with_homography(H, _xys):
         _xys (ndarray[ndim=2]): (2 x N) array
     """
     xyz = add_homogenous_coordinate(_xys)
-    xyz_t = matrix_multiply(H, xyz)
+    xyz_t = np.matmul(H, xyz)
     xy_t = remove_homogenous_coordinate(xyz_t)
     return xy_t
 
