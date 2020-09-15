@@ -4,7 +4,7 @@
 
 set -ex
 
-export OPENCV_VERSION=3.4.10
+export OPENCV_VERSION=3.4.11
 
 export WORKSPACE=$PWD
 
