@@ -8,14 +8,14 @@ from os.path import splitext
 from six.moves import zip, map, range  # NOQA
 import numpy as np
 from PIL import Image
-import cv2
 from .util_math import TAU
 from vtool import exif
 import utool as ut
 import ubelt as ub
 
 
-if cv2 is not None:
+try:
+    import cv2
 
     CV2_INTERPOLATION_TYPES = {
         'nearest': cv2.INTER_NEAREST,
@@ -49,8 +49,8 @@ if cv2 is not None:
         print('UNKNOWN cv2_version = {!r}'.format(cv2_version))
         assert cv2_version.version[0] <= 2
         IMREAD_COLOR = cv2.CV_LOAD_IMAGE_COLOR
-else:
-    # Hacks
+except ImportError:
+    print('ERROR: import cv2 is failing!')
     cv2 = ut.DynStruct()
     cv2.BORDER_CONSTANT = None
     cv2.INTER_LANCZOS4 = None

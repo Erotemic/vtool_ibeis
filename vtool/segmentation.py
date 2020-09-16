@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, print_function
 from six.moves import range, zip  # NOQA
 import numpy as np
-import cv2
 import utool as ut
 import ubelt as ub
 
@@ -16,6 +15,8 @@ def printDBG(msg):
 
 
 def resize_img_and_bbox(img_fpath, bbox_, new_size=None, sqrt_area=400.0):
+    import cv2
+
     printDBG('[segm] imread(%r) ' % img_fpath)
     full_img = cv2.imread(img_fpath)
     (full_h, full_w) = full_img.shape[:2]  # Image Shape
@@ -52,6 +53,8 @@ def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=0.025):
     (num_erode, num_dilate) = (1, 1)
     (w, h) = (10, 10)
     """
+    import cv2
+
     w = h = int(round(min(mask.shape) * window_frac))
     element = cv2.getStructuringElement(cv2.MORPH_CROSS, (w, h))
     _mask = mask
@@ -64,6 +67,8 @@ def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=0.025):
 
 
 def fill_holes(mask):
+    import cv2
+
     mode = cv2.RETR_CCOMP
     method = cv2.CHAIN_APPROX_SIMPLE
     image, contours, hierarchy = cv2.findContours(mask, mode, method)
@@ -99,6 +104,7 @@ def demo_grabcut(bgr_img):
         >>> ## xdoctest: +REQUIRES(--show)
         >>> pt.show_if_requested()
     """
+    import cv2
     import wbia.plottool as pt
     from wbia.plottool import interact_impaint
 
@@ -157,6 +163,8 @@ def grabcut(bgr_img, prior_mask, binary=True):
     Referencs:
         http://docs.opencv.org/trunk/doc/py_tutorials/py_imgproc/py_grabcut/py_grabcut.html
     """
+    import cv2
+
     # Grab Cut Parameters
     (h, w) = bgr_img.shape[0:2]
     rect = (0, 0, w, h)
@@ -179,17 +187,18 @@ def grabcut(bgr_img, prior_mask, binary=True):
     return post_mask
 
 
-into_hsv_flags = {
-    'bgr': cv2.COLOR_BGR2HSV,
-    'rgb': cv2.COLOR_RGB2HSV,
-}
-
-from_hsv_flags = {
-    'bgr': cv2.COLOR_HSV2BGR,
-}
-
-
 def mask_colored_img(img_rgb, mask, encoding='bgr'):
+    import cv2
+
+    into_hsv_flags = {
+        'bgr': cv2.COLOR_BGR2HSV,
+        'rgb': cv2.COLOR_RGB2HSV,
+    }
+
+    from_hsv_flags = {
+        'bgr': cv2.COLOR_HSV2BGR,
+    }
+
     if mask.dtype == np.uint8:
         mask = mask.astype(np.float) / 255.0
     into_hsv_flag = into_hsv_flags[encoding]
@@ -210,6 +219,8 @@ def mask_colored_img(img_rgb, mask, encoding='bgr'):
 # cv2.GC_BGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD, cv2.GC_FGD
 # @profile
 def grabcut2(rgb_chip):
+    import cv2
+
     (h, w) = rgb_chip.shape[0:2]
     _mask = np.zeros((h, w), dtype=np.uint8)  # Initialize: mask
     # Set inside to cv2.GC_PR_FGD (probably forground)
@@ -238,6 +249,8 @@ def grabcut2(rgb_chip):
 
 
 def segment(img_fpath, bbox_, new_size=None):
+    import cv2
+
     """ Runs grabcut """
     printDBG('[segm] segment(img_fpath=%r, bbox=%r)>' % (img_fpath, bbox_))
     num_iters = 5

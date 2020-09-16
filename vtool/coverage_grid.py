@@ -4,7 +4,6 @@ from six.moves import zip, range, map  # NOQA
 import numpy as np
 import utool as ut
 import ubelt as ub
-import cv2
 from vtool import coverage_kpts
 
 
@@ -62,6 +61,7 @@ def make_grid_coverage_mask(
         >>> ut.show_if_requested()
     """
     import vtool as vt
+    import cv2
 
     coverage_gridtup = sparse_grid_coverage(
         kpts,

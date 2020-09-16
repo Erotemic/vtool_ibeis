@@ -17,11 +17,14 @@ def main():  # nocover
     print('sver_c_wrapper.lib_fname_cand = {!r}'.format(sver_c_wrapper.lib_fname_cand))
     print('sver_c_wrapper.c_sver = {!r}'.format(sver_c_wrapper.c_sver))
 
-    import cv2
+    try:
+        import cv2
 
-    print('cv2 = {!r}'.format(cv2))
-    print('cv2.__file__ = {!r}'.format(cv2.__file__))
-    print('cv2.__version__ = {!r}'.format(cv2.__version__))
+        print('cv2 = {!r}'.format(cv2))
+        print('cv2.__file__ = {!r}'.format(cv2.__file__))
+        print('cv2.__version__ = {!r}'.format(cv2.__version__))
+    except Exception:
+        print('OpenCV (cv2) failed to import')
 
 
 if __name__ == '__main__':

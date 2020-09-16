@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function, unicode_literals
 from six.moves import zip, range, map, reduce  # NOQA
-import cv2
 import numpy as np
 import utool as ut
 import ubelt as ub
@@ -153,6 +152,7 @@ def make_kpts_coverage_mask(
         >>> show_coverage_map(chip, mask, patch, kpts)
         >>> pt.show_if_requested()
     """
+    import cv2
     if patch is None:
         patch = get_gaussian_weight_patch(cov_gauss_shape, cov_gauss_sigma_frac)
     chipshape = chipsize[::-1]
@@ -353,6 +353,7 @@ def warped_patch_generator(
     References:
         http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#warpaffine
     """
+    import cv2
     shape = dsize[::-1]
     # warpAffine is weird. If the shape of the dst is the same as src we can
     # use the dst outvar. I dont know why it needs that.  It seems that this
@@ -426,7 +427,7 @@ def get_coverage_kpts_gridsearch_configs():
     """ testing function """
     varied_dict = {
         'cov_agg_mode': ['max', 'sum'],
-        #'cov_blur_ksize'         : [(19, 19), (5, 5)],
+        # 'cov_blur_ksize'         : [(19, 19), (5, 5)],
         'cov_blur_ksize': [(5, 5)],
         'cov_blur_on': [True, False],
         'cov_blur_sigma': [5.0],
@@ -441,7 +442,7 @@ def get_coverage_kpts_gridsearch_configs():
         'cov_scale_factor': slice(0, 3),
         'cov_agg_mode': slice(0, 2),
         'cov_blur_ksize': slice(0, 2),
-        #'grid_sigma'        : slice(0, 4),
+        # 'grid_sigma'        : slice(0, 4),
     }
     slice_dict = None
     # Make configuration for every parameter setting

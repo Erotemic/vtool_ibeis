@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, print_function
 from six.moves import range
 import numpy as np
-import cv2
 
 
 class IntensityPreproc(object):
@@ -33,6 +32,7 @@ class IntensityPreproc(object):
         """
         filter_list is a list of (name, config) tuples for preforming filter ops
         """
+        import cv2
 
         # Convert into LAB space for grayscale extraction
         chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
@@ -48,11 +48,13 @@ class IntensityPreproc(object):
         return chipBGR
 
     def adapteq(self, intensity, tileGridSize=(8, 8), clipLimit=2.0):
+        import cv2
         clahe_obj = cv2.createCLAHE(clipLimit, tileGridSize)
         intensity = clahe_obj.apply(intensity)
         return intensity
 
     def medianblur(self, intensity, noise_thresh=50, ksize1=3, ksize2=5):
+        import cv2
         istd = intensity.std()
         ksize = ksize1 if istd < noise_thresh else ksize2
         intensity = cv2.medianBlur(intensity, ksize)
@@ -60,6 +62,7 @@ class IntensityPreproc(object):
 
     def histeq(self, intensity):
         """ Histogram equalization of a grayscale image. """
+        import cv2
         return cv2.equalizeHist(intensity)
 
 
@@ -74,6 +77,7 @@ def manta_matcher_filters(chipBGR):
         >>> ibs = wbia.opendb('Mantas')
         >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
     """
+    import cv2
     chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
 
     intensity = chipLAB[:, :, 0]
@@ -108,6 +112,7 @@ def adapteq_fn(chipBGR):
         >>> pt.imshow(chip2, pnum=(1, 2, 2), fnum=1)
         >>> ut.show_if_requested()
     """
+    import cv2
     chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
     tileGridSize = (8, 8)
     clipLimit = 2.0
@@ -133,6 +138,7 @@ def medianfilter_fn(chipBGR):
         >>> pt.imshow(chip2, pnum=(1, 2, 2), fnum=1)
         >>> ut.show_if_requested()
     """
+    import cv2
     chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
     intensity = chipLAB[:, :, 0]
     noise_thresh = 100
@@ -145,6 +151,7 @@ def medianfilter_fn(chipBGR):
 
 def histeq_fn(chipBGR):
     """ Histogram equalization of a grayscale image. """
+    import cv2
     chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
     chipLAB[:, :, 0] = cv2.equalizeHist(chipLAB[:, :, 0])
     chipBGR = cv2.cvtColor(chipLAB, cv2.COLOR_LAB2BGR)
@@ -152,9 +159,13 @@ def histeq_fn(chipBGR):
 
 
 def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=0.025):
-    """ Clean the mask
+    """
+    Clean the mask
     (num_erode, num_dilate) = (1, 1)
-    (w, h) = (10, 10) """
+    (w, h) = (10, 10)
+    """
+    import cv2
+
     w = h = int(round(min(mask.shape) * window_frac))
     element = cv2.getStructuringElement(cv2.MORPH_CROSS, (w, h))
     _mask = mask
@@ -168,6 +179,7 @@ def clean_mask(mask, num_dilate=3, num_erode=3, window_frac=0.025):
 
 def grabcut_fn(chipBGR):
     """ naively segments a chip """
+    import cv2
     chipRGB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2RGB)
     (h, w) = chipRGB.shape[0:2]
     _mask = np.zeros((h, w), dtype=np.uint8)  # Initialize: mask

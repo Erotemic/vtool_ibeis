@@ -34,7 +34,6 @@ TODO: Look at this file
 
 """
 from __future__ import absolute_import, division, print_function
-import cv2
 import numpy as np
 import numpy.linalg as npl
 import ubelt as ub
@@ -70,6 +69,7 @@ def svd(M):
         %timeit npl.svd(M)
     """
     # V is actually Vt
+    import cv2
     flags = cv2.SVD_FULL_UV
     S, U, Vt = cv2.SVDecomp(M, flags=flags)
     s = S.flatten()

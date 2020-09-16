@@ -10,13 +10,6 @@ import scipy.signal as spsignal
 import numpy as np
 from vtool import keypoint as ktool
 from vtool import image as gtool
-import utool as ut
-
-try:
-    import cv2
-except ImportError:
-    print('ERROR: import cv2 is failing!')
-    cv2 = ut.DynStruct()
 
 
 def adaptive_scale(img_fpath, kpts, nScales=4, low=-0.5, high=0.5, nSamples=16):
@@ -83,6 +76,8 @@ def sample_ell_border_pts(expanded_kpts, nSamples):
 
 
 def sample_ell_border_vals(imgBGR, expanded_kpts, nKp, nScales, nSamples):
+    import cv2
+
     # Sample points uniformly across the boundary
     ell_border_pts = sample_ell_border_pts(expanded_kpts, nSamples)
     # Build gradient magnitude imaeg
@@ -371,6 +366,8 @@ def sample_uniform(kpts, nSamples=128):
 
 
 def gradient_magnitude(img):
+    import cv2
+
     sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
     sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
     imgMag = np.sqrt(sobelx ** 2 + sobely ** 2)

@@ -4,7 +4,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from six.moves import zip
 import numpy as np
 import utool as ut
-import cv2
 
 
 def bboxes_from_vert_list(verts_list, castint=False):
@@ -164,6 +163,8 @@ def draw_verts(img_in, verts, color=(0, 128, 255), thickness=2, out=None):
 
     out = img_in = np.zeros((500, 500, 3), dtype=np.uint8)
     """
+    import cv2
+
     if out is None:
         out = np.copy(img_in)
     if isinstance(verts, np.ndarray):

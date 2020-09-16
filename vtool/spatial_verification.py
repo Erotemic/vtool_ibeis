@@ -37,7 +37,6 @@ import scipy.sparse.linalg as spsl
 import vtool.keypoint as ktool
 import vtool.linalg as ltool
 import vtool.distance
-import cv2
 from .util_math import TAU
 
 try:
@@ -629,6 +628,7 @@ def estimate_refined_transform(kpts1, kpts2, fm, aff_inliers, refine_method='hom
     References:
         http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
     """
+    import cv2
     xy1_man, xy2_man, T1, T2 = get_normalized_affine_inliers(
         kpts1, kpts2, fm, aff_inliers
     )
@@ -659,7 +659,6 @@ def estimate_refined_transform(kpts1, kpts2, fm, aff_inliers, refine_method='hom
     # H_prime /= H_prime[2, 2]
     # Different methods?
     # H_prime = compute_affine(xy1_man, xy2_man)
-    # import cv2
     # H_prime = cv2.findHomography(xy1_man.T, xy2_man.T)[0]
     # H = compute_affine(xy1_ma, xy2_ma)
     # print(H)
