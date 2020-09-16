@@ -24,8 +24,8 @@ EXIF_TAG_TO_TAGID = {val: key for (key, val) in six.iteritems(TAGS)}
 GPS_TAG_TO_GPSID = {val: key for (key, val) in six.iteritems(GPSTAGS)}
 
 # Relevant EXIF Tags
-#'GPSInfo': 34853
-#'SensitivityType': 34864  # UNSUPPORTED
+# 'GPSInfo': 34853
+# 'SensitivityType': 34864  # UNSUPPORTED
 
 GPSINFO_CODE = EXIF_TAG_TO_TAGID['GPSInfo']
 DATETIMEORIGINAL_TAGID = EXIF_TAG_TO_TAGID['DateTimeOriginal']
@@ -272,7 +272,7 @@ def get_lat_lon(exif_dict, default=(-1, -1)):
                 gps_latitude = gps_info[GPSLATITUDE_CODE]
                 gps_latitude_ref = gps_info[GPSLATITUDEREF_CODE]
                 gps_longitude = gps_info[GPSLONGITUDE_CODE]
-               gps_longitude_ref = gps_info[GPSLONGITUDEREF_CODE]
+                gps_longitude_ref = gps_info[GPSLONGITUDEREF_CODE]
                 try:
                     lat = convert_degrees(gps_latitude)
                     if gps_latitude_ref != 'N':
