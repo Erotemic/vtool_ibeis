@@ -15,12 +15,12 @@ try:
     FLANN_CLS = pyflann.FLANN
 except ImportError:
     print('no pyflann, using cv2.flann_Index')
-    import cv2
 
     pyflann = None
 
     class _CV2_FLANN_CLS:
         def __init__(self):
+            import cv2
             self._internal = cv2.flann_Index()
             self.params = {}
 

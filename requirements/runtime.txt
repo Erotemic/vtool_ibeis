@@ -10,3 +10,4 @@ six >= 1.10.0
 statsmodels
 ubelt
 wbia-utool
+wbia-pyflann
