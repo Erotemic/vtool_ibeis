@@ -4,23 +4,29 @@ abstract which pyflann implementation is used
 
 from vtool._pyflann_backend import pyflann
 """
+import logging
+
 import ubelt as ub
+
 
 __all__ = ['pyflann', 'FLANN_CLS']
 
+
+logger = logging.getLogger('vtool')
 
 try:
     import pyflann
 
     FLANN_CLS = pyflann.FLANN
 except ImportError:
-    print('no pyflann, using cv2.flann_Index')
+    logger.debug('no pyflann, using cv2.flann_Index')
 
     pyflann = None
 
     class _CV2_FLANN_CLS:
         def __init__(self):
             import cv2
+
             self._internal = cv2.flann_Index()
             self.params = {}
 
@@ -39,7 +45,7 @@ except ImportError:
     FLANN_CLS = _CV2_FLANN_CLS
 
     if 0:
-        print('no pyflann, using dummy index')
+        logger.debug('no pyflann, using dummy index')
 
         class _DUMMY_FLANN_CLS:
             def __init__(self):
@@ -47,5 +53,5 @@ except ImportError:
 
         FLANN_CLS = _DUMMY_FLANN_CLS
 
-print('VTOOL BACKEND FOR pyflann = {!r}'.format(pyflann))
-print('VTOOL BACKEND FOR FLANN_CLS = {!r}'.format(FLANN_CLS))
+logger.debug('VTOOL BACKEND FOR pyflann = {!r}'.format(pyflann))
+logger.debug('VTOOL BACKEND FOR FLANN_CLS = {!r}'.format(FLANN_CLS))
