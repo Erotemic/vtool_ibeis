@@ -960,7 +960,7 @@ def iter_reduce_ufunc(ufunc, arr_iter, out=None):
     # Get first item in iterator
     try:
         initial = next(arr_iter)
-    except (RuntimeError, StopIteration):
+    except StopIteration:
         return
     # Populate the outvariable if specified otherwise make a copy of the first
     # item to be the output memory
