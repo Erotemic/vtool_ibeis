@@ -321,7 +321,11 @@ def get_orientation(exif_dict, default=0, on_error='warn'):
         orient = exif_dict[ORIENTATION_CODE]
         if orient in ORIENTATION_DICT:
             if ORIENTATION_DICT[orient] is None:
-                raise NotImplementedError('Orientation not defined')
+                msg = 'Undefined orientation=%r in Exif' % (orient,)
+                if on_error == 'warn':
+                    warnings.warn(msg, RuntimeWarning)
+                else:
+                    raise NotImplementedError(msg)
             default = orient
         else:
             msg = 'Unrecognized orientation=%r in Exif' % (orient,)
