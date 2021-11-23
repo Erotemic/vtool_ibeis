@@ -217,6 +217,11 @@ KWARGS = dict(
         'tests': parse_requirements('requirements/tests.txt'),
         'build': parse_requirements('requirements/build.txt'),
         'runtime': parse_requirements('requirements/runtime.txt'),
+        # Really annoying that this is the best we can do
+        # The user *must* choose either headless or graphics
+        # to get a complete working install.
+        'headless': parse_requirements('requirements/headless.txt'),
+        'graphics': parse_requirements('requirements/graphics.txt'),
     },
     packages=find_packages(),
 )

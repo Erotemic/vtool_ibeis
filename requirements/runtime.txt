@@ -2,7 +2,7 @@ Pillow >= 5.2.0
 functools32 >= 3.2.3-1;python_version < '3.0'
 networkx
 numpy >= 1.11.1
-opencv-python >= 4.1.0.25
+# opencv-python >= 4.1.0.25
 pyflann_ibeis >= 2.0.0
 pyhesaff >= 2.0.1 
 scipy

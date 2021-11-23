@@ -335,14 +335,14 @@ def compute_homog(xy1_mn, xy2_mn):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
-        >>> import plottool_ibeis as pt
         >>> xy1_man, xy2_man, rchip1, rchip2, T1, T2 = testdata_matching_affine_inliers_normalized()
         >>> H_prime = compute_homog(xy1_man, xy2_man)
         >>> H = npl.solve(T2, H_prime).dot(T1)
-        >>> H /= H[2, 2]
+        >>> H = H / H[2, 2]
         >>> result = np.array_str(H, precision=2)
         >>> print(result)
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import plottool_ibeis as pt
         >>> rchip2_blendH = pt.draw_sv.get_blended_chip(rchip1, rchip2, H)
         >>> pt.imshow(rchip2_blendH)
         >>> ut.show_if_requested()
