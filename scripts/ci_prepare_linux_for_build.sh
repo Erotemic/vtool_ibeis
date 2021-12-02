@@ -15,10 +15,11 @@ then
         libgomp
 else
     apt-get update
-    
+
     apt-get install -y \
         pkg-config \
         libeigen3-dev \
         libopencv-dev \
+        libomp \
         libomp-dev
 fi
