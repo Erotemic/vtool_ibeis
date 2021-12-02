@@ -20,6 +20,6 @@ else
         pkg-config \
         libeigen3-dev \
         libopencv-dev \
-        libomp \
+        libomp5 \
         libomp-dev
 fi
