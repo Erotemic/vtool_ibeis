@@ -14,6 +14,7 @@ class IntensityPreproc(object):
     Doctest:
         >>> from vtool.image_filters import *
         >>> import vtool as vt
+        >>> import utool as ut
         >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
         >>> filter_list = [
         >>>     ('medianblur', {}),
@@ -76,6 +77,7 @@ def manta_matcher_filters(chipBGR):
 
     Ignore:
         >>> from wbia.core_annots import *  # NOQA
+        >>> import utool as ut
         >>> import wbia
         >>> ibs = wbia.opendb('Mantas')
         >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))

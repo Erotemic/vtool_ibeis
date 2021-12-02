@@ -43,7 +43,7 @@ Sympy:
     >>> invV = sympy.Matrix(kp)
     >>> V = invV.inv()
     >>> #
-    >>> print(ub.hzcat('invV = ', repr(invV)))
+    >>> print(ub.hzcat('invV = %s' % (repr(invV), )))
     >>> invV = sympy.Matrix([
     >>>        [iv11,  0.0,   x],
     >>>        [iv21, iv22,   y],
@@ -107,12 +107,12 @@ Sympy:
     >>> # xdoctest: +SKIP
     >>> # OLD STUFF
     >>> #
-    >>> print(ub.hzcat('V = ', repr(V)))
+    >>> print(ub.hzcat('V = %s' % (repr(V), )))
     V = Matrix([
         [          1/iv11,     0,                -1.0*x/iv11],
         [-iv21/(iv11*iv22), 1/iv22, -1.0*(y - iv21*x/iv11)/iv22],
         [               0,     0,                        1.0]])
-    >>> print(ub.hzcat('V = ', repr(sympy.simplify(invV.inv()))))
+    >>> print(ub.hzcat('V = %s' % (repr(sympy.simplify(invV.inv())), )))
     V = Matrix([
         [          1/iv11,     0,                       -1.0*x/iv11],
         [-iv21/(iv11*iv22), 1/iv22, 1.0*(-iv11*y + iv21*x)/(iv11*iv22)],
@@ -1758,7 +1758,7 @@ def invert_invV_mats(invV_mats):
             try:
                 V_mats_list[ix] = npl.inv(invV)
             except npl.LinAlgError:
-                print(ub.hzcat('ERROR: invV_mats[%d] = ' % ix, invV))
+                print(ub.hzcat('ERROR: invV_mats[%d] = %s' % (ix, invV, )))
                 V_mats_list[ix] = np.nan(invV.shape)
         if ut.SUPER_STRICT:
             raise

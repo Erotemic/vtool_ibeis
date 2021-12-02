@@ -622,7 +622,7 @@ def get_warped_patches(
         python -m vtool.patch --test-get_warped_patches --show --use_python
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.patch import *  # NOQA
         >>> import vtool as vt
         >>> # build test data

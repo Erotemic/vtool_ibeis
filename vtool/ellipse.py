@@ -277,7 +277,7 @@ def sample_uniform(kpts, nSamples=128):
         offset1 = (step_size - offset) / dist
         offset2 = ((num * step_size) - offset) / dist
         cut_locs = [
-            np.linspace(off1, off2, n, endpoint=True)
+            np.linspace(off1, off2, int(n), endpoint=True)
             for (off1, off2, n) in zip(offset1, offset2, num)
         ]
         # post check for divide by 0

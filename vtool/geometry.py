@@ -382,6 +382,7 @@ def extent_from_bbox(bbox):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.geometry import *  # NOQA
+        >>> import ubelt as ub
         >>> bbox = [0, 0, 10, 10]
         >>> extent = extent_from_bbox(bbox)
         >>> result = ('extent = %s' % (ub.repr2(extent, nl=0),))
@@ -407,6 +408,7 @@ def bbox_from_extent(extent):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.geometry import *  # NOQA
+        >>> import ubelt as ub
         >>> extent = [0, 10, 0, 10]
         >>> bbox = bbox_from_extent(extent)
         >>> result = ('bbox = %s' % (ub.repr2(bbox, nl=0),))
@@ -562,6 +564,7 @@ def point_inside_bbox(point, bbox):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.geometry import *  # NOQA
+        >>> import ubelt as ub
         >>> point = np.array([
         >>>     [3, 2], [4, 1], [2, 3], [1, 1], [0, 0],
         >>>     [4, 9.5], [9, 9.5], [7, 2], [7, 8], [9, 3]

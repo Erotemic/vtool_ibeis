@@ -877,10 +877,8 @@ def partition_scores(X, y, attrs=None):
         >>> print(result)
         tp_scores=np.array([5, 6, 6, 7]),
         tn_scores=np.array([1, 2, 2]),
-        part_attrs={
-            False: {'qaid': np.array([11, 14, 15])},
-            True: {'qaid': np.array([21, 24, 25, 26])},
-        },
+        part_attrs=False: 'qaid': np.array([11, 14, 15]),
+                   True: 'qaid': np.array([21, 24, 25, 26]),,
 
     """
     import vtool as vt
@@ -943,7 +941,7 @@ def flatten_scores(tp_scores, tn_scores, part_attrs=None):
         >>> print(result)
         X=np.array([5, 6, 6, 7, 1, 2, 2]),
         y=np.array([1, 1, 1, 1, 0, 0, 0]),
-        attrs={'qaid': np.array([21, 24, 25, 26, 11, 14, 15])},
+        attrs='qaid': np.array([21, 24, 25, 26, 11, 14, 15]),
     """
     scores = np.hstack([tp_scores, tn_scores])
     labels = np.zeros(scores.size, dtype=np.bool)
@@ -1809,7 +1807,7 @@ def estimate_pdf(data, gridsize=1024, adjust=1):
         ndarray: data_pdf
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.score_normalization import *  # NOQA
         >>> import vtool as vt
         >>> rng = np.random.RandomState(0)

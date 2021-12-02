@@ -3614,7 +3614,7 @@ def testdata_ratio_matches(fname1='easy1.png', fname2='easy2.png', **kwargs):
         python -m vtool.demodata --test-testdata_ratio_matches --show --ratio_thresh=.625 --no-rotation_invariance --fname1 easy1.png --fname2 easy3.png
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.demodata import *  # NOQA
         >>> import vtool as vt
         >>> fname1 = ut.get_argval('--fname1', type_=str, default='easy1.png')

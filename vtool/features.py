@@ -40,7 +40,7 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
         python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show --no-affine-invariance
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.features import *  # NOQA
         >>> import vtool as vt
         >>> # build test data
@@ -95,7 +95,7 @@ def get_extract_features_default_params():
         python -m vtool.features --test-get_extract_features_default_params
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.features import *  # NOQA
         >>> # build test data
         >>> # execute function

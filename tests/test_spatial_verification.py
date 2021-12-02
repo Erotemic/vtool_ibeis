@@ -3,8 +3,6 @@
 from __future__ import absolute_import, division, print_function
 import utool as ut
 import vtool.spatial_verification as sver
-from wbia.plottool import draw_sv
-from wbia.plottool import draw_func2 as df2
 import numpy as np
 import vtool.demodata as demodata
 import vtool.keypoint as ktool  # NOQA
@@ -17,7 +15,7 @@ TAU = np.pi * 2.0  # References: tauday.com
 ori_thresh = ktool.KPTS_DTYPE(TAU / 4.0)
 
 
-def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
+def sver_test(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     r"""
     Args:
         chip1 (ndarray[uint8_t, ndim=2]):  annotation image data
@@ -34,7 +32,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
         >>> # execute function
-        >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+        >>> result = sver_test(chip1, chip2, kpts1, kpts2, fm, nShow)
         >>> # verify results
         >>> print(result)
         >>> pt.show_if_requested()
@@ -46,11 +44,13 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars1()
         >>> # execute function
-        >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+        >>> result = sver_test(chip1, chip2, kpts1, kpts2, fm, nShow)
         >>> # verify results
         >>> print(result)
         >>> pt.show_if_requested()
     """
+    from wbia.plottool import draw_sv
+    from wbia.plottool import draw_func2 as df2
 
     xy_thresh_sqrd = ktool.get_diag_extent_sqrd(kpts2) * xy_thresh
 

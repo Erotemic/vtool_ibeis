@@ -38,6 +38,7 @@ def atleast_nd(arr, n, tofront=False):
     Example0:
         >>> # ENABLE_DOCTEST
         >>> from vtool.numpy_utils import *  # NOQA
+        >>> import ubelt as ub
         >>> n = 2
         >>> arr = np.array([1, 1, 1])
         >>> arr_ = atleast_nd(arr, n)
@@ -47,6 +48,7 @@ def atleast_nd(arr, n, tofront=False):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.numpy_utils import *  # NOQA
+        >>> import ubelt as ub
         >>> n = 4
         >>> arr1 = [1, 1, 1]
         >>> arr2 = np.array(0)
@@ -130,6 +132,7 @@ def fromiter_nd(iter_, shape, dtype):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.numpy_utils import *  # NOQA
+        >>> import utool as ut
         >>> dtype = np.int
         >>> qfxs = np.array([1, 2, 3])
         >>> dfxs = np.array([4, 5, 6])
@@ -334,6 +337,7 @@ def unique_row_indexes(arr):
     Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.numpy_utils import *  # NOQA
+        >>> import ubelt as ub
         >>> arr = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 0], [.534, .432], [.534, .432], [1, 0], [0, 1]])
         >>> unique_rowx = unique_row_indexes(arr)
         >>> result = ('unique_rowx = %s' % (ub.repr2(unique_rowx),))

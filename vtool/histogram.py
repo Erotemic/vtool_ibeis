@@ -18,14 +18,15 @@ def argsubmax(ydata, xdata=None):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.histogram import *  # NOQA
+        >>> import ubelt as ub
         >>> ydata = [ 0,  1,  2, 1.5,  0]
         >>> xdata = [00, 10, 20,  30, 40]
         >>> result1 = argsubmax(ydata, xdata=None)
         >>> result2 = argsubmax(ydata, xdata=xdata)
         >>> result = ub.repr2([result1, result2], precision=4, nl=1, nobr=True)
         >>> print(result)
-        (2.1667, 2.0208),
-        (21.6667, 2.0208),
+        2.1667, 2.0208,
+        21.6667, 2.0208,
 
     Example:
         >>> from vtool.histogram import *  # NOQA
@@ -127,14 +128,15 @@ def argsubmax2(ydata, xdata=None):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.histogram import *  # NOQA
+        >>> import ubelt as ub
         >>> ydata = [ 0,  1,  2, 1.5,  0]
         >>> xdata = [00, 10, 20,  30, 40]
         >>> result1 = argsubmax(ydata, xdata=None)
         >>> result2 = argsubmax(ydata, xdata=xdata)
         >>> result = ub.repr2([result1, result2], precision=4, nl=1, nobr=True)
         >>> print(result)
-        (2.1667, 2.0208),
-        (21.6667, 2.0208),
+        2.1667, 2.0208,
+        21.6667, 2.0208,
 
     Example:
         >>> from vtool.histogram import *  # NOQA
@@ -517,6 +519,7 @@ def interpolate_submaxima(argmaxima, hist_, centers=None):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.histogram import *  # NOQA
+        >>> import ubelt as ub
         >>> argmaxima = np.array([1, 4, 7])
         >>> hist_ = np.array([    6.73, 8.69, 0.00, 0.00, 34.62, 29.16, 0.00, 0.00, 6.73, 8.69])
         >>> centers = np.array([-0.39, 0.39, 1.18, 1.96,  2.75,  3.53, 4.32, 5.11, 5.89, 6.68])
@@ -606,7 +609,7 @@ def show_hist_submaxima(
         python -m vtool.histogram --test-show_hist_submaxima --dpath figures --save ~/latex/crall-candidacy-2015/figures/show_hist_submaxima.jpg
 
     Example:
-        >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> import wbia.plottool as pt
         >>> from vtool.histogram import *  # NOQA
         >>> hist_ = np.array(list(map(float, ut.get_argval('--hist', type_=list, default=[1, 4, 2, 5, 3, 3]))))
@@ -868,6 +871,7 @@ def wrap_histogram(hist_, edges_, _debug=False):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.histogram import *  # NOQA
+        >>> import ubelt as ub
         >>> hist_ = np.array([8., 0., 0., 34.32, 29.45, 0., 0., 6.73])
         >>> edges_ = np.array([ 0.        ,  0.78539816,  1.57079633,
         ...                    2.35619449,  3.14159265,  3.92699081,
@@ -876,8 +880,8 @@ def wrap_histogram(hist_, edges_, _debug=False):
         >>> tup = (hist_wrap.tolist(), edge_wrap.tolist())
         >>> result = ub.repr2(tup, nl=1, nobr=True, precision=2)
         >>> print(result)
-        [6.73, 8.00, 0.00, 0.00, 34.32, 29.45, 0.00, 0.00, 6.73, 8.00],
-        [-0.79, 0.00, 0.79, 1.57, 2.36, 3.14, 3.93, 4.71, 5.50, 6.28, 7.07],
+        6.73, 8.00, 0.00, 0.00, 34.32, 29.45, 0.00, 0.00, 6.73, 8.00,
+        -0.79, 0.00, 0.79, 1.57, 2.36, 3.14, 3.93, 4.71, 5.50, 6.28, 7.07,
     """
     # FIXME; THIS NEEDS INFORMATION ABOUT THE DISTANCE FROM THE LAST BIN
     # TO THE FIRST. IT IS OK AS LONG AS ALL STEPS ARE EQUAL, BUT IT IS NOT

@@ -986,7 +986,7 @@ def spatially_verify_kpts(
         python -m xdoctest vtool.spatial_verification spatially_verify_kpts:0
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.spatial_verification import *
         >>> import vtool.demodata as demodata
         >>> import vtool as vt

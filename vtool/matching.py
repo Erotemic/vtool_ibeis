@@ -463,7 +463,7 @@ class PairwiseMatch(ub.NiceRepr):
         Assign feature correspondences between annots
 
         Example:
-            >>> # xdoctest
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True}
             >>> match = demodata_match({}, apply=False)
@@ -553,6 +553,7 @@ class PairwiseMatch(ub.NiceRepr):
     def sver_flags(match, cfgdict={}, return_extra=False):
         """
         Example:
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True, 'newsym': True}
             >>> match = demodata_match(cfgdict, apply=False)
@@ -793,7 +794,7 @@ class PairwiseMatch(ub.NiceRepr):
             python -m vtool.matching _make_local_summary_feature_vector
 
         Example:
-            >>> # ENABLE_DOCTEST
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool.matching import *  # NOQA
             >>> import vtool as vt
             >>> cfgdict = {}
@@ -1010,7 +1011,7 @@ class AnnotPairFeatInfo(object):
         python -m vtool.matching AnnotPairFeatInfo
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.matching import *  # NOQA
         >>> import vtool as vt
         >>> match = demodata_match({})
@@ -1297,7 +1298,7 @@ class AnnotPairFeatInfo(object):
             python -m vtool.matching AnnotPairFeatInfo.dimkey_grammar
 
         Example:
-            >>> # ENABLE_DOCTEST
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool.matching import *  # NOQA
             >>> import vtool as vt
             >>> match = demodata_match({})
@@ -1511,7 +1512,7 @@ def ensure_metadata_feats(annot, cfgdict={}):
         python -m vtool.matching --exec-ensure_metadata_feats
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.matching import *  # NOQA
         >>> rchip_fpath = ut.grab_test_imgpath('easy1.png')
         >>> annot = ut.LazyDict({'rchip_fpath': rchip_fpath})

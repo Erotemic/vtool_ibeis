@@ -8,7 +8,7 @@ from six import next
 from six.moves import zip, range
 
 
-def safe_vstack(tup, default_shape=(0,), default_dtype=np.float):
+def safe_vstack(tup, default_shape=(0,), default_dtype=np.float32):
     """stacks a tuple even if it is empty"""
     try:
         return np.vstack(tup)
@@ -23,7 +23,7 @@ def pad_vstack(arrs, fill_value=0):
     return np.vstack(padded)
 
 
-def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=np.float):
+def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=np.float32):
     """
     stacks a tuple even if it is empty
     Also deals with numpy bug where cat fails if an element in sequence is empty
@@ -38,17 +38,17 @@ def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=np.float):
         >>> # test2
         >>> tup = (np.array([[1, 2, 3]]), np.array([[]]))
         >>> s = vt.safe_cat(tup, axis=0)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = %s' % (ub.repr2(s), )]))
         >>> ut.assert_eq(s.shape, (1, 3))
         >>> # test3
         >>> tup = (np.array([[1, 2, 3]]), np.array([[3, 4, 5]]))
         >>> s = vt.safe_cat(tup, axis=1)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = %s' % (ub.repr2(s), )]))
         >>> ut.assert_eq(s.shape, (1, 6))
         >>> # test3
         >>> tup = (np.array(1), np.array(2), np.array(3))
         >>> s = vt.safe_cat(tup, axis=1)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = %s' % (ub.repr2(s), )]))
         >>> ut.assert_eq(s.shape, (1, 6))
     """
     if tup is None or len(tup) == 0:
@@ -119,7 +119,7 @@ def argsort_groups(scores_list, reverse=False, rng=np.random, randomize_levels=T
 
     """
     scores_list_ = [
-        np.array(scores, copy=True).astype(np.float) for scores in scores_list
+        np.array(scores, copy=True).astype(np.float32) for scores in scores_list
     ]
     breakers_list = [rng.rand(len(scores)) for scores in scores_list_]
     # replace nan with -inf, or inf randomize order between equal values
@@ -1618,7 +1618,7 @@ def weighted_geometic_mean(data, weights):
         >>> data = [img1, img2]
         >>> weights = np.array([.5, .5])
         >>> gmean_ = weighted_geometic_mean(data, weights)
-        >>> result = ub.hzcat(['gmean_ = ', ub.repr2(gmean_, precision=2, with_dtype=True)])
+        >>> result = ub.hzcat(['gmean_ = %s' % (ub.repr2(gmean_, precision=2, with_dtype=True), )])
         >>> print(result)
 
     Ignore:
@@ -1886,10 +1886,10 @@ def safe_max(arr, fill=np.nan, finite=False, nans=True):
         >>> result = ('results = %s' % (ub.repr2(results, nl=1),))
         >>> print(result)
         results = [
-            [nan, nan, nan, inf, inf, 1],
-            [nan, nan, nan, nan, 1.0, 1],
-            [nan, nan, nan, nan, 1.0, 1],
-            [nan, nan, inf, inf, inf, 1],
+            [float('nan'), float('nan'), float('nan'), float('inf'), float('inf'), 1],
+            [float('nan'), float('nan'), float('nan'), float('nan'), 1.0, 1],
+            [float('nan'), float('nan'), float('nan'), float('nan'), 1.0, 1],
+            [float('nan'), float('nan'), float('inf'), float('inf'), float('inf'), 1],
         ]
     """
     return safe_extreme(arr, np.max, fill, finite, nans)
@@ -1911,10 +1911,10 @@ def safe_min(arr, fill=np.nan, finite=False, nans=True):
         >>> result = ('results = %s' % (ub.repr2(results, nl=1),))
         >>> print(result)
         results = [
-            [nan, nan, nan, inf, 1.0, 0],
-            [nan, nan, nan, nan, 1.0, 0],
-            [nan, nan, nan, nan, 1.0, 0],
-            [nan, nan, -inf, inf, 1.0, 0],
+            [float('nan'), float('nan'), float('nan'), float('inf'), 1.0, 0],
+            [float('nan'), float('nan'), float('nan'), float('nan'), 1.0, 0],
+            [float('nan'), float('nan'), float('nan'), float('nan'), 1.0, 0],
+            [float('nan'), float('nan'), float('-inf'), float('inf'), 1.0, 0],
         ]
     """
     return safe_extreme(arr, np.min, fill, finite, nans)

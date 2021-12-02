@@ -313,6 +313,7 @@ def get_orientation(exif_dict, default=0, on_error='warn'):
         >>>     pil_img = Image.open(join(images_path, image_filename))
         >>>     exif_dict = get_exif_dict(pil_img)
         >>>     orient = get_orientation(exif_dict)
+        >>>     pil_img.close()
         >>>     result.append(orient)
         >>> print(result)
         [1, 6, 8]
@@ -357,6 +358,7 @@ def get_orientation_str(exif_dict, **kwargs):
         >>>     pil_img = Image.open(join(images_path, image_filename))
         >>>     exif_dict = get_exif_dict(pil_img)
         >>>     orient_str = get_orientation_str(exif_dict)
+        >>>     pil_img.close()
         >>>     result.append(orient_str)
         >>> print(result)
         ['Normal', '90 Clockwise', '90 Counter-Clockwise']
@@ -376,6 +378,7 @@ def get_unixtime(exif_dict, default=-1):
         >>> image_fpath = ut.grab_file_url('http://images.summitpost.org/original/769474.JPG')
         >>> pil_img = Image.open(image_fpath)
         >>> exif_dict = get_exif_dict(pil_img)
+        >>> pil_img.close()
     """
     exiftime = exif_dict.get(DATETIMEORIGINAL_TAGID, default)
     if isinstance(exiftime, tuple) and len(exiftime) == 1:

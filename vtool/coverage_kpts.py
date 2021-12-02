@@ -34,8 +34,8 @@ def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
         python -m vtool.coverage_kpts make_kpts_heatmask --show
 
     Example:
-        >>> # ENABLE_DOCTEST
-        >>> # xdoctest: +REQUIRES(module:plottool)
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.coverage_kpts import *  # NOQA
         >>> import vtool as vt
         >>> import pyhesaff
@@ -133,8 +133,8 @@ def make_kpts_coverage_mask(
         tuple (ndarray, ndarray): dstimg, patch
 
     Example:
-        >>> # ENABLE_DOCTEST
-        >>> # xdoctest: +REQUIRES(module:plottool)
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.coverage_kpts import *  # NOQA
         >>> import vtool as vt
         >>> import wbia.plottool as pt
@@ -229,7 +229,8 @@ def warp_patch_onto_kpts(
         python -m vtool.coverage_kpts --test-warp_patch_onto_kpts --show --square --hole
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.coverage_kpts import *  # NOQA
         >>> import vtool as vt
         >>> import pyhesaff
