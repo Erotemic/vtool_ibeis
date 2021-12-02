@@ -16,7 +16,7 @@ def print_image_checks(img_fpath):
         print('[io] Image %r (%s) exists. Is it corrupted?' % _tup)
     else:
         print(
-            '[io] Image %r does not exists '(
+            '[io] Image %r does not exists' % (
                 img_fpath,
             )
         )
