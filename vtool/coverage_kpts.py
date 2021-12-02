@@ -153,6 +153,7 @@ def make_kpts_coverage_mask(
         >>> pt.show_if_requested()
     """
     import cv2
+
     if patch is None:
         patch = get_gaussian_weight_patch(cov_gauss_shape, cov_gauss_sigma_frac)
     chipshape = chipsize[::-1]
@@ -354,6 +355,7 @@ def warped_patch_generator(
         http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#warpaffine
     """
     import cv2
+
     shape = dsize[::-1]
     # warpAffine is weird. If the shape of the dst is the same as src we can
     # use the dst outvar. I dont know why it needs that.  It seems that this
@@ -424,7 +426,7 @@ def get_gaussian_weight_patch(
 
 
 def get_coverage_kpts_gridsearch_configs():
-    """ testing function """
+    """testing function"""
     varied_dict = {
         'cov_agg_mode': ['max', 'sum'],
         # 'cov_blur_ksize'         : [(19, 19), (5, 5)],
@@ -508,7 +510,7 @@ def gridsearch_kpts_coverage_mask():
 
 
 def testdata_coverage(fname=None):
-    """ testing function """
+    """testing function"""
     import vtool as vt
 
     # build test data
@@ -536,7 +538,7 @@ def testdata_coverage(fname=None):
 def show_coverage_map(
     chip, mask, patch, kpts, fnum=None, ell_alpha=0.6, show_mask_kpts=False
 ):
-    """ testing function """
+    """testing function"""
     import wbia.plottool as pt
 
     if fnum is None:

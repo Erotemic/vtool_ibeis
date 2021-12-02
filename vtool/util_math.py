@@ -519,7 +519,7 @@ def test_language_modulus():
 
 
 def iceil(num, dtype=np.int32):
-    """ Integer ceiling. (because numpy doesn't seem to have it!)
+    """Integer ceiling. (because numpy doesn't seem to have it!)
 
     Args:
         num (ndarray or scalar):
@@ -552,7 +552,7 @@ def iceil(num, dtype=np.int32):
 
 
 def iround(num, dtype=np.int32):
-    """ Integer round. (because numpy doesn't seem to have it!) """
+    """Integer round. (because numpy doesn't seem to have it!)"""
     return np.round(num).astype(dtype)
 
 

@@ -70,6 +70,7 @@ def svd(M):
     """
     # V is actually Vt
     import cv2
+
     flags = cv2.SVD_FULL_UV
     S, U, Vt = cv2.SVDecomp(M, flags=flags)
     s = S.flatten()
@@ -115,19 +116,30 @@ def rotation_mat3x3(radians, sin=np.sin, cos=np.cos):
     # TODO: handle array inputs
     sin_ = sin(radians)
     cos_ = cos(radians)
-    R = np.array(((cos_, -sin_, 0), (sin_, cos_, 0), (0, 0, 1),))
+    R = np.array(
+        (
+            (cos_, -sin_, 0),
+            (sin_, cos_, 0),
+            (0, 0, 1),
+        )
+    )
     return R
 
 
 def rotation_mat2x2(theta):
     sin_ = np.sin(theta)
     cos_ = np.cos(theta)
-    rot_ = np.array(((cos_, -sin_), (sin_, cos_),))
+    rot_ = np.array(
+        (
+            (cos_, -sin_),
+            (sin_, cos_),
+        )
+    )
     return rot_
 
 
 def transform_around(M, x, y):
-    """ translates to origin, applies transform and then translates back """
+    """translates to origin, applies transform and then translates back"""
     tr1_ = translation_mat3x3(-x, -y)
     tr2_ = translation_mat3x3(x, y)
     M_ = tr2_.dot(M).dot(tr1_)
@@ -319,19 +331,19 @@ def affine_around_mat3x3(
 
 
 def det_ltri(ltri):
-    """ Lower triangular determinant """
+    """Lower triangular determinant"""
     det = ltri[0] * ltri[2]
     return det
 
 
 def inv_ltri(ltri, det):
-    """ Lower triangular inverse """
+    """Lower triangular inverse"""
     inv_ltri = np.array((ltri[2], -ltri[1], ltri[0]), dtype=ltri.dtype) / det
     return inv_ltri
 
 
 def dot_ltri(ltri1, ltri2):
-    """ Lower triangular dot product """
+    """Lower triangular dot product"""
     # use m, n, and o as temporary matrixes
     m11, m21, m22 = ltri1
     n11, n21, n22 = ltri2
@@ -440,7 +452,7 @@ def transform_points_with_homography(H, _xys):
 
 
 def normalize_rows(arr, out=None):
-    """ DEPRICATE """
+    """DEPRICATE"""
     assert len(arr.shape) == 2
     return normalize(arr, axis=1, out=out)
 

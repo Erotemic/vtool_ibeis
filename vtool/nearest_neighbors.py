@@ -278,7 +278,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
 
 
 def assign_to_centroids(dpts, qpts, num_neighbors=1, flann_params={}):
-    """ Helper for akmeans """
+    """Helper for akmeans"""
     (qx2_dx, qx2_dist) = FLANN_CLS().nn_index(dpts, qpts, num_neighbors, **flann_params)
     return qx2_dx
 
@@ -338,7 +338,7 @@ def get_flann_fpath(
     appname='vtool',
     verbose=True,
 ):
-    """ returns filepath for flann index """
+    """returns filepath for flann index"""
     if cache_dir == 'default':
         if verbose:
             print('[flann] using default cache dir')

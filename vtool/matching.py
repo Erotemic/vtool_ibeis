@@ -41,7 +41,11 @@ else:
 VSONE_ASSIGN_CONFIG = [
     ut.ParamInfo('checks', 20),
     ut.ParamInfo('symmetric', False),
-    ut.ParamInfo('weight', None, valid_values=[None, 'fgweights'],),
+    ut.ParamInfo(
+        'weight',
+        None,
+        valid_values=[None, 'fgweights'],
+    ),
     ut.ParamInfo('K', 1, min_=1),
     ut.ParamInfo('Knorm', 1, min_=1),
 ]
@@ -719,7 +723,7 @@ class PairwiseMatch(ub.NiceRepr):
         return match_
 
     def _make_global_feature_vector(match, global_keys=None):
-        """ Global annotation properties and deltas """
+        """Global annotation properties and deltas"""
         import vtool as vt
 
         feat = ut.odict([])
@@ -838,14 +842,20 @@ class PairwiseMatch(ub.NiceRepr):
                 fxs = np.where(bin_ids <= binid)[0]
                 if 'len' in summary_ops:
                     dimkey = dimkey_fmt.format(
-                        opname='len', measure='matches', bin_key=bin_key, binval=binval,
+                        opname='len',
+                        measure='matches',
+                        bin_key=bin_key,
+                        binval=binval,
                     )
                     feat[dimkey] = len(fxs)
                 for opname in sorted(summary_ops - {'len'}):
                     op = SUM_OPS[opname]
                     for k, vs in local_measures.items():
                         dimkey = dimkey_fmt.format(
-                            opname=opname, measure=k, bin_key=bin_key, binval=binval,
+                            opname=opname,
+                            measure=k,
+                            bin_key=bin_key,
+                            binval=binval,
                         )
                         feat[dimkey] = op(vs[fxs])
 
@@ -881,7 +891,7 @@ class PairwiseMatch(ub.NiceRepr):
     def _make_local_top_feature_vector(
         match, local_keys=None, sorters='ratio', indices=3
     ):
-        """ Selected subsets of top features """
+        """Selected subsets of top features"""
         if local_keys is None:
             local_measures = match.local_measures
         else:
@@ -1313,7 +1323,7 @@ class AnnotPairFeatInfo(object):
         S = pp.Suppress
 
         class Nestings(object):
-            """ allows for a bit of syntactic sugar """
+            """allows for a bit of syntactic sugar"""
 
             def __call__(self, x):
                 return pp.Suppress('(') + x + pp.Suppress(')')
@@ -1616,7 +1626,7 @@ def ensure_metadata_dlen_sqrd(annot):
 
 
 def ensure_metadata_flann(annot, cfgdict):
-    """ setup lazy flann evaluation """
+    """setup lazy flann evaluation"""
     import vtool as vt
 
     flann_params = {'algorithm': 'kdtree', 'trees': 8}

@@ -26,7 +26,9 @@ class ScoreNormalizerUnsupervised(object):
         check_unused_kwargs(kwargs, encoder.learn_kw.keys())
         # Target recall for learned threshold
         # Support data
-        encoder.support = dict(X=None,)
+        encoder.support = dict(
+            X=None,
+        )
         # Learned score normalization
         encoder.score_domain = None
         if X is not None:

@@ -162,8 +162,7 @@ def argsubmaxima2(ydata, xdata=None, thresh_factor=None, normalize_x=True):
 
 
 def argsubminima2(ydata, xdata=None, thresh_factor=None, normalize_x=True):
-    """
-    """
+    """ """
     return argsubextrema2(
         'min', ydata, xdata=xdata, thresh_factor=thresh_factor, normalize_x=normalize_x
     )
@@ -902,7 +901,7 @@ def maxima_neighbors(argmaxima, hist_, centers=None):
 
 
 def maximum_parabola_point(A, B, C):
-    """ Maximum x point is where the derivative is 0 """
+    """Maximum x point is where the derivative is 0"""
     xv = -B / (2 * A)
     yv = C - B * B / (4 * A)
     return xv, yv

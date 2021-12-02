@@ -163,8 +163,7 @@ def test_pyflann_kmeans():
 
 
 def test_pyflann_add_point():
-    """
-    """
+    """ """
     # Test parameters
     num_neighbors = 3
     pts = testdata_points(nPts=1009)
@@ -195,8 +194,7 @@ def test_pyflann_add_point():
 
 
 def test_pyflann_searches():
-    """
-    """
+    """ """
     try:
         num_neighbors = 3
         pts = testdata_points(nPts=5743, nDims=2)

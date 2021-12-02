@@ -63,7 +63,7 @@ class AnnoyWraper(object):
 
 
 def jagged_group(groupids_list):
-    """ flattens and returns group indexes into the flattened list """
+    """flattens and returns group indexes into the flattened list"""
     # flatx2_itemx = np.array(list(ub.flatten(itemxs_iter)))
     flatids = np.array(list(ub.flatten(groupids_list)))
     keys, groupxs = group_indices(flatids)
@@ -71,7 +71,7 @@ def jagged_group(groupids_list):
 
 
 def apply_jagged_grouping(unflat_items, groupxs):
-    """ takes unflat_list and flat group indices. Returns the unflat grouping """
+    """takes unflat_list and flat group indices. Returns the unflat grouping"""
     flat_items = np.array(list(ub.flatten(unflat_items)))
     item_groups = apply_grouping(flat_items, groupxs)
     return item_groups
@@ -346,7 +346,7 @@ def apply_grouping(items, groupxs, axis=0):
 
 
 def apply_grouping_(items, groupxs):
-    """ non-optimized version """
+    """non-optimized version"""
     return ut.apply_grouping(items, groupxs)
 
 
@@ -381,9 +381,11 @@ def invert_apply_grouping(grouped_items, groupxs):
         []
     """
     if len(grouped_items) == 0:
-        assert len(groupxs) == 0, (
-            'inconsistant. len(grouped_items)=%d, len(groupxs)=%d'
-            % (len(grouped_items), len(groupxs))
+        assert (
+            len(groupxs) == 0
+        ), 'inconsistant. len(grouped_items)=%d, len(groupxs)=%d' % (
+            len(grouped_items),
+            len(groupxs),
         )
         return []
     # maxval = max(map(max, groupxs))
@@ -408,7 +410,7 @@ def _max(x):
 
 
 def invert_apply_grouping2(grouped_items, groupxs, dtype=None):
-    """ use only when ungrouping will be complete """
+    """use only when ungrouping will be complete"""
     maxval = _max(list(map(_max, groupxs)))
     ungrouped_items = np.zeros((maxval + 1,), dtype=dtype)
     for itemgroup, ix_list in zip(grouped_items, groupxs):
@@ -458,7 +460,7 @@ def groupby_dict(items, idx2_groupid):
 def plot_centroids(
     data, centroids, num_pca_dims=3, whiten=False, labels='centroids', fnum=1, prefix=''
 ):
-    """ Plots centroids and datapoints. Plots accurately up to 3 dimensions.
+    """Plots centroids and datapoints. Plots accurately up to 3 dimensions.
     If there are more than 3 dimensions, PCA is used to recude the dimenionality
     to the <num_pca_dims> principal components
     """

@@ -317,7 +317,7 @@ def iter_reduce_ufunc(ufunc, arr_iter, out=None):
 
 
 def unique_row_indexes(arr):
-    """ np.unique on rows
+    """np.unique on rows
 
     Args:
         arr (ndarray): 2d array

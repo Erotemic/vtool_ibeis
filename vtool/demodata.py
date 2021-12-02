@@ -3178,7 +3178,7 @@ def get_dummy_kpts(num=1, dtype=DEFAULT_DTYPE):
 
 
 def dummy_img(w, h, intensity=200):
-    """ Creates a demodata test image """
+    """Creates a demodata test image"""
     img = np.zeros((int(h), int(w)), dtype=np.uint8) + intensity
     return img
 
@@ -3211,10 +3211,22 @@ def get_kpts_dummy_img(kpts, sf=1.0, intensity=200):
 def get_dummy_invV_mats(dtype=DEFAULT_DTYPE):
     invV_mats = np.array(
         (
-            ((1.0, 0.0), (0.0, 1.0),),
-            ((0.5, 0.0), (0.0, 2.0),),
-            ((2.5, 0.0), (0.5, 2.0),),
-            ((1.0, 0.0), (0.5, 1.0),),
+            (
+                (1.0, 0.0),
+                (0.0, 1.0),
+            ),
+            (
+                (0.5, 0.0),
+                (0.0, 2.0),
+            ),
+            (
+                (2.5, 0.0),
+                (0.5, 2.0),
+            ),
+            (
+                (1.0, 0.0),
+                (0.5, 1.0),
+            ),
         ),
         dtype=np.float32,
     )
@@ -3493,7 +3505,7 @@ def perterbed_grid_kpts(*args, **kwargs):
 def perterb_kpts(
     kpts, xy_std=None, invV_std=None, ori_std=None, damping=None, seed=None, **kwargs
 ):
-    """ Adds normally distributed pertibations to keypoints """
+    """Adds normally distributed pertibations to keypoints"""
     # TODO: Move to ktool
     # Get standard deviations of pertibations
     if xy_std is None:

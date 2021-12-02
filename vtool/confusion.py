@@ -209,12 +209,12 @@ class ConfusionMetrics(ub.NiceRepr):
 
     @property
     def cs(self):
-        """ class ratio """
+        """class ratio"""
         return self.rn / self.rp
 
     @property
     def cv(self):
-        """ ratio of cost of making a mistake"""
+        """ratio of cost of making a mistake"""
         return self.cn / self.cp
 
     @property
@@ -225,81 +225,81 @@ class ConfusionMetrics(ub.NiceRepr):
 
     @property
     def tp(self):
-        """ true positive probability """
+        """true positive probability"""
         return self.n_tp / self.n_samples
 
     @property
     def tn(self):
-        """ true negative probability """
+        """true negative probability"""
         return self.n_tn / self.n_samples
 
     @property
     def fp(self):
-        """ false positive probability """
+        """false positive probability"""
         return self.n_fp / self.n_samples
 
     @property
     def fn(self):
-        """ false negative probability """
+        """false negative probability"""
         return self.n_fn / self.n_samples
 
     # ----
 
     @property
     def rp(self):
-        """ real positive probability """
+        """real positive probability"""
         # return (self.tp + self.fn)
         return self.n_pos / self.n_samples
 
     @property
     def rn(self):
-        """ real negative probability """
+        """real negative probability"""
         # return (self.fp + self.tn)
         return self.n_neg / self.n_samples
 
     @property
     def pp(self):
-        """ predicted positive probability """
+        """predicted positive probability"""
         return self.tp + self.fp
 
     @property
     def pn(self):
-        """ predicted negative probability """
+        """predicted negative probability"""
         return self.fn + self.tn
 
     # ----
 
     @property
     def fpr(self):
-        """ fallout, false positive rate """
+        """fallout, false positive rate"""
         return self.n_fp / self.n_neg
 
     @property
     def fnr(self):
-        """ miss rate, false negative rate """
+        """miss rate, false negative rate"""
         return self.n_fn / self.n_pos
 
     @property
     def tpr(self):
-        """ sensitivity, recall, hit rate, tpr """
+        """sensitivity, recall, hit rate, tpr"""
         return self.n_tp / self.n_pos
 
     @property
     def tnr(self):
-        """ true negative rate, inverse recall """
+        """true negative rate, inverse recall"""
         return self.n_tn / self.n_neg
 
     # ----
 
     @property
     def tpa(self):
-        """ miss rate, false negative rate """
+        """miss rate, false negative rate"""
         with np.errstate(invalid='ignore'):
             return nan_to_num(self.n_tp / (self.n_tp + self.n_fp), 1.0)
 
     @property
     def tna(self):
-        """ negative predictive value, inverse precision """
+        """negative predictive value, inverse precision"""
         with np.errstate(invalid='ignore'):
             return nan_to_num(self.n_tn / (self.n_tn + self.n_fn), 1.0)
 
@@ -307,12 +307,12 @@ class ConfusionMetrics(ub.NiceRepr):
 
     @property
     def bm(self):
-        """ bookmaker informedness """
+        """bookmaker informedness"""
         return self.tpr + self.tnr - 1
 
     @property
     def mk(self):
-        """ markedness """
+        """markedness"""
         return self.tpa + self.tna - 1
 
     # ---- other measures
@@ -324,17 +324,17 @@ class ConfusionMetrics(ub.NiceRepr):
 
     @property
     def acc(self):
-        """ accuracy """
+        """accuracy"""
         return self.tp + self.tn
 
     @property
     def sqrd_error(self):
-        """ squared error """
+        """squared error"""
         return np.sqrt(self.fpr ** 2 + self.fnr ** 2)
 
     @property
     def mcc(self):
-        """ matthews correlation coefficient
+        """matthews correlation coefficient
 
         Also true that:
             mcc == np.sqrt(self.bm * self.mk)
@@ -352,13 +352,13 @@ class ConfusionMetrics(ub.NiceRepr):
 
     @property
     def jacc(self):
-        """ jaccard coefficient """
+        """jaccard coefficient"""
         return self.n_tp / (self.n_samples - self.n_tn)
         # return self.tp / (self.tp + self.fn + self.fp)
 
     @property
     def wracc(self):
-        """ weighted relative accuracy """
+        """weighted relative accuracy"""
         return 4 * (self.recall - self.bias) * self.prev
 
     # --- alias names currently needed for compatability

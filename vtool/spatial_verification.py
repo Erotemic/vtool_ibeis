@@ -58,7 +58,7 @@ INDEX_DTYPE = np.int32
 
 
 def build_lstsqrs_Mx9(xy1_mn, xy2_mn):
-    """ Builds the M x 9 least squares matrix
+    """Builds the M x 9 least squares matrix
 
     CommandLine:
         python -m vtool.spatial_verification --test-build_lstsqrs_Mx9
@@ -562,8 +562,7 @@ def get_affine_inliers(
 def get_best_affine_inliers(
     kpts1, kpts2, fm, fs, xy_thresh_sqrd, scale_thresh, ori_thresh, forcepy=False
 ):
-    """ Tests each hypothesis and returns only the best transformation and inliers
-    """
+    """Tests each hypothesis and returns only the best transformation and inliers"""
     # Test each affine hypothesis
     # get list if inliers, errors, the affine matrix for each hypothesis
     if HAVE_SVER_C_WRAPPER and not forcepy:
@@ -623,12 +622,13 @@ def unnormalize_transform(M_prime, T1, T2):
 
 
 def estimate_refined_transform(kpts1, kpts2, fm, aff_inliers, refine_method='homog'):
-    """ estimates final transformation using normalized affine inliers
+    """estimates final transformation using normalized affine inliers
 
     References:
         http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
     """
     import cv2
+
     xy1_man, xy2_man, T1, T2 = get_normalized_affine_inliers(
         kpts1, kpts2, fm, aff_inliers
     )

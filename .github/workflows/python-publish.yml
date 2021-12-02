@@ -28,7 +28,7 @@ jobs:
       - name: Build wheel
         env:
           CIBW_SKIP: cp36-* *_i686 *_ppc64le *_s390x
-          CIBW_BEFORE_BUILD_LINUX: bash scripts/ci_prepare_centos_for_build.sh
+          CIBW_BEFORE_BUILD_LINUX: bash scripts/ci_prepare_linux_for_build.sh
           CIBW_BEFORE_BUILD_MACOS: bash scripts/ci_prepare_macos_for_build.sh
           CIBW_TEST_COMMAND: python -c "import vtool; from vtool.__main__ import main; main()"
         run: |

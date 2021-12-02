@@ -123,7 +123,7 @@ def extract_chip_from_gpath_into_square(args):
 def extract_chip_from_img(
     imgBGR, bbox, theta, new_size, interpolation=cv2.INTER_LANCZOS4
 ):
-    """ Crops chip from image ; Rotates and scales;
+    """Crops chip from image ; Rotates and scales;
 
     ibs.show_annot_image(aid)[0].pt_save_and_view()
 
@@ -347,7 +347,7 @@ def get_scaled_size_with_dlen(target_dlen, w, h):
 def compute_chip(
     gfpath, bbox, theta, new_size, filter_list=[], interpolation=cv2.INTER_LANCZOS4
 ):
-    r""" Extracts a chip and applies filters
+    r"""Extracts a chip and applies filters
 
     DEPRICATE
 
@@ -391,7 +391,7 @@ def compute_chip(
 
 
 def apply_filter_funcs(chipBGR, filter_funcs):
-    """ applies a list of preprocessing filters to a chip
+    """applies a list of preprocessing filters to a chip
 
     DEPRICATE
 

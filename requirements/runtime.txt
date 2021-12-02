@@ -9,5 +9,5 @@ scipy
 six
 statsmodels
 ubelt
-wbia-utool
 wbia-pyflann
+wbia-utool

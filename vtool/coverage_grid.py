@@ -103,7 +103,7 @@ def make_grid_coverage_mask(
 
 
 def get_subbin_xy_neighbors(subbin_index00, grid_steps, num_cols, num_rows):
-    """ Generate all neighbor of a bin
+    """Generate all neighbor of a bin
     subbin_index00 = left and up subbin index
     """
     subbin_index00 = np.floor(subbin_index00).astype(np.int32)

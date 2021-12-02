@@ -158,7 +158,7 @@ SHAPE_DIMS = np.array([SCAX_DIM, SKEW_DIM, SCAY_DIM])
 def get_grid_kpts(
     wh=(300, 300), wh_stride=None, scale=20, wh_num=None, dtype=np.float32, **kwargs
 ):
-    """ Returns a regular grid of keypoints
+    """Returns a regular grid of keypoints
 
     Args:
         wh (tuple): (default = (300, 300))
@@ -220,19 +220,19 @@ def get_grid_kpts(
 
 # --- raw keypoint components ---
 def get_xys(kpts):
-    """ Keypoint locations in chip space """
+    """Keypoint locations in chip space"""
     _xys = kpts.T[0:2]
     return _xys
 
 
 def get_invVs(kpts):
-    """ Keypoint shapes (oriented with the gravity vector) """
+    """Keypoint shapes (oriented with the gravity vector)"""
     _invVs = kpts.T[2:5]
     return _invVs
 
 
 def get_oris(kpts):
-    """ Extracts keypoint orientations for kpts array
+    """Extracts keypoint orientations for kpts array
 
     (in isotropic guassian space relative to the gravity vector)
     (in simpler words: the orientation is is taken from keypoints warped to the unit circle)
@@ -289,7 +289,7 @@ def get_sqrd_scales(kpts):
 
 
 def get_scales(kpts):
-    """ Gets average scale (does not take into account elliptical shape """
+    """Gets average scale (does not take into account elliptical shape"""
     _scales = np.sqrt(get_sqrd_scales(kpts))
     return _scales
 
@@ -298,7 +298,7 @@ def get_scales(kpts):
 
 
 def get_ori_mats(kpts):
-    """ Returns keypoint orientation matrixes """
+    """Returns keypoint orientation matrixes"""
     _oris = get_oris(kpts)
     R_mats = [linalgtool.rotation_mat2x2(ori) for ori in _oris]
     return R_mats
@@ -957,7 +957,7 @@ def transform_kpts_xys(H, kpts):
 
 
 def get_invVR_mats_sqrd_scale(invVR_mats):
-    """ Returns the squared scale of the invVR keyponts
+    """Returns the squared scale of the invVR keyponts
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -974,7 +974,7 @@ def get_invVR_mats_sqrd_scale(invVR_mats):
 
 
 def get_invVR_mats_shape(invVR_mats):
-    """ Extracts keypoint shape components
+    """Extracts keypoint shape components
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -1567,7 +1567,7 @@ def rectify_invV_mats_are_up(invVR_mats):
 
 
 def flatten_invV_mats_to_kpts(invV_mats):
-    """ flattens invV matrices into kpts format """
+    """flattens invV matrices into kpts format"""
     invV_mats, _oris = rectify_invV_mats_are_up(invV_mats)
     _xs = invV_mats[:, 0, 2]
     _ys = invV_mats[:, 1, 2]
@@ -1969,7 +1969,7 @@ def get_kpts_dlen_sqrd(kpts, outer=False):
 
 
 def cast_split(kpts, dtype=KPTS_DTYPE):
-    """ breakup keypoints into location, shape, and orientation """
+    """breakup keypoints into location, shape, and orientation"""
     kptsT = kpts.T
     _xs = np.array(kptsT[0], dtype=dtype)
     _ys = np.array(kptsT[1], dtype=dtype)
@@ -1985,17 +1985,33 @@ def cast_split(kpts, dtype=KPTS_DTYPE):
 
 
 def get_xy_strs(kpts):
-    """ strings debugging and output """
+    """strings debugging and output"""
     _xs, _ys = get_xys(kpts)
-    xy_strs = [('xy=(%.1f, %.1f)' % (x, y,)) for x, y, in zip(_xs, _ys)]
+    xy_strs = [
+        (
+            'xy=(%.1f, %.1f)'
+            % (
+                x,
+                y,
+            )
+        )
+        for x, y, in zip(_xs, _ys)
+    ]
     return xy_strs
 
 
 def get_shape_strs(kpts):
-    """ strings debugging and output """
+    """strings debugging and output"""
     invVs = get_invVs(kpts)
     shape_strs = [
-        (('[(%3.1f, 0.00),\n' + ' (%3.1f, %3.1f)]') % (iv11, iv21, iv22,))
+        (
+            ('[(%3.1f, 0.00),\n' + ' (%3.1f, %3.1f)]')
+            % (
+                iv11,
+                iv21,
+                iv22,
+            )
+        )
         for iv11, iv21, iv22 in zip(*invVs)
     ]
     shape_strs = ['invV=\n' + _str for _str in shape_strs]
@@ -2026,7 +2042,7 @@ def kpts_repr(arr, precision=2, suppress_small=True, linebreak=False):
 
 
 def kp_cpp_infostr(kp):
-    """ mirrors c++ debug code """
+    """mirrors c++ debug code"""
     x, y = kp[0:2]
     a11, a21, a22 = kp[2:5]
     a12 = 0.0
@@ -2039,8 +2055,20 @@ def kp_cpp_infostr(kp):
     infostr_list = [
         ('+---'),
         ('|     xy = (%s, %s)' % (x, y)),
-        ('| hat{invV} = [(%s, %s),' % (a11, a12,)),
-        ('|              (%s, %s)]' % (a21, a22,)),
+        (
+            '| hat{invV} = [(%s, %s),'
+            % (
+                a11,
+                a12,
+            )
+        ),
+        (
+            '|              (%s, %s)]'
+            % (
+                a21,
+                a22,
+            )
+        ),
         ('|    sc  = %s' % (s,)),
         ('|    ori = %s' % (ori,)),
         ('L___'),
@@ -2075,7 +2103,7 @@ def kpts_docrepr(arr, name='arr', indent=True, *args, **kwargs):
 
 
 def get_match_spatial_squared_error(kpts1, kpts2, H, fx2_to_fx1):
-    """ transforms img2 to img2 and finds squared spatial error
+    """transforms img2 to img2 and finds squared spatial error
 
     Args:
         kpts1 (ndarray[float32_t, ndim=2]):  keypoints

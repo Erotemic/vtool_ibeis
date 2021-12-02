@@ -5,7 +5,7 @@ from vtool.image import resize_thumb, cvt_BGR2RGB, _trimread, imwrite
 
 
 class ThumbnailCacheContext(object):
-    """ Lazy computation of of images as thumbnails.
+    """Lazy computation of of images as thumbnails.
 
     DEPRICATED
 
@@ -39,7 +39,7 @@ class ThumbnailCacheContext(object):
         return self
 
     def save_dirty_thumbs_from_images(self, img_list):
-        """ Pass in any images marked by the context as dirty here """
+        """Pass in any images marked by the context as dirty here"""
         # Remove any non images
         isvalid_list = [img is not None for img in img_list]
         valid_images = ut.compress(img_list, isvalid_list)
@@ -52,7 +52,7 @@ class ThumbnailCacheContext(object):
             imwrite(gpath, thumb)
 
     def filter_dirty_items(self, list_):
-        """ Returns only items marked by the context as dirty """
+        """Returns only items marked by the context as dirty"""
         return ut.compress(list_, self.dirty_list)
 
     def __exit__(self, type_, value, trace):

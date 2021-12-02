@@ -416,7 +416,7 @@ def kpts_matrices(kpts):
 
 
 def homogenous_circle_pts(nSamples):
-    """  Make a list of homogenous circle points """
+    """Make a list of homogenous circle points"""
     tau = 2 * np.pi
     theta_list = np.linspace(0, tau, nSamples)
     circle_pts = np.array([(np.cos(t_), np.sin(t_), 1) for t_ in theta_list])

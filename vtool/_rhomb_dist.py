@@ -497,7 +497,7 @@ def RhombicuboctahedronDistanceDemo():
     import utool as ut
 
     def rhombicuboctahedro_faces():
-        """ yields names of all 26 rhombicuboctahedron faces"""
+        """yields names of all 26 rhombicuboctahedron faces"""
         face_axes = [['up', 'down'], ['front', 'back'], ['left', 'right']]
         ordering = {f: p for p, fs in enumerate(face_axes) for f in fs}
         for i in range(1, len(face_axes) + 1):

@@ -7,12 +7,12 @@ import utool as ut
 
 
 def bboxes_from_vert_list(verts_list, castint=False):
-    """ Fit the bounding polygon inside a rectangle """
+    """Fit the bounding polygon inside a rectangle"""
     return [bbox_from_verts(verts, castint=castint) for verts in verts_list]
 
 
 def verts_list_from_bboxes_list(bboxes_list):
-    """ Create a four-vertex polygon from the bounding rectangle """
+    """Create a four-vertex polygon from the bounding rectangle"""
     return [verts_from_bbox(bbox) for bbox in bboxes_list]
 
 
@@ -344,7 +344,7 @@ def closest_point_on_bbox(p, bbox):
 
 
 def bbox_from_xywh(xy, wh, xy_rel_pos=[0, 0]):
-    """ need to specify xy_rel_pos if xy is not in tl already """
+    """need to specify xy_rel_pos if xy is not in tl already"""
     to_tlx = xy_rel_pos[0] * wh[0]
     to_tly = xy_rel_pos[1] * wh[1]
     tl_x = xy[0] - to_tlx
@@ -447,7 +447,7 @@ def get_pointset_extent_wh(pts):
 
 
 def cvt_bbox_xywh_to_pt1pt2(xywh, sx=1.0, sy=1.0, round_=True):
-    """ Converts bbox to thumb format with a scale factor"""
+    """Converts bbox to thumb format with a scale factor"""
     import vtool as vt
 
     (x1, y1, _w, _h) = xywh

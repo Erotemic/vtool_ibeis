@@ -85,7 +85,7 @@ def read_exif_tags(pil_img, exif_tagid_list, default_list=None):
 
 
 def get_exif_dict(pil_img):
-    """ Returns exif dictionary by TAGID """
+    """Returns exif dictionary by TAGID"""
     try:
         exif_dict = pil_img._getexif()
         if exif_dict is None:
@@ -100,7 +100,7 @@ def get_exif_dict(pil_img):
 
 
 def get_exif_dict2(pil_img):
-    """ Returns exif dictionary by TAG (less efficient)"""
+    """Returns exif dictionary by TAG (less efficient)"""
     try:
         exif_dict = pil_img._getexif()
         if exif_dict is None:

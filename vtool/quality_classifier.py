@@ -30,6 +30,7 @@ def compute_average_contrast(img):
         >>> ut.show_if_requested()
     """
     import cv2
+
     ksize = 5
     assert img.dtype == np.uint8
     img_ = img.astype(np.float64) / 255.0
@@ -44,6 +45,7 @@ def compute_average_contrast(img):
 
 def contrast_measures(img):
     import cv2
+
     ksize = 5
     assert img.dtype == np.uint8
     img_ = img.astype(np.float64) / 255.0
@@ -117,6 +119,7 @@ def fourier_devtest(img):
 
     def pad_img(img):
         import cv2
+
         rows, cols = img.shape
         nrows = cv2.getOptimalDFTSize(rows)
         ncols = cv2.getOptimalDFTSize(cols)
@@ -128,12 +131,14 @@ def fourier_devtest(img):
 
     def convert_to_fdomain(img):
         import cv2
+
         dft = cv2.dft(img.astype(np.float32), flags=cv2.DFT_COMPLEX_OUTPUT)
         # dft_shift = np.fft.fftshift(dft)
         return dft
 
     def convert_from_fdomain(dft):
         import cv2
+
         img = cv2.idft(dft)
         img = cv2.magnitude(img[:, :, 0], img[:, :, 1])
         img /= img.max()
@@ -141,6 +146,7 @@ def fourier_devtest(img):
 
     def get_fdomain_mag(dft_shift):
         import cv2
+
         magnitude_spectrum = np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
         return magnitude_spectrum
 

@@ -69,7 +69,12 @@ def run_tests():
             dpath_list, exclude_doctests_fnames, exclude_dirs
         )
 
-    coverage = ut.get_argflag(('--coverage', '--cov',))
+    coverage = ut.get_argflag(
+        (
+            '--coverage',
+            '--cov',
+        )
+    )
     if coverage:
         import coverage
 

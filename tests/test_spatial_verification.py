@@ -55,7 +55,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     xy_thresh_sqrd = ktool.get_diag_extent_sqrd(kpts2) * xy_thresh
 
     def pack_errors(xy_err, scale_err, ori_err):
-        """ makes human readable errors """
+        """makes human readable errors"""
 
         def _pack(bits, errs, thresh):
             return ut.indentjoin(

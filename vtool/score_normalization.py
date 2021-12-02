@@ -40,7 +40,7 @@ def testdata_score_normalier(
 
 
 def get_left_area(ydata, xdata, index_list):
-    """ area to the left of each index point """
+    """area to the left of each index point"""
     left_area = np.array(
         [np.trapz(ydata[: ix + 1], xdata[: ix + 1]) for ix in index_list]
     )
@@ -48,7 +48,7 @@ def get_left_area(ydata, xdata, index_list):
 
 
 def get_right_area(ydata, xdata, index_list):
-    """ area to the right of each index point """
+    """area to the right of each index point"""
     right_area = np.array([np.trapz(ydata[ix:], xdata[ix:]) for ix in index_list])
     return right_area
 
@@ -215,7 +215,11 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
         if not any(encoder.thresh_kw.values()):
             encoder.thresh_kw['tpr'] = 0.90
         # Support data
-        encoder.support = dict(X=None, y=None, attrs=None,)
+        encoder.support = dict(
+            X=None,
+            y=None,
+            attrs=None,
+        )
         # Learned score normalization
         encoder.score_domain = None
         encoder.p_tp_given_score = None
@@ -281,13 +285,13 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
         return partition_scores(X, y, attrs)
 
     def fit_partitioned(encoder, tp_scores, tn_scores, part_attrs=None, **kwargs):
-        """ convinience func to fit only scores that have been separated
+        """convinience func to fit only scores that have been separated
         instead of labeled"""
         fitargs = flatten_scores(tp_scores, tn_scores, part_attrs)
         return encoder.fit(*fitargs, **kwargs)
 
     def get_partitioned_support(encoder):
-        """ convinience get prepartitioned data """
+        """convinience get prepartitioned data"""
         X, y, attrs = encoder.get_support()
         return partition_scores(X, y, attrs)
 
@@ -591,7 +595,10 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
         if verbose:
             print(
                 '[scorenorm] Learning threshold to achieve %s=%.5f'
-                % (metric.upper(), value,)
+                % (
+                    metric.upper(),
+                    value,
+                )
             )
             if encoder.learned_thresh is not None:
                 print('[scorenorm]   * learned_thresh = %.5f' % (encoder.learned_thresh,))
@@ -630,7 +637,7 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
         return prob
 
     def predict(encoder, X):
-        """ Predict true or false of ``X``. """
+        """Predict true or false of ``X``."""
         prob = encoder.normalize_scores(X)
         pred = prob > encoder.learned_thresh
         return pred
@@ -1495,7 +1502,10 @@ def plot_postbayes_pdf(
     pt.plots.plot_probabilities(
         (p_tn_given_score, p_tp_given_score),
         ('p(tn | score)', 'p(tp | score)'),
-        prob_colors=(false_color, true_color,),
+        prob_colors=(
+            false_color,
+            true_color,
+        ),
         # figtitle='post_bayes pdf score ' + cfgstr,
         figtitle='p(truth | score)' + cfgstr,
         xdata=score_domain,

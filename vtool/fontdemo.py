@@ -131,7 +131,7 @@ class Font(object):
     def text_dimensions(self, text):
         """
         Return (width, height, baseline) of `text` rendered in the current
-        font. """
+        font."""
         width = 0
         max_ascent = 0
         max_descent = 0

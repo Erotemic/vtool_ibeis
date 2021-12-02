@@ -40,7 +40,7 @@ def patch_mag(gradx, grady):
 
 
 def patch_ori(gradx, grady):
-    """ returns patch orientation relative to the x-axis """
+    """returns patch orientation relative to the x-axis"""
     gori = trig.atan2(grady, gradx)
     return gori
 
@@ -138,7 +138,7 @@ def get_no_symbol(variant='symbol', size=(100, 100)):
 
 
 def get_star_patch(jitter=False):
-    """ test data patch """
+    """test data patch"""
     _, O = 0.1, 0.8  # NOQA
     patch = np.array(
         [
@@ -160,7 +160,7 @@ def get_star_patch(jitter=False):
 
 
 def get_star2_patch(jitter=False):
-    """ test data patch """
+    """test data patch"""
     _, i, O = 0.1, 0.8, 0.5  # NOQA
     patch = np.array(
         [
@@ -189,7 +189,7 @@ def get_star2_patch(jitter=False):
 
 
 def get_cross_patch(jitter=False):
-    """ test data patch """
+    """test data patch"""
     _, O = 0.1, 0.8  # NOQA
     patch = np.array(
         [
@@ -211,7 +211,7 @@ def get_cross_patch(jitter=False):
 
 
 def get_stripe_patch(jitter=False):
-    """ test data patch """
+    """test data patch"""
     _, O = 0.1, 0.8  # NOQA
     patch = np.array(
         [
@@ -309,7 +309,10 @@ def show_gaussian_patch(shape, sigma1, sigma2):
     gausspatch = vt.gaussian_patch(shape, sigma=sigma)
     # print(gausspatch)
     # pt.imshow(gausspatch * 255)
-    title = 'ksize=%r, sigma=%r' % (shape, (sigma1, sigma2),)
+    title = 'ksize=%r, sigma=%r' % (
+        shape,
+        (sigma1, sigma2),
+    )
     pt.plot_surface3d(
         xgrid, ygrid, gausspatch, rstride=1, cstride=1, cmap=mpl.cm.coolwarm, title=title
     )
@@ -830,8 +833,7 @@ def generate_to_patch_transforms(kpts, patch_size=41):
 
 
 def patch_gaussian_weighted_average_intensities(probchip, kpts_):
-    """
-    """
+    """ """
     import vtool as vt
 
     patch_size = 41
@@ -1416,7 +1418,13 @@ def find_patch_dominant_orientations(
         pt.set_figtitle('python orimg')
     submax_ori_offsets = submaxima_x
     if DEBUG_ROTINVAR:
-        print('submaxima_x, submaxima_y = %r, %r' % (submaxima_x, submaxima_y,))
+        print(
+            'submaxima_x, submaxima_y = %r, %r'
+            % (
+                submaxima_x,
+                submaxima_y,
+            )
+        )
         htool.show_hist_submaxima(hist, centers=centers)
         pt.set_figtitle('python hist')
         pt.df2.plt.show()

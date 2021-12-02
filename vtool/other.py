@@ -9,7 +9,7 @@ from six.moves import zip, range
 
 
 def safe_vstack(tup, default_shape=(0,), default_dtype=np.float):
-    """ stacks a tuple even if it is empty """
+    """stacks a tuple even if it is empty"""
     try:
         return np.vstack(tup)
     except ValueError:
@@ -17,7 +17,7 @@ def safe_vstack(tup, default_shape=(0,), default_dtype=np.float):
 
 
 def pad_vstack(arrs, fill_value=0):
-    """ Stacks values and pads arrays with different lengths with zeros """
+    """Stacks values and pads arrays with different lengths with zeros"""
     total = max(map(len, arrs))
     padded = [np.hstack([a, np.full(total - len(a), fill_value)]) for a in arrs]
     return np.vstack(padded)
@@ -408,7 +408,7 @@ def nonunique_row_flags(arr):
 
 
 def nonunique_row_indexes(arr):
-    """ rows that are not unique (does not include the first instance of each pattern)
+    """rows that are not unique (does not include the first instance of each pattern)
 
     Args:
         arr (ndarray): 2d array
@@ -470,7 +470,7 @@ def compute_unique_data_ids_(hashable_rows, iddict_=None):
 
 
 def compute_unique_arr_dataids(arr):
-    """ specialized version for speed when arr is an ndarray """
+    """specialized version for speed when arr is an ndarray"""
     iddict_ = {}
     hashable_rows = list(map(tuple, arr.tolist()))
     for row in hashable_rows:
@@ -822,7 +822,7 @@ def ensure_shape(arr, dimshape):
 
 
 def significant_shape(arr):
-    """ find the shape without trailing 1's """
+    """find the shape without trailing 1's"""
     sig_dim = 0
     for i, dim in enumerate(arr.shape, start=1):
         if dim != 1:
@@ -1229,9 +1229,11 @@ def intersect2d_structured_numpy(arr1, arr2, assume_unique=False):
         http://stackoverflow.com/questions/8317022/get-intersecting-rows-across-two-2d-numpy-arrays
     """
     ncols = arr1.shape[1]
-    assert arr1.dtype == arr2.dtype, (
-        'arr1 and arr2 must have the same dtypes.'
-        'arr1.dtype=%r, arr2.dtype=%r' % (arr1.dtype, arr2.dtype)
+    assert (
+        arr1.dtype == arr2.dtype
+    ), 'arr1 and arr2 must have the same dtypes.' 'arr1.dtype=%r, arr2.dtype=%r' % (
+        arr1.dtype,
+        arr2.dtype,
     )
     # [('f%d' % i, arr1.dtype) for i in range(ncols)]
     # dtype = np.dtype([('f%d' % i, arr1.dtype) for i in range(ncols)])
@@ -1311,7 +1313,7 @@ def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
 
 
 def nearest_point(x, y, pts, mode='random'):
-    """ finds the nearest point(s) in pts to (x, y) """
+    """finds the nearest point(s) in pts to (x, y)"""
     dists = (pts.T[0] - x) ** 2 + (pts.T[1] - y) ** 2
     fx = dists.argmin()
     mindist = dists[fx]
@@ -2560,7 +2562,7 @@ def make_video(images, outvid=None, fps=5, size=None, is_color=True, format='XVI
 
 
 def take_col_per_row(arr, colx_list):
-    """ takes a column from each row
+    """takes a column from each row
 
     Ignore:
         num_rows = 1000

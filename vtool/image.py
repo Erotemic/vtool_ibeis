@@ -81,7 +81,7 @@ EXIF_TAG_DATETIME = 'DateTimeOriginal'
 
 
 def _rectify_border_mode(border_mode, default=cv2.BORDER_CONSTANT):
-    """ Converts argument to cv2 style """
+    """Converts argument to cv2 style"""
     if border_mode is None:
         return default
     elif isinstance(border_mode, six.text_type):
@@ -609,13 +609,13 @@ def imwrite_fallback(img_fpath, imgBGR):
 
 
 def get_size(img):
-    """ Returns the image size in (width, height) """
+    """Returns the image size in (width, height)"""
     wh = img.shape[0:2][::-1]
     return wh
 
 
 def get_num_channels(img):
-    """ Returns the number of color channels """
+    """Returns the number of color channels"""
     ndims = len(img.shape)
     if ndims == 2:
         nChannels = 1
@@ -1346,7 +1346,7 @@ def rectify_to_square(img, extreme='max'):
 
 
 def rectify_to_float01(img, dtype=np.float32):
-    """ Ensure that an image is encoded using a float properly """
+    """Ensure that an image is encoded using a float properly"""
     if img.dtype.kind in ('i', 'u'):
         assert img.max() <= 255
         img_ = img.astype(dtype) / 255.0
@@ -1356,7 +1356,7 @@ def rectify_to_float01(img, dtype=np.float32):
 
 
 def rectify_to_uint8(img):
-    """ Ensure that an image is encoded in uint8 properly """
+    """Ensure that an image is encoded in uint8 properly"""
     if img.dtype.kind in ('f'):
         if img.max() <= 1.0 or img.min() >= 0.0:
             raise ValueError(
@@ -1714,7 +1714,7 @@ def embed_in_square_image(
 
 
 def _trimread(gpath):
-    """ Try an imread """
+    """Try an imread"""
     try:
         return imread(gpath)
     except Exception:
@@ -1722,7 +1722,7 @@ def _trimread(gpath):
 
 
 def get_scale_factor(src_img, dst_img):
-    """ returns scale factor from one image to the next """
+    """returns scale factor from one image to the next"""
     src_h, src_w = src_img.shape[0:2]
     dst_h, dst_w = dst_img.shape[0:2]
     sx = dst_w / src_w
@@ -2233,7 +2233,7 @@ def stack_multi_images(
     modifysize=True,
     interpolation=None,
 ):
-    """ combines images that are already stacked """
+    """combines images that are already stacked"""
     interpolation = _rectify_interpolation(interpolation, default=cv2.INTER_NEAREST)
     if img1 is None:
         return img2, offset_list2, sf_list2
@@ -2327,7 +2327,7 @@ def stack_multi_images2(
 
 
 def combine_offset_lists(offsets_list, sfs_list, offset_tups, sf_tups):
-    """ Helper for stacking """
+    """Helper for stacking"""
     # combine the offsets
     import operator
     from six.moves import reduce
@@ -2587,7 +2587,7 @@ def ensure_3channel(patch):
 
 
 def infer_vert(img1, img2, vert):
-    """ which is the better stack dimension """
+    """which is the better stack dimension"""
     (h1, w1) = img1.shape[0:2]  # get chip dimensions
     (h2, w2) = img2.shape[0:2]
     woff, hoff = 0, 0

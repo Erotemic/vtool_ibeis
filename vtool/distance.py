@@ -222,7 +222,7 @@ def signed_cyclic_distance(arr1, arr2, modulo, out=None):
 
 
 def det_distance(det1, det2):
-    """ Returns how far off determinants are from one another
+    """Returns how far off determinants are from one another
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -243,12 +243,12 @@ def det_distance(det1, det2):
 
 
 def L1(hist1, hist2, dtype=TEMP_VEC_DTYPE):
-    """ returns L1 (aka manhatten or grid) distance between two histograms """
+    """returns L1 (aka manhatten or grid) distance between two histograms"""
     return (np.abs(np.asarray(hist1, dtype) - np.asarray(hist2, dtype))).sum(-1)
 
 
 def L2_sqrd(hist1, hist2, dtype=TEMP_VEC_DTYPE):
-    """ returns the squared L2 distance
+    """returns the squared L2 distance
 
     # FIXME:
         if hist1.shape = (0,) and hist.shape = (0,) then result=0.0
@@ -383,12 +383,12 @@ def understanding_pseudomax_props(mode=2):
 
 
 def L2(hist1, hist2):
-    """ returns L2 (aka euclidean or standard) distance between two histograms """
+    """returns L2 (aka euclidean or standard) distance between two histograms"""
     return np.sqrt(L2_sqrd(hist1, hist2))
 
 
 def hist_isect(hist1, hist2):
-    """ returns histogram intersection distance between two histograms """
+    """returns histogram intersection distance between two histograms"""
     numer = (np.dstack([hist1, hist2])).min(-1).sum(-1)
     denom = hist2.sum(-1)
     hisect_dist = 1 - (numer / denom)
@@ -551,7 +551,7 @@ def L2_sift_sqrd(hist1, hist2):
 
 
 def bar_cos_sift(hist1, hist2):
-    """ 1 - cos dist  """
+    """1 - cos dist"""
     return 1.0 - cos_sift(hist1, hist2)
 
 
@@ -641,7 +641,7 @@ def emd(hist1, hist2, cost_matrix='sift'):
 
 
 def nearest_point(x, y, pts, conflict_mode='next', __next_counter=[0]):
-    """ finds the nearest point(s) in pts to (x, y)
+    """finds the nearest point(s) in pts to (x, y)
 
     TODO: depricate
     """
@@ -668,7 +668,7 @@ def nearest_point(x, y, pts, conflict_mode='next', __next_counter=[0]):
 
 
 def closest_point(pt, pt_arr, distfunc=L2_sqrd):
-    """ finds the nearest point(s) in pts to (x, y)
+    """finds the nearest point(s) in pts to (x, y)
     pt = np.array([1])
     pt_arr = np.array([1.1, 2, .95, 20])[:, None]
     distfunc = vt.L2_sqrd
