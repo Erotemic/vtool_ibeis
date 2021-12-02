@@ -39,10 +39,13 @@ get_os_info()
 if(OS_IS_MACOS)
   message(STATUS "INCLUDING HOMEBREW")
 
-  include_directories(/opt/homebrew/include)
-  link_directories(/opt/homebrew/lib)
+  execute_process(COMMAND brew --prefix OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+  message(STATUS "BREW_PREFIX = ${BREW_PREFIX}")
 
-  set(CMAKE_INSTALL_RPATH "/opt/homebrew/lib")
+  include_directories("${BREW_PREFIX}/include")
+  link_directories("${BREW_PREFIX}/lib")
+
+  set(CMAKE_INSTALL_RPATH "${BREW_PREFIX}/lib")
 
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")

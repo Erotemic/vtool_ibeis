@@ -9,20 +9,20 @@ Vision Tools - tools for computer vision. Part of the WildMe / Wildbook IA Proje
 
 Repos relevant to the ibeis project:
 
-* https://github.com/WildbookOrg/wbia-vtool
+* https://github.com/WildMeOrg/wbia-vtool
 
-* https://github.com/WildbookOrg/wbia-pyflann
+* https://github.com/WildMeOrg/wbia-pyflann
 
-* https://github.com/WildbookOrg/wbia-pyhesaff
+* https://github.com/WildMeOrg/wbia-pyhesaff
 
-* https://github.com/WildbookOrg/wbia-utool
+* https://github.com/WildMeOrg/wbia-utool
 
-* https://github.com/WildbookOrg/wildbook-ia
+* https://github.com/WildMeOrg/wildbook-ia
 
 
-.. |Build| image:: https://img.shields.io/github/workflow/status/WildbookOrg/wbia-vtool/Build%20and%20upload%20to%20PyPI/master
-    :target: https://github.com/WildbookOrg/wbia-vtool/actions?query=branch%3Amaster+workflow%3A%22Build+and+upload+to+PyPI%22
-    :alt: Build and upload to PyPI (master)
+.. |Build| image:: https://img.shields.io/github/workflow/status/WildMeOrg/wbia-vtool/Build%20and%20upload%20to%20PyPI/main
+    :target: https://github.com/WildMeOrg/wbia-vtool/actions?query=branch%3Amain+workflow%3A%22Build+and+upload+to+PyPI%22
+    :alt: Build and upload to PyPI (main)
 
 .. |Pypi| image:: https://img.shields.io/pypi/v/wbia-vtool.svg
    :target: https://pypi.python.org/pypi/wbia-vtool

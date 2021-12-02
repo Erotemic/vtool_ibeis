@@ -7,34 +7,21 @@ on: push
 
 jobs:
   lint:
-    name: Lint on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [3.8]
-
+    name: Lint code
+    runs-on: ubuntu-latest
     steps:
-      # Checkout and env setup
       - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
 
-      - uses: actions/cache@v2
+      - uses: actions/setup-python@v2
+        name: Install Python
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-lint
-          restore-keys: |
-            ${{ runner.os }}-pip-lint
+          python-version: '3.8'
 
       # Lint things before going any further
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
+          pip install flake8
 
       - name: Lint with flake8
         run: |
@@ -50,8 +37,8 @@ jobs:
       max-parallel: 4
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: [3.7, 3.8]
+        os: [ubuntu-latest, ubuntu-18.04, macos-latest, macos-11]
+        python-version: [3.7, 3.8, 3.9, '3.10']
 
     steps:
       # Checkout and env setup
@@ -64,20 +51,22 @@ jobs:
       - name: Install dependencies (Linux)
         if: ${{ runner.os == 'Linux' }}
         run: |
-          bash scripts/ci_prepare_linux_for_build.sh
+          sudo bash scripts/ci_prepare_linux_for_build.sh
 
       - name: Install dependencies (macOS)
         if: ${{ runner.os == 'macOS' }}
         run: |
           bash scripts/ci_prepare_macos_for_build.sh
 
-      - name: Install Python dependencies
+      - name: Build project
         run: |
           bash run_developer_setup.sh
 
       # Install and test
-      - name: Install the project
-        run: pip install -e .[tests]
+      - name: Install project
+        run: |
+          pip install -e .[tests]
 
-      - name: Test with pytest
-        run: pytest
+      - name: Test project
+        run: |
+          pytest
