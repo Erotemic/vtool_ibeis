@@ -1758,7 +1758,15 @@ def invert_invV_mats(invV_mats):
             try:
                 V_mats_list[ix] = npl.inv(invV)
             except npl.LinAlgError:
-                print(ub.hzcat('ERROR: invV_mats[%d] = %s' % (ix, invV, )))
+                print(
+                    ub.hzcat(
+                        'ERROR: invV_mats[%d] = %s'
+                        % (
+                            ix,
+                            invV,
+                        )
+                    )
+                )
                 V_mats_list[ix] = np.nan(invV.shape)
         if ut.SUPER_STRICT:
             raise

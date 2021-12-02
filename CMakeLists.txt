@@ -39,7 +39,8 @@ get_os_info()
 if(OS_IS_MACOS)
   message(STATUS "INCLUDING HOMEBREW")
 
-  execute_process(COMMAND brew --prefix OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND brew --prefix
+                  OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
   message(STATUS "BREW_PREFIX = ${BREW_PREFIX}")
 
   include_directories("${BREW_PREFIX}/include")
