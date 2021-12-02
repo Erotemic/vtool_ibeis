@@ -3,7 +3,6 @@ from vtool.inspect_matches import lazy_test_annot
 from vtool.score_normalization import check_unused_kwargs
 from vtool.inspect_matches import INSPECT_BASE, MatchInspector
 
-# import wbia.guitool as gt
 import utool as ut
 import numpy as np
 import six
@@ -201,6 +200,7 @@ def match_inspect_graph():
     Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.inspect_matches import *  # NOQA
+        >>> import wbia.guitool as gt
         >>> import vtool as vt
         >>> gt.ensure_qapp()
         >>> ut.qtensure()
@@ -228,6 +228,8 @@ class MultiMatchInspector(INSPECT_BASE):
     # DEPRICATE
 
     def initialize(self, matches):
+        import wbia.guitool as gt
+
         self.matches = matches
 
         self.splitter = self.addNewSplitter(orientation='horiz')
@@ -249,6 +251,8 @@ class MultiMatchInspector(INSPECT_BASE):
         self.match_inspector.set_match(match)
 
     def populate_edge_model(self):
+        import wbia.guitool as gt
+
         edge_api = gt.CustomAPI(
             col_name_list=['index', 'aid1', 'aid2'],
             col_getter_dict={
