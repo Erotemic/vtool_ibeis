@@ -1,12 +1,12 @@
 annoy
 networkx
-numpy >= 1.11.1
-# opencv-python==3.4.11.41
-Pillow >= 5.2.0
+numpy
+opencv-contrib-python-headless
+Pillow
 scikit-image
 scikit-learn
 scipy
-six >= 1.10.0
+six
 statsmodels
 ubelt
 wbia-utool
