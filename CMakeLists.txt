@@ -37,18 +37,19 @@ dissect_version()
 get_os_info()
 
 if(OS_IS_MACOS)
-  message(STATUS "INCLUDING MACPORTS")
+  message(STATUS "INCLUDING HOMEBREW")
 
-  include_directories(/opt/local/include)
-  link_directories(/opt/local/lib)
+  include_directories(/opt/homebrew/include)
+  link_directories(/opt/homebrew/lib)
 
-  set(CMAKE_INSTALL_RPATH "/opt/local/lib")
+  set(CMAKE_INSTALL_RPATH "/opt/homebrew/lib")
 
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lc++")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++")
 endif()
+
 
 find_package(Eigen3)
 
@@ -98,19 +99,6 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOC "Build documentation" ON)
 option(USE_OPENMP "Use OpenMP multi-threading" ON)
 
-if(OS_IS_MACOS)
-  find_package(Gflags REQUIRED)
-  if(Gflags_FOUND
-     OR GFLAGS_FOUND
-     OR GFLAGS_INCLUDE_DIRS)
-    message(STATUS "GFLAGS_INCLUDE_DIR: ${GFLAGS_INCLUDE_DIR}")
-    message(STATUS "GFLAGS_LIBRARIES: ${GFLAGS_LIBRARIES}")
-    include_directories(${GFLAGS_INCLUDE_DIR})
-  else()
-    message(FATAL_ERROR "GFlags NOT found")
-  endif()
-endif()
-
 find_package(OpenCV REQUIRED)
 if(OpenCV_FOUND)
   include_directories(${OpenCV_INCLUDE_DIRS})
@@ -118,14 +106,16 @@ else()
   message(FATAL_ERROR "OpenCV NOT found")
 endif()
 
-find_package(OpenMP)
-if(OPENMP_FOUND)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  set(CMAKE_EXE_LINKER_FLAGS
-      "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-else()
-  message(WARNING "OpenMP NOT found")
+if(USE_OPENMP)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_CXX_LIBRARIES}")
+  else()
+    message(WARNING "OpenMP NOT found")
+  endif()
 endif()
 
 find_package(PkgConfig REQUIRED)

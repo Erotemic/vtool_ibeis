@@ -10,4 +10,4 @@ python -m pip install -r requirements/build.txt
 
 brew update
 
-brew install eigen gflags opencv libomp pkg-config
+brew install eigen opencv libomp pkg-config
