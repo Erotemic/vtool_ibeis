@@ -51,6 +51,7 @@ jobs:
       - name: Install dependencies (Linux)
         if: ${{ runner.os == 'Linux' }}
         run: |
+          sudo apt-get update
           sudo bash scripts/ci_prepare_linux_for_build.sh
 
       - name: Install dependencies (macOS)
