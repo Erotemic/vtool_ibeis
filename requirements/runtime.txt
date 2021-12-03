@@ -1,5 +1,4 @@
 annoy
-futures>=3.1.1
 networkx
 numpy
 opencv-contrib-python-headless
