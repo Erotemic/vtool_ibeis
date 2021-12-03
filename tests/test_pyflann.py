@@ -267,12 +267,6 @@ def test_pyflann_searches():
 
 
 def test_pyflann_tune():
-    """
-    Example:
-        >>> # ENABLE_DOCTEST
-        >>> result = test_pyflann_tune()
-        >>> print(result)
-    """
     print('Create random qpts and database data')
     pts = testdata_points(nPts=1009)
     qpts = testdata_points(nPts=7)
@@ -321,12 +315,6 @@ def test_pyflann_tune():
 
 
 def test_pyflann_io():
-    """
-    Example:
-        >>> # ENABLE_DOCTEST
-        >>> result = test_pyflann_io()
-        >>> print(result)
-    """
     # Create qpts and database data
     print('Create random qpts and database data')
     num_neighbors = 3
