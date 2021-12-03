@@ -34,7 +34,7 @@ fs_t = np.ctypeslib.ndpointer(dtype=fs_dtype, ndim=1, flags=FLAGS_RO)
 
 
 def inliers_t(ndim):
-    return np.ctypeslib.ndpointer(dtype=bool, ndim=ndim, flags=FLAGS_RW)
+    return np.ctypeslib.ndpointer(dtype=np.bool_, ndim=ndim, flags=FLAGS_RW)
 
 
 def errs_t(ndim):
@@ -135,7 +135,7 @@ def get_affine_inliers_cpp(
     # with ut.Timer('PreC'):
     num_matches = len(fm)
     fm = np.ascontiguousarray(fm, dtype=fm_dtype)
-    out_inlier_flags = np.empty((num_matches, num_matches), bool)
+    out_inlier_flags = np.empty((num_matches, num_matches), np.bool_)
     out_errors = np.empty((num_matches, 3, num_matches), np.float64)
     out_mats = np.empty((num_matches, 3, 3), np.float64)
     # with ut.Timer('C'):
@@ -166,7 +166,7 @@ def get_best_affine_inliers_cpp(
     # np.ascontiguousarray(kpts1)
     # with ut.Timer('PreC'):
     fm = np.ascontiguousarray(fm, dtype=fm_dtype)
-    out_inlier_flags = np.empty((len(fm),), bool)
+    out_inlier_flags = np.empty((len(fm),), np.bool_)
     out_errors = np.empty((3, len(fm)), np.float64)
     out_mat = np.empty((3, 3), np.float64)
     # with ut.Timer('C'):

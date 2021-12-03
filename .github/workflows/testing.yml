@@ -38,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, '3.10']
 
     steps:
       # Checkout and env setup
@@ -70,4 +70,13 @@ jobs:
 
       - name: Test project
         run: |
+          pytest -v tests/test_pyflann.py::test_pyflann_tune:0
+          pytest -v tests/test_pyflann.py::test_pyflann_io:0
+          pytest -v tests/test_pyflann.py::testdata_points
+          pytest -v tests/test_pyflann.py::test_pyflann_hkmeans
+          pytest -v tests/test_pyflann.py::test_pyflann_kmeans
+          pytest -v tests/test_pyflann.py::test_pyflann_add_point
+          pytest -v tests/test_pyflann.py::test_pyflann_searches
+          pytest -v tests/test_pyflann.py::test_pyflann_tune
+          pytest -v tests/test_pyflann.py::test_pyflann_io
           pytest
