@@ -18,6 +18,11 @@ file(GLOB_RECURSE CPP_SOURCES sver.cpp)
 add_library(sver_s STATIC ${CPP_SOURCES})
 target_link_libraries(sver_s ${OpenCV_LIBS})
 
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+target_link_libraries(sver_s Eigen3::Eigen)
+target_include_directories(sver_s PUBLIC ${EIGEN3_INCLUDE_DIR})
+
 if(OPENMP_FOUND)
   target_link_libraries(sver_s ${OpenMP_CXX_LIBRARIES})
 endif()
