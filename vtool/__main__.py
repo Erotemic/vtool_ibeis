@@ -7,15 +7,15 @@ def main():  # nocover
     print('vtool.__file__ = {!r}'.format(vtool.__file__))
     print('vtool.__version__ = {!r}'.format(vtool.__version__))
 
-    from vtool._pyflann_backend import pyflann
+    # from vtool._pyflann_backend import pyflann
 
-    print('pyflann = {!r}'.format(pyflann))
+    # print('pyflann = {!r}'.format(pyflann))
 
-    from vtool import sver_c_wrapper
+    # from vtool import sver_c_wrapper
 
-    print('sver_c_wrapper.lib_fname = {!r}'.format(sver_c_wrapper.lib_fname))
-    print('sver_c_wrapper.lib_fname_cand = {!r}'.format(sver_c_wrapper.lib_fname_cand))
-    print('sver_c_wrapper.c_sver = {!r}'.format(sver_c_wrapper.c_sver))
+    # print('sver_c_wrapper.lib_fname = {!r}'.format(sver_c_wrapper.lib_fname))
+    # print('sver_c_wrapper.lib_fname_cand = {!r}'.format(sver_c_wrapper.lib_fname_cand))
+    # print('sver_c_wrapper.c_sver = {!r}'.format(sver_c_wrapper.c_sver))
 
     try:
         import cv2
