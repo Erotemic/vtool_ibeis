@@ -84,7 +84,8 @@ if __name__ != '__main__':
     import subprocess
 
     print(lib_fname)
-    output = subprocess.run(['otool', '-L', lib_fname], check=True, text=True)
+    # output = subprocess.run(['otool', '-L', lib_fname], check=True, text=True)
+    output = subprocess.run(['ldd', '-d', lib_fname], check=True, text=True)
     print(output)
 
     try:
