@@ -81,6 +81,12 @@ if __name__ != '__main__':
             cmd_str = cmd_fmtstr.format(**locals())
             ut.cmd(cmd_str)
 
+    import subprocess
+
+    print(lib_fname)
+    output = subprocess.run(['otool', '-L', lib_fname], check=True, text=True)
+    print(output)
+
     try:
         c_sver = C.cdll[lib_fname]
     except Exception:
