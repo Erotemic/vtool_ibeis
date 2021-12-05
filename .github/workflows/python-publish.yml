@@ -30,7 +30,7 @@ jobs:
           CIBW_SKIP: pp* cp36-* *_i686 *_ppc64le *_s390x cp36-musllinux_* cp37-musllinux_* cp38-musllinux_* cp39-musllinux_* cp310-musllinux_* cp310-macosx_*
           CIBW_BEFORE_BUILD_LINUX: bash scripts/ci_prepare_linux_for_build.sh
           CIBW_BEFORE_BUILD_MACOS: bash scripts/ci_prepare_macos_for_build.sh
-          CIBW_TEST_COMMAND: python -c "import vtool; from vtool.__main__ import main; main()"
+          CIBW_TEST_COMMAND: PYTHONFAULTHANDLER=1 python -v -c "import vtool; from vtool.__main__ import main; main()"
         run: |
           python -m pip install cibuildwheel
           python -m cibuildwheel --output-dir wheelhouse
