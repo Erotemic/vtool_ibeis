@@ -18,11 +18,6 @@ file(GLOB_RECURSE CPP_SOURCES sver.cpp)
 add_library(sver_s STATIC ${CPP_SOURCES})
 target_link_libraries(sver_s ${OpenCV_LIBS})
 
-include_directories(${EIGEN3_INCLUDE_DIR})
-
-target_link_libraries(sver_s Eigen3::Eigen)
-target_include_directories(sver_s PUBLIC ${EIGEN3_INCLUDE_DIR})
-
 if(OPENMP_FOUND)
   target_link_libraries(sver_s ${OpenMP_CXX_LIBRARIES})
 endif()
@@ -32,6 +27,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
 endif()
 
 set_property(TARGET sver_s PROPERTY COMPILE_DEFINITIONS SVER_STATIC)
+set_property(TARGET sver_s PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 add_library(sver SHARED "${CMAKE_CURRENT_SOURCE_DIR}/sver/sver.h")
 

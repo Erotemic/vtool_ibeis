@@ -54,9 +54,6 @@ if(OS_IS_MACOS)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lc++")
 endif()
 
-find_package(Eigen3 3.3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
 # Setup basic python stuff and ensure we have skbuild list(INSERT
 # CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/CMake") include( skbuild-helpers )
 
@@ -70,6 +67,8 @@ endif()
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_COMPILER_IS_CLANGXX 1)
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
 
@@ -103,7 +102,8 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOC "Build documentation" ON)
 option(USE_OPENMP "Use OpenMP multi-threading" ON)
 
-find_package(OpenCV REQUIRED)
+FIND_PACKAGE(OpenCV REQUIRED core)
+
 if(OpenCV_FOUND)
   include_directories(${OpenCV_INCLUDE_DIRS})
 else()
