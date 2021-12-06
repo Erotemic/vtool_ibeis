@@ -102,7 +102,7 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOC "Build documentation" ON)
 option(USE_OPENMP "Use OpenMP multi-threading" ON)
 
-FIND_PACKAGE(OpenCV REQUIRED core)
+find_package(OpenCV REQUIRED core)
 
 if(OpenCV_FOUND)
   include_directories(${OpenCV_INCLUDE_DIRS})

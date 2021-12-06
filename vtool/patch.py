@@ -625,6 +625,7 @@ def get_warped_patches(
         >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool.patch import *  # NOQA
         >>> import vtool as vt
+        >>> import ubelt as ub
         >>> # build test data
         >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
         >>> img = vt.imread(img_fpath)

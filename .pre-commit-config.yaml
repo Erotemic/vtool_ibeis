@@ -20,11 +20,11 @@ repos:
         language: system
         types: [python]
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
+    rev: 3.9.2
     hooks:
       - id: flake8
   - repo: https://github.com/iconmaster5326/cmake-format-pre-commit-hook
-    rev: master
+    rev: v0.6.9
     hooks:
       - id: cmake-format
         exclude: >
@@ -32,7 +32,7 @@ repos:
               .*.cmake.in
           )$
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v4.0.1
     hooks:
       - id: requirements-txt-fixer
       - id: check-toml
@@ -41,7 +41,7 @@ repos:
       # - id: check-ast
       # - id: check-executables-have-shebangs
       # - id: check-docstring-first
-      - id: detect-aws-credentials
+      # - id: detect-aws-credentials
       - id: detect-private-key
       - id: double-quote-string-fixer
       - id: trailing-whitespace
