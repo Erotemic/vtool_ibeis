@@ -1149,8 +1149,8 @@ def flag_intersection(arr1, arr2):
     import vtool as vt
 
     if arr1.size == 0 or arr2.size == 0:
-        flags = np.full(arr1.shape[0], False, dtype=np.bool)
-        # return np.empty((0,), dtype=np.bool)
+        flags = np.full(arr1.shape[0], False, dtype=np.bool_)
+        # return np.empty((0,), dtype=np.bool_)
     else:
         # flags = np.logical_or.reduce([arr1 == row for row in arr2]).T[0]
         flags = vt.iter_reduce_ufunc(
@@ -1389,13 +1389,13 @@ def get_uncovered_mask(covered_array, covering_array):
     import vtool as vt
 
     if len(covering_array) == 0:
-        return np.ones(np.shape(covered_array), dtype=np.bool)
+        return np.ones(np.shape(covered_array), dtype=np.bool_)
     else:
         flags_iter = (np.not_equal(covered_array, item) for item in covering_array)
         mask_array = vt.iter_reduce_ufunc(np.logical_and, flags_iter)
         return mask_array
     # if len(covering_array) == 0:
-    #    return np.ones(np.shape(covered_array), dtype=np.bool)
+    #    return np.ones(np.shape(covered_array), dtype=np.bool_)
     # else:
     #    flags_list = (np.not_equal(covered_array, item) for item in covering_array)
     #    mask_array = and_lists(*flags_list)
@@ -1404,7 +1404,7 @@ def get_uncovered_mask(covered_array, covering_array):
 
 # def get_uncovered_mask2(covered_array, covering_array):
 #    if len(covering_array) == 0:
-#        return np.ones(np.shape(covered_array), dtype=np.bool)
+#        return np.ones(np.shape(covered_array), dtype=np.bool_)
 #    else:
 #        flags_iter = (np.not_equal(covered_array, item) for item in covering_array)
 #        mask_array = vt.iter_reduce_ufunc(np.logical_and, flags_iter)

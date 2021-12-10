@@ -244,7 +244,7 @@ def argsubextrema2(
 
     if thresh_factor is None:
         thresh_value = None
-        flags = np.ones(len(ydata), dtype=np.bool)
+        flags = np.ones(len(ydata), dtype=np.bool_)
     else:
         # Find relative and flat extrema
         thresh_value = factor_op(abs_extreme_y, thresh_factor)

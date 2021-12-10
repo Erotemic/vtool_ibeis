@@ -230,7 +230,7 @@ def index_to_boolmask(index_list, maxval=None, isflat=True):
     # assert index_list.min() >= 0
     if maxval is None:
         maxval = index_list.max()
-    mask = np.zeros(maxval, dtype=np.bool)
+    mask = np.zeros(maxval, dtype=np.bool_)
     if not isflat:
         # assumes non-flat
         mask.__setitem__(tuple(index_list.T), True)

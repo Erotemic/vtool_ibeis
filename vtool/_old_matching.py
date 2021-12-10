@@ -96,7 +96,7 @@
 #         if symmetric:
 #             valid_flags = flag_symmetric_matches(fx2_to_fx1, fx1_to_fx2, K)
 #         else:
-#             valid_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool)
+#             valid_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool_)
 
 #         # Assign matches
 #         assigntup = assign_unconstrained_matches(fx2_to_fx1, fx2_to_dist, K,

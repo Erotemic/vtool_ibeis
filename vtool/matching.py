@@ -619,7 +619,7 @@ class PairwiseMatch(ub.NiceRepr):
             ori_err = np.full(n_fm, fill_value=np.inf)
             agg_errors = (xy_err, scale_err, ori_err)
 
-            agg_inlier_flags = np.zeros(n_fm, dtype=np.bool)
+            agg_inlier_flags = np.zeros(n_fm, dtype=np.bool_)
 
             agg_H_12 = None
             prev_best = 50
@@ -1719,7 +1719,7 @@ def asymmetric_correspondence(annot1, annot2, K, Knorm, checks, allow_shrink=Tru
     fx2_to_fx1, fx2_to_dist = normalized_nearest_neighbors(
         annot1['flann'], annot2['vecs'], num_neighbors, checks
     )
-    fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool)
+    fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool_)
     # Assign correspondences
     assigntup = assign_unconstrained_matches(
         fx2_to_fx1, fx2_to_dist, K, Knorm, fx2_to_flags
@@ -1953,7 +1953,7 @@ def assign_unconstrained_matches(
         # make everything valid
         flat_validx = np.arange(len(fx2_to_fx1) * K, dtype=index_dtype)
     else:
-        # fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool)
+        # fx2_to_flags = np.ones((len(fx2_to_fx1), K), dtype=np.bool_)
         flat_validx = np.flatnonzero(fx2_to_flags)
 
     match_fx2 = np.floor_divide(flat_validx, K, dtype=index_dtype)
@@ -1995,7 +1995,7 @@ def flag_sym_slow(fx1_to_fx2, fx2_to_fx1, K):
         fx2_m = fx1_to_fx2[fx1, :K]
         # Find img2 features that have fx1 in their top K
         reverse_m = fx2_to_fx1[fx2_m, :K]
-        is_recip = (reverse_m == fx1).sum(axis=1).astype(np.bool)
+        is_recip = (reverse_m == fx1).sum(axis=1).astype(np.bool_)
         fx1_to_flags.append(is_recip)
     fx1_to_flags = np.array(fx1_to_flags)
     return fx1_to_flags

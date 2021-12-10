@@ -3095,7 +3095,7 @@ def testdata_binary_scores():
             1,
             1,
         ],
-        dtype=np.bool,
+        dtype=np.bool_,
     )
     return X, y
 

@@ -398,7 +398,7 @@ class ConfusionMetrics(ub.NiceRepr):
         scores = np.asarray(scores)
         labels = np.asarray(labels)
         # must be binary
-        labels = labels.astype(np.bool)
+        labels = labels.astype(np.bool_)
         if verbose:
             print('[confusion] building confusion metrics.')
             print(
