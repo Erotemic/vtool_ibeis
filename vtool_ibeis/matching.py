@@ -346,6 +346,11 @@ class PairwiseMatch(ub.NiceRepr):
             >>> # xdoctest: +REQUIRES(--show)
             >>> gt.qtapp_loop(qwin=self, freq=10)
         """
+        try:
+            import guitool_ibeis as gt  # NOQA
+        except Exception:
+            print('guitool_ibeis is required for ishow')
+            raise
         from vtool_ibeis.inspect_matches import MatchInspector
         self = MatchInspector(match=match)
         self.show()
