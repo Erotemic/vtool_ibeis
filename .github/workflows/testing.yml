@@ -70,4 +70,4 @@ jobs:
 
       - name: Test project
         run: |
-          pytest
+          PYTHONFAULTHANDLER=1 pytest
