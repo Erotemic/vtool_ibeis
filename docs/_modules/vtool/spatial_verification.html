@@ -1,48 +1,82 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>vtool.spatial_verification &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool.spatial_verification &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool.spatial_verification</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for vtool.spatial_verification</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Spatial verification of keypoint matches</span>
 
-<span class="sd">Notation::</span>
+<span class="sd">Notation:</span>
 <span class="sd">    1_m = img1_matches; 2_m = img2_matches</span>
 <span class="sd">    x and y are locations, invV is the elliptical shapes.</span>
 <span class="sd">    fx are the original feature indexes (used for making sure 1 keypoint isn&#39;t assigned to 2)</span>
 
-<span class="sd">Look Into::</span>
+<span class="sd">Look Into:</span>
 <span class="sd">    Standard</span>
 <span class="sd">    skimage.transform</span>
 <span class="sd">    http://stackoverflow.com/questions/11462781/fast-2d-rigid-body-transformations-in-numpy-scipy</span>
@@ -60,8 +94,8 @@
 <span class="sd">    Invariants of affine transforms - parallel lines, ratios of parallel lengths, ratios of areas</span>
 <span class="sd">    Invariants of homographies - cross‐ratio of four points on a line (ratio of ratio)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">warnings</span>  <span class="c1"># NOQA</span>
 <span class="kn">import</span> <span class="nn">six</span>  <span class="c1"># NOQA</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
@@ -69,15 +103,13 @@
 <span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="k">as</span> <span class="nn">npl</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sps</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">spsl</span>
-<span class="kn">from</span> <span class="nn">numpy.core.umath_tests</span> <span class="k">import</span> <span class="n">matrix_multiply</span>
 <span class="kn">import</span> <span class="nn">vtool.keypoint</span> <span class="k">as</span> <span class="nn">ktool</span>
 <span class="kn">import</span> <span class="nn">vtool.linalg</span> <span class="k">as</span> <span class="nn">ltool</span>
 <span class="kn">import</span> <span class="nn">vtool.distance</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
-<span class="kn">from</span> <span class="nn">.util_math</span> <span class="k">import</span> <span class="n">TAU</span>
+<span class="kn">from</span> <span class="nn">.util_math</span> <span class="kn">import</span> <span class="n">TAU</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">sver_c_wrapper</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">sver_c_wrapper</span>
 
     <span class="n">HAVE_SVER_C_WRAPPER</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">ut</span><span class="o">.</span><span class="n">get_argflag</span><span class="p">(</span><span class="s1">&#39;--no-c&#39;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
@@ -95,7 +127,7 @@
 
 
 <div class="viewcode-block" id="build_lstsqrs_Mx9"><a class="viewcode-back" href="../../vtool.html#vtool.spatial_verification.build_lstsqrs_Mx9">[docs]</a><span class="k">def</span> <span class="nf">build_lstsqrs_Mx9</span><span class="p">(</span><span class="n">xy1_mn</span><span class="p">,</span> <span class="n">xy2_mn</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Builds the M x 9 least squares matrix</span>
+    <span class="sd">&quot;&quot;&quot;Builds the M x 9 least squares matrix</span>
 
 <span class="sd">    CommandLine:</span>
 <span class="sd">        python -m vtool.spatial_verification --test-build_lstsqrs_Mx9</span>
@@ -215,16 +247,16 @@
 <span class="sd">        &gt;&gt;&gt; result = ut.hashstr(Mx6)</span>
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 
-<span class="sd">    Sympy:</span>
-<span class="sd">        import sympy as sym</span>
-<span class="sd">        x1, y1, x2, y2 = sym.symbols(&#39;x1, y1, x2, y2&#39;)</span>
-<span class="sd">        A = sym.Matrix([</span>
-<span class="sd">            [x1, y1,  0,  0, 1, 0],</span>
-<span class="sd">            [ 0,  0, x1, y1, 0, 1],</span>
-<span class="sd">        ])</span>
-<span class="sd">        b = sym.Matrix([[x2], [y2]])</span>
-<span class="sd">        x = (A.T.multiply(A)).inv().multiply(A.T.multiply(b))</span>
-<span class="sd">        x = (A.T.multiply(A)).pinv().multiply(A.T.multiply(b))</span>
+<span class="sd">    Ignore:</span>
+<span class="sd">        &gt;&gt;&gt; import sympy as sym</span>
+<span class="sd">        &gt;&gt;&gt; x1, y1, x2, y2 = sym.symbols(&#39;x1, y1, x2, y2&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; A = sym.Matrix([</span>
+<span class="sd">        &gt;&gt;&gt;     [x1, y1,  0,  0, 1, 0],</span>
+<span class="sd">        &gt;&gt;&gt;     [ 0,  0, x1, y1, 0, 1],</span>
+<span class="sd">        &gt;&gt;&gt; ])</span>
+<span class="sd">        &gt;&gt;&gt; b = sym.Matrix([[x2], [y2]])</span>
+<span class="sd">        &gt;&gt;&gt; x = (A.T.multiply(A)).inv().multiply(A.T.multiply(b))</span>
+<span class="sd">        &gt;&gt;&gt; x = (A.T.multiply(A)).pinv().multiply(A.T.multiply(b))</span>
 
 <span class="sd">    References:</span>
 <span class="sd">        https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf page 22</span>
@@ -265,7 +297,7 @@
     <span class="n">Sinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">Vt</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">U</span><span class="p">)))</span>
     <span class="n">Sinv</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">s</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">Vt</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Sinv</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">]],</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],])</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">]],</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
     <span class="k">return</span> <span class="n">A</span></div>
     <span class="c1"># TODO FIXME</span>
     <span class="c1"># return Mx6</span>
@@ -296,7 +328,7 @@
 <span class="sd">        &gt;&gt;&gt; result = np.array_str(A, precision=2)</span>
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool.demodata as demodata</span>
@@ -363,7 +395,7 @@
 <span class="sd">         [  2.82e-03   1.80e-03  -7.03e-01]</span>
 <span class="sd">         [  1.67e-05   1.68e-05  -5.53e-03]]</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool.keypoint as ktool</span>
@@ -464,7 +496,7 @@
 <span class="sd">        &gt;&gt;&gt; RV1s_m = ktool.get_RV_mats_3x3(kpts1_m)</span>
 <span class="sd">        &gt;&gt;&gt; invVR2s_m = ktool.get_invVR_mats3x3(kpts2_m)</span>
 <span class="sd">        &gt;&gt;&gt; # The transform from kp1 to kp2 is given as:</span>
-<span class="sd">        &gt;&gt;&gt; Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)</span>
+<span class="sd">        &gt;&gt;&gt; Aff_mats = np.matmul(invVR2s_m, RV1s_m)</span>
 <span class="sd">        &gt;&gt;&gt; Aff = Aff_mats[0]</span>
 <span class="sd">        &gt;&gt;&gt; # Get components to test projects against</span>
 <span class="sd">        &gt;&gt;&gt; xy2_m  = ktool.get_invVR_mats_xys(invVR2s_m)</span>
@@ -480,13 +512,13 @@
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Map keypoints from image 1 onto image 2</span>
-    <span class="n">invVR1s_mt</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">Aff</span><span class="p">,</span> <span class="n">invVR1s_m</span><span class="p">)</span>
+    <span class="n">invVR1s_mt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Aff</span><span class="p">,</span> <span class="n">invVR1s_m</span><span class="p">)</span>
 
     <span class="c1"># Get projection components</span>
     <span class="n">_xy1_mt</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_invVR_mats_xys</span><span class="p">(</span><span class="n">invVR1s_mt</span><span class="p">)</span>
     <span class="n">_det1_mt</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_invVR_mats_sqrd_scale</span><span class="p">(</span><span class="n">invVR1s_mt</span><span class="p">)</span>
     <span class="n">_ori1_mt</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_invVR_mats_oris</span><span class="p">(</span><span class="n">invVR1s_mt</span><span class="p">)</span>
-    <span class="c1">## Check for projection errors</span>
+    <span class="c1"># # Check for projection errors</span>
     <span class="n">xy_err</span> <span class="o">=</span> <span class="n">vtool</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">L2_sqrd</span><span class="p">(</span><span class="n">xy2_m</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">_xy1_mt</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">SV_DTYPE</span><span class="p">)</span>
     <span class="n">scale_err</span> <span class="o">=</span> <span class="n">vtool</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">det_distance</span><span class="p">(</span><span class="n">_det1_mt</span><span class="p">,</span> <span class="n">det2_m</span><span class="p">)</span>
     <span class="n">ori_err</span> <span class="o">=</span> <span class="n">vtool</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">ori_distance</span><span class="p">(</span><span class="n">_ori1_mt</span><span class="p">,</span> <span class="n">ori2_m</span><span class="p">)</span>
@@ -497,7 +529,7 @@
     <span class="n">ori_inliers_flag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">ori_err</span><span class="p">,</span> <span class="n">ori_thresh</span><span class="p">)</span>
     <span class="c1"># np.logical_and(xy_inliers_flag, scale_inliers_flag)</span>
     <span class="c1"># TODO Add uniqueness of matches constraint</span>
-    <span class="c1"># hypo_inliers_flag = np.empty(xy_inliers_flag.size, dtype=np.bool)</span>
+    <span class="c1"># hypo_inliers_flag = np.empty(xy_inliers_flag.size, dtype=np.bool_)</span>
     <span class="n">hypo_inliers_flag</span> <span class="o">=</span> <span class="n">xy_inliers_flag</span>  <span class="c1"># Try to re-use memory</span>
     <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">hypo_inliers_flag</span><span class="p">,</span> <span class="n">ori_inliers_flag</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">hypo_inliers_flag</span><span class="p">)</span>
     <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">hypo_inliers_flag</span><span class="p">,</span> <span class="n">scale_inliers_flag</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">hypo_inliers_flag</span><span class="p">)</span>
@@ -523,7 +555,7 @@
 <span class="sd">        tuple: aff_inliers_list, aff_errors_list, Aff_mats</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">        FROM PERDOCH 2009::</span>
+<span class="sd">        FROM PERDOCH 2009:</span>
 <span class="sd">            H = inv(Aj).dot(Rj.T).dot(Ri).dot(Ai)</span>
 <span class="sd">            H = inv(Aj).dot(Ai)</span>
 <span class="sd">            The input invVs = perdoch.invA&#39;s</span>
@@ -562,7 +594,7 @@
     <span class="n">invVR1s_m</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_invVR_mats3x3</span><span class="p">(</span><span class="n">kpts1_m</span><span class="p">)</span>
     <span class="n">RV1s_m</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">invert_invV_mats</span><span class="p">(</span><span class="n">invVR1s_m</span><span class="p">)</span>  <span class="c1"># 539 us</span>
     <span class="c1"># BUILD ALL HYPOTHESIS TRANSFORMS: The transform from kp1 to kp2 is:</span>
-    <span class="n">Aff_mats</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">invVR2s_m</span><span class="p">,</span> <span class="n">RV1s_m</span><span class="p">)</span>
+    <span class="n">Aff_mats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">invVR2s_m</span><span class="p">,</span> <span class="n">RV1s_m</span><span class="p">)</span>
     <span class="c1"># Get components to test projects against</span>
     <span class="n">xy2_m</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_xys</span><span class="p">(</span><span class="n">kpts2_m</span><span class="p">)</span>
     <span class="n">det2_m</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_sqrd_scales</span><span class="p">(</span><span class="n">kpts2_m</span><span class="p">)</span>
@@ -599,8 +631,7 @@
 <div class="viewcode-block" id="get_best_affine_inliers"><a class="viewcode-back" href="../../vtool.html#vtool.spatial_verification.get_best_affine_inliers">[docs]</a><span class="k">def</span> <span class="nf">get_best_affine_inliers</span><span class="p">(</span>
     <span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">fm</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">xy_thresh_sqrd</span><span class="p">,</span> <span class="n">scale_thresh</span><span class="p">,</span> <span class="n">ori_thresh</span><span class="p">,</span> <span class="n">forcepy</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Tests each hypothesis and returns only the best transformation and inliers</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Tests each hypothesis and returns only the best transformation and inliers&quot;&quot;&quot;</span>
     <span class="c1"># Test each affine hypothesis</span>
     <span class="c1"># get list if inliers, errors, the affine matrix for each hypothesis</span>
     <span class="k">if</span> <span class="n">HAVE_SVER_C_WRAPPER</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">forcepy</span><span class="p">:</span>
@@ -660,11 +691,13 @@
 
 
 <div class="viewcode-block" id="estimate_refined_transform"><a class="viewcode-back" href="../../vtool.html#vtool.spatial_verification.estimate_refined_transform">[docs]</a><span class="k">def</span> <span class="nf">estimate_refined_transform</span><span class="p">(</span><span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">fm</span><span class="p">,</span> <span class="n">aff_inliers</span><span class="p">,</span> <span class="n">refine_method</span><span class="o">=</span><span class="s1">&#39;homog&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; estimates final transformation using normalized affine inliers</span>
+    <span class="sd">&quot;&quot;&quot;estimates final transformation using normalized affine inliers</span>
 
 <span class="sd">    References:</span>
 <span class="sd">        http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+
     <span class="n">xy1_man</span><span class="p">,</span> <span class="n">xy2_man</span><span class="p">,</span> <span class="n">T1</span><span class="p">,</span> <span class="n">T2</span> <span class="o">=</span> <span class="n">get_normalized_affine_inliers</span><span class="p">(</span>
         <span class="n">kpts1</span><span class="p">,</span> <span class="n">kpts2</span><span class="p">,</span> <span class="n">fm</span><span class="p">,</span> <span class="n">aff_inliers</span>
     <span class="p">)</span>
@@ -695,7 +728,6 @@
     <span class="c1"># H_prime /= H_prime[2, 2]</span>
     <span class="c1"># Different methods?</span>
     <span class="c1"># H_prime = compute_affine(xy1_man, xy2_man)</span>
-    <span class="c1"># import cv2</span>
     <span class="c1"># H_prime = cv2.findHomography(xy1_man.T, xy2_man.T)[0]</span>
     <span class="c1"># H = compute_affine(xy1_ma, xy2_ma)</span>
     <span class="c1"># print(H)</span>
@@ -740,7 +772,7 @@
 <span class="sd">        python -m vtool.spatial_verification --test-test_homog_errors:1 --show --rotation_invariance --xy-thresh=.001</span>
 <span class="sd">        python -m vtool.spatial_verification --test-test_homog_errors:0 --show --rotation_invariance --xy-thresh=.001</span>
 
-<span class="sd">    Example0:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
@@ -754,7 +786,7 @@
 <span class="sd">        &gt;&gt;&gt; pt.draw_sv.show_sv(rchip1, rchip2, kpts1, kpts2, fm, homog_tup=homog_tup)</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
@@ -909,7 +941,7 @@
 <span class="sd">        python -m vtool.spatial_verification --test-refine_inliers:0</span>
 <span class="sd">        python -m vtool.spatial_verification --test-refine_inliers:1 --show</span>
 
-<span class="sd">    Example0:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool.demodata as demodata</span>
@@ -924,7 +956,7 @@
 <span class="sd">        &gt;&gt;&gt; result = ub.repr2(homogtup, precision=2, nl=True, suppress_small=True, nobr=True)</span>
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool.keypoint as ktool</span>
@@ -1023,7 +1055,7 @@
 <span class="sd">        python -m xdoctest vtool.spatial_verification spatially_verify_kpts:0</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:pyhesaff)</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.spatial_verification import *</span>
 <span class="sd">        &gt;&gt;&gt; import vtool.demodata as demodata</span>
 <span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
@@ -1184,71 +1216,31 @@
     <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Wild Me.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

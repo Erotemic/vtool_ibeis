@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 from sphinx.ext.autodoc import between
-import alabaster  # NOQA
+from datetime import date
 import sys
 import os
+
+try:
+    from importlib.metadata import version
+    __version__ = version('wbia-vtool')
+except Exception:
+    __version__ = 'latest'
 
 sys.path.append(sys.path.insert(0, os.path.abspath('../')))
 
@@ -12,7 +18,10 @@ modindex_common_prefix = ['_']
 
 master_doc = 'index'
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [
+    '_themes',
+]
 
 html_sidebars = {
     '**': [
@@ -27,15 +36,10 @@ html_sidebars = {
 # -- Project information -----------------------------------------------------
 
 project = 'wbia-vtool'
-copyright = '2020, Wild Me'
-author = 'Jon Crall, Jason Parham, Drew Blount, Michael Mulich, Karen Chan, Avi Weinstock, Chuck Stewart, Hendrik Weideman, Zackary Rutfield, WildMe Developers'
-
-# The short X.Y version
-version = '3.2.1'
-
-# The full version, including alpha/beta/rc tags
-release = '3.2.1'
-
+copyright = f'{date.today().year}, Wild Me'
+author = 'Wild Me (wildme.org)'
+version = __version__
+release = version
 
 # -- General configuration ---------------------------------------------------
 
@@ -48,18 +52,25 @@ if len(MOCK_MODULES) > 0:
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.autosectionlabel',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    # For LaTeX
+    'sphinx.ext.doctest',
     'sphinx.ext.imgmath',
+    'sphinx.ext.todo',
     # For Google Sytle Docstrs
-    # https://pypi.python.org/pypi/sphinxcontrib-napoleon
     'sphinx.ext.napoleon',
     'alabaster',
 ]
 
-
 # -- Extension configuration -------------------------------------------------
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+}
+
+autosectionlabel_prefix_document = True
 
 # -- Options for todo extension ----------------------------------------------
 

@@ -1,56 +1,90 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>vtool.image &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool.image &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool.image</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for vtool.image</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># LICENCE</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span>  <span class="c1"># NOQA</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">splitext</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">map</span><span class="p">,</span> <span class="nb">range</span>  <span class="c1"># NOQA</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">join</span>  <span class="c1"># NOQA</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">splitext</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">map</span><span class="p">,</span> <span class="nb">range</span>  <span class="c1"># NOQA</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
-<span class="kn">from</span> <span class="nn">.util_math</span> <span class="k">import</span> <span class="n">TAU</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">exif</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">.util_math</span> <span class="kn">import</span> <span class="n">TAU</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">exif</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
 <span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
 
 
-<span class="k">if</span> <span class="n">cv2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
 
     <span class="n">CV2_INTERPOLATION_TYPES</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;nearest&#39;</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">,</span>
@@ -78,14 +112,14 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">IMREAD_COLOR</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_COLOR</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">distutils.version</span> <span class="k">import</span> <span class="n">LooseVersion</span>
+        <span class="kn">from</span> <span class="nn">distutils.version</span> <span class="kn">import</span> <span class="n">LooseVersion</span>
 
         <span class="n">cv2_version</span> <span class="o">=</span> <span class="n">LooseVersion</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;UNKNOWN cv2_version = </span><span class="si">{!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cv2_version</span><span class="p">))</span>
         <span class="k">assert</span> <span class="n">cv2_version</span><span class="o">.</span><span class="n">version</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span>
         <span class="n">IMREAD_COLOR</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_LOAD_IMAGE_COLOR</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="c1"># Hacks</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR: import cv2 is failing!&#39;</span><span class="p">)</span>
     <span class="n">cv2</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">DynStruct</span><span class="p">()</span>
     <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">cv2</span><span class="o">.</span><span class="n">INTER_LANCZOS4</span> <span class="o">=</span> <span class="kc">None</span>
@@ -116,7 +150,7 @@
 
 
 <span class="k">def</span> <span class="nf">_rectify_border_mode</span><span class="p">(</span><span class="n">border_mode</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts argument to cv2 style &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Converts argument to cv2 style&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">border_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">default</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">border_mode</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
@@ -502,7 +536,7 @@
 
 
 <div class="viewcode-block" id="imread_remote_url"><a class="viewcode-back" href="../../vtool.html#vtool.image.imread_remote_url">[docs]</a><span class="k">def</span> <span class="nf">imread_remote_url</span><span class="p">(</span><span class="n">img_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">urllib</span>
+    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="n">urllib</span>
     <span class="kn">import</span> <span class="nn">io</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;USE PIL REMOTE&#39;</span><span class="p">)</span>
@@ -623,7 +657,7 @@
         <span class="k">if</span> <span class="n">fallback</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">imwrite_fallback</span><span class="p">(</span><span class="n">img_fpath</span><span class="p">,</span> <span class="n">imgBGR</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;[vt.image] ERROR writing: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">img_fpath</span><span class="p">,)</span>
         <span class="n">ut</span><span class="o">.</span><span class="n">printex</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;imgBGR.shape&#39;</span><span class="p">])</span>
@@ -644,13 +678,13 @@
 
 
 <div class="viewcode-block" id="get_size"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_size">[docs]</a><span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns the image size in (width, height) &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Returns the image size in (width, height)&quot;&quot;&quot;</span>
     <span class="n">wh</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">wh</span></div>
 
 
 <div class="viewcode-block" id="get_num_channels"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_num_channels">[docs]</a><span class="k">def</span> <span class="nf">get_num_channels</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns the number of color channels &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of color channels&quot;&quot;&quot;</span>
     <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">nChannels</span> <span class="o">=</span> <span class="mi">1</span>
@@ -734,30 +768,30 @@
 <span class="sd">        size = (800, 441)</span>
 
 <span class="sd">    Ignore:</span>
-<span class="sd">        # Confirm that Image.open is a lazy load</span>
-<span class="sd">        import vtool as vt</span>
-<span class="sd">        import utool as ut</span>
-<span class="sd">        import timeit</span>
-<span class="sd">        setup = ut.codeblock(</span>
-<span class="sd">            &#39;&#39;&#39;</span>
-<span class="sd">            from PIL import Image</span>
-<span class="sd">            import utool as ut</span>
-<span class="sd">            import vtool as vt</span>
-<span class="sd">            image_fpath = ut.grab_test_imgpath(&#39;patsy.jpg&#39;)</span>
-<span class="sd">            &#39;&#39;&#39;</span>
-<span class="sd">        )</span>
-<span class="sd">        t1 = timeit.timeit(&#39;Image.open(image_fpath)&#39;, setup, number=100)</span>
-<span class="sd">        t2 = timeit.timeit(&#39;Image.open(image_fpath).size&#39;, setup, number=100)</span>
-<span class="sd">        t3 = timeit.timeit(&#39;vt.open_image_size(image_fpath)&#39;, setup, number=100)</span>
-<span class="sd">        t4 = timeit.timeit(&#39;vt.imread(image_fpath).shape&#39;, setup, number=100)</span>
-<span class="sd">        t5 = timeit.timeit(&#39;Image.open(image_fpath).getdata()&#39;, setup, number=100)</span>
-<span class="sd">        print(&#39;t1 = %r&#39; % (t1,))</span>
-<span class="sd">        print(&#39;t2 = %r&#39; % (t2,))</span>
-<span class="sd">        print(&#39;t3 = %r&#39; % (t3,))</span>
-<span class="sd">        print(&#39;t4 = %r&#39; % (t4,))</span>
-<span class="sd">        print(&#39;t5 = %r&#39; % (t5,))</span>
-<span class="sd">        assert t2 &lt; t5</span>
-<span class="sd">        assert t3 &lt; t4</span>
+<span class="sd">        &gt;&gt;&gt; # Confirm that Image.open is a lazy load</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; import utool as ut</span>
+<span class="sd">        &gt;&gt;&gt; import timeit</span>
+<span class="sd">        &gt;&gt;&gt; setup = ut.codeblock(</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;&#39;&#39;</span>
+<span class="sd">        &gt;&gt;&gt;     from PIL import Image</span>
+<span class="sd">        &gt;&gt;&gt;     import utool as ut</span>
+<span class="sd">        &gt;&gt;&gt;     import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt;     image_fpath = ut.grab_test_imgpath(&#39;patsy.jpg&#39;)</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;&#39;&#39;</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
+<span class="sd">        &gt;&gt;&gt; t1 = timeit.timeit(&#39;Image.open(image_fpath)&#39;, setup, number=100)</span>
+<span class="sd">        &gt;&gt;&gt; t2 = timeit.timeit(&#39;Image.open(image_fpath).size&#39;, setup, number=100)</span>
+<span class="sd">        &gt;&gt;&gt; t3 = timeit.timeit(&#39;vt.open_image_size(image_fpath)&#39;, setup, number=100)</span>
+<span class="sd">        &gt;&gt;&gt; t4 = timeit.timeit(&#39;vt.imread(image_fpath).shape&#39;, setup, number=100)</span>
+<span class="sd">        &gt;&gt;&gt; t5 = timeit.timeit(&#39;Image.open(image_fpath).getdata()&#39;, setup, number=100)</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;t1 = %r&#39; % (t1,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;t2 = %r&#39; % (t2,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;t3 = %r&#39; % (t3,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;t4 = %r&#39; % (t4,))</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;t5 = %r&#39; % (t5,))</span>
+<span class="sd">        &gt;&gt;&gt; assert t2 &lt; t5</span>
+<span class="sd">        &gt;&gt;&gt; assert t3 &lt; t4</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">pil_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_fpath</span><span class="p">)</span>
@@ -810,21 +844,19 @@
 <span class="sd">        &gt;&gt;&gt; pt.imshow(warped_img)</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 
-<span class="sd">    Timeit:</span>
-<span class="sd">        import skimage.transform</span>
-<span class="sd">        %timeit cv2.warpAffine(img, Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)</span>
-<span class="sd">        100 loops, best of 3: 7.95 ms per loop</span>
-<span class="sd">        skimage.transform.AffineTransform</span>
-<span class="sd">        tf = skimage.transform.AffineTransform(rotation=TAU / 8)</span>
-<span class="sd">        Aff_ = tf.params</span>
-<span class="sd">        out = skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode=&#39;constant&#39;, order=1)</span>
-<span class="sd">        %timeit skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode=&#39;constant&#39;, order=1)</span>
-<span class="sd">        100 loops, best of 3: 5.74 ms per loop</span>
-<span class="sd">        %timeit cv2.warpAffine(img[:, :, 0], Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)</span>
-<span class="sd">        100 loops, best of 3: 5.13 ms per loop</span>
-
-<span class="sd">        CONCLUSION, cv2 transforms are better</span>
-
+<span class="sd">    Ignore:</span>
+<span class="sd">        &gt;&gt;&gt; import skimage.transform</span>
+<span class="sd">        &gt;&gt;&gt; %timeit cv2.warpAffine(img, Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)</span>
+<span class="sd">        &gt;&gt;&gt; 100 loops, best of 3: 7.95 ms per loop</span>
+<span class="sd">        &gt;&gt;&gt; skimage.transform.AffineTransform</span>
+<span class="sd">        &gt;&gt;&gt; tf = skimage.transform.AffineTransform(rotation=TAU / 8)</span>
+<span class="sd">        &gt;&gt;&gt; Aff_ = tf.params</span>
+<span class="sd">        &gt;&gt;&gt; out = skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode=&#39;constant&#39;, order=1)</span>
+<span class="sd">        &gt;&gt;&gt; %timeit skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode=&#39;constant&#39;, order=1)</span>
+<span class="sd">        &gt;&gt;&gt; 100 loops, best of 3: 5.74 ms per loop</span>
+<span class="sd">        &gt;&gt;&gt; %timeit cv2.warpAffine(img[:, :, 0], Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)</span>
+<span class="sd">        &gt;&gt;&gt; 100 loops, best of 3: 5.13 ms per loop</span>
+<span class="sd">        &gt;&gt;&gt; CONCLUSION, cv2 transforms are better</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">warped_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">warpAffine</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">Aff</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dsize</span><span class="p">),</span> <span class="o">**</span><span class="n">CV2_WARP_KWARGS</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">assume_float01</span> <span class="ow">and</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
@@ -1231,7 +1263,7 @@
 <span class="sd">        &gt;&gt;&gt;     pt.imshow(imgR * 255, pnum=(1, 2, 2))</span>
 <span class="sd">        &gt;&gt;&gt;     pt.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
 
     <span class="n">border_mode</span> <span class="o">=</span> <span class="n">_rectify_border_mode</span><span class="p">(</span><span class="n">border_mode</span><span class="p">)</span>
     <span class="n">interpolation</span> <span class="o">=</span> <span class="n">_rectify_interpolation</span><span class="p">(</span><span class="n">interpolation</span><span class="p">)</span>
@@ -1274,7 +1306,7 @@
 <span class="sd">        &gt;&gt;&gt; pt.imshow(imgSh)</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
 
     <span class="k">if</span> <span class="n">dsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dsize</span> <span class="o">=</span> <span class="n">get_size</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
@@ -1328,7 +1360,7 @@
 <span class="sd">        &gt;&gt;&gt; pt.imshow((img_warped * 255.0).astype(np.uint8))</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
 
     <span class="k">if</span> <span class="n">dsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1381,7 +1413,7 @@
 
 
 <div class="viewcode-block" id="rectify_to_float01"><a class="viewcode-back" href="../../vtool.html#vtool.image.rectify_to_float01">[docs]</a><span class="k">def</span> <span class="nf">rectify_to_float01</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ensure that an image is encoded using a float properly &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Ensure that an image is encoded using a float properly&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">img</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">255</span>
         <span class="n">img_</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
@@ -1391,7 +1423,7 @@
 
 
 <div class="viewcode-block" id="rectify_to_uint8"><a class="viewcode-back" href="../../vtool.html#vtool.image.rectify_to_uint8">[docs]</a><span class="k">def</span> <span class="nf">rectify_to_uint8</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ensure that an image is encoded in uint8 properly &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Ensure that an image is encoded in uint8 properly&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">img</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mf">1.0</span> <span class="ow">or</span> <span class="n">img</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1701,7 +1733,7 @@
     <span class="c1"># print(&#39;target_origin = %r&#39; % (target_origin,))</span>
     <span class="c1"># print(&#39;target_origin_abs = %r&#39; % (target_origin_abs,))</span>
 
-    <span class="c1">## Find start slice in the target image</span>
+    <span class="c1"># # Find start slice in the target image</span>
     <span class="n">target_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">target_origin_abs</span> <span class="o">-</span> <span class="n">img_origin_abs</span><span class="p">)</span>
     <span class="n">target_rc_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">target_diff</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 
@@ -1727,7 +1759,7 @@
     <span class="c1">##-np.minimum(np.floor(img_origin_abs - target_origin_abs), 0)</span>
     <span class="c1">##img_origin_abs - target_rc_overhang</span>
 
-    <span class="c1">## Find start slice in the given image</span>
+    <span class="c1"># # Find start slice in the given image</span>
     <span class="c1"># img_rc_start = img_rc - target_rc_overhang</span>
     <span class="c1"># cliped_img_rc = img_rc - img_rc_start</span>
 
@@ -1749,7 +1781,7 @@
 
 
 <span class="k">def</span> <span class="nf">_trimread</span><span class="p">(</span><span class="n">gpath</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Try an imread &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Try an imread&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">imread</span><span class="p">(</span><span class="n">gpath</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -1757,7 +1789,7 @@
 
 
 <div class="viewcode-block" id="get_scale_factor"><a class="viewcode-back" href="../../vtool.html#vtool.image.get_scale_factor">[docs]</a><span class="k">def</span> <span class="nf">get_scale_factor</span><span class="p">(</span><span class="n">src_img</span><span class="p">,</span> <span class="n">dst_img</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns scale factor from one image to the next &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;returns scale factor from one image to the next&quot;&quot;&quot;</span>
     <span class="n">src_h</span><span class="p">,</span> <span class="n">src_w</span> <span class="o">=</span> <span class="n">src_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">dst_h</span><span class="p">,</span> <span class="n">dst_w</span> <span class="o">=</span> <span class="n">dst_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">sx</span> <span class="o">=</span> <span class="n">dst_w</span> <span class="o">/</span> <span class="n">src_w</span>
@@ -1950,7 +1982,7 @@
 <span class="sd">        &gt;&gt;&gt; pt.imshow(img)</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.image import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
@@ -2055,7 +2087,7 @@
     <span class="c1"># from PIL import Image</span>
 
     <span class="k">class</span> <span class="nc">PerlinNoiseGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
             <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">256</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span> <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
@@ -2268,7 +2300,7 @@
     <span class="n">modifysize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">interpolation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; combines images that are already stacked &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;combines images that are already stacked&quot;&quot;&quot;</span>
     <span class="n">interpolation</span> <span class="o">=</span> <span class="n">_rectify_interpolation</span><span class="p">(</span><span class="n">interpolation</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">img1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">img2</span><span class="p">,</span> <span class="n">offset_list2</span><span class="p">,</span> <span class="n">sf_list2</span>
@@ -2362,10 +2394,10 @@
 
 
 <div class="viewcode-block" id="combine_offset_lists"><a class="viewcode-back" href="../../vtool.html#vtool.image.combine_offset_lists">[docs]</a><span class="k">def</span> <span class="nf">combine_offset_lists</span><span class="p">(</span><span class="n">offsets_list</span><span class="p">,</span> <span class="n">sfs_list</span><span class="p">,</span> <span class="n">offset_tups</span><span class="p">,</span> <span class="n">sf_tups</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Helper for stacking &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Helper for stacking&quot;&quot;&quot;</span>
     <span class="c1"># combine the offsets</span>
     <span class="kn">import</span> <span class="nn">operator</span>
-    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">reduce</span>
+    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="n">reduce</span>
 
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">offsets_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">offset_tups</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sfs_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sf_tups</span><span class="p">)</span>
@@ -2622,7 +2654,7 @@
 
 
 <div class="viewcode-block" id="infer_vert"><a class="viewcode-back" href="../../vtool.html#vtool.image.infer_vert">[docs]</a><span class="k">def</span> <span class="nf">infer_vert</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">,</span> <span class="n">vert</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; which is the better stack dimension &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;which is the better stack dimension&quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span> <span class="o">=</span> <span class="n">img1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># get chip dimensions</span>
     <span class="p">(</span><span class="n">h2</span><span class="p">,</span> <span class="n">w2</span><span class="p">)</span> <span class="o">=</span> <span class="n">img2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">woff</span><span class="p">,</span> <span class="n">hoff</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
@@ -2945,8 +2977,8 @@
 <span class="sd">        &gt;&gt;&gt; flags = filterflags_valid_images(gpaths)</span>
 <span class="sd">        &gt;&gt;&gt; assert all(flags)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
-    <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">splitext</span>
+    <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+    <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">splitext</span>
 
     <span class="c1"># import operator</span>
     <span class="c1"># import itertools as it</span>
@@ -3079,71 +3111,31 @@
     <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Wild Me.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

@@ -25,7 +25,7 @@ def sver_test(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         fm (list):  list of feature matches as tuples (qfx, dfx)
         nShow (int):
 
-    Example0:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> import wbia.plottool as pt
         >>> # build test data
@@ -37,7 +37,7 @@ def sver_test(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> print(result)
         >>> pt.show_if_requested()
 
-    Example1:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> import wbia.plottool as pt
         >>> # build test data

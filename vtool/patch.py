@@ -690,62 +690,62 @@ def intern_warp_single_patch(
     img, x, y, ori, V, patch_size, flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE
 ):
     r"""
-    Sympy:
-        # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA
-        from vtool.patch import *  # NOQA
-        import sympy
-        from sympy.abc import theta
-        ori = theta
-        x, y, a, c, d, patch_size = sympy.symbols('x y a c d S')
-        half_patch_size = patch_size / 2
-
-        def sympy_rotation_mat3x3(radians):
-            # TODO: handle array impouts
-            sin_ = sympy.sin(radians)
-            cos_ = sympy.cos(radians)
-            R = np.array(((cos_, -sin_,  0),
-                          (sin_,  cos_,  0),
-                          (   0,     0,  1),))
-            return sympy.Matrix(R)
-
-        kpts = np.array([[x, y, a, c, d, ori]])
-        kp = ktool.get_invV_mats(kpts, with_trans=True)[0]
-        invV = sympy.Matrix(kp)
-        V = invV.inv()
-        ss = sympy.sqrt(patch_size) * 3.0
-        T = sympy.Matrix(ltool.translation_mat3x3(-x, -y, None))  # Center the patch
-        R = sympy_rotation_mat3x3(-ori)  # Rotate the centered unit circle patch
-        S = sympy.Matrix(ltool.scale_mat3x3(ss, dtype=None))  # scale from unit circle to the patch size
-        X = sympy.Matrix(ltool.translation_mat3x3(half_patch_size, half_patch_size, None))  # Translate back to patch-image coordinates
-
-        sympy.MatMul(X, S, hold=True)
-
-        def add_matmul_hold_prop(mat):
-            #import functools
-            def matmul_hold(other, hold=True):
-                new = sympy.MatMul(mat, other, hold=hold)
-                add_matmul_hold_prop(new)
-                return new
-            #matmul_hold = functools.partial(sympy.MatMul, mat, hold=True)
-            setattr(mat, 'matmul_hold', matmul_hold)
-        add_matmul_hold_prop(X)
-        add_matmul_hold_prop(S)
-        add_matmul_hold_prop(R)
-        add_matmul_hold_prop(V)
-        add_matmul_hold_prop(T)
-
-        M = X.matmul_hold(S).matmul_hold(R).matmul_hold(V).matmul_hold(T)
-        #M = X.multiply(S).multiply(R).multiply(V).multiply(T)
-
-
-        V_full = R.multiply(V).multiply(T)
-        sympy.latex(V_full)
-        print(sympy.latex(R.multiply(V).multiply(T)))
-        print(sympy.latex(X))
-        print(sympy.latex(S))
-        print(sympy.latex(R))
-        print(sympy.latex(invV) + '^{-1}')
-        print(sympy.latex(T))
+    Ignore:
+        >>> # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA
+        >>> from vtool.patch import *  # NOQA
+        >>> import sympy
+        >>> from sympy.abc import theta
+        >>> ori = theta
+        >>> x, y, a, c, d, patch_size = sympy.symbols('x y a c d S')
+        >>> half_patch_size = patch_size / 2
+        >>>
+        >>> def sympy_rotation_mat3x3(radians):
+        >>>     # TODO: handle array impouts
+        >>>     sin_ = sympy.sin(radians)
+        >>>     cos_ = sympy.cos(radians)
+        >>>     R = np.array(((cos_, -sin_,  0),
+        >>>                   (sin_,  cos_,  0),
+        >>>                   (   0,     0,  1),))
+        >>>     return sympy.Matrix(R)
+        >>>
+        >>> kpts = np.array([[x, y, a, c, d, ori]])
+        >>> kp = ktool.get_invV_mats(kpts, with_trans=True)[0]
+        >>> invV = sympy.Matrix(kp)
+        >>> V = invV.inv()
+        >>> ss = sympy.sqrt(patch_size) * 3.0
+        >>> T = sympy.Matrix(ltool.translation_mat3x3(-x, -y, None))  # Center the patch
+        >>> R = sympy_rotation_mat3x3(-ori)  # Rotate the centered unit circle patch
+        >>> S = sympy.Matrix(ltool.scale_mat3x3(ss, dtype=None))  # scale from unit circle to the patch size
+        >>> X = sympy.Matrix(ltool.translation_mat3x3(half_patch_size, half_patch_size, None))  # Translate back to patch-image coordinates
+        >>>
+        >>> sympy.MatMul(X, S, hold=True)
+        >>>
+        >>> def add_matmul_hold_prop(mat):
+        >>>     #import functools
+        >>>     def matmul_hold(other, hold=True):
+        >>>         new = sympy.MatMul(mat, other, hold=hold)
+        >>>         add_matmul_hold_prop(new)
+        >>>         return new
+        >>>     #matmul_hold = functools.partial(sympy.MatMul, mat, hold=True)
+        >>>     setattr(mat, 'matmul_hold', matmul_hold)
+        >>> add_matmul_hold_prop(X)
+        >>> add_matmul_hold_prop(S)
+        >>> add_matmul_hold_prop(R)
+        >>> add_matmul_hold_prop(V)
+        >>> add_matmul_hold_prop(T)
+        >>>
+        >>> M = X.matmul_hold(S).matmul_hold(R).matmul_hold(V).matmul_hold(T)
+        >>> #M = X.multiply(S).multiply(R).multiply(V).multiply(T)
+        >>>
+        >>>
+        >>> V_full = R.multiply(V).multiply(T)
+        >>> sympy.latex(V_full)
+        >>> print(sympy.latex(R.multiply(V).multiply(T)))
+        >>> print(sympy.latex(X))
+        >>> print(sympy.latex(S))
+        >>> print(sympy.latex(R))
+        >>> print(sympy.latex(invV) + '^{-1}')
+        >>> print(sympy.latex(T))
     """
     cv2_warp_kwargs = {
         #'flags': cv2.INTER_LINEAR,
@@ -994,7 +994,7 @@ def GaussianBlurInplace(img, sigma, size=None):
         sigma is a Gaussian function with spread sqrt(2)*sigma scaled by the
         area of the Gaussian filter
 
-    Example0:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.patch import *  # NOQA
         >>> from mpl_toolkits.mplot3d import Axes3D  # NOQA
@@ -1014,7 +1014,7 @@ def GaussianBlurInplace(img, sigma, size=None):
         >>> pt.imshow(img * 255, fnum=1, pnum=(1, 3, 3))
         >>> pt.show_if_requested()
 
-    Example1:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> # demonstrate cascading smoothing property
         >>> # THIS ISNT WORKING WHY???

@@ -745,7 +745,7 @@ def atleast_nd(arr, n, tofront=False):
     See Also:
         atleast_1d, atleast_2d, atleast_3d
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> n = 2
@@ -793,7 +793,7 @@ def ensure_shape(arr, dimshape):
             dimensions)
 
     Returns:
-        ndarray: arr_ -  the input array, which has been modified inplace.
+        ndarray - the input array, which has been modified inplace.
 
     CommandLine:
         python -m vtool.other ensure_shape
@@ -842,7 +842,7 @@ def atleast_shape(arr, dimshape):
             dimensions)
 
     Returns:
-        ndarray: arr_ -  the input array, which has been modified inplace.
+        ndarray - the input array, which has been modified inplace.
 
     CommandLine:
         python -m vtool.other ensure_shape
@@ -975,8 +975,8 @@ def iter_reduce_ufunc(ufunc, arr_iter, out=None):
 
 
 def clipnorm(arr, min_, max_, out=None):
-    """
-    normalizes arr to the range 0 to 1 using min_ and max_ as clipping bounds
+    r"""
+    normalizes arr to the range 0 to 1 using min\_ and max\_ as clipping bounds
     """
     if max_ == 1 and min_ == 0:
         if out is not None:
@@ -1096,7 +1096,7 @@ def flag_intersection(arr1, arr2):
     Returns:
         ndarray: flags where len(flags) == len(arr1)
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> arr1 = np.array([0, 1, 2, 3, 4, 5])
@@ -1106,7 +1106,7 @@ def flag_intersection(arr1, arr2):
         >>> result = ('flags = %s' % (ub.repr2(flags),))
         >>> print(result)
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> import vtool as vt
@@ -1118,7 +1118,7 @@ def flag_intersection(arr1, arr2):
         >>> result = ('flags = %s' % (ub.repr2(flags),))
         >>> print(result)
 
-    Example2:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> arr1 = np.array([0, 1, 2, 3, 4, 5])
@@ -1128,7 +1128,7 @@ def flag_intersection(arr1, arr2):
         >>> flags = flag_intersection(np.array([]), np.array([2, 6, 4]))
         >>> assert len(flags) == 0
 
-    Timeit:
+    Ignore:
         >>> setup = ut.codeblock(
         >>>     r'''
                 import vtool as vt
@@ -1216,13 +1216,13 @@ def unstructure_rows(*structured_arrs):
 
 
 def intersect2d_structured_numpy(arr1, arr2, assume_unique=False):
-    """
+    r"""
     Args:
         arr1: unstructured 2d array
         arr2: unstructured 2d array
 
     Returns:
-        A_, B_, C_ - structured versions of arr1, and arr2, and their structured intersection
+        A\_, B\_, C\_ - structured versions of arr1, and arr2, and their structured intersection
 
     References:
         http://stackoverflow.com/questions/16970982/find-unique-rows-in-numpy-array
@@ -1259,7 +1259,7 @@ def intersect2d_structured_numpy(arr1, arr2, assume_unique=False):
 
 def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
     """
-    References::
+    References:
         http://stackoverflow.com/questions/8317022/get-intersecting-rows-across-two-2d-numpy-arrays/8317155#8317155
 
     Args:
@@ -1290,7 +1290,7 @@ def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
         (array([[ 85, 403, 412],
                [ 32,  22, 103]]), array([2, 6, 7]), array([0, 1, 2]))
 
-    Example2:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> A = np.array([[1, 2, 3], [1, 1, 1]])
@@ -1351,7 +1351,7 @@ def get_uncovered_mask(covered_array, covering_array):
         >>> print(result)
         [ True False  True False False]
 
-    Example2:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> covered_array = [1, 2, 3, 4, 5]
@@ -1361,7 +1361,7 @@ def get_uncovered_mask(covered_array, covering_array):
         >>> print(result)
         [ True  True  True  True  True]
 
-    Example3:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> covered_array = np.array([
@@ -1375,9 +1375,9 @@ def get_uncovered_mask(covered_array, covering_array):
         >>> print(result)
         np.array([[ True, False,  True],
                   [False, False,  True],
-                  [ True,  True,  True]], dtype=bool)
-
-    Ignore::
+                  [ True,  True,  True]], dtype=np.bool)
+                  
+    Ignore:
         covering_array = [1, 2, 3, 4, 5, 6, 7]
         %timeit get_uncovered_mask(covered_array, covering_array)
         100000 loops, best of 3: 18.6 µs per loop
@@ -1440,7 +1440,7 @@ def and_lists(*args):
     SeeAlso:
        or_lists
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> arg1 = np.array([1, 1, 1, 1,])
@@ -1452,7 +1452,7 @@ def and_lists(*args):
         >>> print(result)
         [False  True False  True]
 
-    Example2:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.other import *  # NOQA
         >>> size = 10000
@@ -1588,7 +1588,7 @@ def weighted_geometic_mean(data, weights):
         weights (ndarray):
 
     Returns:
-        ndarray: gmean_
+        ndarray
 
     CommandLine:
         python -m vtool.other --test-weighted_geometic_mean

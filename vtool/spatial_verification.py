@@ -2,12 +2,12 @@
 """
 Spatial verification of keypoint matches
 
-Notation::
+Notation:
     1_m = img1_matches; 2_m = img2_matches
     x and y are locations, invV is the elliptical shapes.
     fx are the original feature indexes (used for making sure 1 keypoint isn't assigned to 2)
 
-Look Into::
+Look Into:
     Standard
     skimage.transform
     http://stackoverflow.com/questions/11462781/fast-2d-rigid-body-transformations-in-numpy-scipy
@@ -178,16 +178,16 @@ def build_affine_lstsqrs_Mx6(xy1_man, xy2_man):
         >>> result = ut.hashstr(Mx6)
         >>> print(result)
 
-    Sympy:
-        import sympy as sym
-        x1, y1, x2, y2 = sym.symbols('x1, y1, x2, y2')
-        A = sym.Matrix([
-            [x1, y1,  0,  0, 1, 0],
-            [ 0,  0, x1, y1, 0, 1],
-        ])
-        b = sym.Matrix([[x2], [y2]])
-        x = (A.T.multiply(A)).inv().multiply(A.T.multiply(b))
-        x = (A.T.multiply(A)).pinv().multiply(A.T.multiply(b))
+    Ignore:
+        >>> import sympy as sym
+        >>> x1, y1, x2, y2 = sym.symbols('x1, y1, x2, y2')
+        >>> A = sym.Matrix([
+        >>>     [x1, y1,  0,  0, 1, 0],
+        >>>     [ 0,  0, x1, y1, 0, 1],
+        >>> ])
+        >>> b = sym.Matrix([[x2], [y2]])
+        >>> x = (A.T.multiply(A)).inv().multiply(A.T.multiply(b))
+        >>> x = (A.T.multiply(A)).pinv().multiply(A.T.multiply(b))
 
     References:
         https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf page 22
@@ -259,7 +259,7 @@ def compute_affine(xy1_man, xy2_man):
         >>> result = np.array_str(A, precision=2)
         >>> print(result)
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import vtool.demodata as demodata
@@ -326,7 +326,7 @@ def compute_homog(xy1_mn, xy2_mn):
          [  2.82e-03   1.80e-03  -7.03e-01]
          [  1.67e-05   1.68e-05  -5.53e-03]]
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import vtool.keypoint as ktool
@@ -486,7 +486,7 @@ def get_affine_inliers(
         tuple: aff_inliers_list, aff_errors_list, Aff_mats
 
     Notes:
-        FROM PERDOCH 2009::
+        FROM PERDOCH 2009:
             H = inv(Aj).dot(Rj.T).dot(Ri).dot(Ai)
             H = inv(Aj).dot(Ai)
             The input invVs = perdoch.invA's
@@ -703,7 +703,7 @@ def test_homog_errors(
         python -m vtool.spatial_verification --test-test_homog_errors:1 --show --rotation_invariance --xy-thresh=.001
         python -m vtool.spatial_verification --test-test_homog_errors:0 --show --rotation_invariance --xy-thresh=.001
 
-    Example0:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import wbia.plottool as pt
@@ -717,7 +717,7 @@ def test_homog_errors(
         >>> pt.draw_sv.show_sv(rchip1, rchip2, kpts1, kpts2, fm, homog_tup=homog_tup)
         >>> ut.show_if_requested()
 
-    Example1:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import wbia.plottool as pt
@@ -872,7 +872,7 @@ def refine_inliers(
         python -m vtool.spatial_verification --test-refine_inliers:0
         python -m vtool.spatial_verification --test-refine_inliers:1 --show
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import vtool.demodata as demodata
@@ -887,7 +887,7 @@ def refine_inliers(
         >>> result = ub.repr2(homogtup, precision=2, nl=True, suppress_small=True, nobr=True)
         >>> print(result)
 
-    Example1:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import vtool.keypoint as ktool

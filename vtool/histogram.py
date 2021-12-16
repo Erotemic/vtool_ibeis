@@ -52,7 +52,7 @@ def argsubmaxima(hist, centers=None, maxima_thresh=None, _debug=False):
     Determines approximate maxima values to subindex accuracy.
 
     Args:
-        hist_ (ndarray): ydata, histogram frequencies
+        hist\_ (ndarray): ydata, histogram frequencies
         centers (ndarray): xdata, histogram labels
         maxima_thresh (float): cutoff point for labeing a value as a maxima
 
@@ -507,11 +507,11 @@ def interpolate_submaxima(argmaxima, hist_, centers=None):
     r"""
     Args:
         argmaxima (ndarray): indicies into ydata / centers that are argmaxima
-        hist_ (ndarray): ydata, histogram frequencies
+        hist\_ (ndarray): ydata, histogram frequencies
         centers (ndarray): xdata, histogram labels
 
     FIXME:
-        what happens when argmaxima[i] == len(hist_)
+        what happens when argmaxima[i] == len(hist\_)
 
     CommandLine:
         python -m vtool.histogram --test-interpolate_submaxima --show
@@ -733,7 +733,7 @@ def interpolated_histogram(
     CommandLine:
         python -m vtool.histogram --test-interpolated_histogram
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.histogram import *  # NOQA
         >>> data = np.array([ 0,  1,  2,  3.5,  3,  3,  4,  4])
@@ -749,7 +749,7 @@ def interpolated_histogram(
         >>> result = get_histinfo_str(hist, edges)
         >>> print(result)
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.histogram import *  # NOQA
         >>> data = np.array([ 0,  1,  2,  3.5,  3,  3,  4,  4])
@@ -915,22 +915,6 @@ def subbin_bounds(z, radius, low, high):
     """
     Gets quantized bounds of a sub-bin/pixel point and a radius.
     Useful for cropping using subpixel points
-
-    Illustration::
-        (the bin edges are pipes)
-        (the bin centers are pluses)
-
-        Input = {'z': 1.5, 'radius':5.666, 'low':0, 'high':7}
-        Output = {'z1':0, 'z2': 7, 'offst': 5.66}
-
-        |   |   |   |   |   |   |   |   |
-        |_+_|_+_|_+_|_+_|_+_|_+_|_+_|_+_|
-          ^     ^                     ^
-          z1    z                     z2
-                ,.___.___.___.___.___.   < radius (5.333)
-          .---.-,                        < z_offset1 (1.6666)
-                ,_.___.___.___.___.___.  < z_offset2 (5.666)
-          .---.-,                        < z_offset1 (1.6666)
 
     Args:
         z (float): center of a circle a 1d pixel array

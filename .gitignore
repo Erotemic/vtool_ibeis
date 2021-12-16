@@ -97,6 +97,6 @@ Dockerfile*
 _skbuild/*
 opencv-docker-tag.txt
 
-_doc/_build
-_doc/_static
-_doc/_templates
+_docs/_build
+_docs/_static
+_docs/_templates

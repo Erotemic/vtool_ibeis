@@ -100,40 +100,6 @@ def ori_distance(ori1, ori2, out=None):
     References:
         http://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
 
-    Timeit:
-        >>> #xdoctest: +SKIP
-        >>> #xdoctest: +IGNORE_WHITESPACE
-        >>> import utool as ut
-        >>> setup = ub.codeblock(
-        >>>     r'''
-                # STARTBLOCK
-                import numpy as np
-                tau = np.pi * 2
-                rng = np.random.RandomState(53)
-                ori1 = (rng.rand(100000) * tau) - np.pi
-                ori2 = (rng.rand(100000) * tau) - np.pi
-
-                def func_outvars():
-                    ori_dist = np.abs(ori1 - ori2)
-                    np.mod(ori_dist, tau, out=ori_dist)
-                    np.minimum(ori_dist, np.subtract(tau, ori_dist), out=ori_dist)
-                    return ori_dist
-
-                def func_orig():
-                    ori_dist = np.abs(ori1 - ori2) % tau
-                    ori_dist = np.minimum(ori_dist, tau - ori_dist)
-                    return ori_dist
-                # ENDBLOCK
-                ''')
-        >>> stmt_list = ub.codeblock(
-        >>>    '''
-                func_outvars()
-                func_orig()
-                '''
-        >>> ).split('\n')
-        >>> ut.util_dev.rrr()
-        >>> ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))
-
     CommandLine:
         python -m vtool.distance --test-ori_distance
 
@@ -150,7 +116,7 @@ def ori_distance(ori1, ori2, out=None):
         >>> #xdoctest: +IGNORE_WHITESPACE
         >>> print(result)
 
-    Example2:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.distance import *  # NOQA
         >>> ori1 = np.array([ 0.3,  7.0,  0.0,  3.1], dtype=np.float64)
@@ -160,7 +126,7 @@ def ori_distance(ori1, ori2, out=None):
         >>> #xdoctest: +IGNORE_WHITESPACE
         >>> print(result)
 
-    Example3:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.distance import *  # NOQA
         >>> ori1 = .3
@@ -168,11 +134,6 @@ def ori_distance(ori1, ori2, out=None):
         >>> dist_ = ori_distance(ori1, ori2)
         >>> result = ub.repr2(dist_, precision=2)
         >>> print(result)
-
-    Ignore:
-        # This also works
-        ori_dist = np.abs(np.arctan2(np.sin(ori1 - ori2), np.cos(ori1 - ori2)))
-        %timeit np.abs(np.arctan2(np.sin(ori1 - ori2), np.cos(ori1 - ori2)))
     """
     return cyclic_distance(ori1, ori2, modulo=TAU, out=out)
 

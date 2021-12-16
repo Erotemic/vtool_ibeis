@@ -1,37 +1,71 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>vtool.confusion &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool.confusion &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool.confusion</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for vtool.confusion</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -40,7 +74,7 @@
 <span class="sd">References:</span>
 <span class="sd">    http://en.wikipedia.org/wiki/Confusion_matrix</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
 <span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -99,9 +133,9 @@
 <span class="sd">    Notes:</span>
 <span class="sd">        From oxford:</span>
 <span class="sd">        Precision is defined as the ratio of retrieved positive images to the</span>
-<span class="sd">          total number retrieved.</span>
+<span class="sd">        total number retrieved.</span>
 <span class="sd">        Recall is defined as the ratio of the number of retrieved positive</span>
-<span class="sd">          images to the total number of positive images in the corpus.</span>
+<span class="sd">        images to the total number of positive images in the corpus.</span>
 
 <span class="sd">    Ignore:</span>
 <span class="sd">        varname_list = &#39;tp, fp, fn, tn, fpr, tpr, tpa&#39;.split(&#39;, &#39;)</span>
@@ -216,7 +250,7 @@
         <span class="k">for</span> <span class="n">alias_key</span> <span class="ow">in</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">alias_vals</span><span class="p">,</span> <span class="p">{</span><span class="n">std_key</span><span class="p">})</span>
     <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Scalars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_pos</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_neg</span> <span class="o">=</span> <span class="kc">None</span>
@@ -244,12 +278,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; class ratio &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;class ratio&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rn</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rp</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; ratio of cost of making a mistake&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;ratio of cost of making a mistake&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cn</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cp</span>
 
     <span class="nd">@property</span>
@@ -260,81 +294,81 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; true positive probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;true positive probability&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tp</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; true negative probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;true negative probability&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tn</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; false positive probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;false positive probability&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fp</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; false negative probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;false negative probability&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fn</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
 
     <span class="c1"># ----</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; real positive probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;real positive probability&quot;&quot;&quot;</span>
         <span class="c1"># return (self.tp + self.fn)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pos</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; real negative probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;real negative probability&quot;&quot;&quot;</span>
         <span class="c1"># return (self.fp + self.tn)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_neg</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; predicted positive probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;predicted positive probability&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tp</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; predicted negative probability &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;predicted negative probability&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tn</span>
 
     <span class="c1"># ----</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; fallout, false positive rate &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;fallout, false positive rate&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fp</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_neg</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fnr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; miss rate, false negative rate &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;miss rate, false negative rate&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fn</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pos</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; sensitivity, recall, hit rate, tpr &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;sensitivity, recall, hit rate, tpr&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tp</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_pos</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tnr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; true negative rate, inverse recall &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;true negative rate, inverse recall&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tn</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_neg</span>
 
     <span class="c1"># ----</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tpa</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; miss rate, false negative rate &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;miss rate, false negative rate&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">nan_to_num</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tp</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tp</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fp</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tna</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; negative predictive value, inverse precision &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;negative predictive value, inverse precision&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">nan_to_num</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tn</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_tn</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fn</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
 
@@ -342,12 +376,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; bookmaker informedness &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;bookmaker informedness&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tnr</span> <span class="o">-</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; markedness &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;markedness&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tpa</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tna</span> <span class="o">-</span> <span class="mi">1</span>
 
     <span class="c1"># ---- other measures</span>
@@ -359,17 +393,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">acc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; accuracy &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;accuracy&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tp</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tn</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sqrd_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; squared error &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;squared error&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fpr</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnr</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mcc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; matthews correlation coefficient</span>
+        <span class="sd">&quot;&quot;&quot;matthews correlation coefficient</span>
 
 <span class="sd">        Also true that:</span>
 <span class="sd">            mcc == np.sqrt(self.bm * self.mk)</span>
@@ -387,18 +421,18 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">jacc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; jaccard coefficient &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;jaccard coefficient&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tp</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_tn</span><span class="p">)</span>
         <span class="c1"># return self.tp / (self.tp + self.fn + self.fp)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">wracc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; weighted relative accuracy &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;weighted relative accuracy&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recall</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span>
 
     <span class="c1"># --- alias names currently needed for compatability</span>
 
-    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
         <span class="n">attrs</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">attrs</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -406,7 +440,7 @@
         <span class="n">attrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">attrs</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">attrs</span>
 
-    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">std_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_aliases</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -433,7 +467,7 @@
         <span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
         <span class="c1"># must be binary</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[confusion] building confusion metrics.&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span>
@@ -449,9 +483,9 @@
         <span class="c1"># n_fp - count the number of false positives with score &gt;= threshold[i]</span>
         <span class="c1"># n_tp - count the number of true positives with score &gt;= threshold[i]</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">sklearn.metrics._ranking</span> <span class="k">import</span> <span class="n">_binary_clf_curve</span>
+            <span class="kn">from</span> <span class="nn">sklearn.metrics._ranking</span> <span class="kn">import</span> <span class="n">_binary_clf_curve</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">sklearn.metrics.ranking</span> <span class="k">import</span> <span class="n">_binary_clf_curve</span>
+            <span class="kn">from</span> <span class="nn">sklearn.metrics.ranking</span> <span class="kn">import</span> <span class="n">_binary_clf_curve</span>
 
         <span class="n">n_fp</span><span class="p">,</span> <span class="n">n_tp</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">_binary_clf_curve</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -852,11 +886,13 @@
 
 <span class="sd">    FIXME:</span>
 <span class="sd">        if duplicate xdata is given bad things happen.</span>
+
 <span class="sd">    BUG:</span>
 <span class="sd">        in scipy.interpolate.interp1d</span>
 <span class="sd">        If there is a duplicate xdata, then assume_sorted=False will</span>
 <span class="sd">        sort ydata by xdata, but xdata should retain its initial ordering</span>
 <span class="sd">        in places of ambuguity. Currently it does not.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        xdata (ndarray):</span>
 <span class="sd">        ydata (ndarray):</span>
@@ -1042,7 +1078,7 @@
 <span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">wbia.plottool.abstract_interaction</span> <span class="k">import</span> <span class="n">AbstractInteraction</span>
+    <span class="kn">from</span> <span class="nn">wbia.plottool.abstract_interaction</span> <span class="kn">import</span> <span class="n">AbstractInteraction</span>
 
     <span class="k">class</span> <span class="nc">ROCInteraction</span><span class="p">(</span><span class="n">AbstractInteraction</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1054,7 +1090,7 @@
 <span class="sd">            Specificity = true negative rate</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ROC Interact&#39;</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">ROCInteraction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">confusions</span> <span class="o">=</span> <span class="n">confusions</span>
@@ -1302,71 +1338,31 @@
     <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Wild Me.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

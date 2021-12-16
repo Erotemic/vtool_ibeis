@@ -1,19 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>vtool.exif &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -42,16 +40,16 @@
 <span class="sd">TODO:</span>
 <span class="sd">    https://github.com/recurser/exif-orientation-examples</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">six</span>
-<span class="kn">from</span> <span class="nn">PIL.ExifTags</span> <span class="k">import</span> <span class="n">TAGS</span><span class="p">,</span> <span class="n">GPSTAGS</span>
+<span class="kn">from</span> <span class="nn">PIL.ExifTags</span> <span class="kn">import</span> <span class="n">TAGS</span><span class="p">,</span> <span class="n">GPSTAGS</span>
 <span class="kn">import</span> <span class="nn">PIL.ExifTags</span>  <span class="c1"># NOQA</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">utool</span> <span class="k">import</span> <span class="n">util_time</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">image_shared</span>
+<span class="kn">from</span> <span class="nn">utool</span> <span class="kn">import</span> <span class="n">util_time</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">image_shared</span>
 
 
 <span class="c1"># Inverse of PIL.ExifTags.TAGS</span>
@@ -59,8 +57,8 @@
 <span class="n">GPS_TAG_TO_GPSID</span> <span class="o">=</span> <span class="p">{</span><span class="n">val</span><span class="p">:</span> <span class="n">key</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">GPSTAGS</span><span class="p">)}</span>
 
 <span class="c1"># Relevant EXIF Tags</span>
-<span class="c1">#&#39;GPSInfo&#39;: 34853</span>
-<span class="c1">#&#39;SensitivityType&#39;: 34864  # UNSUPPORTED</span>
+<span class="c1"># &#39;GPSInfo&#39;: 34853</span>
+<span class="c1"># &#39;SensitivityType&#39;: 34864  # UNSUPPORTED</span>
 
 <span class="n">GPSINFO_CODE</span> <span class="o">=</span> <span class="n">EXIF_TAG_TO_TAGID</span><span class="p">[</span><span class="s1">&#39;GPSInfo&#39;</span><span class="p">]</span>
 <span class="n">DATETIMEORIGINAL_TAGID</span> <span class="o">=</span> <span class="n">EXIF_TAG_TO_TAGID</span><span class="p">[</span><span class="s1">&#39;DateTimeOriginal&#39;</span><span class="p">]</span>
@@ -120,7 +118,7 @@
 
 
 <div class="viewcode-block" id="get_exif_dict"><a class="viewcode-back" href="../../vtool.html#vtool.exif.get_exif_dict">[docs]</a><span class="k">def</span> <span class="nf">get_exif_dict</span><span class="p">(</span><span class="n">pil_img</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns exif dictionary by TAGID &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Returns exif dictionary by TAGID&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">exif_dict</span> <span class="o">=</span> <span class="n">pil_img</span><span class="o">.</span><span class="n">_getexif</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">exif_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -135,7 +133,7 @@
 
 
 <div class="viewcode-block" id="get_exif_dict2"><a class="viewcode-back" href="../../vtool.html#vtool.exif.get_exif_dict2">[docs]</a><span class="k">def</span> <span class="nf">get_exif_dict2</span><span class="p">(</span><span class="n">pil_img</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns exif dictionary by TAG (less efficient)&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Returns exif dictionary by TAG (less efficient)&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">exif_dict</span> <span class="o">=</span> <span class="n">pil_img</span><span class="o">.</span><span class="n">_getexif</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">exif_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -348,6 +346,7 @@
 <span class="sd">        &gt;&gt;&gt;     pil_img = Image.open(join(images_path, image_filename))</span>
 <span class="sd">        &gt;&gt;&gt;     exif_dict = get_exif_dict(pil_img)</span>
 <span class="sd">        &gt;&gt;&gt;     orient = get_orientation(exif_dict)</span>
+<span class="sd">        &gt;&gt;&gt;     pil_img.close()</span>
 <span class="sd">        &gt;&gt;&gt;     result.append(orient)</span>
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 <span class="sd">        [1, 6, 8]</span>
@@ -356,7 +355,11 @@
         <span class="n">orient</span> <span class="o">=</span> <span class="n">exif_dict</span><span class="p">[</span><span class="n">ORIENTATION_CODE</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">orient</span> <span class="ow">in</span> <span class="n">ORIENTATION_DICT</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">ORIENTATION_DICT</span><span class="p">[</span><span class="n">orient</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Orientation not defined&#39;</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Undefined orientation=</span><span class="si">%r</span><span class="s1"> in Exif&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orient</span><span class="p">,)</span>
+                <span class="k">if</span> <span class="n">on_error</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">default</span> <span class="o">=</span> <span class="n">orient</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Unrecognized orientation=</span><span class="si">%r</span><span class="s1"> in Exif&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orient</span><span class="p">,)</span>
@@ -388,6 +391,7 @@
 <span class="sd">        &gt;&gt;&gt;     pil_img = Image.open(join(images_path, image_filename))</span>
 <span class="sd">        &gt;&gt;&gt;     exif_dict = get_exif_dict(pil_img)</span>
 <span class="sd">        &gt;&gt;&gt;     orient_str = get_orientation_str(exif_dict)</span>
+<span class="sd">        &gt;&gt;&gt;     pil_img.close()</span>
 <span class="sd">        &gt;&gt;&gt;     result.append(orient_str)</span>
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 <span class="sd">        [&#39;Normal&#39;, &#39;90 Clockwise&#39;, &#39;90 Counter-Clockwise&#39;]</span>
@@ -407,6 +411,7 @@
 <span class="sd">        &gt;&gt;&gt; image_fpath = ut.grab_file_url(&#39;http://images.summitpost.org/original/769474.JPG&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; pil_img = Image.open(image_fpath)</span>
 <span class="sd">        &gt;&gt;&gt; exif_dict = get_exif_dict(pil_img)</span>
+<span class="sd">        &gt;&gt;&gt; pil_img.close()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">exiftime</span> <span class="o">=</span> <span class="n">exif_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DATETIMEORIGINAL_TAGID</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exiftime</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">exiftime</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -487,7 +492,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
 </ul>
@@ -502,17 +507,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -529,7 +532,7 @@
       &copy;2020, Wild Me.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

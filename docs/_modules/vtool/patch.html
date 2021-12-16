@@ -1,51 +1,85 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>vtool.patch &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool.patch &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool.patch</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for vtool.patch</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># LICENCE</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">six</span>  <span class="c1"># NOQA</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">histogram</span> <span class="k">as</span> <span class="n">htool</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">keypoint</span> <span class="k">as</span> <span class="n">ktool</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">image</span> <span class="k">as</span> <span class="n">gtool</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">trig</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">histogram</span> <span class="k">as</span> <span class="n">htool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">keypoint</span> <span class="k">as</span> <span class="n">ktool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">ltool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">image</span> <span class="k">as</span> <span class="n">gtool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">trig</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
-<span class="kn">from</span> <span class="nn">.util_math</span> <span class="k">import</span> <span class="n">TAU</span>
+<span class="kn">from</span> <span class="nn">.util_math</span> <span class="kn">import</span> <span class="n">TAU</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cv2</span>
@@ -75,7 +109,7 @@
 
 
 <div class="viewcode-block" id="patch_ori"><a class="viewcode-back" href="../../vtool.html#vtool.patch.patch_ori">[docs]</a><span class="k">def</span> <span class="nf">patch_ori</span><span class="p">(</span><span class="n">gradx</span><span class="p">,</span> <span class="n">grady</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns patch orientation relative to the x-axis &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;returns patch orientation relative to the x-axis&quot;&quot;&quot;</span>
     <span class="n">gori</span> <span class="o">=</span> <span class="n">trig</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">grady</span><span class="p">,</span> <span class="n">gradx</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gori</span></div>
 
@@ -173,8 +207,8 @@
 
 
 <div class="viewcode-block" id="get_star_patch"><a class="viewcode-back" href="../../vtool.html#vtool.patch.get_star_patch">[docs]</a><span class="k">def</span> <span class="nf">get_star_patch</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; test data patch &quot;&quot;&quot;</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span>
+    <span class="sd">&quot;&quot;&quot;test data patch&quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span>  <span class="c1"># NOQA</span>
     <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="p">[</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">],</span>
@@ -195,8 +229,8 @@
 
 
 <div class="viewcode-block" id="get_star2_patch"><a class="viewcode-back" href="../../vtool.html#vtool.patch.get_star2_patch">[docs]</a><span class="k">def</span> <span class="nf">get_star2_patch</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; test data patch &quot;&quot;&quot;</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.5</span>
+    <span class="sd">&quot;&quot;&quot;test data patch&quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.5</span>  <span class="c1"># NOQA</span>
     <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="p">[</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">],</span>
@@ -224,8 +258,8 @@
 
 
 <div class="viewcode-block" id="get_cross_patch"><a class="viewcode-back" href="../../vtool.html#vtool.patch.get_cross_patch">[docs]</a><span class="k">def</span> <span class="nf">get_cross_patch</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; test data patch &quot;&quot;&quot;</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span>
+    <span class="sd">&quot;&quot;&quot;test data patch&quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span>  <span class="c1"># NOQA</span>
     <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="p">[</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">],</span>
@@ -246,8 +280,8 @@
 
 
 <div class="viewcode-block" id="get_stripe_patch"><a class="viewcode-back" href="../../vtool.html#vtool.patch.get_stripe_patch">[docs]</a><span class="k">def</span> <span class="nf">get_stripe_patch</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; test data patch &quot;&quot;&quot;</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span>
+    <span class="sd">&quot;&quot;&quot;test data patch&quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span>  <span class="c1"># NOQA</span>
     <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="p">[</span><span class="n">O</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">],</span>
@@ -288,7 +322,7 @@
 <span class="sd">        &gt;&gt;&gt; test_show_gaussian_patches2(shape=shape)</span>
 <span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
     <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
@@ -332,7 +366,7 @@
 
 
 <div class="viewcode-block" id="show_gaussian_patch"><a class="viewcode-back" href="../../vtool.html#vtool.patch.show_gaussian_patch">[docs]</a><span class="k">def</span> <span class="nf">show_gaussian_patch</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">sigma1</span><span class="p">,</span> <span class="n">sigma2</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
     <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
     <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
     <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
@@ -344,7 +378,10 @@
     <span class="n">gausspatch</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">gaussian_patch</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
     <span class="c1"># print(gausspatch)</span>
     <span class="c1"># pt.imshow(gausspatch * 255)</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;ksize=</span><span class="si">%r</span><span class="s1">, sigma=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">sigma1</span><span class="p">,</span> <span class="n">sigma2</span><span class="p">),)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;ksize=</span><span class="si">%r</span><span class="s1">, sigma=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">shape</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">sigma1</span><span class="p">,</span> <span class="n">sigma2</span><span class="p">),</span>
+    <span class="p">)</span>
     <span class="n">pt</span><span class="o">.</span><span class="n">plot_surface3d</span><span class="p">(</span>
         <span class="n">xgrid</span><span class="p">,</span> <span class="n">ygrid</span><span class="p">,</span> <span class="n">gausspatch</span><span class="p">,</span> <span class="n">rstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">mpl</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">coolwarm</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span>
     <span class="p">)</span></div>
@@ -482,7 +519,7 @@
 <span class="sd">        &gt;&gt;&gt; test_show_gaussian_patches(shape=shape)</span>
 <span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># NOQA</span>
     <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
@@ -654,9 +691,10 @@
 <span class="sd">        python -m vtool.patch --test-get_warped_patches --show --use_python</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:pyhesaff)</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.patch import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; import ubelt as ub</span>
 <span class="sd">        &gt;&gt;&gt; # build test data</span>
 <span class="sd">        &gt;&gt;&gt; img_fpath = ut.grab_test_imgpath(&#39;carl.jpg&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; img = vt.imread(img_fpath)</span>
@@ -721,62 +759,62 @@
     <span class="n">img</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ori</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_CUBIC</span><span class="p">,</span> <span class="n">borderMode</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_REPLICATE</span>
 <span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sympy:</span>
-<span class="sd">        # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA</span>
-<span class="sd">        from vtool.patch import *  # NOQA</span>
-<span class="sd">        import sympy</span>
-<span class="sd">        from sympy.abc import theta</span>
-<span class="sd">        ori = theta</span>
-<span class="sd">        x, y, a, c, d, patch_size = sympy.symbols(&#39;x y a c d S&#39;)</span>
-<span class="sd">        half_patch_size = patch_size / 2</span>
-
-<span class="sd">        def sympy_rotation_mat3x3(radians):</span>
-<span class="sd">            # TODO: handle array impouts</span>
-<span class="sd">            sin_ = sympy.sin(radians)</span>
-<span class="sd">            cos_ = sympy.cos(radians)</span>
-<span class="sd">            R = np.array(((cos_, -sin_,  0),</span>
-<span class="sd">                          (sin_,  cos_,  0),</span>
-<span class="sd">                          (   0,     0,  1),))</span>
-<span class="sd">            return sympy.Matrix(R)</span>
-
-<span class="sd">        kpts = np.array([[x, y, a, c, d, ori]])</span>
-<span class="sd">        kp = ktool.get_invV_mats(kpts, with_trans=True)[0]</span>
-<span class="sd">        invV = sympy.Matrix(kp)</span>
-<span class="sd">        V = invV.inv()</span>
-<span class="sd">        ss = sympy.sqrt(patch_size) * 3.0</span>
-<span class="sd">        T = sympy.Matrix(ltool.translation_mat3x3(-x, -y, None))  # Center the patch</span>
-<span class="sd">        R = sympy_rotation_mat3x3(-ori)  # Rotate the centered unit circle patch</span>
-<span class="sd">        S = sympy.Matrix(ltool.scale_mat3x3(ss, dtype=None))  # scale from unit circle to the patch size</span>
-<span class="sd">        X = sympy.Matrix(ltool.translation_mat3x3(half_patch_size, half_patch_size, None))  # Translate back to patch-image coordinates</span>
-
-<span class="sd">        sympy.MatMul(X, S, hold=True)</span>
-
-<span class="sd">        def add_matmul_hold_prop(mat):</span>
-<span class="sd">            #import functools</span>
-<span class="sd">            def matmul_hold(other, hold=True):</span>
-<span class="sd">                new = sympy.MatMul(mat, other, hold=hold)</span>
-<span class="sd">                add_matmul_hold_prop(new)</span>
-<span class="sd">                return new</span>
-<span class="sd">            #matmul_hold = functools.partial(sympy.MatMul, mat, hold=True)</span>
-<span class="sd">            setattr(mat, &#39;matmul_hold&#39;, matmul_hold)</span>
-<span class="sd">        add_matmul_hold_prop(X)</span>
-<span class="sd">        add_matmul_hold_prop(S)</span>
-<span class="sd">        add_matmul_hold_prop(R)</span>
-<span class="sd">        add_matmul_hold_prop(V)</span>
-<span class="sd">        add_matmul_hold_prop(T)</span>
-
-<span class="sd">        M = X.matmul_hold(S).matmul_hold(R).matmul_hold(V).matmul_hold(T)</span>
-<span class="sd">        #M = X.multiply(S).multiply(R).multiply(V).multiply(T)</span>
-
-
-<span class="sd">        V_full = R.multiply(V).multiply(T)</span>
-<span class="sd">        sympy.latex(V_full)</span>
-<span class="sd">        print(sympy.latex(R.multiply(V).multiply(T)))</span>
-<span class="sd">        print(sympy.latex(X))</span>
-<span class="sd">        print(sympy.latex(S))</span>
-<span class="sd">        print(sympy.latex(R))</span>
-<span class="sd">        print(sympy.latex(invV) + &#39;^{-1}&#39;)</span>
-<span class="sd">        print(sympy.latex(T))</span>
+<span class="sd">    Ignore:</span>
+<span class="sd">        &gt;&gt;&gt; # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.patch import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import sympy</span>
+<span class="sd">        &gt;&gt;&gt; from sympy.abc import theta</span>
+<span class="sd">        &gt;&gt;&gt; ori = theta</span>
+<span class="sd">        &gt;&gt;&gt; x, y, a, c, d, patch_size = sympy.symbols(&#39;x y a c d S&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; half_patch_size = patch_size / 2</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; def sympy_rotation_mat3x3(radians):</span>
+<span class="sd">        &gt;&gt;&gt;     # TODO: handle array impouts</span>
+<span class="sd">        &gt;&gt;&gt;     sin_ = sympy.sin(radians)</span>
+<span class="sd">        &gt;&gt;&gt;     cos_ = sympy.cos(radians)</span>
+<span class="sd">        &gt;&gt;&gt;     R = np.array(((cos_, -sin_,  0),</span>
+<span class="sd">        &gt;&gt;&gt;                   (sin_,  cos_,  0),</span>
+<span class="sd">        &gt;&gt;&gt;                   (   0,     0,  1),))</span>
+<span class="sd">        &gt;&gt;&gt;     return sympy.Matrix(R)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; kpts = np.array([[x, y, a, c, d, ori]])</span>
+<span class="sd">        &gt;&gt;&gt; kp = ktool.get_invV_mats(kpts, with_trans=True)[0]</span>
+<span class="sd">        &gt;&gt;&gt; invV = sympy.Matrix(kp)</span>
+<span class="sd">        &gt;&gt;&gt; V = invV.inv()</span>
+<span class="sd">        &gt;&gt;&gt; ss = sympy.sqrt(patch_size) * 3.0</span>
+<span class="sd">        &gt;&gt;&gt; T = sympy.Matrix(ltool.translation_mat3x3(-x, -y, None))  # Center the patch</span>
+<span class="sd">        &gt;&gt;&gt; R = sympy_rotation_mat3x3(-ori)  # Rotate the centered unit circle patch</span>
+<span class="sd">        &gt;&gt;&gt; S = sympy.Matrix(ltool.scale_mat3x3(ss, dtype=None))  # scale from unit circle to the patch size</span>
+<span class="sd">        &gt;&gt;&gt; X = sympy.Matrix(ltool.translation_mat3x3(half_patch_size, half_patch_size, None))  # Translate back to patch-image coordinates</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; sympy.MatMul(X, S, hold=True)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; def add_matmul_hold_prop(mat):</span>
+<span class="sd">        &gt;&gt;&gt;     #import functools</span>
+<span class="sd">        &gt;&gt;&gt;     def matmul_hold(other, hold=True):</span>
+<span class="sd">        &gt;&gt;&gt;         new = sympy.MatMul(mat, other, hold=hold)</span>
+<span class="sd">        &gt;&gt;&gt;         add_matmul_hold_prop(new)</span>
+<span class="sd">        &gt;&gt;&gt;         return new</span>
+<span class="sd">        &gt;&gt;&gt;     #matmul_hold = functools.partial(sympy.MatMul, mat, hold=True)</span>
+<span class="sd">        &gt;&gt;&gt;     setattr(mat, &#39;matmul_hold&#39;, matmul_hold)</span>
+<span class="sd">        &gt;&gt;&gt; add_matmul_hold_prop(X)</span>
+<span class="sd">        &gt;&gt;&gt; add_matmul_hold_prop(S)</span>
+<span class="sd">        &gt;&gt;&gt; add_matmul_hold_prop(R)</span>
+<span class="sd">        &gt;&gt;&gt; add_matmul_hold_prop(V)</span>
+<span class="sd">        &gt;&gt;&gt; add_matmul_hold_prop(T)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; M = X.matmul_hold(S).matmul_hold(R).matmul_hold(V).matmul_hold(T)</span>
+<span class="sd">        &gt;&gt;&gt; #M = X.multiply(S).multiply(R).multiply(V).multiply(T)</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; V_full = R.multiply(V).multiply(T)</span>
+<span class="sd">        &gt;&gt;&gt; sympy.latex(V_full)</span>
+<span class="sd">        &gt;&gt;&gt; print(sympy.latex(R.multiply(V).multiply(T)))</span>
+<span class="sd">        &gt;&gt;&gt; print(sympy.latex(X))</span>
+<span class="sd">        &gt;&gt;&gt; print(sympy.latex(S))</span>
+<span class="sd">        &gt;&gt;&gt; print(sympy.latex(R))</span>
+<span class="sd">        &gt;&gt;&gt; print(sympy.latex(invV) + &#39;^{-1}&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(sympy.latex(T))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cv2_warp_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="c1">#&#39;flags&#39;: cv2.INTER_LINEAR,</span>
@@ -865,8 +903,7 @@
 
 
 <div class="viewcode-block" id="patch_gaussian_weighted_average_intensities"><a class="viewcode-back" href="../../vtool.html#vtool.patch.patch_gaussian_weighted_average_intensities">[docs]</a><span class="k">def</span> <span class="nf">patch_gaussian_weighted_average_intensities</span><span class="p">(</span><span class="n">probchip</span><span class="p">,</span> <span class="n">kpts_</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
 
     <span class="n">patch_size</span> <span class="o">=</span> <span class="mi">41</span>
@@ -1026,7 +1063,7 @@
 <span class="sd">        sigma is a Gaussian function with spread sqrt(2)*sigma scaled by the</span>
 <span class="sd">        area of the Gaussian filter</span>
 
-<span class="sd">    Example0:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.patch import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; from mpl_toolkits.mplot3d import Axes3D  # NOQA</span>
@@ -1046,7 +1083,7 @@
 <span class="sd">        &gt;&gt;&gt; pt.imshow(img * 255, fnum=1, pnum=(1, 3, 3))</span>
 <span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; # demonstrate cascading smoothing property</span>
 <span class="sd">        &gt;&gt;&gt; # THIS ISNT WORKING WHY???</span>
@@ -1173,11 +1210,11 @@
     <span class="c1"># build test data</span>
     <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
     <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
-    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">input</span>
+    <span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">input</span>
     <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
 
     <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">wbia.scripts.thesis</span> <span class="k">import</span> <span class="n">TMP_RC</span>
+        <span class="kn">from</span> <span class="nn">wbia.scripts.thesis</span> <span class="kn">import</span> <span class="n">TMP_RC</span>
         <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 
         <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">TMP_RC</span><span class="p">)</span>
@@ -1451,7 +1488,13 @@
         <span class="n">pt</span><span class="o">.</span><span class="n">set_figtitle</span><span class="p">(</span><span class="s1">&#39;python orimg&#39;</span><span class="p">)</span>
     <span class="n">submax_ori_offsets</span> <span class="o">=</span> <span class="n">submaxima_x</span>
     <span class="k">if</span> <span class="n">DEBUG_ROTINVAR</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;submaxima_x, submaxima_y = </span><span class="si">%r</span><span class="s1">, </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">submaxima_x</span><span class="p">,</span> <span class="n">submaxima_y</span><span class="p">,))</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s1">&#39;submaxima_x, submaxima_y = </span><span class="si">%r</span><span class="s1">, </span><span class="si">%r</span><span class="s1">&#39;</span>
+            <span class="o">%</span> <span class="p">(</span>
+                <span class="n">submaxima_x</span><span class="p">,</span>
+                <span class="n">submaxima_y</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">htool</span><span class="o">.</span><span class="n">show_hist_submaxima</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">)</span>
         <span class="n">pt</span><span class="o">.</span><span class="n">set_figtitle</span><span class="p">(</span><span class="s1">&#39;python hist&#39;</span><span class="p">)</span>
         <span class="n">pt</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -1619,71 +1662,31 @@
     <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Wild Me.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

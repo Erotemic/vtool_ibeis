@@ -166,12 +166,8 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
     Kwargs:
         tpr (float): target true positive rate (default .90)
         fpr (float): target false positive rate (default None)
-        gridsize=1024,
-        adjust=8,
-        monotonize=False, if True ensures inferred probability curves are monotonic
-        clip_factor=None,
         reverse (bool): True if lower scores are better, False if higher scores
-            are better (default=None)
+        are better (default=None)
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -771,7 +767,7 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
             python -m vtool.score_normalization --exec-ScoreNormalizer.visualize:0 --show
             python -m vtool.score_normalization --exec-ScoreNormalizer.visualize:1 --show
 
-        Example0:
+        Example:
             >>> # UNSTABLE_DOCTEST
             >>> from vtool.score_normalization import *  # NOQA
             >>> import vtool as vt
@@ -784,7 +780,7 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
             >>> encoder.visualize(**kwargs)
             >>> ut.show_if_requested()
 
-        Example1:
+        Example:
             >>> # UNSTABLE_DOCTEST
             >>> from vtool.score_normalization import *  # NOQA
             >>> import vtool as vt

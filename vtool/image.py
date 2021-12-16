@@ -699,30 +699,30 @@ def open_image_size(image_fpath):
         size = (800, 441)
 
     Ignore:
-        # Confirm that Image.open is a lazy load
-        import vtool as vt
-        import utool as ut
-        import timeit
-        setup = ut.codeblock(
-            '''
-            from PIL import Image
-            import utool as ut
-            import vtool as vt
-            image_fpath = ut.grab_test_imgpath('patsy.jpg')
-            '''
-        )
-        t1 = timeit.timeit('Image.open(image_fpath)', setup, number=100)
-        t2 = timeit.timeit('Image.open(image_fpath).size', setup, number=100)
-        t3 = timeit.timeit('vt.open_image_size(image_fpath)', setup, number=100)
-        t4 = timeit.timeit('vt.imread(image_fpath).shape', setup, number=100)
-        t5 = timeit.timeit('Image.open(image_fpath).getdata()', setup, number=100)
-        print('t1 = %r' % (t1,))
-        print('t2 = %r' % (t2,))
-        print('t3 = %r' % (t3,))
-        print('t4 = %r' % (t4,))
-        print('t5 = %r' % (t5,))
-        assert t2 < t5
-        assert t3 < t4
+        >>> # Confirm that Image.open is a lazy load
+        >>> import vtool as vt
+        >>> import utool as ut
+        >>> import timeit
+        >>> setup = ut.codeblock(
+        >>>     '''
+        >>>     from PIL import Image
+        >>>     import utool as ut
+        >>>     import vtool as vt
+        >>>     image_fpath = ut.grab_test_imgpath('patsy.jpg')
+        >>>     '''
+        >>> )
+        >>> t1 = timeit.timeit('Image.open(image_fpath)', setup, number=100)
+        >>> t2 = timeit.timeit('Image.open(image_fpath).size', setup, number=100)
+        >>> t3 = timeit.timeit('vt.open_image_size(image_fpath)', setup, number=100)
+        >>> t4 = timeit.timeit('vt.imread(image_fpath).shape', setup, number=100)
+        >>> t5 = timeit.timeit('Image.open(image_fpath).getdata()', setup, number=100)
+        >>> print('t1 = %r' % (t1,))
+        >>> print('t2 = %r' % (t2,))
+        >>> print('t3 = %r' % (t3,))
+        >>> print('t4 = %r' % (t4,))
+        >>> print('t5 = %r' % (t5,))
+        >>> assert t2 < t5
+        >>> assert t3 < t4
     """
     try:
         pil_img = Image.open(image_fpath)
@@ -775,21 +775,19 @@ def warpAffine(img, Aff, dsize, assume_float01=True):
         >>> pt.imshow(warped_img)
         >>> ut.show_if_requested()
 
-    Timeit:
-        import skimage.transform
-        %timeit cv2.warpAffine(img, Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)
-        100 loops, best of 3: 7.95 ms per loop
-        skimage.transform.AffineTransform
-        tf = skimage.transform.AffineTransform(rotation=TAU / 8)
-        Aff_ = tf.params
-        out = skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode='constant', order=1)
-        %timeit skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode='constant', order=1)
-        100 loops, best of 3: 5.74 ms per loop
-        %timeit cv2.warpAffine(img[:, :, 0], Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)
-        100 loops, best of 3: 5.13 ms per loop
-
-        CONCLUSION, cv2 transforms are better
-
+    Ignore:
+        >>> import skimage.transform
+        >>> %timeit cv2.warpAffine(img, Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)
+        >>> 100 loops, best of 3: 7.95 ms per loop
+        >>> skimage.transform.AffineTransform
+        >>> tf = skimage.transform.AffineTransform(rotation=TAU / 8)
+        >>> Aff_ = tf.params
+        >>> out = skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode='constant', order=1)
+        >>> %timeit skimage.transform._warps_cy._warp_fast(img[:, :, 0], Aff_, output_shape=dsize, mode='constant', order=1)
+        >>> 100 loops, best of 3: 5.74 ms per loop
+        >>> %timeit cv2.warpAffine(img[:, :, 0], Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)
+        >>> 100 loops, best of 3: 5.13 ms per loop
+        >>> CONCLUSION, cv2 transforms are better
     """
     warped_img = cv2.warpAffine(img, Aff[0:2], tuple(dsize), **CV2_WARP_KWARGS)
     if assume_float01 and img.dtype.kind == 'f':
@@ -1915,7 +1913,7 @@ def draw_text(
         >>> pt.imshow(img)
         >>> ut.show_if_requested()
 
-    Example1:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.image import *  # NOQA
         >>> import vtool as vt

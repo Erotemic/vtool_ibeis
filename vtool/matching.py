@@ -470,14 +470,14 @@ class PairwiseMatch(ub.NiceRepr):
             >>> m1 = match.copy().assign({'symmetric': False})
             >>> m2 = match.copy().assign({'symmetric': True})
 
-        Grid:
-            from vtool.matching import *  # NOQA
-            grid = {
-                'symmetric': [True, False],
-            }
-            for cfgdict in ut.all_dict_combinations(grid):
-                match = demodata_match(cfgdict, apply=False)
-                match.assign()
+        Example:
+            >>> from vtool.matching import *  # NOQA
+            >>> grid = {
+            >>>     'symmetric': [True, False],
+            >>> }
+            >>> for cfgdict in ut.all_dict_combinations(grid):
+            >>>     match = demodata_match(cfgdict, apply=False)
+            >>>     match.assign()
         """
         params = match._take_params(
             cfgdict, ['K', 'Knorm', 'symmetric', 'checks', 'weight']
@@ -1001,10 +1001,10 @@ class AnnotPairFeatInfo(object):
     Information class about feature dimensions of PairwiseMatch.
 
     Notes:
-        * Can be used to compute marginal importances over groups of features
+        Can be used to compute marginal importances over groups of features
         used in the pairwise one-vs-one scoring algorithm
 
-        * Can be used to construct an appropriate cfgdict for a new
+        Can be used to construct an appropriate cfgdict for a new
         PairwiseMatch.
 
     CommandLine:
@@ -1765,56 +1765,57 @@ def assign_symmetric_matches(
     fx2_to_fx1, fx2_to_dist, fx1_to_fx2, fx1_to_dist, K, Knorm=None
 ):
     r"""
-    import vtool as vt
-    from vtool.matching import *
-    K = 2
-    Knorm = 1
-    feat1 = np.random.rand(5, 3)
-    feat2 = np.random.rand(7, 3)
-
-    # Assign distances
-    distmat = vt.L2(feat1[:, None], feat2[None, :])
-
-    # Find nearest K
-    fx1_to_fx2 = distmat.argsort()[:, 0:K + Knorm]
-    fx2_to_fx1 = distmat.T.argsort()[:, 0:K + Knorm]
-    # and order their distances
-    fx1_to_dist = np.array([distmat[i].take(col) for i, col in enumerate(fx1_to_fx2)])
-    fx2_to_dist = np.array([distmat.T[j].take(row) for j, row in enumerate(fx2_to_fx1)])
-
-    # flat_matx1 = fx1_to_fx2 + np.arange(distmat.shape[0])[:, None] * distmat.shape[1]
-    # fx1_to_dist = distmat.take(flat_matx1).reshape(fx1_to_fx2.shape)
-
-    fx21 = pd.DataFrame(fx2_to_fx1)
-    fx21.columns.name = 'K'
-    fx21.index.name = 'fx1'
-
-    fx12 = pd.DataFrame(fx1_to_fx2)
-    fx12.columns.name = 'K'
-    fx12.index.name = 'fx2'
-
-    fx12 = fx12.T[0:K].T.astype(np.float)
-    fx21 = fx21.T[0:K].T.astype(np.float)
-
-    fx12.values[~fx1_to_flags] = np.nan
-    fx21.values[~fx2_to_flags] = np.nan
-
-    print('fx12.values =\n%r' % (fx12,))
-    print('fm_ =\n%r' % (fm_,))
-
-    print('fx21.values =\n%r' % (fx21,))
-    print('fm =\n%r' % (fm,))
-
-    unflat_match_idx2 = -np.ones(fx2_to_fx1.shape)
-    unflat_match_idx2.ravel()[flat_match_idx2] = flat_match_idx2
-    inv_lookup21 = unflat_match_idx2.T[0:K].T
-
-    for fx2 in zip(fx12.values[fx1_to_flags]:
-
-    for fx1, fx2 in zip(match_fx1_, match_fx2_):
-        cx = np.where(fx2_to_fx1[fx2][0:K] == fx1)[0][0]
-        inv_idx = inv_lookup21[fx2][cx]
-        print('inv_idx = %r' % (inv_idx,))
+    Ignore:
+        >>> import vtool as vt
+        >>> from vtool.matching import *
+        >>> K = 2
+        >>> Knorm = 1
+        >>> feat1 = np.random.rand(5, 3)
+        >>> feat2 = np.random.rand(7, 3)
+        >>>
+        >>> # Assign distances
+        >>> distmat = vt.L2(feat1[:, None], feat2[None, :])
+        >>>
+        >>> # Find nearest K
+        >>> fx1_to_fx2 = distmat.argsort()[:, 0:K + Knorm]
+        >>> fx2_to_fx1 = distmat.T.argsort()[:, 0:K + Knorm]
+        >>> # and order their distances
+        >>> fx1_to_dist = np.array([distmat[i].take(col) for i, col in enumerate(fx1_to_fx2)])
+        >>> fx2_to_dist = np.array([distmat.T[j].take(row) for j, row in enumerate(fx2_to_fx1)])
+        >>>
+        >>> # flat_matx1 = fx1_to_fx2 + np.arange(distmat.shape[0])[:, None] * distmat.shape[1]
+        >>> # fx1_to_dist = distmat.take(flat_matx1).reshape(fx1_to_fx2.shape)
+        >>>
+        >>> fx21 = pd.DataFrame(fx2_to_fx1)
+        >>> fx21.columns.name = 'K'
+        >>> fx21.index.name = 'fx1'
+        >>>
+        >>> fx12 = pd.DataFrame(fx1_to_fx2)
+        >>> fx12.columns.name = 'K'
+        >>> fx12.index.name = 'fx2'
+        >>>
+        >>> fx12 = fx12.T[0:K].T.astype(np.float)
+        >>> fx21 = fx21.T[0:K].T.astype(np.float)
+        >>>
+        >>> fx12.values[~fx1_to_flags] = np.nan
+        >>> fx21.values[~fx2_to_flags] = np.nan
+        >>>
+        >>> print('fx12.values =\n%r' % (fx12,))
+        >>> print('fm_ =\n%r' % (fm_,))
+        >>>
+        >>> print('fx21.values =\n%r' % (fx21,))
+        >>> print('fm =\n%r' % (fm,))
+        >>>
+        >>> unflat_match_idx2 = -np.ones(fx2_to_fx1.shape)
+        >>> unflat_match_idx2.ravel()[flat_match_idx2] = flat_match_idx2
+        >>> inv_lookup21 = unflat_match_idx2.T[0:K].T
+        >>>
+        >>> for fx2 in zip(fx12.values[fx1_to_flags]:
+        >>>
+        >>> for fx1, fx2 in zip(match_fx1_, match_fx2_):
+        >>>     cx = np.where(fx2_to_fx1[fx2][0:K] == fx1)[0][0]
+        >>>     inv_idx = inv_lookup21[fx2][cx]
+        >>>     print('inv_idx = %r' % (inv_idx,))
     """
     # Infer the valid internal query feature indexes and ranks
     if Knorm is None:

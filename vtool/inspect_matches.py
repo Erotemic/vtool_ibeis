@@ -9,7 +9,7 @@ try:
 
     INSPECT_BASE = gt.GuitoolWidget
     MatplotlibWidget = mpl_widget.MatplotlibWidget
-except ImportError:
+except (ImportError, TypeError):
     import warnings
 
     warnings.warn('WARNING: guitool not available')
@@ -56,7 +56,7 @@ try:
             ut.ParamInfo('line_alpha', 0.35, min_=0, max_=1, hideif=':not overlay'),
         ]
     )
-except ImportError:
+except (ImportError, TypeError):
     pass
 
 

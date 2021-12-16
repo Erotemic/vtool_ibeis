@@ -139,7 +139,7 @@ def draw_verts(img_in, verts, color=(0, 128, 255), thickness=2, out=None):
         >>> pt.imshow(img)
         >>> pt.show_if_requested()
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.geometry import *  # NOQA
         >>> # xdoctest: +REQUIRES(--show)
@@ -329,7 +329,7 @@ def closest_point_on_vert_segments(p, verts):
 def closest_point_on_bbox(p, bbox):
     """
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.geometry import *  # NOQA
         >>> p_list = np.array([[19, 7], [7, 14], [14, 11], [8, 7], [23, 21]], dtype=np.float)

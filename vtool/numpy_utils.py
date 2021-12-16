@@ -35,7 +35,7 @@ def atleast_nd(arr, n, tofront=False):
     See Also:
         ensure_shape, np.atleast_1d, np.atleast_2d, np.atleast_3d
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.numpy_utils import *  # NOQA
         >>> import ubelt as ub
@@ -99,16 +99,16 @@ def ensure_shape(arr, dimshape):
 
 
 def fromiter_nd(iter_, shape, dtype):
-    """
+    r"""
     Like np.fromiter but handles iterators that generated
     n-dimensional arrays. Slightly faster than np.array.
 
     Note:
-        np.vstack(list_) is still faster than
-        vt.fromiter_nd(ut.iflatten(list_))
+        np.vstack(list\_) is still faster than
+        vt.fromiter_nd(ut.iflatten(list\_))
 
     Args:
-        iter_ (iter): an iterable that generates homogenous ndarrays
+        iter\_ (iter): an iterable that generates homogenous ndarrays
         shape (tuple): the expected output shape
         dtype (dtype): the numpy datatype of the generated ndarrays
 
@@ -142,7 +142,7 @@ def fromiter_nd(iter_, shape, dtype):
         >>> result = fromiter_nd(iter_, shape, dtype)
         >>> assert result.shape == shape
 
-    Timeit:
+    Ignore:
         >>> dtype = np.uint8
         >>> feat_dim = 128
         >>> mu = 1000
@@ -163,15 +163,15 @@ def fromiter_nd(iter_, shape, dtype):
         >>> shape = (n_total, feat_dim)
         >>> target2 = vt.fromiter_nd(it.chain.from_iterable(vecs_list), shape, dtype=dtype)
         >>> assert np.all(target1 == target2)
-
-        %timeit np.vstack(vecs_list)
-        20.4ms
-        %timeit vt.fromiter_nd(it.chain.from_iterable(vecs_list), shape, dtype)
-        102ms
-
-        iter_ = it.chain.from_iterable(vecs_list)
-        %time vt.fromiter_nd(iter_, shape, dtype)
-        %time np.vstack(vecs_list)
+        >>>
+        >>> %timeit np.vstack(vecs_list)
+        >>> 20.4ms
+        >>> %timeit vt.fromiter_nd(it.chain.from_iterable(vecs_list), shape, dtype)
+        >>> 102ms
+        >>>
+        >>> iter_ = it.chain.from_iterable(vecs_list)
+        >>> %time vt.fromiter_nd(iter_, shape, dtype)
+        >>> %time np.vstack(vecs_list)
     """
     num_rows = shape[0]
     chunksize = np.prod(shape[1:])

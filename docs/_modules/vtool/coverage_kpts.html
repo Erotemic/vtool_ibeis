@@ -1,19 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>vtool.coverage_kpts &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -34,14 +32,13 @@
             
   <h1>Source code for vtool.coverage_kpts</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">map</span><span class="p">,</span> <span class="n">reduce</span>  <span class="c1"># NOQA</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">map</span><span class="p">,</span> <span class="n">reduce</span>  <span class="c1"># NOQA</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
 <span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">patch</span> <span class="k">as</span> <span class="n">ptool</span>
-<span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">keypoint</span> <span class="k">as</span> <span class="n">ktool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">patch</span> <span class="k">as</span> <span class="n">ptool</span>
+<span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">keypoint</span> <span class="k">as</span> <span class="n">ktool</span>
 
 
 <span class="c1"># TODO: integrate more</span>
@@ -70,8 +67,8 @@
 <span class="sd">        python -m vtool.coverage_kpts make_kpts_heatmask --show</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
-<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:plottool)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:pyhesaff)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:wbia)</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.coverage_kpts import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
 <span class="sd">        &gt;&gt;&gt; import pyhesaff</span>
@@ -169,8 +166,8 @@
 <span class="sd">        tuple (ndarray, ndarray): dstimg, patch</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
-<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:plottool)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:pyhesaff)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:wbia)</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.coverage_kpts import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
 <span class="sd">        &gt;&gt;&gt; import wbia.plottool as pt</span>
@@ -188,6 +185,8 @@
 <span class="sd">        &gt;&gt;&gt; show_coverage_map(chip, mask, patch, kpts)</span>
 <span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+
     <span class="k">if</span> <span class="n">patch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">patch</span> <span class="o">=</span> <span class="n">get_gaussian_weight_patch</span><span class="p">(</span><span class="n">cov_gauss_shape</span><span class="p">,</span> <span class="n">cov_gauss_sigma_frac</span><span class="p">)</span>
     <span class="n">chipshape</span> <span class="o">=</span> <span class="n">chipsize</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -263,7 +262,8 @@
 <span class="sd">        python -m vtool.coverage_kpts --test-warp_patch_onto_kpts --show --square --hole</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:pyhesaff)</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(module:wbia)</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.coverage_kpts import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
 <span class="sd">        &gt;&gt;&gt; import pyhesaff</span>
@@ -337,9 +337,9 @@
         <span class="n">S2</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">scale_mat3x3</span><span class="p">(</span><span class="n">cov_scale_factor</span><span class="p">,</span> <span class="n">cov_scale_factor</span><span class="p">)</span>
         <span class="c1"># perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cov_remove_scale</span><span class="p">:</span>
-            <span class="n">M_list</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">matrix_multiply</span><span class="p">,</span> <span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">kpts_T</span><span class="p">,</span> <span class="n">kpts_S</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">T1</span><span class="p">))</span>
+            <span class="n">M_list</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">,</span> <span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">kpts_T</span><span class="p">,</span> <span class="n">kpts_S</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">T1</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">M_list</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">vt</span><span class="o">.</span><span class="n">matrix_multiply</span><span class="p">,</span> <span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">kpts_T</span><span class="p">,</span> <span class="n">T1</span><span class="p">))</span>
+            <span class="n">M_list</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">,</span> <span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">kpts_T</span><span class="p">,</span> <span class="n">T1</span><span class="p">))</span>
     <span class="c1"># &lt;/HACK&gt;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">M_list</span> <span class="o">=</span> <span class="n">ktool</span><span class="o">.</span><span class="n">get_transforms_from_patch_image_kpts</span><span class="p">(</span>
@@ -388,6 +388,8 @@
 <span class="sd">    References:</span>
 <span class="sd">        http://docs.opencv.org/modules/imgproc/doc/geometric_transformations.html#warpaffine</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+
     <span class="n">shape</span> <span class="o">=</span> <span class="n">dsize</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="c1"># warpAffine is weird. If the shape of the dst is the same as src we can</span>
     <span class="c1"># use the dst outvar. I dont know why it needs that.  It seems that this</span>
@@ -458,10 +460,10 @@
 
 
 <div class="viewcode-block" id="get_coverage_kpts_gridsearch_configs"><a class="viewcode-back" href="../../vtool.html#vtool.coverage_kpts.get_coverage_kpts_gridsearch_configs">[docs]</a><span class="k">def</span> <span class="nf">get_coverage_kpts_gridsearch_configs</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; testing function &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;testing function&quot;&quot;&quot;</span>
     <span class="n">varied_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;cov_agg_mode&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">],</span>
-        <span class="c1">#&#39;cov_blur_ksize&#39;         : [(19, 19), (5, 5)],</span>
+        <span class="c1"># &#39;cov_blur_ksize&#39;         : [(19, 19), (5, 5)],</span>
         <span class="s1">&#39;cov_blur_ksize&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)],</span>
         <span class="s1">&#39;cov_blur_on&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
         <span class="s1">&#39;cov_blur_sigma&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">],</span>
@@ -476,10 +478,11 @@
         <span class="s1">&#39;cov_scale_factor&#39;</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
         <span class="s1">&#39;cov_agg_mode&#39;</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="s1">&#39;cov_blur_ksize&#39;</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="c1">#&#39;grid_sigma&#39;        : slice(0, 4),</span>
+        <span class="c1"># &#39;grid_sigma&#39;        : slice(0, 4),</span>
     <span class="p">}</span>
     <span class="n">slice_dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># Make configuration for every parameter setting</span>
+
     <span class="k">def</span> <span class="nf">constrain_func</span><span class="p">(</span><span class="n">cfgdict</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">cfgdict</span><span class="p">[</span><span class="s1">&#39;cov_remove_shape&#39;</span><span class="p">]:</span>
             <span class="n">cfgdict</span><span class="p">[</span><span class="s1">&#39;cov_remove_scale&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
@@ -541,14 +544,14 @@
 
 
 <div class="viewcode-block" id="testdata_coverage"><a class="viewcode-back" href="../../vtool.html#vtool.coverage_kpts.testdata_coverage">[docs]</a><span class="k">def</span> <span class="nf">testdata_coverage</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; testing function &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;testing function&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
 
     <span class="c1"># build test data</span>
     <span class="n">kpts</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">demodata</span><span class="o">.</span><span class="n">get_testdata_kpts</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">with_vecs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># HACK IN DISTINCTIVENESS</span>
     <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">wbia.algo.hots</span> <span class="k">import</span> <span class="n">distinctiveness_normalizer</span>
+        <span class="kn">from</span> <span class="nn">wbia.algo.hots</span> <span class="kn">import</span> <span class="n">distinctiveness_normalizer</span>
 
         <span class="n">cachedir</span> <span class="o">=</span> <span class="n">ub</span><span class="o">.</span><span class="n">ensure_app_cache_dir</span><span class="p">(</span><span class="s1">&#39;ibeis&#39;</span><span class="p">,</span> <span class="s1">&#39;distinctiveness_model&#39;</span><span class="p">)</span>
         <span class="n">species</span> <span class="o">=</span> <span class="s1">&#39;zebra_plains&#39;</span>
@@ -569,7 +572,7 @@
 <div class="viewcode-block" id="show_coverage_map"><a class="viewcode-back" href="../../vtool.html#vtool.coverage_kpts.show_coverage_map">[docs]</a><span class="k">def</span> <span class="nf">show_coverage_map</span><span class="p">(</span>
     <span class="n">chip</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">kpts</span><span class="p">,</span> <span class="n">fnum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ell_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">show_mask_kpts</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; testing function &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;testing function&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
 
     <span class="k">if</span> <span class="n">fnum</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -615,7 +618,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
 </ul>
@@ -630,17 +633,15 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -657,7 +658,7 @@
       &copy;2020, Wild Me.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

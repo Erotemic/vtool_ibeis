@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool._grave &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool._grave</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for vtool._grave</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">vtool.inspect_matches</span> <span class="kn">import</span> <span class="n">lazy_test_annot</span>
+<span class="kn">from</span> <span class="nn">vtool.score_normalization</span> <span class="kn">import</span> <span class="n">check_unused_kwargs</span>
+<span class="kn">from</span> <span class="nn">vtool.inspect_matches</span> <span class="kn">import</span> <span class="n">INSPECT_BASE</span><span class="p">,</span> <span class="n">MatchInspector</span>
+
+<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+
+<div class="viewcode-block" id="ScoreNormalizerUnsupervised"><a class="viewcode-back" href="../../vtool.html#vtool._grave.ScoreNormalizerUnsupervised">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">ReloadingMetaclass</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ScoreNormalizerUnsupervised</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">learn_kw</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">update_existing</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">gridsize</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+                <span class="n">adjust</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                <span class="n">monotonize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="c1"># monotonize=True,</span>
+                <span class="c1"># clip_factor=(ut.PHI + 1),</span>
+                <span class="n">clip_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_unused_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">encoder</span><span class="o">.</span><span class="n">learn_kw</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="c1"># Target recall for learned threshold</span>
+        <span class="c1"># Support data</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">support</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Learned score normalization</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">score_domain</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScoreNormalizerUnsupervised.fit"><a class="viewcode-back" href="../../vtool.html#vtool._grave.ScoreNormalizerUnsupervised.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fits estimator to data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">learn_probabilities</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScoreNormalizerUnsupervised.learn_probabilities"><a class="viewcode-back" href="../../vtool.html#vtool._grave.ScoreNormalizerUnsupervised.learn_probabilities">[docs]</a>    <span class="k">def</span> <span class="nf">learn_probabilities</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+        <span class="n">gridsize</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">learn_kw</span><span class="p">[</span><span class="s1">&#39;gridsize&#39;</span><span class="p">]</span>
+        <span class="n">adjust</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">learn_kw</span><span class="p">[</span><span class="s1">&#39;adjust&#39;</span><span class="p">]</span>
+        <span class="c1"># Record support</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">support</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="n">xdata</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="p">)]</span>
+        <span class="n">xdata_pdf</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">estimate_pdf</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">gridsize</span><span class="o">=</span><span class="n">gridsize</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="n">adjust</span><span class="p">)</span>
+        <span class="c1"># Find good score domain range</span>
+        <span class="n">min_score</span><span class="p">,</span> <span class="n">max_score</span> <span class="o">=</span> <span class="n">xdata</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">xdata</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">xdata_domain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_score</span><span class="p">,</span> <span class="n">max_score</span><span class="p">,</span> <span class="n">gridsize</span><span class="p">)</span>
+        <span class="n">p_xdata</span> <span class="o">=</span> <span class="n">xdata_pdf</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">xdata_domain</span><span class="p">)</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">p_xdata</span> <span class="o">=</span> <span class="n">p_xdata</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">xdata_domain</span> <span class="o">=</span> <span class="n">xdata_domain</span>
+        <span class="kn">import</span> <span class="nn">scipy.interpolate</span>
+
+        <span class="n">encoder</span><span class="o">.</span><span class="n">interp_fn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
+            <span class="n">encoder</span><span class="o">.</span><span class="n">xdata_domain</span><span class="p">,</span>
+            <span class="n">encoder</span><span class="o">.</span><span class="n">p_xdata</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+            <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ScoreNormalizerUnsupervised.visualize"><a class="viewcode-back" href="../../vtool.html#vtool._grave.ScoreNormalizerUnsupervised.visualize">[docs]</a>    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="n">encoder</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">wbia.plottool</span> <span class="k">as</span> <span class="nn">pt</span>
+
+        <span class="c1"># is_timedata = False</span>
+        <span class="n">is_timedelta</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">p_xdata</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">p_xdata</span>
+        <span class="n">xdata_domain</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">xdata_domain</span>
+        <span class="c1"># if is_timedata:</span>
+        <span class="c1">#    xdata_domain_ = [ut.unixtime_to_datetimeobj(unixtime) for unixtime in xdata_domain]</span>
+        <span class="k">if</span> <span class="n">is_timedelta</span><span class="p">:</span>
+            <span class="c1"># xdata_domain_ = [ut.unixtime_to_timedelta(unixtime) for unixtime in xdata_domain]</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="c1"># xdata_domain_ = xdata_domain</span>
+        <span class="n">pt</span><span class="o">.</span><span class="n">plot_probabilities</span><span class="p">([</span><span class="n">p_xdata</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">],</span> <span class="n">xdata</span><span class="o">=</span><span class="n">xdata_domain</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+        <span class="c1"># HISTOGRAM</span>
+        <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">support</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span>
+            <span class="n">xdata</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="p">)]</span>
+            <span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;xdata&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_timedelta</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time Delta&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Timedelta distribution&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">timeTicks</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+                <span class="kn">import</span> <span class="nn">datetime</span>
+
+                <span class="n">d</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+
+            <span class="n">formatter</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">ticker</span><span class="o">.</span><span class="n">FuncFormatter</span><span class="p">(</span><span class="n">timeTicks</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+            <span class="n">pt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span></div></div>
+        <span class="c1"># if is_timedata:</span>
+        <span class="c1">#    ax.set_xlabel(&#39;Date&#39;)</span>
+        <span class="c1">#    ax.set_title(&#39;Timestamp distribution&#39;)</span>
+        <span class="c1">#    pt.gcf().autofmt_xdate()</span>
+        <span class="c1"># ax.set_title(&#39;Timestamp distribution of %s&#39; % (ibs.get_dbname()))</span>
+        <span class="c1"># pt.gcf().autofmt_xdate()</span>
+
+
+<div class="viewcode-block" id="bow_test"><a class="viewcode-back" href="../../vtool.html#vtool._grave.bow_test">[docs]</a><span class="k">def</span> <span class="nf">bow_test</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">/=</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">c1</span> <span class="o">/=</span> <span class="n">c1</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">c2</span> <span class="o">/=</span> <span class="n">c2</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># fred_query = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># sue_query  = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># tom_query  = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># # columns that are distinctive per name</span>
+    <span class="c1"># #                      f1  f2  s1  s2  s3  t1  z1  z2  z3  z4, z5, z6</span>
+    <span class="c1"># fred1      = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># fred2      = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># sue1       = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># sue2       = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># sue3       = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+    <span class="c1"># tom1       = np.array([ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0], dtype=np.float)</span>
+
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">,</span> <span class="s1">&#39;sue&#39;</span><span class="p">,</span> <span class="s1">&#39;tom&#39;</span><span class="p">]</span>
+    <span class="n">num_exemplars</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">ax2_nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ut</span><span class="o">.</span><span class="n">flatten</span><span class="p">([[</span><span class="n">nx</span><span class="p">]</span> <span class="o">*</span> <span class="n">num</span> <span class="k">for</span> <span class="n">nx</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">num_exemplars</span><span class="p">)]))</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">num_exemplars</span><span class="p">)</span>
+
+    <span class="n">num_words</span> <span class="o">=</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="c1"># bow vector for database</span>
+    <span class="n">darr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">total</span><span class="p">,</span> <span class="n">num_words</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">darr</span><span class="p">)):</span>
+        <span class="c1"># nx = ax2_nx[ax]</span>
+        <span class="c1"># num = num_exemplars[nx]</span>
+        <span class="n">darr</span><span class="p">[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">darr</span><span class="p">[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span> <span class="o">+</span> <span class="n">total</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># nx2_axs = dict(zip(*))</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">groupxs</span> <span class="o">=</span> <span class="n">vt</span><span class="o">.</span><span class="n">group_indices</span><span class="p">(</span><span class="n">ax2_nx</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">class_bows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">arr</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">vt</span><span class="o">.</span><span class="n">apply_grouping</span><span class="p">(</span><span class="n">darr</span><span class="p">,</span> <span class="n">groupxs</span><span class="p">)])</span>
+    <span class="c1"># generate a query for each class</span>
+    <span class="n">true_class_bows</span> <span class="o">=</span> <span class="n">class_bows</span><span class="p">[:]</span>
+    <span class="c1"># noise words</span>
+    <span class="n">true_class_bows</span><span class="p">[:,</span> <span class="o">-</span><span class="n">total</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">true_class_bows</span> <span class="o">=</span> <span class="n">true_class_bows</span> <span class="o">/</span> <span class="n">true_class_bows</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">class_bows</span> <span class="o">=</span> <span class="n">class_bows</span> <span class="o">/</span> <span class="n">class_bows</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">confusion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="c1"># bow vector for query</span>
+        <span class="n">qarr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">num_words</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">cx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">class_bows</span><span class="p">)):</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_words</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">true_class_bows</span><span class="p">[</span><span class="n">cx</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_words</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">qarr</span><span class="p">[</span><span class="n">cx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">hist</span> <span class="o">/</span> <span class="n">hist</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="mf">0.5</span>
+        <span class="c1"># normalize histograms</span>
+        <span class="n">qarr</span> <span class="o">=</span> <span class="n">qarr</span> <span class="o">/</span> <span class="n">qarr</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="c1"># Scoring for each class</span>
+        <span class="n">similarity</span> <span class="o">=</span> <span class="n">qarr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">class_bows</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">similarity</span>
+        <span class="n">confusion</span> <span class="o">+=</span> <span class="n">distance</span>
+
+    <span class="n">x</span> <span class="o">/=</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">c1</span> <span class="o">/=</span> <span class="n">c1</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">c2</span> <span class="o">/=</span> <span class="n">c2</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">c1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">c2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="match_inspect_graph"><a class="viewcode-back" href="../../vtool.html#vtool._grave.match_inspect_graph">[docs]</a><span class="k">def</span> <span class="nf">match_inspect_graph</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    CommandLine:</span>
+<span class="sd">        python -m vtool.inspect_matches match_inspect_graph --show</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.inspect_matches import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import wbia.guitool as gt</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; gt.ensure_qapp()</span>
+<span class="sd">        &gt;&gt;&gt; ut.qtensure()</span>
+<span class="sd">        &gt;&gt;&gt; self = match_inspect_graph()</span>
+<span class="sd">        &gt;&gt;&gt; self.show()</span>
+<span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
+<span class="sd">        &gt;&gt;&gt; self.update()</span>
+<span class="sd">        &gt;&gt;&gt; gt.qtapp_loop(qwin=self, freq=10)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
+
+    <span class="n">annots</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">lazy_test_annot</span><span class="p">(</span><span class="s1">&#39;easy1.png&#39;</span><span class="p">),</span>
+        <span class="n">lazy_test_annot</span><span class="p">(</span><span class="s1">&#39;easy2.png&#39;</span><span class="p">),</span>
+        <span class="n">lazy_test_annot</span><span class="p">(</span><span class="s1">&#39;easy3.png&#39;</span><span class="p">),</span>
+        <span class="n">lazy_test_annot</span><span class="p">(</span><span class="s1">&#39;zebra.png&#39;</span><span class="p">),</span>
+        <span class="n">lazy_test_annot</span><span class="p">(</span><span class="s1">&#39;hard3.png&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">vt</span><span class="o">.</span><span class="n">PairwiseMatch</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">ut</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">annots</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">MultiMatchInspector</span><span class="p">(</span><span class="n">matches</span><span class="o">=</span><span class="n">matches</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="MultiMatchInspector"><a class="viewcode-back" href="../../vtool.html#vtool._grave.MultiMatchInspector">[docs]</a><span class="k">class</span> <span class="nc">MultiMatchInspector</span><span class="p">(</span><span class="n">INSPECT_BASE</span><span class="p">):</span>
+    <span class="c1"># DEPRICATE</span>
+
+<div class="viewcode-block" id="MultiMatchInspector.initialize"><a class="viewcode-back" href="../../vtool.html#vtool._grave.MultiMatchInspector.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matches</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">wbia.guitool</span> <span class="k">as</span> <span class="nn">gt</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matches</span> <span class="o">=</span> <span class="n">matches</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addNewSplitter</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horiz&#39;</span><span class="p">)</span>
+        <span class="c1"># tab_widget = self.addNewTabWidget(verticalStretch=1)</span>
+        <span class="c1"># self.edge_tab = tab_widget.addNewTab(&#39;Edges&#39;)</span>
+        <span class="c1"># self.match_tab = tab_widget.addNewTab(&#39;Matches&#39;)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_api_widget</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">APIItemWidget</span><span class="p">(</span><span class="n">doubleClicked</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_doubleclick</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match_inspector</span> <span class="o">=</span> <span class="n">MatchInspector</span><span class="p">(</span><span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_api_widget</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">match_inspector</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">populate_edge_model</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MultiMatchInspector.edge_doubleclick"><a class="viewcode-back" href="../../vtool.html#vtool._grave.MultiMatchInspector.edge_doubleclick">[docs]</a>    <span class="k">def</span> <span class="nf">edge_doubleclick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qtindex</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">qtindex</span><span class="o">.</span><span class="n">row</span><span class="p">()</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match_inspector</span><span class="o">.</span><span class="n">set_match</span><span class="p">(</span><span class="n">match</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MultiMatchInspector.populate_edge_model"><a class="viewcode-back" href="../../vtool.html#vtool._grave.MultiMatchInspector.populate_edge_model">[docs]</a>    <span class="k">def</span> <span class="nf">populate_edge_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">wbia.guitool</span> <span class="k">as</span> <span class="nn">gt</span>
+
+        <span class="n">edge_api</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">CustomAPI</span><span class="p">(</span>
+            <span class="n">col_name_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;aid1&#39;</span><span class="p">,</span> <span class="s1">&#39;aid2&#39;</span><span class="p">],</span>
+            <span class="n">col_getter_dict</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">))),</span>
+                <span class="s1">&#39;aid1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">annot1</span><span class="p">[</span><span class="s1">&#39;aid&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">],</span>
+                <span class="s1">&#39;aid2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">annot2</span><span class="p">[</span><span class="s1">&#39;aid&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">sort_reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">edge_api</span><span class="o">.</span><span class="n">make_headers</span><span class="p">(</span><span class="n">tblnice</span><span class="o">=</span><span class="s1">&#39;Edges&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_api_widget</span><span class="o">.</span><span class="n">change_headers</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_api_widget</span><span class="o">.</span><span class="n">resize_headers</span><span class="p">(</span><span class="n">edge_api</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_api_widget</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">verticalHeader</span><span class="p">()</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div></div>
+        <span class="c1"># self.edge_api_widget.view.verticalHeader().setDefaultSectionSize(24)</span>
+        <span class="c1"># self.edge_api_widget.view.verticalHeader().setDefaultSectionSize(221)</span>
+        <span class="c1"># self.edge_tab.setTabText(&#39;Matches (%r)&#39; % (self.edge_api_widget.model.num_rows_total))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

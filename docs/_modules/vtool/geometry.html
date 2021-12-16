@@ -1,55 +1,87 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>vtool.geometry &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool.geometry &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool.geometry</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for vtool.geometry</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># LICENCE</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">zip</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
-<span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
 
 
 <div class="viewcode-block" id="bboxes_from_vert_list"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bboxes_from_vert_list">[docs]</a><span class="k">def</span> <span class="nf">bboxes_from_vert_list</span><span class="p">(</span><span class="n">verts_list</span><span class="p">,</span> <span class="n">castint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Fit the bounding polygon inside a rectangle &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Fit the bounding polygon inside a rectangle&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">bbox_from_verts</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">castint</span><span class="o">=</span><span class="n">castint</span><span class="p">)</span> <span class="k">for</span> <span class="n">verts</span> <span class="ow">in</span> <span class="n">verts_list</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="verts_list_from_bboxes_list"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.verts_list_from_bboxes_list">[docs]</a><span class="k">def</span> <span class="nf">verts_list_from_bboxes_list</span><span class="p">(</span><span class="n">bboxes_list</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Create a four-vertex polygon from the bounding rectangle &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Create a four-vertex polygon from the bounding rectangle&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">verts_from_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span> <span class="k">for</span> <span class="n">bbox</span> <span class="ow">in</span> <span class="n">bboxes_list</span><span class="p">]</span></div>
 
 
@@ -176,7 +208,7 @@
 <span class="sd">        &gt;&gt;&gt; pt.imshow(img)</span>
 <span class="sd">        &gt;&gt;&gt; pt.show_if_requested()</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; # xdoctest: +REQUIRES(--show)</span>
@@ -200,6 +232,8 @@
 
 <span class="sd">    out = img_in = np.zeros((500, 500, 3), dtype=np.uint8)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+
     <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img_in</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -364,7 +398,7 @@
 <div class="viewcode-block" id="closest_point_on_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.closest_point_on_bbox">[docs]</a><span class="k">def</span> <span class="nf">closest_point_on_bbox</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">bbox</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; p_list = np.array([[19, 7], [7, 14], [14, 11], [8, 7], [23, 21]], dtype=np.float)</span>
@@ -379,7 +413,7 @@
 
 
 <div class="viewcode-block" id="bbox_from_xywh"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.bbox_from_xywh">[docs]</a><span class="k">def</span> <span class="nf">bbox_from_xywh</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">wh</span><span class="p">,</span> <span class="n">xy_rel_pos</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot; need to specify xy_rel_pos if xy is not in tl already &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;need to specify xy_rel_pos if xy is not in tl already&quot;&quot;&quot;</span>
     <span class="n">to_tlx</span> <span class="o">=</span> <span class="n">xy_rel_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">wh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">to_tly</span> <span class="o">=</span> <span class="n">xy_rel_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">wh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">tl_x</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">to_tlx</span>
@@ -417,6 +451,7 @@
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import ubelt as ub</span>
 <span class="sd">        &gt;&gt;&gt; bbox = [0, 0, 10, 10]</span>
 <span class="sd">        &gt;&gt;&gt; extent = extent_from_bbox(bbox)</span>
 <span class="sd">        &gt;&gt;&gt; result = (&#39;extent = %s&#39; % (ub.repr2(extent, nl=0),))</span>
@@ -442,6 +477,7 @@
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import ubelt as ub</span>
 <span class="sd">        &gt;&gt;&gt; extent = [0, 10, 0, 10]</span>
 <span class="sd">        &gt;&gt;&gt; bbox = bbox_from_extent(extent)</span>
 <span class="sd">        &gt;&gt;&gt; result = (&#39;bbox = %s&#39; % (ub.repr2(bbox, nl=0),))</span>
@@ -482,7 +518,7 @@
 
 
 <div class="viewcode-block" id="cvt_bbox_xywh_to_pt1pt2"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.cvt_bbox_xywh_to_pt1pt2">[docs]</a><span class="k">def</span> <span class="nf">cvt_bbox_xywh_to_pt1pt2</span><span class="p">(</span><span class="n">xywh</span><span class="p">,</span> <span class="n">sx</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">round_</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts bbox to thumb format with a scale factor&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Converts bbox to thumb format with a scale factor&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">vtool</span> <span class="k">as</span> <span class="nn">vt</span>
 
     <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">_w</span><span class="p">,</span> <span class="n">_h</span><span class="p">)</span> <span class="o">=</span> <span class="n">xywh</span>
@@ -500,7 +536,7 @@
 <div class="viewcode-block" id="scale_bbox"><a class="viewcode-back" href="../../vtool.html#vtool.geometry.scale_bbox">[docs]</a><span class="k">def</span> <span class="nf">scale_bbox</span><span class="p">(</span><span class="n">bbox</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">sy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sy</span> <span class="o">=</span> <span class="n">sx</span>
-    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span>
 
     <span class="n">centerx</span><span class="p">,</span> <span class="n">centery</span> <span class="o">=</span> <span class="n">bbox_center</span><span class="p">(</span><span class="n">bbox</span><span class="p">)</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">scale_around_mat3x3</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">centerx</span><span class="p">,</span> <span class="n">centery</span><span class="p">)</span>
@@ -565,7 +601,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">bbox</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="kn">from</span> <span class="nn">vtool</span> <span class="k">import</span> <span class="n">linalg</span>
+    <span class="kn">from</span> <span class="nn">vtool</span> <span class="kn">import</span> <span class="n">linalg</span>
 
     <span class="c1"># Transformation matrixes</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">rotation_around_bbox_mat3x3</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
@@ -597,6 +633,7 @@
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.geometry import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import ubelt as ub</span>
 <span class="sd">        &gt;&gt;&gt; point = np.array([</span>
 <span class="sd">        &gt;&gt;&gt;     [3, 2], [4, 1], [2, 3], [1, 1], [0, 0],</span>
 <span class="sd">        &gt;&gt;&gt;     [4, 9.5], [9, 9.5], [7, 2], [7, 8], [9, 3]</span>
@@ -634,71 +671,31 @@
     <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Wild Me.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

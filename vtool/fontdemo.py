@@ -147,11 +147,6 @@ class Font(object):
         return (width, height, max_descent)
 
     def render_text(self, text, width=None, height=None, baseline=None):
-        """
-        Render the given `text` into a Bitmap and return it.  If `width`,
-        `height`, and `baseline` are not specified they are computed using the
-        `text_dimensions' method.
-        """
         if None in (width, height, baseline):
             width, height, baseline = self.text_dimensions(text)
         x = 0

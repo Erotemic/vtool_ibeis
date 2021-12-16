@@ -179,7 +179,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
     CommandLine:
         xdoctest -m ~/code/vtool/vtool/nearest_neighbors.py ann_flann_once:0
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.nearest_neighbors import *  # NOQA
         >>> np.random.seed(1)
@@ -197,7 +197,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         )
 
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> # Test upper bounds on sift descriptors
         >>> # SeeAlso distance.understanding_pseudomax_props
@@ -233,7 +233,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         >>> result = ub.hash_data(repr((qx2_dx, qx2_dist)))
         >>> print(result)
 
-     Example2:
+     Example:
         >>> # Build theoretically maximally distant vectors
         >>> b = 512
         >>> D = 128
@@ -551,7 +551,7 @@ def tune_flann(
         http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann_manual-1.8.4.pdf
         http://docs.opencv.org/trunk/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html
 
-    Math::
+    Math:
         cost of an algorithm is:
 
         LaTeX:

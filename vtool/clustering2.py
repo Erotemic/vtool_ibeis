@@ -137,7 +137,7 @@ def group_indices(idx2_groupid, assume_sorted=False):
         xdoctest -m ~/code/vtool/vtool/clustering2.py group_indices:0
         xdoctest -m ~/code/vtool/vtool/clustering2.py group_indices:1
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.clustering2 import *  # NOQA
         >>> idx2_groupid = np.array([2, 1, 2, 1, 2, 1, 2, 3, 3, 3, 3])
@@ -151,7 +151,7 @@ def group_indices(idx2_groupid, assume_sorted=False):
             np.array([ 7,  8,  9, 10], dtype=np.int64),
         ],
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.clustering2 import *  # NOQA
         >>> idx2_groupid = np.array([[  24], [ 129], [ 659], [ 659], [ 24],
@@ -169,14 +169,14 @@ def group_indices(idx2_groupid, assume_sorted=False):
             np.array([7], dtype=np.int64),
         ],
 
-    Example2:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.clustering2 import *  # NOQA
         >>> idx2_groupid = np.array([True, True, False, True, False, False, True])
         >>> (keys, groupxs) = group_indices(idx2_groupid)
         >>> result = ut.repr2((keys, groupxs), nl=2, nobr=True, with_dtype=True)
         >>> print(result)
-        np.array([False,  True], dtype=np.bool_),
+        np.array([False,  True], dtype=np.bool),
         [
             np.array([2, 4, 5], dtype=np.int64),
             np.array([0, 1, 3, 6], dtype=np.int64),
@@ -211,7 +211,7 @@ def group_indices(idx2_groupid, assume_sorted=False):
         >>> stmt_list = [x for x in stmt_list if not x.startswith('#')]
         >>> passed, times, outputs = ut.timeit_compare(stmt_list, setup, iterations=10000)
 
-    Timeit:
+    Ignore:
         import numba
         group_indices_numba = numba.jit(group_indices)
         group_indices_numba(idx2_groupid)

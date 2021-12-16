@@ -64,9 +64,9 @@ class ConfusionMetrics(ub.NiceRepr):
     Notes:
         From oxford:
         Precision is defined as the ratio of retrieved positive images to the
-          total number retrieved.
+        total number retrieved.
         Recall is defined as the ratio of the number of retrieved positive
-          images to the total number of positive images in the corpus.
+        images to the total number of positive images in the corpus.
 
     Ignore:
         varname_list = 'tp, fp, fn, tn, fpr, tpr, tpa'.split(', ')
@@ -817,11 +817,13 @@ def interpolate_replbounds(xdata, ydata, pt, maximize=True):
 
     FIXME:
         if duplicate xdata is given bad things happen.
+
     BUG:
         in scipy.interpolate.interp1d
         If there is a duplicate xdata, then assume_sorted=False will
         sort ydata by xdata, but xdata should retain its initial ordering
         in places of ambuguity. Currently it does not.
+
     Args:
         xdata (ndarray):
         ydata (ndarray):

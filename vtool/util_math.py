@@ -102,7 +102,7 @@ def ensure_monotone_strictly_increasing(
         >>> arr = ensure_monotone_strictly_increasing(arr_)
         >>> assert strictly_increasing(arr), 'ensure strict monotonic failed1'
 
-    Example2:
+    Example:
         >>> # DISABLE_DOCTEST
         >>> from vtool.util_math import *  # NOQA
         >>> import vtool as vt
@@ -530,21 +530,20 @@ def iceil(num, dtype=np.int32):
     CommandLine:
         python -m vtool.util_math --test-iceil
 
-    Setup:
-        >>> from vtool.util_math import *  # NOQA
-        >>> import vtool as vt
-
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
+        >>> from vtool.util_math import *  # NOQA
         >>> num = 1.5
-        >>> result = repr(vt.iceil(num))
+        >>> result = repr(iceil(num))
         >>> print(result)
         2
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
+        >>> from vtool.util_math import *  # NOQA
+        >>> import ubelt as ub
         >>> num = [1.5, 2.9]
-        >>> result = ub.repr2(vt.iceil(num), with_dtype=True)
+        >>> result = ub.repr2(iceil(num), with_dtype=True)
         >>> print(result)
         np.array([2, 3], dtype=np.int32)
     """

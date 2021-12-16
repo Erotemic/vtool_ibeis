@@ -3,7 +3,7 @@ r"""
 TODO: Look at this file
     http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
 
-# Sympy:
+# Ignore:
 #     >>> # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA
 #     >>> import vtool as vt
 #     >>> import sympy
@@ -63,7 +63,7 @@ def svd(M):
         >>> # execute function
         >>> (U, s, Vt) = svd(M)
 
-    Timeit::
+    Ignore:
         flags = cv2.SVD_FULL_UV
         %timeit cv2.SVDecomp(M, flags=flags)
         %timeit npl.svd(M)
@@ -80,9 +80,14 @@ def svd(M):
 
 def gauss2d_pdf(x_, y_, sigma=None, mu=None):
     """
-    Input: x and y coordinate of a 2D gaussian
-           sigma, mu - covariance and mean vector
-    Output: The probability density at that point
+    Args:
+        x: x cooordinate of a 2D Gaussian
+        y: y cooordinate of a 2D Gaussian
+        sigma: covariance of vector
+        mu: mean of vector
+
+    Returns:
+        float - The probability density at that point
     """
     if sigma is None:
         sigma = np.eye(2)
@@ -268,42 +273,42 @@ def affine_around_mat3x3(
         >>> pt.plt.ylim(0, 40)
         >>> ut.show_if_requested()
 
-    # Timeit:
-    #     >>> from vtool.linalg import *  # NOQA
-    #     >>> x, y, sx, sy, theta, shear, tx, ty, x2, y2 = (
-    #     >>>     256.0, 256.0, 1.5, 1.0, 0.78, 0.2, 0, 100, 500.0, 500.0)
-    #     >>> for timer in ub.Timerit(1000, 'old'):  # 19.0697 µs
-    #     >>>     with timer:
-    #     >>>         tr1_ = translation_mat3x3(-x, -y)
-    #     >>>         Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty)
-    #     >>>         tr2_ = translation_mat3x3(x2, y2)
-    #     >>>         Aff1 = tr2_.dot(Aff_).dot(tr1_)
-    #     >>> for timer in ub.Timerit(1000, 'new'):  # 11.0242 µs
-    #     >>>     with timer:
-    #     >>>         Aff2 = affine_around_mat3x3(x, y, sx, sy, theta, shear,
-    #     >>>                                     tx, ty, x2, y2)
-    #     >>> assert np.all(np.isclose(Aff2, Aff1))
+    Ignore:
+        >>> from vtool.linalg import *  # NOQA
+        >>> x, y, sx, sy, theta, shear, tx, ty, x2, y2 = (
+        >>>     256.0, 256.0, 1.5, 1.0, 0.78, 0.2, 0, 100, 500.0, 500.0)
+        >>> for timer in ub.Timerit(1000, 'old'):  # 19.0697 µs
+        >>>     with timer:
+        >>>         tr1_ = translation_mat3x3(-x, -y)
+        >>>         Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty)
+        >>>         tr2_ = translation_mat3x3(x2, y2)
+        >>>         Aff1 = tr2_.dot(Aff_).dot(tr1_)
+        >>> for timer in ub.Timerit(1000, 'new'):  # 11.0242 µs
+        >>>     with timer:
+        >>>         Aff2 = affine_around_mat3x3(x, y, sx, sy, theta, shear,
+        >>>                                     tx, ty, x2, y2)
+        >>> assert np.all(np.isclose(Aff2, Aff1))
 
-    # Sympy:
-    #     >>> from vtool.linalg import *  # NOQA
-    #     >>> import vtool as vt
-    #     >>> import sympy
-    #     >>> # Shows the symbolic construction of the code
-    #     >>> # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA
-    #     >>> from sympy.abc import theta
-    #     >>> x, y, sx, sy, theta, shear, tx, ty, x2, y2 = sympy.symbols(
-    #     >>>     'x, y, sx, sy, theta, shear, tx, ty, x2, y2')
-    #     >>> theta = sx = sy = tx = ty = 0
-    #     >>> # move to center xy, apply affine transform, move center xy2
-    #     >>> tr1_ = translation_mat3x3(-x, -y, dtype=None)
-    #     >>> Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty, trig=sympy)
-    #     >>> tr2_ = translation_mat3x3(x2, y2, dtype=None)
-    #     >>> # combine transformations
-    #     >>> Aff = vt.sympy_mat(tr2_.dot(Aff_).dot(tr1_))
-    #     >>> vt.evalprint('Aff')
-    #     >>> print('-------')
-    #     >>> print('Numpy')
-    #     >>> vt.sympy_numpy_repr(Aff)
+    Ignore:
+        >>> from vtool.linalg import *  # NOQA
+        >>> import vtool as vt
+        >>> import sympy
+        >>> # Shows the symbolic construction of the code
+        >>> # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA
+        >>> from sympy.abc import theta
+        >>> x, y, sx, sy, theta, shear, tx, ty, x2, y2 = sympy.symbols(
+        >>>     'x, y, sx, sy, theta, shear, tx, ty, x2, y2')
+        >>> theta = sx = sy = tx = ty = 0
+        >>> # move to center xy, apply affine transform, move center xy2
+        >>> tr1_ = translation_mat3x3(-x, -y, dtype=None)
+        >>> Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty, trig=sympy)
+        >>> tr2_ = translation_mat3x3(x2, y2, dtype=None)
+        >>> # combine transformations
+        >>> Aff = vt.sympy_mat(tr2_.dot(Aff_).dot(tr1_))
+        >>> vt.evalprint('Aff')
+        >>> print('-------')
+        >>> print('Numpy')
+        >>> vt.sympy_numpy_repr(Aff)
     """
     x2 = x if x2 is None else x2
     y2 = y if y2 is None else y2
@@ -412,7 +417,7 @@ def remove_homogenous_coordinate(_xyzs):
     CommandLine:
         python -m vtool.linalg --test-remove_homogenous_coordinate
 
-    Example0:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.linalg import *  # NOQA
         >>> _xyzs = np.array([[ 2.,   0.,  0.,  2.],
@@ -422,7 +427,7 @@ def remove_homogenous_coordinate(_xyzs):
         >>> result = ub.repr2(_xys, precision=3, with_dtype=True)
         >>> print(result)
 
-    Example1:
+    Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool.linalg import *  # NOQA
         >>> _xyzs = np.array([[ 140.,  167.,  185.,  185.,  194.],

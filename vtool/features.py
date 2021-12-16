@@ -2,7 +2,6 @@
 from __future__ import absolute_import, print_function, division
 import utool as ut
 import ubelt as ub
-import six
 
 
 def extract_feature_from_patch(patch):
@@ -35,9 +34,6 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
     CommandLine:
         python -m vtool.features --test-extract_features
         python -m vtool.features --test-extract_features --show
-        python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show
-        python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show
-        python -m vtool.features --test-extract_features --feat-type=hesaff+siam128 --show --no-affine-invariance
 
     Example:
         >>> # xdoctest: +REQUIRES(module:pyhesaff)
@@ -69,18 +65,18 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
     if feat_type == 'hesaff+sift':
         # (kpts, vecs) = pyhesaff.detect_feats(img_fpath, **kwargs)
         (kpts, vecs) = pyhesaff.detect_feats2(img_or_fpath, **kwargs)
-    elif feat_type == 'hesaff+siam128':
-        # hacky
-        from wbia_cnn import _plugin
+    # elif feat_type == 'hesaff+siam128':
+    #     # hacky
+    #     from wbia_cnn import _plugin
 
-        (kpts, sift) = pyhesaff.detect_feats2(img_or_fpath, **kwargs)
-        if isinstance(img_or_fpath, six.string_types):
-            import vtool as vt
+    #     (kpts, sift) = pyhesaff.detect_feats2(img_or_fpath, **kwargs)
+    #     if isinstance(img_or_fpath, six.string_types):
+    #         import vtool as vt
 
-            img_or_fpath = vt.imread(img_or_fpath)
-        vecs_list = _plugin.extract_siam128_vecs([img_or_fpath], [kpts])
-        vecs = vecs_list[0]
-        pass
+    #         img_or_fpath = vt.imread(img_or_fpath)
+    #     vecs_list = _plugin.extract_siam128_vecs([img_or_fpath], [kpts])
+    #     vecs = vecs_list[0]
+    #     pass
     else:
         raise AssertionError('Unknown feat_type=%r' % (feat_type,))
     return (kpts, vecs)

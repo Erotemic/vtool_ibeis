@@ -1,44 +1,78 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>vtool.linalg &#8212; wbia-vtool 3.2.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vtool.linalg &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> wbia-vtool
+          </a>
+              <div class="version">
+                4.0.2.dev2+dirty
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wbia-vtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>vtool.linalg</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <h1>Source code for vtool.linalg</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">TODO: Look at this file</span>
 <span class="sd">    http://www.lfd.uci.edu/~gohlke/code/transformations.py.html</span>
 
-<span class="sd"># Sympy:</span>
+<span class="sd"># Ignore:</span>
 <span class="sd">#     &gt;&gt;&gt; # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA</span>
 <span class="sd">#     &gt;&gt;&gt; import vtool as vt</span>
 <span class="sd">#     &gt;&gt;&gt; import sympy</span>
@@ -68,20 +102,14 @@
 <span class="sd">#     &gt;&gt;&gt; print(ut.align(&#39;\\\\\n&#39;.join(sympy.latex(R).split(r&#39;\\&#39;)).replace(&#39;{matrix}&#39;, &#39;{matrix}\n&#39;), &#39;&amp;&#39;)</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="k">as</span> <span class="nn">npl</span>
-<span class="kn">import</span> <span class="nn">utool</span> <span class="k">as</span> <span class="nn">ut</span>
 <span class="kn">import</span> <span class="nn">ubelt</span> <span class="k">as</span> <span class="nn">ub</span>
 <span class="kn">import</span> <span class="nn">warnings</span>  <span class="c1"># NOQA</span>
-<span class="kn">from</span> <span class="nn">.util_math</span> <span class="k">import</span> <span class="n">TAU</span>
+<span class="kn">from</span> <span class="nn">.util_math</span> <span class="kn">import</span> <span class="n">TAU</span>
 
 <span class="n">TRANSFORM_DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
-
-
-<span class="c1"># Function which multiplies many matrices at once</span>
-<span class="kn">from</span> <span class="nn">numpy.core.umath_tests</span> <span class="k">import</span> <span class="n">matrix_multiply</span>  <span class="c1"># NOQA</span>
 
 
 <div class="viewcode-block" id="svd"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.svd">[docs]</a><span class="k">def</span> <span class="nf">svd</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
@@ -104,12 +132,14 @@
 <span class="sd">        &gt;&gt;&gt; # execute function</span>
 <span class="sd">        &gt;&gt;&gt; (U, s, Vt) = svd(M)</span>
 
-<span class="sd">    Timeit::</span>
+<span class="sd">    Ignore:</span>
 <span class="sd">        flags = cv2.SVD_FULL_UV</span>
 <span class="sd">        %timeit cv2.SVDecomp(M, flags=flags)</span>
 <span class="sd">        %timeit npl.svd(M)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># V is actually Vt</span>
+    <span class="kn">import</span> <span class="nn">cv2</span>
+
     <span class="n">flags</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">SVD_FULL_UV</span>
     <span class="n">S</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">SVDecomp</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -119,9 +149,14 @@
 
 <div class="viewcode-block" id="gauss2d_pdf"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.gauss2d_pdf">[docs]</a><span class="k">def</span> <span class="nf">gauss2d_pdf</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Input: x and y coordinate of a 2D gaussian</span>
-<span class="sd">           sigma, mu - covariance and mean vector</span>
-<span class="sd">    Output: The probability density at that point</span>
+<span class="sd">    Args:</span>
+<span class="sd">        x: x cooordinate of a 2D Gaussian</span>
+<span class="sd">        y: y cooordinate of a 2D Gaussian</span>
+<span class="sd">        sigma: covariance of vector</span>
+<span class="sd">        mu: mean of vector</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float - The probability density at that point</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -155,19 +190,30 @@
     <span class="c1"># TODO: handle array inputs</span>
     <span class="n">sin_</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
     <span class="n">cos_</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(((</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">sin_</span><span class="p">,</span> <span class="n">cos_</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),))</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="p">(</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">sin_</span><span class="p">,</span> <span class="n">cos_</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">R</span></div>
 
 
 <div class="viewcode-block" id="rotation_mat2x2"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.rotation_mat2x2">[docs]</a><span class="k">def</span> <span class="nf">rotation_mat2x2</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
     <span class="n">sin_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
     <span class="n">cos_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">rot_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(((</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">),</span> <span class="p">(</span><span class="n">sin_</span><span class="p">,</span> <span class="n">cos_</span><span class="p">),))</span>
+    <span class="n">rot_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="p">(</span><span class="n">cos_</span><span class="p">,</span> <span class="o">-</span><span class="n">sin_</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">sin_</span><span class="p">,</span> <span class="n">cos_</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">rot_</span></div>
 
 
 <div class="viewcode-block" id="transform_around"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.transform_around">[docs]</a><span class="k">def</span> <span class="nf">transform_around</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; translates to origin, applies transform and then translates back &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;translates to origin, applies transform and then translates back&quot;&quot;&quot;</span>
     <span class="n">tr1_</span> <span class="o">=</span> <span class="n">translation_mat3x3</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">)</span>
     <span class="n">tr2_</span> <span class="o">=</span> <span class="n">translation_mat3x3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">M_</span> <span class="o">=</span> <span class="n">tr2_</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tr1_</span><span class="p">)</span>
@@ -296,42 +342,42 @@
 <span class="sd">        &gt;&gt;&gt; pt.plt.ylim(0, 40)</span>
 <span class="sd">        &gt;&gt;&gt; ut.show_if_requested()</span>
 
-<span class="sd">    # Timeit:</span>
-<span class="sd">    #     &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    #     &gt;&gt;&gt; x, y, sx, sy, theta, shear, tx, ty, x2, y2 = (</span>
-<span class="sd">    #     &gt;&gt;&gt;     256.0, 256.0, 1.5, 1.0, 0.78, 0.2, 0, 100, 500.0, 500.0)</span>
-<span class="sd">    #     &gt;&gt;&gt; for timer in ub.Timerit(1000, &#39;old&#39;):  # 19.0697 µs</span>
-<span class="sd">    #     &gt;&gt;&gt;     with timer:</span>
-<span class="sd">    #     &gt;&gt;&gt;         tr1_ = translation_mat3x3(-x, -y)</span>
-<span class="sd">    #     &gt;&gt;&gt;         Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty)</span>
-<span class="sd">    #     &gt;&gt;&gt;         tr2_ = translation_mat3x3(x2, y2)</span>
-<span class="sd">    #     &gt;&gt;&gt;         Aff1 = tr2_.dot(Aff_).dot(tr1_)</span>
-<span class="sd">    #     &gt;&gt;&gt; for timer in ub.Timerit(1000, &#39;new&#39;):  # 11.0242 µs</span>
-<span class="sd">    #     &gt;&gt;&gt;     with timer:</span>
-<span class="sd">    #     &gt;&gt;&gt;         Aff2 = affine_around_mat3x3(x, y, sx, sy, theta, shear,</span>
-<span class="sd">    #     &gt;&gt;&gt;                                     tx, ty, x2, y2)</span>
-<span class="sd">    #     &gt;&gt;&gt; assert np.all(np.isclose(Aff2, Aff1))</span>
+<span class="sd">    Ignore:</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; x, y, sx, sy, theta, shear, tx, ty, x2, y2 = (</span>
+<span class="sd">        &gt;&gt;&gt;     256.0, 256.0, 1.5, 1.0, 0.78, 0.2, 0, 100, 500.0, 500.0)</span>
+<span class="sd">        &gt;&gt;&gt; for timer in ub.Timerit(1000, &#39;old&#39;):  # 19.0697 µs</span>
+<span class="sd">        &gt;&gt;&gt;     with timer:</span>
+<span class="sd">        &gt;&gt;&gt;         tr1_ = translation_mat3x3(-x, -y)</span>
+<span class="sd">        &gt;&gt;&gt;         Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty)</span>
+<span class="sd">        &gt;&gt;&gt;         tr2_ = translation_mat3x3(x2, y2)</span>
+<span class="sd">        &gt;&gt;&gt;         Aff1 = tr2_.dot(Aff_).dot(tr1_)</span>
+<span class="sd">        &gt;&gt;&gt; for timer in ub.Timerit(1000, &#39;new&#39;):  # 11.0242 µs</span>
+<span class="sd">        &gt;&gt;&gt;     with timer:</span>
+<span class="sd">        &gt;&gt;&gt;         Aff2 = affine_around_mat3x3(x, y, sx, sy, theta, shear,</span>
+<span class="sd">        &gt;&gt;&gt;                                     tx, ty, x2, y2)</span>
+<span class="sd">        &gt;&gt;&gt; assert np.all(np.isclose(Aff2, Aff1))</span>
 
-<span class="sd">    # Sympy:</span>
-<span class="sd">    #     &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
-<span class="sd">    #     &gt;&gt;&gt; import vtool as vt</span>
-<span class="sd">    #     &gt;&gt;&gt; import sympy</span>
-<span class="sd">    #     &gt;&gt;&gt; # Shows the symbolic construction of the code</span>
-<span class="sd">    #     &gt;&gt;&gt; # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA</span>
-<span class="sd">    #     &gt;&gt;&gt; from sympy.abc import theta</span>
-<span class="sd">    #     &gt;&gt;&gt; x, y, sx, sy, theta, shear, tx, ty, x2, y2 = sympy.symbols(</span>
-<span class="sd">    #     &gt;&gt;&gt;     &#39;x, y, sx, sy, theta, shear, tx, ty, x2, y2&#39;)</span>
-<span class="sd">    #     &gt;&gt;&gt; theta = sx = sy = tx = ty = 0</span>
-<span class="sd">    #     &gt;&gt;&gt; # move to center xy, apply affine transform, move center xy2</span>
-<span class="sd">    #     &gt;&gt;&gt; tr1_ = translation_mat3x3(-x, -y, dtype=None)</span>
-<span class="sd">    #     &gt;&gt;&gt; Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty, trig=sympy)</span>
-<span class="sd">    #     &gt;&gt;&gt; tr2_ = translation_mat3x3(x2, y2, dtype=None)</span>
-<span class="sd">    #     &gt;&gt;&gt; # combine transformations</span>
-<span class="sd">    #     &gt;&gt;&gt; Aff = vt.sympy_mat(tr2_.dot(Aff_).dot(tr1_))</span>
-<span class="sd">    #     &gt;&gt;&gt; vt.evalprint(&#39;Aff&#39;)</span>
-<span class="sd">    #     &gt;&gt;&gt; print(&#39;-------&#39;)</span>
-<span class="sd">    #     &gt;&gt;&gt; print(&#39;Numpy&#39;)</span>
-<span class="sd">    #     &gt;&gt;&gt; vt.sympy_numpy_repr(Aff)</span>
+<span class="sd">    Ignore:</span>
+<span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
+<span class="sd">        &gt;&gt;&gt; import vtool as vt</span>
+<span class="sd">        &gt;&gt;&gt; import sympy</span>
+<span class="sd">        &gt;&gt;&gt; # Shows the symbolic construction of the code</span>
+<span class="sd">        &gt;&gt;&gt; # https://groups.google.com/forum/#!topic/sympy/k1HnZK_bNNA</span>
+<span class="sd">        &gt;&gt;&gt; from sympy.abc import theta</span>
+<span class="sd">        &gt;&gt;&gt; x, y, sx, sy, theta, shear, tx, ty, x2, y2 = sympy.symbols(</span>
+<span class="sd">        &gt;&gt;&gt;     &#39;x, y, sx, sy, theta, shear, tx, ty, x2, y2&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; theta = sx = sy = tx = ty = 0</span>
+<span class="sd">        &gt;&gt;&gt; # move to center xy, apply affine transform, move center xy2</span>
+<span class="sd">        &gt;&gt;&gt; tr1_ = translation_mat3x3(-x, -y, dtype=None)</span>
+<span class="sd">        &gt;&gt;&gt; Aff_ = affine_mat3x3(sx, sy, theta, shear, tx, ty, trig=sympy)</span>
+<span class="sd">        &gt;&gt;&gt; tr2_ = translation_mat3x3(x2, y2, dtype=None)</span>
+<span class="sd">        &gt;&gt;&gt; # combine transformations</span>
+<span class="sd">        &gt;&gt;&gt; Aff = vt.sympy_mat(tr2_.dot(Aff_).dot(tr1_))</span>
+<span class="sd">        &gt;&gt;&gt; vt.evalprint(&#39;Aff&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;-------&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;Numpy&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; vt.sympy_numpy_repr(Aff)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="n">x2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x2</span>
     <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y2</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">y2</span>
@@ -359,19 +405,19 @@
 
 
 <div class="viewcode-block" id="det_ltri"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.det_ltri">[docs]</a><span class="k">def</span> <span class="nf">det_ltri</span><span class="p">(</span><span class="n">ltri</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Lower triangular determinant &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Lower triangular determinant&quot;&quot;&quot;</span>
     <span class="n">det</span> <span class="o">=</span> <span class="n">ltri</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">ltri</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">det</span></div>
 
 
 <div class="viewcode-block" id="inv_ltri"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.inv_ltri">[docs]</a><span class="k">def</span> <span class="nf">inv_ltri</span><span class="p">(</span><span class="n">ltri</span><span class="p">,</span> <span class="n">det</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Lower triangular inverse &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Lower triangular inverse&quot;&quot;&quot;</span>
     <span class="n">inv_ltri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">ltri</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="n">ltri</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ltri</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ltri</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">/</span> <span class="n">det</span>
     <span class="k">return</span> <span class="n">inv_ltri</span></div>
 
 
 <div class="viewcode-block" id="dot_ltri"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.dot_ltri">[docs]</a><span class="k">def</span> <span class="nf">dot_ltri</span><span class="p">(</span><span class="n">ltri1</span><span class="p">,</span> <span class="n">ltri2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Lower triangular dot product &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Lower triangular dot product&quot;&quot;&quot;</span>
     <span class="c1"># use m, n, and o as temporary matrixes</span>
     <span class="n">m11</span><span class="p">,</span> <span class="n">m21</span><span class="p">,</span> <span class="n">m22</span> <span class="o">=</span> <span class="n">ltri1</span>
     <span class="n">n11</span><span class="p">,</span> <span class="n">n21</span><span class="p">,</span> <span class="n">n22</span> <span class="o">=</span> <span class="n">ltri2</span>
@@ -440,7 +486,7 @@
 <span class="sd">    CommandLine:</span>
 <span class="sd">        python -m vtool.linalg --test-remove_homogenous_coordinate</span>
 
-<span class="sd">    Example0:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; _xyzs = np.array([[ 2.,   0.,  0.,  2.],</span>
@@ -450,7 +496,7 @@
 <span class="sd">        &gt;&gt;&gt; result = ub.repr2(_xys, precision=3, with_dtype=True)</span>
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 
-<span class="sd">    Example1:</span>
+<span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.linalg import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; _xyzs = np.array([[ 140.,  167.,  185.,  185.,  194.],</span>
@@ -474,13 +520,13 @@
 <span class="sd">        _xys (ndarray[ndim=2]): (2 x N) array</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">xyz</span> <span class="o">=</span> <span class="n">add_homogenous_coordinate</span><span class="p">(</span><span class="n">_xys</span><span class="p">)</span>
-    <span class="n">xyz_t</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)</span>
+    <span class="n">xyz_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)</span>
     <span class="n">xy_t</span> <span class="o">=</span> <span class="n">remove_homogenous_coordinate</span><span class="p">(</span><span class="n">xyz_t</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">xy_t</span></div>
 
 
 <div class="viewcode-block" id="normalize_rows"><a class="viewcode-back" href="../../vtool.html#vtool.linalg.normalize_rows">[docs]</a><span class="k">def</span> <span class="nf">normalize_rows</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; DEPRICATE &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;DEPRICATE&quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
     <span class="k">return</span> <span class="n">normalize</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
 
@@ -657,71 +703,31 @@
     <span class="n">xdoctest</span><span class="o">.</span><span class="n">doctest_module</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </pre></div>
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Wild Me.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">wbia-vtool</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../vtool.html">vtool package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Wild Me.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>
