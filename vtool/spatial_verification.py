@@ -261,6 +261,7 @@ def compute_affine(xy1_man, xy2_man):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import vtool.demodata as demodata
         >>> import vtool.keypoint as ktool
@@ -328,6 +329,7 @@ def compute_homog(xy1_mn, xy2_mn):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.spatial_verification import *  # NOQA
         >>> import vtool.keypoint as ktool
         >>> import wbia.plottool as pt

@@ -372,6 +372,7 @@ class PairwiseMatch(ub.NiceRepr):
 
         Example:
             >>> # SCRIPT
+            >>> # xdoctest: +REQUIRES(module:wbia)
             >>> from vtool.matching import *  # NOQA
             >>> import vtool as vt
             >>> import wbia.guitool as gt
@@ -471,6 +472,7 @@ class PairwiseMatch(ub.NiceRepr):
             >>> m2 = match.copy().assign({'symmetric': True})
 
         Example:
+            >>> # xdoctest: +REQUIRES(module:wbia)
             >>> from vtool.matching import *  # NOQA
             >>> grid = {
             >>>     'symmetric': [True, False],

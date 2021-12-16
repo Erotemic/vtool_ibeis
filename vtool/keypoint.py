@@ -1060,6 +1060,7 @@ def rectify_invV_mats_are_up(invVR_mats):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.keypoint import *  # NOQA
         >>> import vtool as vt
         >>> rng = np.random.RandomState(0)
@@ -1097,6 +1098,7 @@ def rectify_invV_mats_are_up(invVR_mats):
         ut.show_if_requested()
 
     Example:
+        >>> # xdoctest: +REQUIRES(module:wbia)
         >>> from vtool.keypoint import *  # NOQA
         >>> rng = np.random.RandomState(0)
         >>> invVR_mats = rng.rand(1000, 2, 2).astype(np.float64)
