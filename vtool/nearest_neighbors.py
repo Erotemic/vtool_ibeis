@@ -217,7 +217,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         >>> uint8_max = 512  # hack
         >>> uint8_min = 0  # hack
         >>> K = 100 # 2
-
+        >>>
         >>> qpts8 = np.clip(np.round(qpts * uint8_max), uint8_min, uint8_max).astype(np.uint8)
         >>> dpts8 = np.clip(np.round(dpts * uint8_max), uint8_min, uint8_max).astype(np.uint8)
         >>> qmag8 = np.sqrt(np.power(qpts8.astype(np.float32), 2).sum(1))
