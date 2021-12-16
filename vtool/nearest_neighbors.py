@@ -197,7 +197,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         )
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # DISABLE_DOCTEST
         >>> # Test upper bounds on sift descriptors
         >>> # SeeAlso distance.understanding_pseudomax_props
         >>> from vtool.nearest_neighbors import *  # NOQA
@@ -233,6 +233,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         >>> print(result)
 
      Example:
+        >>> # DISABLE_DOCTEST
         >>> # Build theoretically maximally distant vectors
         >>> b = 512
         >>> D = 128
