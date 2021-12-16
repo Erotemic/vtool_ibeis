@@ -1376,7 +1376,7 @@ def get_uncovered_mask(covered_array, covering_array):
         np.array([[ True, False,  True],
                   [False, False,  True],
                   [ True,  True,  True]], dtype=np.bool)
-                  
+
     Ignore:
         covering_array = [1, 2, 3, 4, 5, 6, 7]
         %timeit get_uncovered_mask(covered_array, covering_array)

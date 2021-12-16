@@ -6,6 +6,7 @@ import os
 
 try:
     from importlib.metadata import version
+
     __version__ = version('wbia-vtool')
 except Exception:
     __version__ = 'latest'
