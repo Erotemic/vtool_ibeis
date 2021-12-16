@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vtool package &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+  <title>vtool package &mdash; wbia-vtool 4.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> wbia-vtool
           </a>
               <div class="version">
-                4.0.2.dev2+dirty
+                4.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -78,7 +78,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-vtool.score_normalization">vtool.score_normalization module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-vtool.segmentation">vtool.segmentation module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-vtool.spatial_verification">vtool.spatial_verification module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-vtool.sver_c_wrapper">vtool.sver_c_wrapper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vtool-sver-c-wrapper-module">vtool.sver_c_wrapper module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-vtool.symbolic">vtool.symbolic module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-vtool.trig">vtool.trig module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-vtool.util_math">vtool.util_math module</a></li>
@@ -13960,52 +13960,8 @@ python -m vtool.spatial_verification –test-test_homog_errors:0 –show –rota
 <dd></dd></dl>
 
 </section>
-<section id="module-vtool.sver_c_wrapper">
-<span id="vtool-sver-c-wrapper-module"></span><h2>vtool.sver_c_wrapper module<a class="headerlink" href="#module-vtool.sver_c_wrapper" title="Permalink to this headline"></a></h2>
-<p>wraps c implementations slower parts of spatial verification</p>
-<dl>
-<dt>CommandLine:</dt><dd><p>python -m vtool.sver_c_wrapper –rebuild-sver
-python -m vtool.sver_c_wrapper –rebuild-sver –allexamples
-python -m vtool.sver_c_wrapper –allexamples</p>
-<p>python -m vtool.sver_c_wrapper –test-test_sver_wrapper –rebuild-sver</p>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.c_double_p">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">c_double_p</span></span><a class="headerlink" href="#vtool.sver_c_wrapper.c_double_p" title="Permalink to this definition"></a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">vtool.sver_c_wrapper.LP_c_double</span></code></p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.call_hello">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">call_hello</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vtool/sver_c_wrapper.html#call_hello"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vtool.sver_c_wrapper.call_hello" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.errs_t">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">errs_t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ndim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vtool/sver_c_wrapper.html#errs_t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vtool.sver_c_wrapper.errs_t" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.get_affine_inliers_cpp">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">get_affine_inliers_cpp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpts1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpts2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_thresh_sqrd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_thresh_sqrd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ori_thresh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vtool/sver_c_wrapper.html#get_affine_inliers_cpp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vtool.sver_c_wrapper.get_affine_inliers_cpp" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.get_best_affine_inliers_cpp">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">get_best_affine_inliers_cpp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpts1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kpts2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_thresh_sqrd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_thresh_sqrd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ori_thresh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vtool/sver_c_wrapper.html#get_best_affine_inliers_cpp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vtool.sver_c_wrapper.get_best_affine_inliers_cpp" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.inliers_t">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">inliers_t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ndim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vtool/sver_c_wrapper.html#inliers_t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vtool.sver_c_wrapper.inliers_t" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="vtool.sver_c_wrapper.mats_t">
-<span class="sig-prename descclassname"><span class="pre">vtool.sver_c_wrapper.</span></span><span class="sig-name descname"><span class="pre">mats_t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ndim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vtool/sver_c_wrapper.html#mats_t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vtool.sver_c_wrapper.mats_t" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="vtool-sver-c-wrapper-module">
+<h2>vtool.sver_c_wrapper module<a class="headerlink" href="#vtool-sver-c-wrapper-module" title="Permalink to this headline"></a></h2>
 </section>
 <section id="module-vtool.symbolic">
 <span id="vtool-symbolic-module"></span><h2>vtool.symbolic module<a class="headerlink" href="#module-vtool.symbolic" title="Permalink to this headline"></a></h2>

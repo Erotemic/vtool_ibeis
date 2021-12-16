@@ -4,13 +4,6 @@ from datetime import date
 import sys
 import os
 
-try:
-    from importlib.metadata import version
-
-    __version__ = version('wbia-vtool')
-except Exception:
-    __version__ = 'latest'
-
 sys.path.append(sys.path.insert(0, os.path.abspath('../')))
 
 autosummary_generate = True
@@ -37,8 +30,16 @@ html_sidebars = {
 # -- Project information -----------------------------------------------------
 
 project = 'wbia-vtool'
+
 copyright = f'{date.today().year}, Wild Me'
 author = 'Wild Me (wildme.org)'
+
+try:
+    from importlib.metadata import version
+
+    __version__ = version(project)
+except Exception:
+    __version__ = 'latest'
 version = __version__
 release = version
 
