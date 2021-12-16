@@ -180,7 +180,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         xdoctest -m ~/code/vtool/vtool/nearest_neighbors.py ann_flann_once:0
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # DISABLE_DOCTEST
         >>> from vtool.nearest_neighbors import *  # NOQA
         >>> np.random.seed(1)
         >>> dpts = np.random.randint(0, 255, (5, 128)).astype(np.uint8)
@@ -195,7 +195,6 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
             np.array([[1037329., 1235876., 1168550., 1286435., 1075507.],
                       [1038324., 1243690., 1304896., 1320598., 1369036.]], dtype=np.float32),
         )
-
 
     Example:
         >>> # ENABLE_DOCTEST
