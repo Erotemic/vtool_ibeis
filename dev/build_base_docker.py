@@ -162,79 +162,97 @@ def main():
                 default = envval
         return ub.argval(clikey, default=default)
 
-    default_dpath = ub.get_app_cache_dir('erotemic/manylinux-for/staging')
+    default_dpath = ub.get_app_cache_dir('erotemic/manylinux-for/workspace')
     DPATH = argval('--dpath', None, default=default_dpath)
 
     MAKE_CPUS = argval('--make_cpus', 'MAKE_CPUS', multiprocessing.cpu_count() + 1)
 
-    PLAT = argval('--plat', 'PLAT', default='x86_64')
+    ARCH = argval('--arch', 'ARCH', default='x86_64')
 
     OPENCV_VERSION = '4.1.0'
 
     DRY = ub.argflag('--dry')
 
-    dpath = realpath(ub.expandpath(DPATH))
-    dpath = ub.ensuredir(dpath)
+    dpath = ub.Path(realpath(ub.expandpath(DPATH))).ensuredir()
+
+    staging_dpath = (dpath / 'staging').ensuredir()
+
     os.chdir(dpath)
 
     # BASE_REPO = 'quay.io/skvark'
-    # BASE = 'manylinux1_{}'.format(PLAT)
+    # BASE = 'manylinux1_{}'.format(ARCH)
 
     BASE_REPO = 'quay.io/pypa'
-    BASE = 'manylinux2010_{}'.format(PLAT)
+    # BASE = 'manylinux2010_{}'.format(ARCH)
+    BASE = 'manylinux2014_{}'.format(ARCH)
 
-    if PLAT in ['aarch64', 's390x', 'ppc64le']:
-        BASE = 'manylinux2014_{}'.format(PLAT)
+    if ARCH in ['aarch64', 's390x', 'ppc64le']:
+        BASE = 'manylinux2014_{}'.format(ARCH)
 
     # do we need the unicode width in this tag?
-    DOCKER_TAG = '{}-opencv{}-v4'.format(PLAT, OPENCV_VERSION)
+    DOCKER_TAG = '{}-opencv{}-v4'.format(ARCH, OPENCV_VERSION)
     DOCKER_URI = '{QUAY_REPO}:{DOCKER_TAG}'.format(**locals())
 
-    if not exists(join(dpath, 'opencv-' + OPENCV_VERSION)):
+    if not exists(join(staging_dpath, 'opencv-' + OPENCV_VERSION)):
         # FIXME: make robust in the case this fails
         print('downloading opencv')
         fpath = ub.grabdata(
             'https://github.com/opencv/opencv/archive/{}.zip'.format(OPENCV_VERSION),
-            dpath=dpath, hash_prefix='1a00f2cdf2b1bd62e5a700a6f15026b2f2de9b1',
+            dpath=staging_dpath, hash_prefix='1a00f2cdf2b1bd62e5a700a6f15026b2f2de9b1',
             hasher='sha512', verbose=3
         )
-        ub.cmd('ln -s {} .'.format(fpath), cwd=dpath, verbose=0)
-        ub.cmd('unzip {}'.format(fpath), cwd=dpath, verbose=0)
+        ub.cmd('ln -s {} .'.format(fpath), cwd=staging_dpath, verbose=0)
+        ub.cmd('unzip {}'.format(fpath), cwd=staging_dpath, verbose=0)
 
     dockerfile_fpath = join(dpath, 'Dockerfile_' + DOCKER_TAG)
 
     PARENT_IMAGE = f'{BASE_REPO}/{BASE}'
 
+    needed_libs = [
+        'lz4-devel', 'zlib-devel',
+        'curl-devel',  # for cmake
+
+        'freetype-devel',
+        'bzip2-devel',
+        'zlib-devel',
+    ]
+    needed_base_libs_str = ' '.join(sorted(set(needed_libs)))
+
     docker_header = ub.codeblock(
         f'''
         FROM {PARENT_IMAGE}
 
-        RUN yum install lz4-devel zlib-devel -y
+        RUN yum install {needed_base_libs_str} -y
 
+        RUN mkdir -p /staging
+
+        COPY ./staging/opencv-{OPENCV_VERSION} /staging/opencv-{OPENCV_VERSION}
         RUN mkdir -p /root/code
-        COPY opencv-{OPENCV_VERSION} /root/code/opencv
+        RUN cp -r /staging/opencv-{OPENCV_VERSION} /root/code/opencv
+
 
         ENV _MY_DOCKER_TAG={DOCKER_TAG}
         ENV HOME=/root
-        ENV PLAT={PLAT}
+        ENV ARCH={ARCH}
         ''')
 
     MB_PYTHON_TAGS = [
+        'cp39-cp39',
         'cp38-cp38',
         'cp37-cp37m',
         'cp36-cp36m',
-        'cp35-cp35m',
-        'cp27-cp27mu',
+        # 'cp35-cp35m',
+        # 'cp27-cp27mu',
     ]
 
     parts = [docker_header]
 
-    # if PLAT != 'x86_64':
+    # if ARCH != 'x86_64':
     if True:
         # For architectures other than x86_64 we have to build cmake ourselves
         fpath = ub.grabdata(
             'https://github.com/Kitware/CMake/releases/download/v3.15.6/cmake-3.15.6.tar.gz',
-            dpath=dpath, hash_prefix='3210cbf4644a7cb8d08ad752a0b550d864666b0',
+            dpath=staging_dpath, hash_prefix='3210cbf4644a7cb8d08ad752a0b550d864666b0',
             hasher='sha512', verbose=3
         )
         cmake_tar_fname = basename(fpath)
@@ -249,15 +267,13 @@ def main():
 
         parts.append(ub.codeblock(
             fr'''
-
-            RUN yum install curl-devel -y
-
-            COPY {cmake_tar_fname} /root/code/
+            COPY ./staging/{cmake_tar_fname} /staging/
+            RUN cp /staging/{cmake_tar_fname} /root/code/
 
             RUN \
                 mkdir -p /root/code/ && \
                 cd /root/code/ && \
-                tar -xf cmake-3.15.6.tar.gz && \
+                tar -xf /staging/cmake-3.15.6.tar.gz && \
                 cd cmake-3.15.6 && \
                 export MAKEFLAGS=-j$(getconf _NPROCESSORS_ONLN) && \
                 ./configure --system-curl && \
@@ -269,23 +285,25 @@ def main():
 
     # note: perl build scripts does a lot of redundant work
     # if running "make install" separately
+    # TODO: hashes
+    # curl -O -L https://www.cpan.org/src/5.0/perl-5.20.1.tar.gz && \
     parts.append(ub.codeblock(
         r'''
-        RUN yum install freetype-devel bzip2-devel zlib-devel -y && \
-            mkdir -p ~/ffmpeg_sources
+        RUN mkdir -p /root/ffmpeg_sources
+        RUN mkdir -p /root/openssl_build
 
         # Newer openssl configure requires newer perl
-        RUN cd ~/ffmpeg_sources && \
-            curl -O -L https://www.cpan.org/src/5.0/perl-5.20.1.tar.gz && \
-            tar -xf perl-5.20.1.tar.gz && \
-            cd ~/ffmpeg_sources/perl-5.20.1 && \
-            ./Configure -des -Dprefix="$HOME/openssl_build" && \
+        RUN cd /root/ffmpeg_sources && \
+            curl -O -L https://www.cpan.org/src/5.0/perl-5.14.1.tar.gz && \
+            tar -xf perl-5.14.1.tar.gz && \
+            cd /root/ffmpeg_sources/perl-5.14.1 && \
+            ./Configure -des -Dprefix="/root/openssl_build" && \
             make install -j$(getconf _NPROCESSORS_ONLN) && \
-            cd ~/ffmpeg_sources && \
+            cd /root/ffmpeg_sources && \
             rm -rf perl-5.20.1*
         '''))
 
-    if PLAT == 'i686':
+    if ARCH == 'i686':
         parts.append(ub.codeblock(
             r'''
             RUN cd ~/ffmpeg_sources && \
@@ -294,19 +312,20 @@ def main():
                 cd ~/ffmpeg_sources/openssl-OpenSSL_1_1_1c && \
                 #in i686, ./config detects x64 in i686 container without linux32
                 # when run from "docker build"
-                PERL="$HOME/openssl_build/bin/perl" linux32 ./config --prefix="$HOME/ffmpeg_build" --openssldir="$HOME/ffmpeg_build" shared zlib && \
+                PERL="/root/openssl_build/bin/perl" linux32 ./config --prefix="/root/ffmpeg_build" --openssldir="/root/ffmpeg_build" shared zlib && \
                 make -j$(getconf _NPROCESSORS_ONLN) && \
                 make install_sw && \
                 rm -rf ~/openssl_build
             '''))
     else:
+        # TODO: might try to use fletch on this docker image?
         parts.append(ub.codeblock(
             r'''
             RUN cd ~/ffmpeg_sources && \
                 curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz && \
                 tar -xf OpenSSL_1_1_1c.tar.gz && \
                 cd ~/ffmpeg_sources/openssl-OpenSSL_1_1_1c && \
-                PERL="$HOME/openssl_build/bin/perl" ./config --prefix="$HOME/ffmpeg_build" --openssldir="$HOME/ffmpeg_build" shared zlib && \
+                PERL="/root/openssl_build/bin/perl" ./config --prefix="/root/ffmpeg_build" --openssldir="/root/ffmpeg_build" shared zlib && \
                 make -j$(getconf _NPROCESSORS_ONLN) && \
                 make install_sw && \
                 rm -rf ~/openssl_build
@@ -317,7 +336,7 @@ def main():
         RUN cd ~/ffmpeg_sources && \
             curl -O -L http://www.nasm.us/pub/nasm/releasebuilds/2.14.01/nasm-2.14.01.tar.bz2 && \
             tar -xf nasm-2.14.01.tar.bz2 && cd nasm-2.14.01 && ./autogen.sh && \
-            ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" && \
+            ./configure --prefix="/root/ffmpeg_build" --bindir="/root/bin" && \
             make -j$(getconf _NPROCESSORS_ONLN) && \
             make install
 
@@ -325,14 +344,14 @@ def main():
             curl -O -L http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz && \
             tar -xf yasm-1.3.0.tar.gz && \
             cd yasm-1.3.0 && \
-            ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" && \
+            ./configure --prefix="/root/ffmpeg_build" --bindir="/root/bin" && \
             make -j$(getconf _NPROCESSORS_ONLN) && \
             make install
 
         RUN cd ~/ffmpeg_sources && \
             git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git && \
             cd libvpx && \
-            ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm --enable-pic --enable-shared && \
+            ./configure --prefix="/root/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm --enable-pic --enable-shared && \
             make -j$(getconf _NPROCESSORS_ONLN) && \
             make install
 
@@ -341,7 +360,7 @@ def main():
             tar -xf ffmpeg-snapshot.tar.bz2 && \
             cd ffmpeg && \
             PATH=~/bin:$PATH && \
-            PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --extra-cflags="-I$HOME/ffmpeg_build/include" --extra-ldflags="-L$HOME/ffmpeg_build/lib" --enable-openssl --enable-libvpx --enable-shared --enable-pic --bindir="$HOME/bin" && \
+            PKG_CONFIG_PATH="/root/ffmpeg_build/lib/pkgconfig" ./configure --prefix="/root/ffmpeg_build" --extra-cflags="-I/root/ffmpeg_build/include" --extra-ldflags="-L$/root/ffmpeg_build/lib" --enable-openssl --enable-libvpx --enable-shared --enable-pic --bindir="/root/bin" && \
             make -j$(getconf _NPROCESSORS_ONLN) && \
             make install && \
             echo "/root/ffmpeg_build/lib/" >> /etc/ld.so.conf && \
@@ -358,7 +377,7 @@ def main():
             mv videodev2.h v4l2-common.h v4l2-controls.h compiler.h /usr/include/linux
         '''))
 
-    if PLAT == 'i686':
+    if ARCH == 'i686':
         parts.append(ub.codeblock(
             r'''
             #in i686, yum metadata ends up with slightly wrong timestamps
@@ -369,12 +388,12 @@ def main():
 
     parts.append(ub.codeblock(
         r'''
-        ENV PATH "$HOME/bin:$PATH"
+        ENV PATH "/root/bin:$PATH"
         '''))
 
     # Create a virtual environment for each supported python version
     for MB_PYTHON_TAG in MB_PYTHON_TAGS:
-        if PLAT == 'x86_64':
+        if ARCH == 'x86_64':
             pip_pkgs = 'cmake ubelt numpy wheel'
         else:
             pip_pkgs = 'ubelt numpy wheel'
@@ -395,7 +414,7 @@ def main():
         PY_VER = '{}.{}'.format(major, minor)
 
         config = {
-            'is_64bit': PLAT in {'x86_64'},
+            'is_64bit': ARCH in {'x86_64'},
             'build_contrib': False,
             'build_headless': True,
             'python_args': None,
@@ -451,7 +470,7 @@ def main():
         print(docker_build_cli)
     else:
         ub.cmd(f'docker pull {PARENT_IMAGE}')
-        info = ub.cmd(docker_build_cli, verbose=3, shell=True)
+        info = ub.cmd(docker_build_cli, cwd=dpath, verbose=3, shell=True)
 
         if info['ret'] != 0:
             print(ub.color_text('\n--- FAILURE ---', 'red'))
@@ -498,19 +517,19 @@ if __name__ == '__main__':
     """
     CommandLine:
 
-        docker run --rm -it quay.io/pypa/manylinux2010_x86_64 /bin/bash
+        # Interactive:
+        cd ~/.cache/erotemic/manylinux-for/workspace
+        docker run -v $PWD/staging:/staging:ro --rm -it quay.io/pypa/manylinux2014_x86_64 /bin/bash
 
         # Pull the standard manylinux base images
-        docker pull quay.io/pypa/manylinux2010_i686
-        docker pull quay.io/pypa/manylinux2010_x86_64
         docker pull quay.io/pypa/manylinux2014_i686
         docker pull quay.io/pypa/manylinux2014_x86_64
         docker pull quay.io/pypa/manylinux2014_aarch64
 
 
         python ~/code/vtool_ibeis/dev/build_base_docker.py --dry
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=x86_64
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=i686
-        python ~/code/vtool_ibeis/dev/build_base_docker.py --plat=aarch64 --dry
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --arch=x86_64
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --arch=i686
+        python ~/code/vtool_ibeis/dev/build_base_docker.py --arch=aarch64 --dry
     """
     main()
