@@ -27,10 +27,8 @@ def install_opencv_fletch_command():
         cd fletch &&
         mkdir build &&
         cd build &&
-        cmake
-            -Dfletch_ENABLE_OpenCV=True
-            -DOpenCV_SELECT_VERSION=4.2.0
-            .. &&
+        cmake -Dfletch_ENABLE_OpenCV=True -DOpenCV_SELECT_VERSION=4.2.0 ..
+        &&
         make -j$(getconf _NPROCESSORS_ONLN) &&
         make install
         ''')
