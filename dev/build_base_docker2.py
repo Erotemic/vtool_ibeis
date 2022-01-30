@@ -1,6 +1,10 @@
 import ubelt as ub
 import os
 
+BS = chr(92)  # backslash
+NL = chr(10)  # newline
+CMD_SEP = f' && {BS}{NL}'
+
 
 def argval(clikey, envkey=None, default=ub.NoParam):
     if envkey is not None:
@@ -10,43 +14,9 @@ def argval(clikey, envkey=None, default=ub.NoParam):
     return ub.argval(clikey, default=default)
 
 
-def main():
-    fletch_version = 'v1.5.0'
-    ARCH = argval('--arch', 'ARCH', default='x86_64')
-    PARENT_IMAGE_PREFIX = argval('--parent_image_prefix', 'PARENT_IMAGE_PREFIX', default='manylinux2014')
-    # PARENT_IMAGE_PREFIX = 'manylinux_2_24'
-    # PARENT_IMAGE_PREFIX = 'manylinux2014'
-
-    PARENT_IMAGE_BASE = f'{PARENT_IMAGE_PREFIX}_{ARCH}'
-    PARENT_IMAGE_TAG = 'latest'
-    PARENT_IMAGE_NAME = f'{PARENT_IMAGE_BASE}:{PARENT_IMAGE_TAG}'
-
-    PARENT_QUAY_USER = 'quay.io/pypa'
-    PARENT_IMAGE_URI = f'{PARENT_QUAY_USER}/{PARENT_IMAGE_NAME}'
-
-    OUR_QUAY_USER = 'quay.io/erotemic'
-    OUR_IMAGE_BASE = f'{PARENT_IMAGE_BASE}_for'
-    OUR_IMAGE_TAG = f'fletch{fletch_version}-opencv'
-    OUR_IMAGE_NAME = f'{OUR_IMAGE_BASE}:{OUR_IMAGE_TAG}'
-
-    OUR_DOCKER_URI = f'{OUR_QUAY_USER}/{OUR_IMAGE_NAME}'
-    DRY = ub.argflag('--dry')
-
-    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2'))
-
-    dockerfile_fpath = dpath / f'{OUR_IMAGE_BASE}.{OUR_IMAGE_TAG}.Dockerfile'
-
-    if PARENT_IMAGE_PREFIX == 'manylinux2014':
-        distribution = 'centos'
-    elif PARENT_IMAGE_PREFIX == 'manylinux_2_24':
-        distribution = 'debian'
-    elif PARENT_IMAGE_PREFIX == 'musllinux_1_1':
-        distribution = 'alpine'
-    else:
-        raise KeyError(PARENT_IMAGE_PREFIX)
-
+def add_fletch_parts(fletch_version, dpath, parts):
+    fletch_init_commands = []
     USE_STAGING_STRATEGY = False
-
     if USE_STAGING_STRATEGY:
         staging_dpath = (dpath / 'staging').ensuredir()
         fletch_dpath = staging_dpath / 'fletch'
@@ -55,19 +25,6 @@ def main():
             # pre-downloads all the requirements so we can stage them
             ub.cmd('git clone https://github.com/Kitware/fletch.git@v1.5.0', cwd=staging_dpath)
         ub.cmd(f'git checkout {fletch_version}', cwd=fletch_dpath)
-
-    parts = []
-    parts.append(ub.codeblock(
-        f'''
-        FROM {PARENT_IMAGE_URI}
-        SHELL ["/bin/bash", "-c"]
-        ENV HOME=/root
-        RUN mkdir -p /root/code
-        '''))
-    # ENV ARCH={ARCH}
-
-    fletch_init_commands = []
-    if USE_STAGING_STRATEGY:
         parts.append(ub.codeblock(
             '''
             COPY ./staging/fletch /root/code/fletch
@@ -96,14 +53,11 @@ def main():
         'make install',
         'rm -rf /root/code/fletch',
     ])
-    BS = '\\'
-    NL = '\n'
-    CMD_SEP = f' && {BS}{NL}'
     fletch_init_run_command = ub.indent(CMD_SEP.join(fletch_init_commands)).lstrip()
     parts.append(f'RUN {fletch_init_run_command}')
 
-    parts.append(f'RUN {fletch_init_run_command}')
 
+def add_package_manager_parts(distribution, parts):
     if distribution == 'centos':
         yum_libs = [
             'lz4-devel',
@@ -140,6 +94,74 @@ def main():
         ]
         apk_install_cmd = ub.indent(CMD_SEP.join(apt_parts)).lstrip()
         parts.append(f'RUN {apk_install_cmd}')
+
+
+def main():
+    fletch_version = 'v1.5.0'
+    ARCH = argval('--arch', 'ARCH', default='x86_64')
+    PARENT_IMAGE_PREFIX = argval('--parent_image_prefix', 'PARENT_IMAGE_PREFIX', default='manylinux2014')
+    # PARENT_IMAGE_PREFIX = 'manylinux_2_24'
+    # PARENT_IMAGE_PREFIX = 'manylinux2014'
+
+    PARENT_IMAGE_BASE = f'{PARENT_IMAGE_PREFIX}_{ARCH}'
+    PARENT_IMAGE_TAG = 'latest'
+    PARENT_IMAGE_NAME = f'{PARENT_IMAGE_BASE}:{PARENT_IMAGE_TAG}'
+
+    PARENT_QUAY_USER = 'quay.io/pypa'
+    PARENT_IMAGE_URI = f'{PARENT_QUAY_USER}/{PARENT_IMAGE_NAME}'
+
+    OUR_QUAY_USER = 'quay.io/erotemic'
+    OUR_IMAGE_BASE = f'{PARENT_IMAGE_BASE}_for'
+
+    included_packages = []
+
+    if ub.argflag('--lz4'):
+        included_packages.append('lz4')
+
+    if ub.argflag('--opencv'):
+        included_packages.append('opencv')
+
+    # included_packages = [
+    #     'lz4',
+    #     # 'opencv',
+    # ]
+    pkg_suffix = '-'.join(included_packages)
+
+    OUR_IMAGE_TAG = pkg_suffix
+    OUR_IMAGE_NAME = f'{OUR_IMAGE_BASE}:{OUR_IMAGE_TAG}'
+
+    OUR_DOCKER_URI = f'{OUR_QUAY_USER}/{OUR_IMAGE_NAME}'
+    DRY = ub.argflag('--dry')
+
+    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2'))
+
+    dockerfile_fpath = dpath / f'{OUR_IMAGE_BASE}.{OUR_IMAGE_TAG}.Dockerfile'
+
+    if PARENT_IMAGE_PREFIX == 'manylinux2014':
+        distribution = 'centos'
+    elif PARENT_IMAGE_PREFIX == 'manylinux_2_24':
+        distribution = 'debian'
+    elif PARENT_IMAGE_PREFIX == 'musllinux_1_1':
+        distribution = 'alpine'
+    else:
+        raise KeyError(PARENT_IMAGE_PREFIX)
+
+    parts = []
+    parts.append(ub.codeblock(
+        f'''
+        FROM {PARENT_IMAGE_URI}
+        SHELL ["/bin/bash", "-c"]
+        ENV HOME=/root
+        RUN mkdir -p /root/code
+        '''))
+    # ENV ARCH={ARCH}
+
+    if 'lz4' in included_packages:
+        add_package_manager_parts(distribution, parts)
+
+    WITH_OPENCV = 'opencv' in included_packages
+    if WITH_OPENCV:
+        add_fletch_parts(fletch_version, dpath, parts)
 
     docker_code = '\n\n'.join(parts)
 
@@ -204,13 +226,25 @@ if __name__ == '__main__':
     CommandLine:
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --dry
 
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux_2_24
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux_2_24
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux2014
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux2014
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux2014 --opencv
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux2014 --opencv
 
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux_2_24 --opencv
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux_2_24 --opencv
+
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1 --opencv
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1 --opencv
+
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux2014 --lz4
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux2014 --lz4
+
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux_2_24 --lz4
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux_2_24 --lz4
+
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1 --lz4
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1 --lz4
+
+
 
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=aarch64 --dry
 
