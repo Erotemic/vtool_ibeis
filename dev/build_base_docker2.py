@@ -53,6 +53,7 @@ def main():
         FROM {PARENT_IMAGE_URI}
         SHELL ["/bin/bash", "-c"]
         ENV HOME=/root
+        RUN mkdir -p /root/code
         '''))
     # ENV ARCH={ARCH}
 
