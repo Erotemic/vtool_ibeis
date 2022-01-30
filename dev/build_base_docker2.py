@@ -32,7 +32,7 @@ def main():
     OUR_DOCKER_URI = f'{OUR_QUAY_USER}/{OUR_IMAGE_NAME}'
     DRY = ub.argflag('--dry')
 
-    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2'))
+    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2')).ensuredir()
 
     dockerfile_fpath = dpath / f'{OUR_IMAGE_BASE}.{OUR_IMAGE_TAG}.Dockerfile'
 
@@ -53,7 +53,7 @@ def main():
         if not fletch_dpath.exists():
             # TODO: setup a dummy build on the host machine that
             # pre-downloads all the requirements so we can stage them
-            ub.cmd('git clone https://github.com/Kitware/fletch.git@v1.5.0', cwd=staging_dpath)
+            ub.cmd('git clone -b @v1.5.0 https://github.com/Kitware/fletch.git', cwd=staging_dpath)
         ub.cmd(f'git checkout {fletch_version}', cwd=fletch_dpath)
 
     parts = []
@@ -209,8 +209,8 @@ if __name__ == '__main__':
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux2014
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux2014
 
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1 --lz4
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1 --lz4
 
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=aarch64 --dry
 
