@@ -1,6 +1,5 @@
 import ubelt as ub
 import os
-QUAY_REPO = 'quay.io/erotemic/manylinux-for'
 
 
 def argval(clikey, envkey=None, default=ub.NoParam):
@@ -12,53 +11,85 @@ def argval(clikey, envkey=None, default=ub.NoParam):
 
 
 def main():
-    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2'))
-    staging_dpath = (dpath / 'staging').ensuredir()
-    fletch_dpath = staging_dpath / 'fletch'
-    if not fletch_dpath.exists():
-        # TODO: setup a dummy build on the host machine that
-        # pre-downloads all the requirements so we can stage them
-        ub.cmd('git clone https://github.com/Kitware/fletch.git', cwd=staging_dpath)
-    ub.cmd('git checkout v1.5.0', cwd=fletch_dpath)
-
+    fletch_version = 'v1.5.0'
     ARCH = argval('--arch', 'ARCH', default='x86_64')
-    manylinux_base = 'manylinux_2_24'
-    BASE = f'{manylinux_base}_{ARCH}'
-    DOCKER_TAG = '{}-fletch1.5.0-opencv'.format(ARCH)
-    DOCKER_URI = f'{QUAY_REPO}:{DOCKER_TAG}'
+    PARENT_IMAGE_PREFIX = argval('--parent_image_prefix', 'PARENT_IMAGE_PREFIX', default='manylinux2014')
+    # PARENT_IMAGE_PREFIX = 'manylinux_2_24'
+    # PARENT_IMAGE_PREFIX = 'manylinux2014'
+
+    PARENT_IMAGE_BASE = f'{PARENT_IMAGE_PREFIX}_{ARCH}'
+    PARENT_IMAGE_TAG = 'latest'
+    PARENT_IMAGE_NAME = f'{PARENT_IMAGE_BASE}:{PARENT_IMAGE_TAG}'
+
+    PARENT_QUAY_USER = 'quay.io/pypa'
+    PARENT_IMAGE_URI = f'{PARENT_QUAY_USER}/{PARENT_IMAGE_NAME}'
+
+    OUR_QUAY_USER = 'quay.io/erotemic'
+    OUR_IMAGE_BASE = f'{PARENT_IMAGE_BASE}_for'
+    OUR_IMAGE_TAG = f'fletch{fletch_version}-opencv'
+    OUR_IMAGE_NAME = f'{OUR_IMAGE_BASE}:{OUR_IMAGE_TAG}'
+
+    OUR_DOCKER_URI = f'{OUR_QUAY_USER}/{OUR_IMAGE_NAME}'
     DRY = ub.argflag('--dry')
 
-    dockerfile_fpath = dpath / ('Dockerfile_' + DOCKER_TAG)
-    BASE_REPO = 'quay.io/pypa'
-    PARENT_IMAGE = f'{BASE_REPO}/{BASE}'
+    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2'))
+
+    dockerfile_fpath = dpath / f'{OUR_IMAGE_BASE}.{OUR_IMAGE_TAG}.Dockerfile'
+
+    USE_STAGING_STRATEGY = False
+
+    if USE_STAGING_STRATEGY:
+        staging_dpath = (dpath / 'staging').ensuredir()
+        fletch_dpath = staging_dpath / 'fletch'
+        if not fletch_dpath.exists():
+            # TODO: setup a dummy build on the host machine that
+            # pre-downloads all the requirements so we can stage them
+            ub.cmd('git clone https://github.com/Kitware/fletch.git@v1.5.0', cwd=staging_dpath)
+        ub.cmd(f'git checkout {fletch_version}', cwd=fletch_dpath)
 
     parts = []
-
     parts.append(ub.codeblock(
         f'''
-        FROM {PARENT_IMAGE}
+        FROM {PARENT_IMAGE_URI}
         SHELL ["/bin/bash", "-c"]
         ENV HOME=/root
-        ENV ARCH={ARCH}
         '''))
+    # ENV ARCH={ARCH}
 
-    parts.append(ub.codeblock(
-        '''
-        RUN mkdir -p /staging
-
-        COPY ./staging/fletch /staging/fletch
-        RUN mkdir -p /root/code
-        RUN cp -r /staging/fletch /root/code/fletch
-        '''))
-
-    parts.append(ub.codeblock(
+    fletch_init_commands = []
+    if USE_STAGING_STRATEGY:
+        parts.append(ub.codeblock(
+            '''
+            COPY ./staging/fletch /root/code/fletch
+            '''))
+        fletch_init_commands.extend([
+            'mkdir -p /root/code/fletch/build',
+            'cd /root/code/fletch/build',
+        ])
+    else:
+        # Clone specific branch with no tag history
+        fletch_init_commands.extend([
+            'cd /root/code',
+            'git clone -b v1.5.0 --depth 1 https://github.com/Kitware/fletch.git fletch',
+            'mkdir -p /root/code/fletch/build',
+            'cd /root/code/fletch/build',
+        ])
+    fletch_init_commands.append(ub.codeblock(
         r'''
-        RUN mkdir -p /root/code/fletch/build
-        RUN cd /root/code/fletch/build && \
-            cmake -Dfletch_ENABLE_OpenCV=True -DOpenCV_SELECT_VERSION=4.2.0 .. && \
-            make -j$(getconf _NPROCESSORS_ONLN) && \
-            make install
+        cmake \
+            -Dfletch_ENABLE_OpenCV=True \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOpenCV_SELECT_VERSION=4.2.0 ..
         '''))
+    fletch_init_commands.extend([
+        'make -j$(getconf _NPROCESSORS_ONLN)',
+        'make install',
+        'rm -rf /root/code/fletch',
+    ])
+    BS = '\\'
+    NL = '\n'
+    fletch_init_run_command = ub.indent(f' && {BS}{NL}'.join(fletch_init_commands)).lstrip()
+    parts.append(f'RUN {fletch_init_run_command}')
 
     docker_code = '\n\n'.join(parts)
 
@@ -73,7 +104,7 @@ def main():
 
     docker_build_cli = ' '.join([
         'docker', 'build',
-        '--tag {}'.format(DOCKER_TAG),
+        '--tag {}'.format(OUR_IMAGE_NAME),
         '-f {}'.format(dockerfile_fpath),
         '.'
     ])
@@ -81,11 +112,11 @@ def main():
 
     if DRY:
         print('DRY RUN: Would run')
-        print(f'docker pull {PARENT_IMAGE}')
+        print(f'docker pull {PARENT_IMAGE_URI}')
         print(f'cd {dpath}')
         print(docker_build_cli)
     else:
-        ub.cmd(f'docker pull {PARENT_IMAGE}')
+        ub.cmd(f'docker pull {PARENT_IMAGE_URI}', verbose=3)
         info = ub.cmd(docker_build_cli, cwd=dpath, verbose=3, shell=True)
 
         if info['ret'] != 0:
@@ -103,9 +134,9 @@ def main():
             # To test / export / publish you can do something like this:
 
             # Test that we can get a bash terminal
-            docker run -it {DOCKER_TAG} bash
+            docker run -it {OUR_IMAGE_NAME} bash
 
-            docker save -o {DOCKER_TAG}.docker.tar {DOCKER_TAG}
+            docker save -o {OUR_IMAGE_NAME}.docker.tar {OUR_IMAGE_NAME}
 
             # To publish to quay
 
@@ -113,8 +144,8 @@ def main():
             echo "QUAY_USERNAME = $QUAY_USERNAME"
             docker login -u $QUAY_USERNAME -p $QUAY_PASSWORD quay.io
 
-            docker tag {DOCKER_TAG} {DOCKER_URI}
-            docker push {DOCKER_URI}
+            docker tag {OUR_IMAGE_NAME} {OUR_DOCKER_URI}
+            docker push {OUR_DOCKER_URI}
             '''), 'bash'))
 
 
@@ -122,10 +153,14 @@ if __name__ == '__main__':
     """
     CommandLine:
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --dry
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=aarch64 --dry
 
         # Then to build with CIBW
         pip install cibuildwheel
-        CIBW_MANYLINUX_X86_64_IMAGE=quay.io/erotemic/manylinux-for:x86_64-fletch1.5.0-opencv cibuildwheel --platform linux
+        CIBW_BUILD='cp*-manylinux_x86_64' CIBW_MANYLINUX_X86_64_IMAGE=quay.io/erotemic/manylinux-for:x86_64-fletch1.5.0-opencv cibuildwheel --platform linux --archs x86_64
+
 
     """
     main()
