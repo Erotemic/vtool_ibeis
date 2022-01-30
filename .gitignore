@@ -91,3 +91,4 @@ timeings.txt
 Dockerfile*
 _skbuild/*
 opencv-docker-tag.txt
+wheelhouse
