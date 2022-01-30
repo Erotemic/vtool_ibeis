@@ -12,3 +12,5 @@ scikit-learn
 statsmodels
 ubelt 
 utool >= 2.0.0
+
+# opencv-python >= 4.1.0.25

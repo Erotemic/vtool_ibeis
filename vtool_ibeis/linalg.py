@@ -30,14 +30,13 @@ TODO: Look at this file
 #     >>> vt.evalprint('S.inv()')
 #     >>> print('-------')
 #     >>> print('LaTeX')
-#     >>> print(ut.align('\\\\\n'.join(sympy.latex(R).split(r'\\')).replace('{matrix}', '{matrix}\n'), '&')
+#     >>> print(xdev.align('\\\\\n'.join(sympy.latex(R).split(r'\\')).replace('{matrix}', '{matrix}\n'), '&')
 
 """
 from __future__ import absolute_import, division, print_function
 import cv2
 import numpy as np
 import numpy.linalg as npl
-import utool as ut
 import ubelt as ub
 import warnings  # NOQA
 from .util_math import TAU
@@ -269,7 +268,7 @@ def affine_around_mat3x3(x, y, sx=1.0, sy=1.0, theta=0.0, shear=0.0, tx=0.0,
         >>> pt.plt.axis('equal')
         >>> pt.plt.xlim(0, 40)
         >>> pt.plt.ylim(0, 40)
-        >>> ut.show_if_requested()
+        >>> pt.show_if_requested()
 
     # Timeit:
     #     >>> from vtool_ibeis.linalg import *  # NOQA
