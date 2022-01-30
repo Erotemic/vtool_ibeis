@@ -36,6 +36,15 @@ def main():
 
     dockerfile_fpath = dpath / f'{OUR_IMAGE_BASE}.{OUR_IMAGE_TAG}.Dockerfile'
 
+    if PARENT_IMAGE_PREFIX == 'manylinux2014':
+        distribution = 'centos'
+    elif PARENT_IMAGE_PREFIX == 'manylinux_2_24':
+        distribution = 'debian'
+    elif PARENT_IMAGE_PREFIX == 'musllinux_1_1':
+        distribution = 'alpine'
+    else:
+        raise KeyError(PARENT_IMAGE_PREFIX)
+
     USE_STAGING_STRATEGY = False
 
     if USE_STAGING_STRATEGY:
@@ -89,8 +98,48 @@ def main():
     ])
     BS = '\\'
     NL = '\n'
-    fletch_init_run_command = ub.indent(f' && {BS}{NL}'.join(fletch_init_commands)).lstrip()
+    CMD_SEP = f' && {BS}{NL}'
+    fletch_init_run_command = ub.indent(CMD_SEP.join(fletch_init_commands)).lstrip()
     parts.append(f'RUN {fletch_init_run_command}')
+
+    parts.append(f'RUN {fletch_init_run_command}')
+
+    if distribution == 'centos':
+        yum_libs = [
+            'lz4-devel',
+        ]
+        yum_libs_str = ' '.join(yum_libs)
+        yum_parts = [
+            'yum update -y',
+            f'yum install {yum_libs_str} -y',
+            'yum clean all',
+        ]
+        yum_install_cmd = ub.indent(CMD_SEP.join(yum_parts)).lstrip()
+        parts.append(f'RUN {yum_install_cmd}')
+    elif distribution == 'debian':
+        apt_libs = [
+            'liblz4-dev',
+        ]
+        apt_libs_str = ' '.join(apt_libs)
+        apt_parts = [
+            'apt-get update',
+            'apt-get install',
+            f'apt-get install {apt_libs_str} -y',
+            'rm -rf /var/lib/apt/lists/*',
+        ]
+        apt_install_cmd = ub.indent(CMD_SEP.join(apt_parts)).lstrip()
+        parts.append(f'RUN {apt_install_cmd}')
+    elif distribution == 'alpine':
+        apt_libs = [
+            'lz4-dev',
+        ]
+        apt_libs_str = ' '.join(apt_libs)
+        apt_parts = [
+            f'apk add --update-cache {apt_libs_str}',
+            'rm -rf /var/cache/apk/*',
+        ]
+        apk_install_cmd = ub.indent(CMD_SEP.join(apt_parts)).lstrip()
+        parts.append(f'RUN {apk_install_cmd}')
 
     docker_code = '\n\n'.join(parts)
 
@@ -154,11 +203,14 @@ if __name__ == '__main__':
     """
     CommandLine:
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --dry
+
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux_2_24
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux_2_24
-
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux2014
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux2014
+
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1
 
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=aarch64 --dry
 
