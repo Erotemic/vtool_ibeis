@@ -16,6 +16,40 @@ def argval(clikey, envkey=None, default=ub.NoParam):
 
 def add_fletch_parts(fletch_version, dpath, parts):
     fletch_init_commands = []
+    fletch_version = 'v1.5.0'
+    ARCH = argval('--arch', 'ARCH', default='x86_64')
+    PARENT_IMAGE_PREFIX = argval('--parent_image_prefix', 'PARENT_IMAGE_PREFIX', default='manylinux2014')
+    # PARENT_IMAGE_PREFIX = 'manylinux_2_24'
+    # PARENT_IMAGE_PREFIX = 'manylinux2014'
+
+    PARENT_IMAGE_BASE = f'{PARENT_IMAGE_PREFIX}_{ARCH}'
+    PARENT_IMAGE_TAG = 'latest'
+    PARENT_IMAGE_NAME = f'{PARENT_IMAGE_BASE}:{PARENT_IMAGE_TAG}'
+
+    PARENT_QUAY_USER = 'quay.io/pypa'
+    PARENT_IMAGE_URI = f'{PARENT_QUAY_USER}/{PARENT_IMAGE_NAME}'
+
+    OUR_QUAY_USER = 'quay.io/erotemic'
+    OUR_IMAGE_BASE = f'{PARENT_IMAGE_BASE}_for'
+    OUR_IMAGE_TAG = f'fletch{fletch_version}-opencv'
+    OUR_IMAGE_NAME = f'{OUR_IMAGE_BASE}:{OUR_IMAGE_TAG}'
+
+    OUR_DOCKER_URI = f'{OUR_QUAY_USER}/{OUR_IMAGE_NAME}'
+    DRY = ub.argflag('--dry')
+
+    dpath = ub.Path(ub.get_app_cache_dir('erotemic/manylinux-for/workspace2'))
+
+    dockerfile_fpath = dpath / f'{OUR_IMAGE_BASE}.{OUR_IMAGE_TAG}.Dockerfile'
+
+    if PARENT_IMAGE_PREFIX == 'manylinux2014':
+        distribution = 'centos'
+    elif PARENT_IMAGE_PREFIX == 'manylinux_2_24':
+        distribution = 'debian'
+    elif PARENT_IMAGE_PREFIX == 'musllinux_1_1':
+        distribution = 'alpine'
+    else:
+        raise KeyError(PARENT_IMAGE_PREFIX)
+
     USE_STAGING_STRATEGY = False
     if USE_STAGING_STRATEGY:
         staging_dpath = (dpath / 'staging').ensuredir()
@@ -23,7 +57,7 @@ def add_fletch_parts(fletch_version, dpath, parts):
         if not fletch_dpath.exists():
             # TODO: setup a dummy build on the host machine that
             # pre-downloads all the requirements so we can stage them
-            ub.cmd('git clone https://github.com/Kitware/fletch.git@v1.5.0', cwd=staging_dpath)
+            ub.cmd('git clone -b @v1.5.0 https://github.com/Kitware/fletch.git', cwd=staging_dpath)
         ub.cmd(f'git checkout {fletch_version}', cwd=fletch_dpath)
         parts.append(ub.codeblock(
             '''
@@ -245,6 +279,8 @@ if __name__ == '__main__':
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1 --lz4
 
 
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=musllinux_1_1 --lz4
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=musllinux_1_1 --lz4
 
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=aarch64 --dry
 

@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+pip install cibuildwheel
+CIBW_SKIP='pp*' cibuildwheel --config-file pyproject.toml --platform linux --arch x86_64
+"""
 from __future__ import absolute_import, division, print_function
 from os.path import dirname
 from os.path import join
