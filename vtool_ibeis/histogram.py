@@ -5,7 +5,6 @@ import warnings
 import scipy.signal
 import numpy as np
 import utool as ut
-import ubelt as ub
 from .util_math import TAU
 
 
@@ -19,6 +18,7 @@ def argsubmax(ydata, xdata=None):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.histogram import *  # NOQA
+        >>> import ubelt as ub
         >>> ydata = [ 0,  1,  2, 1.5,  0]
         >>> xdata = [00, 10, 20,  30, 40]
         >>> result1 = argsubmax(ydata, xdata=None)
@@ -128,8 +128,10 @@ def argsubmax2(ydata, xdata=None):
         >>> xdata = [00, 10, 20,  30, 40]
         >>> result1 = argsubmax(ydata, xdata=None)
         >>> result2 = argsubmax(ydata, xdata=xdata)
+        >>> import ubelt as ub
         >>> result = ub.repr2([result1, result2], precision=4, nl=1, nobr=True)
         >>> print(result)
+
         (2.1667, 2.0208),
         (21.6667, 2.0208),
 
@@ -139,6 +141,7 @@ def argsubmax2(ydata, xdata=None):
         >>> centers = None
         >>> thresh_factor = None
         >>> argsubmax(hist_)
+
         (4.0, 4.0)
     """
     if len(ydata) == 0:
@@ -520,6 +523,7 @@ def interpolate_submaxima(argmaxima, hist_, centers=None):
         >>>                            key_list=['x123', 'y123', 'coeff_list'])
         >>> x123, y123, coeff_list = locals_
         >>> res = (submaxima_x, submaxima_y)
+        >>> import ubelt as ub
         >>> result = ub.repr2(res, nl=1, nobr=True, precision=2, with_dtype=True)
         >>> print(result)
         >>> # xdoctest: +REQUIRES(--show)
@@ -861,8 +865,10 @@ def wrap_histogram(hist_, edges_, _debug=False):
         ...                    4.71238898,  5.49778714,  6.2831853 ])
         >>> (hist_wrap, edge_wrap) = wrap_histogram(hist_, edges_)
         >>> tup = (hist_wrap.tolist(), edge_wrap.tolist())
+        >>> import ubelt as ub
         >>> result = ub.repr2(tup, nl=1, nobr=True, precision=2)
         >>> print(result)
+
         [6.73, 8.00, 0.00, 0.00, 34.32, 29.45, 0.00, 0.00, 6.73, 8.00],
         [-0.79, 0.00, 0.79, 1.57, 2.36, 3.14, 3.93, 4.71, 5.50, 6.28, 7.07],
     """

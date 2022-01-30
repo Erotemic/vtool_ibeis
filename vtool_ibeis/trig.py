@@ -19,6 +19,7 @@ def atan2(y, x):
         >>> assert np.all(theta < 2 * np.pi)
         >>> import ubelt as ub
         >>> print(ub.hash_data(theta))
+
         90fe55311562f1c3ae4...
     """
     theta = np.arctan2(y, x)  # outputs from -TAU/2 to TAU/2
