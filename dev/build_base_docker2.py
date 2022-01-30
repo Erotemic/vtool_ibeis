@@ -118,7 +118,7 @@ def main():
         print(docker_build_cli)
     else:
         ub.cmd(f'docker pull {PARENT_IMAGE_URI}', verbose=3)
-        info = ub.cmd(docker_build_cli, cwd=dpath, verbose=3, shell=True)
+        info = ub.cmd(docker_build_cli, cwd=dpath, verbose=3, shell=True, check=True)
 
         if info['ret'] != 0:
             print(ub.color_text('\n--- FAILURE ---', 'red'))
@@ -154,8 +154,12 @@ if __name__ == '__main__':
     """
     CommandLine:
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --dry
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64
-        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux_2_24
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux_2_24
+
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=x86_64 --parent_image_prefix=manylinux2014
+        python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=i686 --parent_image_prefix=manylinux2014
+
         python ~/code/vtool_ibeis/dev/build_base_docker2.py --arch=aarch64 --dry
 
         # Then to build with CIBW
