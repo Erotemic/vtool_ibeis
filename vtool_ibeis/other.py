@@ -390,42 +390,42 @@ def compute_ndarray_unique_rowids_unsafe(arr):
     #assert arr.data == arr_void_view.data
 
 
-def nonunique_row_flags(arr):
-    import vtool_ibeis as vt
-    unique_rowx = unique_row_indexes(arr)
-    unique_flags = vt.index_to_boolmask(unique_rowx, len(arr))
-    nonunique_flags = np.logical_not(unique_flags)
-    return nonunique_flags
+# def nonunique_row_flags(arr):
+#     import vtool_ibeis as vt
+#     unique_rowx = unique_row_indexes(arr)
+#     unique_flags = vt.index_to_boolmask(unique_rowx, len(arr))
+#     nonunique_flags = np.logical_not(unique_flags)
+#     return nonunique_flags
 
 
-def nonunique_row_indexes(arr):
-    """ rows that are not unique (does not include the first instance of each pattern)
+# def nonunique_row_indexes(arr):
+#     """ rows that are not unique (does not include the first instance of each pattern)
 
-    Args:
-        arr (ndarray): 2d array
+#     Args:
+#         arr (ndarray): 2d array
 
-    Returns:
-        ndarray: nonunique_rowx
+#     Returns:
+#         ndarray: nonunique_rowx
 
-    SeeAlso:
-        unique_row_indexes
-        nonunique_row_flags
+#     SeeAlso:
+#         unique_row_indexes
+#         nonunique_row_flags
 
-    CommandLine:
-        python -m vtool_ibeis.other --test-unique_row_indexes
+#     CommandLine:
+#         python -m vtool_ibeis.other --test-unique_row_indexes
 
-    Example:
-        >>> # DISABLE_DOCTEST
-        >>> from vtool_ibeis.other import *  # NOQA
-        >>> arr = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 0], [.534, .432], [.534, .432], [1, 0], [0, 1]])
-        >>> nonunique_rowx = unique_row_indexes(arr)
-        >>> result = ('nonunique_rowx = %s' % (ub.repr2(nonunique_rowx),))
-        >>> print(result)
-        nonunique_rowx = np.array([4, 6, 7, 8], dtype=np.int64)
-    """
-    nonunique_flags = nonunique_row_flags(arr)
-    nonunique_rowx = np.where(nonunique_flags)[0]
-    return nonunique_rowx
+#     Example:
+#         >>> # DISABLE_DOCTEST
+#         >>> from vtool_ibeis.other import *  # NOQA
+#         >>> arr = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 0], [.534, .432], [.534, .432], [1, 0], [0, 1]])
+#         >>> nonunique_rowx = unique_row_indexes(arr)
+#         >>> result = ('nonunique_rowx = %s' % (ub.repr2(nonunique_rowx),))
+#         >>> print(result)
+#         nonunique_rowx = np.array([4, 6, 7, 8], dtype=np.int64)
+#     """
+#     nonunique_flags = nonunique_row_flags(arr)
+#     nonunique_rowx = np.where(nonunique_flags)[0]
+#     return nonunique_rowx
 
 
 def compute_unique_data_ids(data):
