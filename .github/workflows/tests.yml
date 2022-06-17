@@ -51,11 +51,11 @@ jobs:
     - name: Build sdist
       run: |
         # python setup.py sdist
-        python -m build --sdist --outdir dist
+        python -m build --sdist --outdir wheelhouse
     - name: Install sdist
       run: |
-        ls -al ./dist
-        pip install dist/vtool_ibeis*.tar.gz -v
+        ls -al ./wheelhouse
+        pip install wheelhouse/vtool_ibeis*.tar.gz -v
     - name: Test minimal sdist
       run: |
         pwd
@@ -90,7 +90,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: wheels
-        path: ./dist/*.tar.gz
+        path: ./wheelhouse/*.tar.gz
 
   build_and_test_wheels:
     # TODO: handle different python versions: https://github.com/actions/setup-python
@@ -99,7 +99,10 @@ jobs:
     #needs: [lint]
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [
+          ubuntu-latest, 
+          #windows-latest, macOS-latest
+        ]
         python-version: 
           - '3.7'
           - '3.8'
@@ -178,7 +181,9 @@ jobs:
       shell: bash
       run: |
         python -m pip install setuptools>=0.8 wheel pip -U
-        python -m build --wheel --outdir wheelhouse .
+        python -m pip wheel --wheel-dir wheelhouse .
+        #python -m build --wheel --outdir wheelhouse .
+        #python -m build --wheel --outdir wheelhouse .
 
     - name: Test pure wheel
       shell: bash
@@ -256,11 +261,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: wheels
-          path: dist
+          path: wheelhouse
 
       - name: Show files to upload
         shell: bash
-        run: ls -la dist
+        run: ls -la wheelhouse
 
       # Note:
       # See ../../dev/setup_secrets.sh for details on how secrets are deployed securely
@@ -313,11 +318,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: wheels
-          path: dist
+          path: wheelhouse
 
       - name: Show files to upload
         shell: bash
-        run: ls -la dist
+        run: ls -la wheelhouse
       - name: Sign and Publish
         env:
           TEST_TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
