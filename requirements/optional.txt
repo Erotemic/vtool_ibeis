@@ -1,10 +1,2 @@
 # Add requirements here, use the script for help (erotemic needs to publish this script)
 # python ~/local/tools/supported_python_versions_pip.py pyflann_ibeis
-
-pyflann_ibeis>=2.2.0     ;                            python_version >= '3.10'    # Python 3.10+
-pyflann_ibeis>=2.2.0     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
-pyflann_ibeis>=2.0.0     ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
-pyflann_ibeis>=2.2.0     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
-pyflann_ibeis>=2.0.0     ; python_version < '3.7' and python_version >= '3.6'    # Python 3.6
-pyflann_ibeis>=2.0.0     ; python_version < '3.6' and python_version >= '3.5'    # Python 3.5
-pyflann_ibeis>=2.0.0     ; python_version < '3.5' and python_version >= '2.7'    # Python 2.7
