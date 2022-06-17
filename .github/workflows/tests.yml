@@ -72,19 +72,18 @@ jobs:
         python -m pytest -p pytester -p no:doctest --xdoctest --cov=vtool_ibeis "$MOD_DPATH" "$TEST_DPATH"
         cd ..
 
-    # TODO: only enable on ubuntu
-    #- name: Test full sdist
-    #  run: |
-    #    pwd
-    #    ls -al
-    #    python -m pip install -r requirements/optional.txt
-    #    python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
-    #    # Run the tests
-    #    # Get path to installed package
-    #    pip install ubelt
-    #    MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
-    #    echo "MOD_DPATH = $MOD_DPATH"
-    #    python -m pytest -p pytester -p no:doctest --xdoctest $MOD_DPATH ./tests
+    - name: Test full sdist
+      run: |
+        pwd
+        ls -al
+        python -m pip install -r requirements/optional.txt
+        python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
+        # Run the tests
+        # Get path to installed package
+        pip install ubelt
+        MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
+        echo "MOD_DPATH = $MOD_DPATH"
+        python -m pytest -p pytester -p no:doctest --xdoctest $MOD_DPATH ./tests
 
 
     - name: Upload sdist artifact
@@ -178,8 +177,8 @@ jobs:
     - name: Build pure wheel
       shell: bash
       run: |
-        python -m pip install setuptools>=0.8 wheel
-        python -m pip wheel --wheel-dir wheelhouse .
+        python -m pip install setuptools>=0.8 wheel pip -U
+        python -m build --wheel --outdir wheelhouse .
 
     - name: Test pure wheel
       shell: bash
@@ -188,12 +187,12 @@ jobs:
         #OS_NAME: ${{ matrix.os }}
       run: | 
         # Remove source directory (ensure it doesn't conflict)
-        mv vtool_ibeis ignore_src_vtool_ibeis
+        #mv vtool_ibeis ignore_src_vtool_ibeis
         #rm pytest.ini
         # Install the wheel
-        python -m pip install wheelhouse/vtool_ibeis*.whl
         python -m pip install -r requirements/tests.txt
         python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
+        python -m pip install wheelhouse/vtool_ibeis*.whl
         # Run in a sandboxed directory
         WORKSPACE_DNAME="testdir_${CI_PYTHON_VERSION}_${GITHUB_RUN_ID}_${RUNNER_OS}"
         mkdir -p $WORKSPACE_DNAME
