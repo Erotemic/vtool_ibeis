@@ -433,6 +433,7 @@ class PairwiseMatch(ub.NiceRepr):
         Example:
             >>> # xdoctest
             >>> # xdoctest: +REQUIRES(module:pyhesaff)
+            >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True}
             >>> match = demodata_match({}, apply=False)
@@ -521,6 +522,7 @@ class PairwiseMatch(ub.NiceRepr):
         """
         Example:
             >>> # xdoctest: +REQUIRES(module:pyhesaff)
+            >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True, 'newsym': True}
             >>> match = demodata_match(cfgdict, apply=False)
@@ -753,6 +755,7 @@ class PairwiseMatch(ub.NiceRepr):
         Example:
             >>> # ENABLE_DOCTEST
             >>> # xdoctest: +REQUIRES(module:pyhesaff)
+            >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> import vtool_ibeis as vt
             >>> cfgdict = {}
@@ -955,6 +958,7 @@ class AnnotPairFeatInfo(object):
     Example:
         >>> # ENABLE_DOCTEST
         >>> # xdoctest: +REQUIRES(module:pyhesaff)
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.matching import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> match = demodata_match({})
@@ -1242,6 +1246,7 @@ class AnnotPairFeatInfo(object):
 
         Example:
             >>> # ENABLE_DOCTEST
+            >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
             >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> import vtool_ibeis as vt

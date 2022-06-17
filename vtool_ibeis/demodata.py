@@ -683,9 +683,8 @@ def testdata_ratio_matches(fname1='easy1.png', fname2='easy2.png', **kwargs):
     from vtool_ibeis import image as gtool
     from vtool_ibeis import features as feattool
 
-    try:
-        from vtool_ibeis._pyflann_backend import pyflann
-    except ImportError:
+    from vtool_ibeis._pyflann_backend import pyflann
+    if pyflann is None:
         import pytest
         pytest.skip()
     # Get params

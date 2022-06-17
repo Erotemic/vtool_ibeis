@@ -122,6 +122,9 @@ def test_pyflann_hkmeans():
         #>>> test_pyflann_hkmeans()  #doctest: +ELLIPSIS
         #HKmeans...
     """
+    if FLANN_CLS is None:
+        import pytest
+        pytest.skip()
 
     # Test parameters
     flann = FLANN_CLS()
@@ -153,6 +156,9 @@ def test_pyflann_kmeans():
         type as pts.  Otherwise, the returned array is of type dtype.
     """
     print('Kmeans')
+    if FLANN_CLS is None:
+        import pytest
+        pytest.skip()
     flann = FLANN_CLS()
     num_clusters = 7
     pts = testdata_points(nPts=1009)
@@ -176,6 +182,9 @@ def test_pyflann_add_point():
 
     # build index
     print('Build Index')
+    if FLANN_CLS is None:
+        import pytest
+        pytest.skip()
     flann = FLANN_CLS()
     _build_params = flann.build_index(pts)
     print(_build_params)
@@ -223,6 +232,9 @@ def test_pyflann_add_point():
 def test_pyflann_searches():
     """
     """
+    if FLANN_CLS is None:
+        import pytest
+        pytest.skip()
     try:
         num_neighbors = 3
         pts = testdata_points(nPts=5743, nDims=2)
@@ -272,6 +284,9 @@ def test_pyflann_tune():
         >>> print(result)
     """
     print('Create random qpts and database data')
+    if FLANN_CLS is None:
+        import pytest
+        pytest.skip()
     pts = testdata_points(nPts=1009)
     qpts = testdata_points(nPts=7)
     num_neighbors = 3
@@ -316,6 +331,9 @@ def test_pyflann_io():
     nQPts = 31
     qpts = testdata_points(nPts=nQPts)
     pts = testdata_points(nPts=nPts)
+    if FLANN_CLS is None:
+        import pytest
+        pytest.skip()
 
     # Create flann object
     print('Create flann object')
