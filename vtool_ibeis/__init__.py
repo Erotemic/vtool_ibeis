@@ -7,7 +7,12 @@ Autogenerate Command:
 """
 # flake8: noqa
 from __future__ import absolute_import, division, print_function
+
 __version__ = '2.2.0'
+__author__ = 'Jon Crall, Avi Weinstock, Chuck Stewart, Hendrik Weideman, Jason Parham, Zackary Rutfield'
+__author_email__ = 'erotemic@gmail.com'
+__url__ = 'https://github.com/Erotemic/vtool_ibeis'
+
 
 
 __submodules__ = [

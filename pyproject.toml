@@ -5,9 +5,13 @@ requires = [ "setuptools>=41.0.1", "wheel>=0.37.1",]
 ignore_missing_imports = true
 
 [tool.xcookie]
-tags = [ "purepy", "github", "erotemic",]
+tags = [ "purepy", "github", "erotemic", "cv2"]
 mod_name = "vtool_ibeis"
 repo_name = "vtool_ibeis"
+url = "https://github.com/Erotemic/vtool_ibeis"
+authors = ['Avi Weinstock', 'Chuck Stewart', 'Hendrik Weideman', 'Jason Parham', 'Jon Crall', 'Zackary Rutfield']
+dev_status = "beta"
+
 
 [tool.pytest.ini_options]
 addopts = "-p no:doctest --xdoctest --xdoctest-style=google --ignore-glob=setup.py"
