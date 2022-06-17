@@ -72,18 +72,19 @@ jobs:
         python -m pytest -p pytester -p no:doctest --xdoctest --cov=vtool_ibeis "$MOD_DPATH" "$TEST_DPATH"
         cd ..
 
-    - name: Test full sdist
-      run: |
-        pwd
-        ls -al
-        python -m pip install -r requirements/optional.txt
-        python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
-        # Run the tests
-        # Get path to installed package
-        pip install ubelt
-        MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
-        echo "MOD_DPATH = $MOD_DPATH"
-        python -m pytest -p pytester -p no:doctest --xdoctest $MOD_DPATH ./tests
+    # TODO: only enable on ubuntu
+    #- name: Test full sdist
+    #  run: |
+    #    pwd
+    #    ls -al
+    #    python -m pip install -r requirements/optional.txt
+    #    python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
+    #    # Run the tests
+    #    # Get path to installed package
+    #    pip install ubelt
+    #    MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
+    #    echo "MOD_DPATH = $MOD_DPATH"
+    #    python -m pytest -p pytester -p no:doctest --xdoctest $MOD_DPATH ./tests
 
 
     - name: Upload sdist artifact
