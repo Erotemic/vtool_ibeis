@@ -178,14 +178,39 @@ def test_pyflann_add_point():
     print('NN_Index')
     indices1, dists1 = flann.nn_index(qpts, num_neighbors=num_neighbors)
     assert np.all(indices1 < pts.shape[0]), 'indicies should be less than num pts'
-    print(ub.hzcat('indices1, dists1 = ', indices1,  dists1))
+    print(ub.hzcat(['indices1, dists1 = ', str(indices1),  str(dists1)]))
 
     print('Adding points')
     flann.add_points(newpts, rebuild_threshold=2)
 
     print('NN_Index')
     indices2, dists2 = flann.nn_index(qpts, num_neighbors=num_neighbors)
-    print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
+    print(ub.hzcat(['indices2, dists2 = ', str(indices2),  str(dists2)]))
+    assert np.any(indices2 > pts.shape[0]), 'should be some indexes into new points'
+    assert np.all(indices2 < pts.shape[0] + newpts.shape[0]), 'but not more than the points being added'
+    # Test parameters
+    num_neighbors = 3
+    pts = testdata_points(nPts=1009)
+    qpts = testdata_points(nPts=7)
+    newpts = testdata_points(nPts=1013)
+
+    # build index
+    print('Build Index')
+    flann = FLANN_CLS()
+    _build_params = flann.build_index(pts)
+    print(_build_params)
+
+    print('NN_Index')
+    indices1, dists1 = flann.nn_index(qpts, num_neighbors=num_neighbors)
+    assert np.all(indices1 < pts.shape[0]), 'indicies should be less than num pts'
+    print(ub.hzcat(['indices1, dists1 = ', str(indices1),  str(dists1)]))
+
+    print('Adding points')
+    flann.add_points(newpts, rebuild_threshold=2)
+
+    print('NN_Index')
+    indices2, dists2 = flann.nn_index(qpts, num_neighbors=num_neighbors)
+    print(ub.hzcat(['indices2, dists2 = ', str(indices2),  str(dists2)]))
     assert np.any(indices2 > pts.shape[0]), 'should be some indexes into new points'
     assert np.all(indices2 < pts.shape[0] + newpts.shape[0]), 'but not more than the points being added'
 
@@ -206,14 +231,14 @@ def test_pyflann_searches():
         print('NN_OnTheFly')
         # build nn_index on the fly
         indices1, dists1 = flann.nn(pts, qpts, num_neighbors, algorithm='hierarchical')
-        print(ub.hzcat('indices1, dists1 = ', indices1,  dists1))
+        print(ub.hzcat(['indices1, dists1 = ', str(indices1),  str(dists1)]))
 
         _build_params = flann.build_index(pts, algorithm='kmeans')
         del _build_params
 
         print('NN_Index')
         indices2, dists2 = flann.nn_index(qpts, num_neighbors=num_neighbors)
-        print(ub.hzcat('indices2, dists2 = ', indices2,  dists2))
+        print(ub.hzcat(['indices2, dists2 = ', str(indices2),  str(dists2)]))
 
         # this can only be called on one query point at a time
         # because the output size is unknown
@@ -263,9 +288,9 @@ def test_pyflann_tune():
     tuned_params = flann_tuned.build_index(pts, **flannkw)
     index_tuned, dist_tuned = flann_tuned.nn_index(qpts, num_neighbors=num_neighbors)
 
-    print(ub.hzcat('index_tuned, dist_tuned     = ', index_tuned,  dist_tuned))
+    print(ub.hzcat(['index_tuned, dist_tuned     = ', str(index_tuned),  str(dist_tuned)]))
     print('')
-    print(ub.hzcat('index_untuned, dist_untuned = ', index_untuned,  dist_untuned))
+    print(ub.hzcat(['index_untuned, dist_untuned = ', str(index_untuned),  str(dist_untuned)]))
 
     print(dist_untuned >= dist_tuned)
 

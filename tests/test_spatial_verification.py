@@ -16,7 +16,13 @@ TAU = np.pi * 2.0  # References: tauday.com
 ori_thresh = ktool.KPTS_DTYPE(TAU / 4.0)
 
 
-def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
+# def test_sver():
+#     nShow = ut.get_argval('--nShow', int, 1)
+#     chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
+#     demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+
+
+def demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     r"""
     Args:
         chip1 (ndarray[uint8_t, ndim=2]):  annotation image data
@@ -33,7 +39,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
         >>> # execute function
-        >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+        >>> result = demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
         >>> # verify results
         >>> print(result)
         >>> pt.show_if_requested()
@@ -45,7 +51,7 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars1()
         >>> # execute function
-        >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+        >>> result = demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
         >>> # verify results
         >>> print(result)
         >>> pt.show_if_requested()
