@@ -1,2 +1,2 @@
 #!/bin/bash
-xdoctest -m vtool_ibeis --style=google all
+xdoctest vtool_ibeis --style=google all
