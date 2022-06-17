@@ -44,26 +44,33 @@ jobs:
     - name: Upgrade pip 
       run: |
         python -m pip install --upgrade pip
+        python -m pip install build
         python -m pip install -r requirements/tests.txt
         python -m pip install -r requirements/runtime.txt
         python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
     - name: Build sdist
       run: |
-        python setup.py sdist
+        # python setup.py sdist
+        python -m build --sdist --outdir dist
     - name: Install sdist
       run: |
         ls -al ./dist
         pip install dist/vtool_ibeis*.tar.gz -v
-        mv vtool_ibeis ignore_src_vtool_ibeis
     - name: Test minimal sdist
       run: |
         pwd
         ls -al
         # Run the tests
         # Get path to installed package
-        MOD_DPATH=$(python -c "import vtool_ibeis, os; print(os.path.dirname(vtool_ibeis.__file__))")
+        mkdir -p ./_test_env
+        cd ./_test_env
+        pip install ubelt
+        MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
+        #MOD_DPATH=$(python -c "import vtool_ibeis, os; print(os.path.dirname(vtool_ibeis.__file__))")
+        TEST_DPATH=./../tests
         echo "MOD_DPATH = $MOD_DPATH"
-        python -m pytest -p pytester -p no:doctest --xdoctest --cov=vtool_ibeis $MOD_DPATH ./tests
+        python -m pytest -p pytester -p no:doctest --xdoctest --cov=vtool_ibeis "$MOD_DPATH" "$TEST_DPATH"
+        cd ..
 
     - name: Test full sdist
       run: |
@@ -73,7 +80,8 @@ jobs:
         python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
         # Run the tests
         # Get path to installed package
-        MOD_DPATH=$(python -c "import vtool_ibeis, os; print(os.path.dirname(vtool_ibeis.__file__))")
+        pip install ubelt
+        MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
         echo "MOD_DPATH = $MOD_DPATH"
         python -m pytest -p pytester -p no:doctest --xdoctest $MOD_DPATH ./tests
 
@@ -191,8 +199,8 @@ jobs:
         cd $WORKSPACE_DNAME
         # Run the tests
         # Get path to installed package
-        MOD_DPATH=$(python -c "import vtool_ibeis, os; print(os.path.dirname(vtool_ibeis.__file__))")
-        echo "MOD_DPATH = $MOD_DPATH"
+        pip install ubelt
+        MOD_DPATH=$(python -c "import ubelt; print(ubelt.modname_to_modpath('vtool_ibeis'))")
         python -m pytest -p pytester -p no:doctest --xdoctest --cov-config ../pyproject.toml --cov-report term --cov=vtool_ibeis $MOD_DPATH ../tests
         mv .coverage "../.coverage.$WORKSPACE_DNAME"
         cd ..
