@@ -4,7 +4,12 @@ import ubelt as ub
 # import utool
 import numpy as np
 from numpy.random import randint
-from vtool_ibeis._pyflann_backend import FLANN_CLS
+
+try:
+    from vtool_ibeis._pyflann_backend import FLANN_CLS
+except Exception:
+    FLANN_CLS = None
+
 
 """
 remove_points does not currently have bindings

@@ -154,7 +154,11 @@ def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
     #pseudo_max_dist_sqrd = (np.sqrt(2) * 512) ** 2
     pseudo_max_dist_sqrd = 2 * (512 ** 2)
     flann = vt.flann_cache(vecs1, flann_params=flann_params)
-    from vtool_ibeis._pyflann_backend import pyflann
+    try:
+        from vtool_ibeis._pyflann_backend import pyflann
+    except Exception:
+        import pytest
+        pytest.skip()
     try:
         fx2_to_fx1, _fx2_to_dist = flann.nn_index(vecs2, num_neighbors=2, checks=checks)
     except pyflann.FLANNException:

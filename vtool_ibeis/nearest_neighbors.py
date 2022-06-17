@@ -8,7 +8,13 @@ from os.path import exists, normpath, join
 import utool as ut
 import ubelt as ub
 import numpy as np
-from vtool_ibeis._pyflann_backend import FLANN_CLS, pyflann
+
+try:
+    from vtool_ibeis._pyflann_backend import FLANN_CLS
+    from vtool_ibeis._pyflann_backend import pyflann
+except Exception:
+    FLANN_CLS = None
+    pyflann = None
 
 
 class AnnoyWrapper(object):

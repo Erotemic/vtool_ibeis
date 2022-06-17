@@ -34,7 +34,8 @@ import numpy as np
 import numpy.linalg as npl
 import scipy.sparse as sps
 import scipy.sparse.linalg as spsl
-from numpy.core.umath_tests import matrix_multiply
+import operator as op
+# from numpy.core.umath_tests import matrix_multiply
 import vtool_ibeis.keypoint as ktool
 import vtool_ibeis.linalg as ltool
 import vtool_ibeis.distance
@@ -427,7 +428,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
         >>> RV1s_m = ktool.get_RV_mats_3x3(kpts1_m)
         >>> invVR2s_m = ktool.get_invVR_mats3x3(kpts2_m)
         >>> # The transform from kp1 to kp2 is given as:
-        >>> Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)
+        >>> Aff_mats = op.matmul(invVR2s_m, RV1s_m)
         >>> Aff = Aff_mats[0]
         >>> # Get components to test projects against
         >>> xy2_m  = ktool.get_invVR_mats_xys(invVR2s_m)
@@ -443,7 +444,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
         >>> print(result)
     """
     # Map keypoints from image 1 onto image 2
-    invVR1s_mt = matrix_multiply(Aff, invVR1s_m)
+    invVR1s_mt = op.matmul(Aff, invVR1s_m)
 
     # Get projection components
     _xy1_mt   = ktool.get_invVR_mats_xys(invVR1s_mt)
@@ -526,7 +527,7 @@ def get_affine_inliers(kpts1, kpts2, fm, fs,
     invVR1s_m = ktool.get_invVR_mats3x3(kpts1_m)
     RV1s_m    = ktool.invert_invV_mats(invVR1s_m)  # 539 us
     # BUILD ALL HYPOTHESIS TRANSFORMS: The transform from kp1 to kp2 is:
-    Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)
+    Aff_mats = op.matmul(invVR2s_m, RV1s_m)
     # Get components to test projects against
     xy2_m  = ktool.get_xys(kpts2_m)
     det2_m = ktool.get_sqrd_scales(kpts2_m)
