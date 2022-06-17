@@ -974,9 +974,9 @@ def get_invVR_mats_shape(invVR_mats):
         >>> np.random.seed(0)
         >>> invVR_mats = np.random.rand(1000, 3, 3).astype(np.float64)
         >>> output = get_invVR_mats_shape(invVR_mats)
-        >>> result = ut.hash_data(output)
-        >>> print(result)
-        pibujdiaimwcnmomserkcytyyikahjmp
+        >>> result = ub.hash_data(output)
+        >>> print(result[0:16])
+        e9c2e93471c0ec88
 
     References:
         TODO
@@ -1255,11 +1255,9 @@ def get_invVR_mats_oris(invVR_mats):
         >>> # LATEX PART
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_held_full)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
         >>>
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_full)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
 
 
         >>> from sympy import Symbol, Q, refine, atan2
@@ -1305,11 +1303,9 @@ def get_invVR_mats_oris(invVR_mats):
             print('%r.assumptions0 = %s' % (sym, ub.repr2(sym.assumptions0),))
 
 
-
         >>> #invTVR = sympy.simplify(RVT_full.inv())
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_full)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
 
     Sympy:
         >>> import sympy
@@ -1347,16 +1343,13 @@ def get_invVR_mats_oris(invVR_mats):
         print('v22 = ' + str(sympy.solve(inveq, v22)))
         >>> invVR = invV.multiply(R)
         >>> invV.matmul(R, hold=True)
-        >>> ut.eval
         >>> print(invVR)
         >>> print(repr(invVR))
         >>> vt.rrrr()
         >>> other_repr = vt.sympy_latex_repr(invV.matmul(R, hold=True))
         >>> print(other_repr)
-        >>> ut.copy_text_to_clipboard(other_repr)
         >>> expr1_repr = vt.sympy_latex_repr(invVR)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
 
 
     Sympy:
@@ -1395,16 +1388,13 @@ def get_invVR_mats_oris(invVR_mats):
         print('v22 = ' + str(sympy.solve(inveq, v22)))
         >>> invVR = invV.multiply(R)
         >>> invV.matmul(R, hold=True)
-        >>> ut.eval
         >>> print(invVR)
         >>> print(repr(invVR))
         >>> vt.rrrr()
         >>> other_repr = vt.sympy_latex_repr(invV.matmul(R, hold=True))
         >>> print(other_repr)
-        >>> ut.copy_text_to_clipboard(other_repr)
         >>> expr1_repr = vt.sympy_latex_repr(invVR)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
         Matrix([
         [                 iv11*cos(theta),                  -iv11*sin(theta),  x],
         [iv21*cos(theta) + iv22*sin(theta), -iv21*sin(theta) + iv22*cos(theta),  y],
@@ -1436,23 +1426,6 @@ def get_invVR_mats_oris(invVR_mats):
         sympy.trigsimp(sympy.simplify(sympy.trigsimp(z)))
         ori = np.arctan2(_iv12s, _iv11s)
         z = ori.subs(dict(iv11=1, theta=1))
-
-    Timeit:
-        >>> import utool as ut
-        >>> setup = ut.codeblock(
-        ...     '''
-                import numpy as np
-                np.random.seed(0)
-                invVR_mats = np.random.rand(10000, 2, 2).astype(np.float64)
-                ''')
-        >>> stmt_list = ut.codeblock(
-        ...     '''
-                invVR_mats[:, 0, 1]
-                invVR_mats.T[1, 0]
-                '''
-        ... ).split('\n')
-        >>> ut.util_dev.rrr()
-        >>> ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))
     """
     # Extract only the needed shape components
     #_iv11s = invVR_mats[:, 0, 0]
@@ -1828,7 +1801,7 @@ def get_kpts_wh(kpts, outer=True):
         >>> vert_pts2 = np.array([xs, (ys + radii.T[1])]).T
         >>> pt.draw_line_segments2(horiz_pts1, horiz_pts2, color='g')
         >>> pt.draw_line_segments2(vert_pts1, vert_pts2, color='b')
-        >>> ut.show_if_requested()
+        >>> pt.show_if_requested()
         np.array([[10.43315411, 58.5216589 ],
                   [ 4.71017647, 58.5216589 ],
                   [24.43314171, 45.09558868],
@@ -1911,7 +1884,7 @@ def get_kpts_image_extent(kpts, outer=False, only_xy=False):
         >>> pt.draw_kpts2(kpts, bbox=True)
         >>> ax = pt.gca()
         >>> pt.set_axis_extent(extent, ax)
-        >>> ut.show_if_requested()
+        >>> pt.show_if_requested()
         np.array([ 14.78, 48.05,  0.32, 51.58])
     """
     if len(kpts) == 0:

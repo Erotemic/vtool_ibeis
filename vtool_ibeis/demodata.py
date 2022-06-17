@@ -658,6 +658,7 @@ def testdata_ratio_matches(fname1='easy1.png', fname2='easy2.png', **kwargs):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.demodata import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> fname1 = ut.get_argval('--fname1', type_=str, default='easy1.png')

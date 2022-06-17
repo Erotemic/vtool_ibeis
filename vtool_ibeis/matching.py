@@ -140,6 +140,7 @@ class PairwiseMatch(ub.NiceRepr):
             aid, nid, flann, rchip, dlen_sqrd, weight
 
     Ignore:
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.matching import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> imgR = vt.imread(ut.grab_test_imgpath('easy1.png'))
@@ -335,6 +336,7 @@ class PairwiseMatch(ub.NiceRepr):
 
         Example:
             >>> # SCRIPT
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> import vtool_ibeis as vt
             >>> import guitool_ibeis as gt
@@ -430,6 +432,7 @@ class PairwiseMatch(ub.NiceRepr):
 
         Example:
             >>> # xdoctest
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True}
             >>> match = demodata_match({}, apply=False)
@@ -517,6 +520,7 @@ class PairwiseMatch(ub.NiceRepr):
     def sver_flags(match, cfgdict={}, return_extra=False):
         """
         Example:
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True, 'newsym': True}
             >>> match = demodata_match(cfgdict, apply=False)
@@ -656,6 +660,7 @@ class PairwiseMatch(ub.NiceRepr):
     def apply_sver(match, cfgdict={}, inplace=None):
         """
         Ignore:
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> cfgdict = {'symmetric': True, 'ratio_thresh': .8,
             >>>            'thresh_bins': [.5, .6, .7, .8]}
@@ -747,6 +752,7 @@ class PairwiseMatch(ub.NiceRepr):
 
         Example:
             >>> # ENABLE_DOCTEST
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> import vtool_ibeis as vt
             >>> cfgdict = {}
@@ -892,6 +898,7 @@ class PairwiseMatch(ub.NiceRepr):
 
         Example:
             >>> # DISABLE_DOCTEST
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> import vtool_ibeis as vt
             >>> match = demodata_match({})
@@ -947,6 +954,7 @@ class AnnotPairFeatInfo(object):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.matching import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> match = demodata_match({})
@@ -1234,6 +1242,7 @@ class AnnotPairFeatInfo(object):
 
         Example:
             >>> # ENABLE_DOCTEST
+            >>> # xdoctest: +REQUIRES(module:pyhesaff)
             >>> from vtool_ibeis.matching import *  # NOQA
             >>> import vtool_ibeis as vt
             >>> match = demodata_match({})
@@ -1433,6 +1442,7 @@ def ensure_metadata_feats(annot, cfgdict={}):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.matching import *  # NOQA
         >>> rchip_fpath = ut.grab_test_imgpath('easy1.png')
         >>> annot = ut.LazyDict({'rchip_fpath': rchip_fpath})

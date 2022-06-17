@@ -38,18 +38,18 @@ def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=np.float):
         >>> # test2
         >>> tup = (np.array([[1, 2, 3]]), np.array([[]]))
         >>> s = vt.safe_cat(tup, axis=0)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = ', ub.repr2(s)]))
         >>> ut.assert_eq(s.shape, (1, 3))
         >>> # test3
         >>> tup = (np.array([[1, 2, 3]]), np.array([[3, 4, 5]]))
         >>> s = vt.safe_cat(tup, axis=1)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = ', ub.repr2(s)]))
         >>> ut.assert_eq(s.shape, (1, 6))
         >>> # test3
         >>> tup = (np.array(1), np.array(2), np.array(3))
-        >>> s = vt.safe_cat(tup, axis=1)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
-        >>> ut.assert_eq(s.shape, (1, 6))
+        >>> s = vt.safe_cat(tup, axis=0)
+        >>> print(ub.hzcat(['s = ', ub.repr2(s)]))
+        >>> ut.assert_eq(s.shape, (3,))
     """
     if tup is None or len(tup) == 0:
         stack = np.empty(default_shape, dtype=default_dtype)

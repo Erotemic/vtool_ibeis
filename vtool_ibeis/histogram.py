@@ -25,8 +25,8 @@ def argsubmax(ydata, xdata=None):
         >>> result2 = argsubmax(ydata, xdata=xdata)
         >>> result = ub.repr2([result1, result2], precision=4, nl=1, nobr=True)
         >>> print(result)
-        (2.1667, 2.0208),
-        (21.6667, 2.0208),
+        2.1667, 2.0208,
+        21.6667, 2.0208,
 
     Example:
         >>> from vtool_ibeis.histogram import *  # NOQA

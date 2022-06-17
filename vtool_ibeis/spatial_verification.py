@@ -852,6 +852,7 @@ def refine_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd,
 
     Example0:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis.keypoint as ktool
@@ -949,6 +950,7 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis as vt

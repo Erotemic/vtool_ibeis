@@ -10,12 +10,17 @@ CommandLine:
     python -m vtool_ibeis.sver_c_wrapper --test-test_sver_wrapper --rebuild-sver
 """
 from __future__ import absolute_import, division, print_function
+
+try:
+    import vtool_ibeis_ext
+except ImportError:
+    pass
+
 import ctypes as C
 import numpy as np
 import utool as ut
 import ubelt as ub
 from os.path import dirname, join, realpath
-from vtool_ibeis.other import asserteq, compare_implementations  # NOQA
 
 c_double_p = C.POINTER(C.c_double)
 

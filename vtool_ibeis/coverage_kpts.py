@@ -34,6 +34,7 @@ def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
     Example:
         >>> # ENABLE_DOCTEST
         >>> # xdoctest: +REQUIRES(module:plottool_ibeis)
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
@@ -124,6 +125,7 @@ def make_kpts_coverage_mask(
     Example:
         >>> # ENABLE_DOCTEST
         >>> # xdoctest: +REQUIRES(module:plottool_ibeis)
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import plottool_ibeis as pt
@@ -205,6 +207,7 @@ def warp_patch_onto_kpts(
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
