@@ -1,17 +1,22 @@
 [build-system]
-requires = ["setuptools>=41.0.1", "wheel", "scikit-build>=0.9.0", "numpy", "cmake", "cython", "ninja", "cffi"]
+requires = [ "setuptools>=41.0.1", "wheel>=0.37.1",]
 
-[tool.cibuildwheel]
+[tool.mypy]
+ignore_missing_imports = true
 
-skip = "pp*"
+[tool.xcookie]
+tags = [ "purepy", "github", "erotemic",]
+mod_name = "vtool_ibeis"
+repo_name = "vtool_ibeis"
 
-manylinux-x86_64-image = "quay.io/erotemic/manylinux2014_x86_64_for:fletchv1.5.0-opencv"
-manylinux-i686-image = "quay.io/erotemic/manylinux2014_i686_for:fletchv1.5.0-opencv"
+[tool.pytest.ini_options]
+addopts = "-p no:doctest --xdoctest --xdoctest-style=google --ignore-glob=setup.py"
+norecursedirs = ".git ignore build __pycache__ dev _skbuild"
+filterwarnings = [ "default", "ignore:.*No cfgstr given in Cacher constructor or call.*:Warning", "ignore:.*Define the __nice__ method for.*:Warning", "ignore:.*private pytest class or function.*:Warning",]
 
-musllinux-x86_64-image = "quay.io/erotemic/musllinux_1_1_x86_64_for:fletchv1.5.0-opencv"
-musllinux-i686-image = "quay.io/erotemic/musllinux_1_1_i686_for:fletchv1.5.0-opencv"
+[tool.coverage.run]
+branch = true
 
-#musllinux-aarch64-image = "quay.io/erotemic/musllinux_1_1_aarch64_for:fletchv1.5.0-opencv"
-#manylinux-aarch64-image = "quay.io/erotemic/manylinux2014_aarch64_for:fletchv1.5.0-opencv"
-#manylinux-ppc64le-image
-#manylinux-s390x-image
+[tool.coverage.report]
+exclude_lines = [ "pragma: no cover", ".*  # pragma: no cover", ".*  # nocover", "def __repr__", "raise AssertionError", "raise NotImplementedError", "if 0:", "if trace is not None", "verbose = .*", "^ *raise", "^ *pass *$", "if _debug:", "if __name__ == .__main__.:", ".*if six.PY2:",]
+omit = [ "vtool_ibeis/__main__.py", "*/setup.py",]

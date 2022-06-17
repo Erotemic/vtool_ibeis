@@ -9,9 +9,12 @@ def main():  # nocover
 
     from vtool_ibeis._pyflann_backend import pyflann
     print('pyflann = {!r}'.format(pyflann))
-    from vtool_ibeis import sver_c_wrapper
-    print('sver_c_wrapper.lib_fname = {!r}'.format(sver_c_wrapper.lib_fname))
-    print('sver_c_wrapper.lib_fname_cand = {!r}'.format(sver_c_wrapper.lib_fname_cand))
+    try:
+        from vtool_ibeis_ext import sver_c_wrapper
+        print('sver_c_wrapper.lib_fname = {!r}'.format(sver_c_wrapper.lib_fname))
+        print('sver_c_wrapper.lib_fname_cand = {!r}'.format(sver_c_wrapper.lib_fname_cand))
+    except Exception as ex:
+        print(f'ex={ex}')
 
 
 if __name__ == '__main__':

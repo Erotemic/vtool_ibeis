@@ -1,13 +1,38 @@
+# python ~/local/tools/supported_python_versions_pip.py networkx
+# python ~/local/tools/supported_python_versions_pip.py scipy
+# python ~/local/tools/supported_python_versions_pip.py scikit-learn
+# python ~/local/tools/supported_python_versions_pip.py statsmodels
+
+networkx>=2.7       ;                            python_version >= '3.8'    # Python 3.8+
+networkx>=2.6.2     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
+networkx>=2.5       ; python_version < '3.7' and python_version >= '3.6'    # Python 3.6
+networkx>=2.3       ; python_version < '3.6' and python_version >= '3.5'    # Python 3.5
+networkx>=1.11      ; python_version < '3.5' and python_version >= '2.7'    # Python 2.7
+
 Pillow >= 5.2.0
-networkx
 numpy >= 1.11.1
 pyflann_ibeis >= 2.0.0
 vtool_ibeis_ext>=0.1.0
 pyhesaff >= 2.1.0
-scipy
+
+scipy>=1.8.0     ;                            python_version >= '3.10'    # Python 3.10+
+scipy>=1.8.0     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
+scipy>=1.8.0     ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
+scipy>=1.6.0     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
+
 six >= 1.10.0
 scikit-image
-scikit-learn
-statsmodels
-ubelt 
+
+scikit-learn>=1.0.2     ;                            python_version >= '3.10'    # Python 3.10+
+scikit-learn>=1.0.2     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
+scikit-learn>=1.0.2     ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
+scikit-learn>=0.24.1    ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
+scikit-learn>=0.24.1    ; python_version < '3.7' and python_version >= '3.6'    # Python 3.6
+
+statsmodels>=0.13.1    ;                            python_version >= '3.10'    # Python 3.10+
+statsmodels>=0.13.1    ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
+statsmodels>=0.13.1    ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
+statsmodels>=0.9.0     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
+
+ubelt >= 0.9.0
 utool >= 2.1.5
