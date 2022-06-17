@@ -50,15 +50,24 @@ jobs:
         python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
     - name: Build sdist
       run: |
-        python setup.py sdist
+        python -m pip install setuptools>=0.8 wheel pip -U
+        python -m pip install build -U || true
+        python -m build --sdist --outdir wheelhouse .  || python setup.py sdist
+        #python -m build --wheel --outdir wheelhouse .
         mkdir -p dist
         mkdir -p wheelhouse
-        mv dist/* wheelhouse
-        #python -m build --sdist --outdir wheelhouse
+        mv dist/* wheelhouse || true
+
+        #python setup.py sdist
+        #mkdir -p dist
+        #mkdir -p wheelhouse
+        #mv dist/* wheelhouse
+        ##python -m build --sdist --outdir wheelhouse
     - name: Install sdist
       run: |
         ls -al ./wheelhouse
-        pip install wheelhouse/vtool_ibeis*.tar.gz -v
+        #pip install wheelhouse/vtool_ibeis*.tar.gz -v
+        pip install vtool_ibeis[headless,tests] --find-links wheelhouse
     - name: Test minimal sdist
       run: |
         pwd
@@ -79,6 +88,7 @@ jobs:
       run: |
         pwd
         ls -al
+        pip install vtool_ibeis[headless,tests,optional] --find-links wheelhouse
         python -m pip install -r requirements/optional.txt
         python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
         # Run the tests
@@ -189,7 +199,7 @@ jobs:
         #python -m build --wheel --outdir wheelhouse .
         mkdir -p dist
         mkdir -p wheelhouse
-        mv dist/* wheelhouse
+        mv dist/* wheelhouse || true
 
     - name: Test pure wheel
       shell: bash
@@ -201,9 +211,10 @@ jobs:
         #mv vtool_ibeis ignore_src_vtool_ibeis
         #rm pytest.ini
         # Install the wheel
-        python -m pip install -r requirements/tests.txt
-        python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
-        python -m pip install wheelhouse/vtool_ibeis*.whl
+        #python -m pip install -r requirements/tests.txt
+        #python -m pip install -r requirements/headless.txt  # xcookie: +UNCOMMENT_IF(cv2)
+        #python -m pip install wheelhouse/vtool_ibeis*.whl
+        python -m pip install vtool_ibeis[headless,tests] --find-links wheelhouse
         # Run in a sandboxed directory
         WORKSPACE_DNAME="testdir_${CI_PYTHON_VERSION}_${GITHUB_RUN_ID}_${RUNNER_OS}"
         mkdir -p $WORKSPACE_DNAME
