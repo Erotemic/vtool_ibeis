@@ -43,3 +43,6 @@ statsmodels>=0.9.0     ; python_version < '3.8' and python_version >= '3.7'    #
 
 ubelt >= 0.9.0
 utool >= 2.1.5
+
+delorean
+# python ~/local/tools/supported_python_versions_pip.py delorean
