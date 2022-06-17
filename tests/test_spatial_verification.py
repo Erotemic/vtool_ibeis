@@ -2,8 +2,6 @@
 from __future__ import absolute_import, division, print_function
 import utool as ut
 import vtool_ibeis.spatial_verification as sver
-from plottool_ibeis import draw_sv
-from plottool_ibeis import draw_func2 as df2
 import numpy as np
 import vtool_ibeis.demodata as demodata
 import vtool_ibeis.keypoint as ktool  # NOQA
@@ -34,6 +32,7 @@ def demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
     Example0:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:plottool)
         >>> import plottool_ibeis as pt
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
@@ -46,6 +45,7 @@ def demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
     Example1:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:plottool)
         >>> import plottool_ibeis as pt
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
@@ -109,6 +109,8 @@ def demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
         _args = (chip1, chip2, kpts1, kpts2, fm)
         _kw = dict(show_assign=True, show_kpts=True, mx=mx, fnum=fnum * 3)
+        from plottool_ibeis import draw_func2 as df2
+        from plottool_ibeis import draw_sv
         draw_sv.show_sv(*_args, aff_tup=aff_tup, homog_tup=homog_tup, **_kw)
         #draw_sv.show_sv(*_args, aff_tup=aff_tup, mx=mx, fnum=fnum * 3)
         #draw_sv.show_sv(*_args, homog_tup=homog_tup, mx=mx, fnum=3)
