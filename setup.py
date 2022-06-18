@@ -257,7 +257,7 @@ if __name__ == "__main__":
         packages=find_packages("."),
         python_requires=">=3.7",
         classifiers=[
-            ("Development Status :: 3 - Alpha",),
+            "Development Status :: 4 - Beta",
             "Intended Audience :: Developers",
             "Topic :: Software Development :: Libraries :: Python Modules",
             "Topic :: Utilities",
