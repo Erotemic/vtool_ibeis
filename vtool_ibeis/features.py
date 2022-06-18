@@ -30,7 +30,6 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
     Returns:
         tuple : (kpts, vecs)
 
-
     CommandLine:
         python -m vtool_ibeis.features --test-extract_features
         python -m vtool_ibeis.features --test-extract_features --show
@@ -40,6 +39,7 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.features import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
@@ -92,6 +92,7 @@ def get_extract_features_default_params():
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.features import *  # NOQA
         >>> # build test data
         >>> # execute function

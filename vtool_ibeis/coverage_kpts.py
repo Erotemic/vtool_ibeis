@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import utool as ut
 import ubelt as ub
+import operator as op
 from vtool_ibeis import patch as ptool
 from vtool_ibeis import keypoint as ktool
 
@@ -34,6 +35,7 @@ def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
     Example:
         >>> # ENABLE_DOCTEST
         >>> # xdoctest: +REQUIRES(module:plottool_ibeis)
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
@@ -124,6 +126,7 @@ def make_kpts_coverage_mask(
     Example:
         >>> # ENABLE_DOCTEST
         >>> # xdoctest: +REQUIRES(module:plottool_ibeis)
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import plottool_ibeis as pt
@@ -205,6 +208,7 @@ def warp_patch_onto_kpts(
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
@@ -276,9 +280,9 @@ def warp_patch_onto_kpts(
         S2 = vt.scale_mat3x3(cov_scale_factor, cov_scale_factor)
         #perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
         if not cov_remove_scale:
-            M_list = reduce(vt.matrix_multiply, (S2, kpts_T, kpts_S, S1, T1))
+            M_list = reduce(op.matmul, (S2, kpts_T, kpts_S, S1, T1))
         else:
-            M_list = reduce(vt.matrix_multiply, (S2, kpts_T, T1))
+            M_list = reduce(op.matmul, (S2, kpts_T, T1))
     # </HACK>
     else:
         M_list = ktool.get_transforms_from_patch_image_kpts(kpts, patch_shape,

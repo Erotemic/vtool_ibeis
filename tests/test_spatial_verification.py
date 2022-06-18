@@ -2,8 +2,6 @@
 from __future__ import absolute_import, division, print_function
 import utool as ut
 import vtool_ibeis.spatial_verification as sver
-from plottool_ibeis import draw_sv
-from plottool_ibeis import draw_func2 as df2
 import numpy as np
 import vtool_ibeis.demodata as demodata
 import vtool_ibeis.keypoint as ktool  # NOQA
@@ -16,7 +14,13 @@ TAU = np.pi * 2.0  # References: tauday.com
 ori_thresh = ktool.KPTS_DTYPE(TAU / 4.0)
 
 
-def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
+# def test_sver():
+#     nShow = ut.get_argval('--nShow', int, 1)
+#     chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
+#     demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+
+
+def demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
     r"""
     Args:
         chip1 (ndarray[uint8_t, ndim=2]):  annotation image data
@@ -28,24 +32,26 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
     Example0:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:plottool)
         >>> import plottool_ibeis as pt
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars()
         >>> # execute function
-        >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+        >>> result = demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
         >>> # verify results
         >>> print(result)
         >>> pt.show_if_requested()
 
     Example1:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:plottool)
         >>> import plottool_ibeis as pt
         >>> # build test data
         >>> nShow = ut.get_argval('--nShow', int, 1)
         >>> chip1, chip2, kpts1, kpts2, fm = get_dummy_test_vars1()
         >>> # execute function
-        >>> result = test_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
+        >>> result = demo_sver(chip1, chip2, kpts1, kpts2, fm, nShow)
         >>> # verify results
         >>> print(result)
         >>> pt.show_if_requested()
@@ -103,6 +109,8 @@ def test_sver(chip1, chip2, kpts1, kpts2, fm, nShow=6):
 
         _args = (chip1, chip2, kpts1, kpts2, fm)
         _kw = dict(show_assign=True, show_kpts=True, mx=mx, fnum=fnum * 3)
+        from plottool_ibeis import draw_func2 as df2
+        from plottool_ibeis import draw_sv
         draw_sv.show_sv(*_args, aff_tup=aff_tup, homog_tup=homog_tup, **_kw)
         #draw_sv.show_sv(*_args, aff_tup=aff_tup, mx=mx, fnum=fnum * 3)
         #draw_sv.show_sv(*_args, homog_tup=homog_tup, mx=mx, fnum=3)
@@ -146,7 +154,11 @@ def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
     #pseudo_max_dist_sqrd = (np.sqrt(2) * 512) ** 2
     pseudo_max_dist_sqrd = 2 * (512 ** 2)
     flann = vt.flann_cache(vecs1, flann_params=flann_params)
-    from vtool_ibeis._pyflann_backend import pyflann
+    try:
+        from vtool_ibeis._pyflann_backend import pyflann
+    except Exception:
+        import pytest
+        pytest.skip()
     try:
         fx2_to_fx1, _fx2_to_dist = flann.nn_index(vecs2, num_neighbors=2, checks=checks)
     except pyflann.FLANNException:

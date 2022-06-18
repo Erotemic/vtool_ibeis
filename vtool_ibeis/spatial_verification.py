@@ -34,7 +34,8 @@ import numpy as np
 import numpy.linalg as npl
 import scipy.sparse as sps
 import scipy.sparse.linalg as spsl
-from numpy.core.umath_tests import matrix_multiply
+import operator as op
+# from numpy.core.umath_tests import matrix_multiply
 import vtool_ibeis.keypoint as ktool
 import vtool_ibeis.linalg as ltool
 import vtool_ibeis.distance
@@ -335,14 +336,14 @@ def compute_homog(xy1_mn, xy2_mn):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
-        >>> import plottool_ibeis as pt
         >>> xy1_man, xy2_man, rchip1, rchip2, T1, T2 = testdata_matching_affine_inliers_normalized()
         >>> H_prime = compute_homog(xy1_man, xy2_man)
         >>> H = npl.solve(T2, H_prime).dot(T1)
-        >>> H /= H[2, 2]
+        >>> H = H / H[2, 2]
         >>> result = np.array_str(H, precision=2)
         >>> print(result)
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import plottool_ibeis as pt
         >>> rchip2_blendH = pt.draw_sv.get_blended_chip(rchip1, rchip2, H)
         >>> pt.imshow(rchip2_blendH)
         >>> ut.show_if_requested()
@@ -427,7 +428,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
         >>> RV1s_m = ktool.get_RV_mats_3x3(kpts1_m)
         >>> invVR2s_m = ktool.get_invVR_mats3x3(kpts2_m)
         >>> # The transform from kp1 to kp2 is given as:
-        >>> Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)
+        >>> Aff_mats = op.matmul(invVR2s_m, RV1s_m)
         >>> Aff = Aff_mats[0]
         >>> # Get components to test projects against
         >>> xy2_m  = ktool.get_invVR_mats_xys(invVR2s_m)
@@ -443,7 +444,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
         >>> print(result)
     """
     # Map keypoints from image 1 onto image 2
-    invVR1s_mt = matrix_multiply(Aff, invVR1s_m)
+    invVR1s_mt = op.matmul(Aff, invVR1s_m)
 
     # Get projection components
     _xy1_mt   = ktool.get_invVR_mats_xys(invVR1s_mt)
@@ -526,7 +527,7 @@ def get_affine_inliers(kpts1, kpts2, fm, fs,
     invVR1s_m = ktool.get_invVR_mats3x3(kpts1_m)
     RV1s_m    = ktool.invert_invV_mats(invVR1s_m)  # 539 us
     # BUILD ALL HYPOTHESIS TRANSFORMS: The transform from kp1 to kp2 is:
-    Aff_mats = matrix_multiply(invVR2s_m, RV1s_m)
+    Aff_mats = op.matmul(invVR2s_m, RV1s_m)
     # Get components to test projects against
     xy2_m  = ktool.get_xys(kpts2_m)
     det2_m = ktool.get_sqrd_scales(kpts2_m)
@@ -852,6 +853,7 @@ def refine_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd,
 
     Example0:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis.keypoint as ktool
@@ -949,6 +951,7 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis as vt

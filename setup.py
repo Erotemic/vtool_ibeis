@@ -1,78 +1,45 @@
-#!/usr/bin/env python
-from __future__ import absolute_import, division, print_function
-from os.path import dirname
-from os.path import join
-from os.path import sys
+import sys
 from os.path import exists
 from setuptools import find_packages
+from setuptools import setup
 
 
 def parse_version(fpath):
     """
     Statically parse the version number from a python file
     """
+    value = static_parse("__version__", fpath)
+    return value
+
+
+def static_parse(varname, fpath):
+    """
+    Statically parse the a constant variable from a python file
+    """
     import ast
+
     if not exists(fpath):
-        try2 = join(dirname(__file__), fpath)
-        if exists(try2):
-            fpath = try2
-        else:
-            raise ValueError('fpath={!r} does not exist'.format(fpath))
-    with open(fpath, 'r') as file_:
+        raise ValueError("fpath={!r} does not exist".format(fpath))
+    with open(fpath, "r") as file_:
         sourcecode = file_.read()
     pt = ast.parse(sourcecode)
-    class VersionVisitor(ast.NodeVisitor):
+
+    class StaticVisitor(ast.NodeVisitor):
         def visit_Assign(self, node):
             for target in node.targets:
-                if getattr(target, 'id', None) == '__version__':
-                    self.version = node.value.s
-    visitor = VersionVisitor()
+                if getattr(target, "id", None) == varname:
+                    self.static_value = node.value.s
+
+    visitor = StaticVisitor()
     visitor.visit(pt)
-    return visitor.version
+    try:
+        value = visitor.static_value
+    except AttributeError:
+        import warnings
 
-
-def native_mb_python_tag(plat_impl=None, version_info=None):
-    """
-    Example:
-        >>> print(native_mb_python_tag())
-        >>> print(native_mb_python_tag('PyPy', (2, 7)))
-        >>> print(native_mb_python_tag('CPython', (3, 8)))
-    """
-    if plat_impl is None:
-        import platform
-        plat_impl = platform.python_implementation()
-
-    if version_info is None:
-        import sys
-        version_info = sys.version_info
-
-    major, minor = version_info[0:2]
-    ver = '{}{}'.format(major, minor)
-
-    if plat_impl == 'CPython':
-        # TODO: get if cp27m or cp27mu
-        impl = 'cp'
-        if ver == '27':
-            IS_27_BUILT_WITH_UNICODE = True  # how to determine this?
-            if IS_27_BUILT_WITH_UNICODE:
-                abi = 'mu'
-            else:
-                abi = 'm'
-        else:
-            if ver == '38':
-                # no abi in 38?
-                abi = ''
-            else:
-                abi = 'm'
-        mb_tag = '{impl}{ver}-{impl}{ver}{abi}'.format(**locals())
-    elif plat_impl == 'PyPy':
-        abi = ''
-        impl = 'pypy'
-        ver = '{}{}'.format(major, minor)
-        mb_tag = '{impl}-{ver}'.format(**locals())
-    else:
-        raise NotImplementedError(plat_impl)
-    return mb_tag
+        value = "Unknown {}".format(varname)
+        warnings.warn(value)
+    return value
 
 
 def parse_description():
@@ -84,200 +51,221 @@ def parse_description():
         python -c "import setup; print(setup.parse_description())"
     """
     from os.path import dirname, join, exists
-    readme_fpath = join(dirname(__file__), 'README.rst')
+
+    readme_fpath = join(dirname(__file__), "README.rst")
     # This breaks on pip install, so check that it exists.
     if exists(readme_fpath):
-        with open(readme_fpath, 'r') as f:
+        with open(readme_fpath, "r") as f:
             text = f.read()
         return text
-    return ''
+    return ""
 
 
-def parse_requirements(fname='requirements.txt', with_version=False):
+def parse_requirements(fname="requirements.txt", versions=False):
     """
     Parse the package dependencies listed in a requirements file but strips
     specific versioning information.
 
     Args:
         fname (str): path to requirements file
-        with_version (bool, default=False): if true include version specs
+        versions (bool | str, default=False):
+            If true include version specs.
+            If strict, then pin to the minimum version.
 
     Returns:
         List[str]: list of requirements items
-
-    CommandLine:
-        python -c "import setup; print(setup.parse_requirements())"
-        python -c "import setup; print(chr(10).join(setup.parse_requirements(with_version=True)))"
     """
-    from os.path import exists
+    from os.path import exists, dirname, join
     import re
+
     require_fpath = fname
 
-    def parse_line(line):
+    def parse_line(line, dpath=""):
         """
         Parse information from a line in a requirements text file
+
+        line = 'git+https://a.com/somedep@sometag#egg=SomeDep'
+        line = '-e git+https://a.com/somedep@sometag#egg=SomeDep'
         """
-        if line.startswith('-r '):
+        # Remove inline comments
+        comment_pos = line.find(" #")
+        if comment_pos > -1:
+            line = line[:comment_pos]
+
+        if line.startswith("-r "):
             # Allow specifying requirements in other files
-            target = line.split(' ')[1]
+            target = join(dpath, line.split(" ")[1])
             for info in parse_require_file(target):
                 yield info
         else:
-            info = {'line': line}
-            if line.startswith('-e '):
-                info['package'] = line.split('#egg=')[1]
+            # See: https://www.python.org/dev/peps/pep-0508/
+            info = {"line": line}
+            if line.startswith("-e "):
+                info["package"] = line.split("#egg=")[1]
             else:
+                if ";" in line:
+                    pkgpart, platpart = line.split(";")
+                    # Handle platform specific dependencies
+                    # setuptools.readthedocs.io/en/latest/setuptools.html
+                    # #declaring-platform-specific-dependencies
+                    plat_deps = platpart.strip()
+                    info["platform_deps"] = plat_deps
+                else:
+                    pkgpart = line
+                    platpart = None
+
                 # Remove versioning from the package
-                pat = '(' + '|'.join(['>=', '==', '>']) + ')'
-                parts = re.split(pat, line, maxsplit=1)
+                pat = "(" + "|".join([">=", "==", ">"]) + ")"
+                parts = re.split(pat, pkgpart, maxsplit=1)
                 parts = [p.strip() for p in parts]
 
-                info['package'] = parts[0]
+                info["package"] = parts[0]
                 if len(parts) > 1:
                     op, rest = parts[1:]
-                    if ';' in rest:
-                        # Handle platform specific dependencies
-                        # http://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-platform-specific-dependencies
-                        version, platform_deps = map(str.strip, rest.split(';'))
-                        info['platform_deps'] = platform_deps
-                    else:
-                        version = rest  # NOQA
-                    info['version'] = (op, version)
+                    version = rest  # NOQA
+                    info["version"] = (op, version)
             yield info
 
     def parse_require_file(fpath):
-        with open(fpath, 'r') as f:
+        dpath = dirname(fpath)
+        with open(fpath, "r") as f:
             for line in f.readlines():
                 line = line.strip()
-                if line and not line.startswith('#'):
-                    for info in parse_line(line):
+                if line and not line.startswith("#"):
+                    for info in parse_line(line, dpath=dpath):
                         yield info
 
     def gen_packages_items():
         if exists(require_fpath):
             for info in parse_require_file(require_fpath):
-                parts = [info['package']]
-                if with_version and 'version' in info:
-                    parts.extend(info['version'])
-                if not sys.version.startswith('3.4'):
+                parts = [info["package"]]
+                if versions and "version" in info:
+                    if versions == "strict":
+                        # In strict mode, we pin to the minimum version
+                        if info["version"]:
+                            # Only replace the first >= instance
+                            verstr = "".join(info["version"]).replace(">=", "==", 1)
+                            parts.append(verstr)
+                    else:
+                        parts.extend(info["version"])
+                if not sys.version.startswith("3.4"):
                     # apparently package_deps are broken in 3.4
-                    platform_deps = info.get('platform_deps')
-                    if platform_deps is not None:
-                        parts.append(';' + platform_deps)
-                item = ''.join(parts)
+                    plat_deps = info.get("platform_deps")
+                    if plat_deps is not None:
+                        parts.append(";" + plat_deps)
+                item = "".join(parts)
                 yield item
 
     packages = list(gen_packages_items())
     return packages
 
-"""
-TODO: automate with some modified version of: git shortlog -s | cut -c8-
-TODO: maintain contributors file
-"""
-AUTHORS = [
-    'Avi Weinstock',
-    'Chuck Stewart',
-    'Hendrik Weideman'
-    'Jason Parham'
-    'Jon Crall'
-    'Zackary Rutfield'
-]
 
-
-NAME = 'vtool_ibeis'
-MB_PYTHON_TAG = native_mb_python_tag()  # NOQA
-VERSION = parse_version('vtool_ibeis/__init__.py')
-
-KWARGS = dict(
-    name='vtool_ibeis',
-    version=VERSION,
-    author=', '.join(AUTHORS),
-    description='vision tools',
-    long_description=parse_description(),
-    long_description_content_type='text/x-rst',
-    author_email='erotemic@gmail.com',
-    url='https://github.com/Erotemic/vtool_ibeis',
-    license='Apache 2',
-    # List of classifiers available at:
-    # https://pypi.python.org/pypi?%3Aaction=list_classifiers
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'License :: OSI Approved :: Apache Software License',  # Interpret as Apache License v2.0
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Utilities',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-    ],
-    install_requires=parse_requirements('requirements/runtime.txt'),
-    extras_require={
-        'all': parse_requirements('requirements.txt'),
-        'tests': parse_requirements('requirements/tests.txt'),
-        'build': parse_requirements('requirements/build.txt'),
-        'runtime': parse_requirements('requirements/runtime.txt'),
-    },
-    packages=find_packages(),
-)
-
-
-try:
-    class EmptyListWithLength(list):
-        def __len__(self):
-            return 1
-except Exception:
-    raise RuntimeError('FAILED TO ADD BUILD CONSTRUCTS')
-
-
-if __name__ == '__main__':
+def native_mb_python_tag(plat_impl=None, version_info=None):
     """
-    CommandLine:
-        xdoctest -m setup
-    """
-    import sysconfig
-    import os
-    try:
-        soconfig = sysconfig.get_config_var('EXT_SUFFIX')
-    except Exception:
-        soconfig = sysconfig.get_config_var('SO')
+    Get the correct manylinux python version tag for this interpreter
 
-    def get_lib_ext():
-        if sys.platform.startswith('win32'):
-            ext = '.dll'
-        elif sys.platform.startswith('darwin'):
-            ext = '.dylib'
-        elif sys.platform.startswith('linux'):
-            ext = '.so'
+    Example:
+        >>> print(native_mb_python_tag())
+        >>> print(native_mb_python_tag('PyPy', (2, 7)))
+        >>> print(native_mb_python_tag('CPython', (3, 8)))
+    """
+    if plat_impl is None:
+        import platform
+
+        plat_impl = platform.python_implementation()
+
+    if version_info is None:
+        import sys
+
+        version_info = sys.version_info
+
+    major, minor = version_info[0:2]
+    ver = "{}{}".format(major, minor)
+
+    if plat_impl == "CPython":
+        # TODO: get if cp27m or cp27mu
+        impl = "cp"
+        if ver == "27":
+            IS_27_BUILT_WITH_UNICODE = True  # how to determine this?
+            if IS_27_BUILT_WITH_UNICODE:
+                abi = "mu"
+            else:
+                abi = "m"
         else:
-            raise Exception('Unknown operating system: %s' % sys.platform)
-        return ext
-
-    libext = get_lib_ext()
-    _pyver = '{}.{}'.format(sys.version_info.major, sys.version_info.minor)
-    hack_libconfig = '-{}{}'.format(_pyver, libext)
-
-    PACKAGE_DATA = (
-            ['*%s' % soconfig] +
-            ['*%s' % hack_libconfig] +
-            ['*%s' % libext] +
-            (['*.dll'] if os.name == 'nt' else []) +
-            (['Release\\*.dll'] if os.name == 'nt' else [])
-            # ["LICENSE.txt", "LICENSE-3RD-PARTY.txt", "LICENSE.SIFT"]
-    )
-    KWARGS.update(dict(
-        ext_modules=EmptyListWithLength(),  # hack for including ctypes bins
-        include_package_data=True,
-        package_data={
-            KWARGS['name']: PACKAGE_DATA,
-        },
-    ))
-
-    if '--universal' in sys.argv:
-        if 'develop' in sys.argv:
-            sys.argv.remove('--universal')
-        from setuptools import setup
-        setup(**KWARGS)
+            if sys.version_info[:2] >= (3, 8):
+                # bpo-36707: 3.8 dropped the m flag
+                abi = ""
+            else:
+                abi = "m"
+        mb_tag = "{impl}{ver}-{impl}{ver}{abi}".format(**locals())
+    elif plat_impl == "PyPy":
+        abi = ""
+        impl = "pypy"
+        ver = "{}{}".format(major, minor)
+        mb_tag = "{impl}-{ver}".format(**locals())
     else:
-        from skbuild import setup
-        setup(**KWARGS)
+        raise NotImplementedError(plat_impl)
+    return mb_tag
+
+
+NAME = "vtool_ibeis"
+INIT_PATH = "vtool_ibeis/__init__.py"
+VERSION = parse_version("vtool_ibeis/__init__.py")
+
+if __name__ == "__main__":
+    setupkw = {}
+
+    if 0:
+        setupkw["entry_points"] = {
+            # the console_scripts entry point creates the package CLI
+            "console_scripts": ["xcookie = xcookie.__main__:main"]
+        }
+    setupkw["install_requires"] = parse_requirements("requirements/runtime.txt")
+    setupkw["extras_require"] = {
+        "all": parse_requirements("requirements.txt"),
+        "tests": parse_requirements("requirements/tests.txt"),
+        "optional": parse_requirements("requirements/optional.txt"),
+        "headless": parse_requirements("requirements/headless.txt"),
+        "graphics": parse_requirements("requirements/graphics.txt"),
+        # Strict versions
+        "headless-strict": parse_requirements(
+            "requirements/headless.txt", versions="strict"
+        ),
+        "graphics-strict": parse_requirements(
+            "requirements/graphics.txt", versions="strict"
+        ),
+        "all-strict": parse_requirements("requirements.txt", versions="strict"),
+        "runtime-strict": parse_requirements(
+            "requirements/runtime.txt", versions="strict"
+        ),
+        "tests-strict": parse_requirements("requirements/tests.txt", versions="strict"),
+        "optional-strict": parse_requirements(
+            "requirements/optional.txt", versions="strict"
+        ),
+    }
+
+    setup(
+        name=NAME,
+        version=VERSION,
+        author=static_parse("__author__", INIT_PATH),
+        author_email=static_parse("__author_email__", INIT_PATH),
+        url=static_parse("__url__", INIT_PATH),
+        description=("The xcookie Module"),
+        long_description=parse_description(),
+        long_description_content_type="text/x-rst",
+        license="Apache 2",
+        packages=find_packages("."),
+        python_requires=">=3.7",
+        classifiers=[
+            ("Development Status :: 3 - Alpha",),
+            "Intended Audience :: Developers",
+            "Topic :: Software Development :: Libraries :: Python Modules",
+            "Topic :: Utilities",
+            "License :: OSI Approved :: Apache Software License",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+        ],
+        **setupkw,
+    )

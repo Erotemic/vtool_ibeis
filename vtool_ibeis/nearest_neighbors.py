@@ -8,7 +8,13 @@ from os.path import exists, normpath, join
 import utool as ut
 import ubelt as ub
 import numpy as np
-from vtool_ibeis._pyflann_backend import FLANN_CLS, pyflann
+
+try:
+    from vtool_ibeis._pyflann_backend import FLANN_CLS
+    from vtool_ibeis._pyflann_backend import pyflann
+except Exception:
+    FLANN_CLS = None
+    pyflann = None
 
 
 class AnnoyWrapper(object):
@@ -27,8 +33,8 @@ class AnnoyWrapper(object):
         self.params.update(kwargs)
         self.ann = annoy.AnnoyIndex(f=dvecs.shape[1], metric='euclidean')
         for i, dvec in enumerate(dvecs):
-            ann.add_item(i, dvec)
-        ann.build(n_trees=self.params['trees'])
+            self.ann.add_item(i, dvec)
+        self.ann.build(n_trees=self.params['trees'])
 
     def nn_index(self, qvecs, num_neighbs, checks=None):
         if checks is None:
@@ -36,7 +42,7 @@ class AnnoyWrapper(object):
         idxs = np.empty((len(qvecs), num_neighbs), dtype=np.int)
         dists = np.empty((len(qvecs), num_neighbs), dtype=np.float)
         for i, qvec in enumerate(qvecs):
-            idxs[i], dists[i] = ann.get_nns_by_vector(
+            idxs[i], dists[i] = self.ann.get_nns_by_vector(
                 qvec, n=num_neighbs, search_k=checks, include_distances=True)
         return idxs, dists
 
@@ -47,7 +53,7 @@ def test_annoy():
     import utool
     qvecs = demodata.testdata_dummy_sift(2 * 1000)
     dvecs = demodata.testdata_dummy_sift(100 * 1000)
-    dim = dpts.shape[1]
+    dim = dvecs.shape[1]
 
     checks = 200
     num_neighbs = 10

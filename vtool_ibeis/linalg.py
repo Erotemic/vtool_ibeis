@@ -30,23 +30,23 @@ TODO: Look at this file
 #     >>> vt.evalprint('S.inv()')
 #     >>> print('-------')
 #     >>> print('LaTeX')
-#     >>> print(ut.align('\\\\\n'.join(sympy.latex(R).split(r'\\')).replace('{matrix}', '{matrix}\n'), '&')
+#     >>> print(xdev.align('\\\\\n'.join(sympy.latex(R).split(r'\\')).replace('{matrix}', '{matrix}\n'), '&')
 
 """
 from __future__ import absolute_import, division, print_function
 import cv2
 import numpy as np
 import numpy.linalg as npl
-import utool as ut
 import ubelt as ub
 import warnings  # NOQA
 from .util_math import TAU
+from operator import matmul as matrix_multiply  # NOQA
+
 
 TRANSFORM_DTYPE = np.float64
 
-
 # Function which multiplies many matrices at once
-from numpy.core.umath_tests import matrix_multiply  # NOQA
+# from numpy.core.umath_tests import matrix_multiply  # NOQA
 
 
 def svd(M):
@@ -269,7 +269,7 @@ def affine_around_mat3x3(x, y, sx=1.0, sy=1.0, theta=0.0, shear=0.0, tx=0.0,
         >>> pt.plt.axis('equal')
         >>> pt.plt.xlim(0, 40)
         >>> pt.plt.ylim(0, 40)
-        >>> ut.show_if_requested()
+        >>> pt.show_if_requested()
 
     # Timeit:
     #     >>> from vtool_ibeis.linalg import *  # NOQA
@@ -447,7 +447,7 @@ def transform_points_with_homography(H, _xys):
         _xys (ndarray[ndim=2]): (2 x N) array
     """
     xyz  = add_homogenous_coordinate(_xys)
-    xyz_t = matrix_multiply(H, xyz)
+    xyz_t = H @ xyz
     xy_t  = remove_homogenous_coordinate(xyz_t)
     return xy_t
 

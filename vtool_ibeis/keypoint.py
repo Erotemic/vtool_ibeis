@@ -133,7 +133,6 @@ from __future__ import absolute_import, division, print_function
 from six.moves import zip, range, reduce
 import numpy as np
 import numpy.linalg as npl
-from numpy.core.umath_tests import matrix_multiply
 from vtool_ibeis import linalg as linalgtool
 from vtool_ibeis import chip as chiptool
 from vtool_ibeis import distance
@@ -141,6 +140,7 @@ from vtool_ibeis import trig
 import ubelt as ub
 import utool as ut
 from .util_math import TAU
+import operator as op
 
 
 GRAVITY_THETA = TAU / 4
@@ -410,7 +410,7 @@ def get_invVR_mats2x2(kpts):
     # This is because we are dealing with \emph{inv}(V).
     # numpy operates with data on the right (operate right-to-left)
     R_mats2x2  = get_ori_mats(kpts)
-    invVR_mats2x2 = matrix_multiply(invV_mats2x2, R_mats2x2)
+    invVR_mats2x2 = op.matmul(invV_mats2x2, R_mats2x2)
     return invVR_mats2x2
 
 
@@ -670,17 +670,17 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
 
     Timeit:
         sa_list1 = np.array([S2.dot(A) for A in invVR_aff2Ds])
-        sa_list2 = matrix_multiply(S2, invVR_aff2Ds)
+        sa_list2 = op.matmul(S2, invVR_aff2Ds)
         assert np.all(sa_list1 == sa_list2)
         %timeit np.array([S2.dot(A) for A in invVR_aff2Ds])
-        %timeit matrix_multiply(S2, invVR_aff2Ds)
+        %timeit op.matmul(S2, invVR_aff2Ds)
 
         from six.moves import reduce
         perspective_list2 = np.array([S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds])
-        perspective_list = reduce(matrix_multiply, (S2, invVR_aff2Ds, S1, T1))
+        perspective_list = reduce(op.matmul, (S2, invVR_aff2Ds, S1, T1))
         assert np.all(perspective_list == perspective_list2)
         %timeit np.array([S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds])
-        %timeit reduce(matrix_multiply, (S2, invVR_aff2Ds, S1, T1))
+        %timeit reduce(op.matmul, (S2, invVR_aff2Ds, S1, T1))
     """
     (patch_h, patch_w) = patch_shape
     half_width  = (patch_w / 2.0)  # - .5
@@ -695,7 +695,8 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
     # Adjust for the requested scale factor
     S2 = linalgtool.scale_mat3x3(scale_factor, scale_factor)
     #perspective_list = [S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds]
-    M_list = reduce(matrix_multiply, (S2, invVR_aff2Ds, S1.dot(T1)))
+    import operator as op
+    M_list = reduce(op.matmul, (S2, invVR_aff2Ds, S1.dot(T1)))
     return M_list
 
 
@@ -711,7 +712,7 @@ def transform_kpts_to_imgspace(kpts, bbox, bbox_theta, chipsz):
     # Get chip to imagespace transform
     invC = chiptool._get_chip_to_image_transform(bbox, chipsz, bbox_theta)
     # Apply transform to keypoints
-    invCinvV_mats = matrix_multiply(invC, invV_mats)
+    invCinvV_mats = invC @ invV_mats
     # Flatten back into keypoint (x, y, a, c, d, o) format
     imgkpts = flatten_invV_mats_to_kpts(invCinvV_mats)
     return imgkpts
@@ -886,7 +887,7 @@ def transform_kpts(kpts, M):
                   [320.   , 630.   , 160.527, 194.6  , 117.354,   0.   ]], dtype=np.float64)
     """
     invVR_mats3x3 = get_invVR_mats3x3(kpts)
-    MinvVR_mats3x3 = matrix_multiply(M, invVR_mats3x3)
+    MinvVR_mats3x3 = M @ invVR_mats3x3
     try:
         assert np.all(MinvVR_mats3x3[:, 2, 0:2] == 0)
         assert np.all(MinvVR_mats3x3[:, 2, 2] == 1)
@@ -939,7 +940,7 @@ def transform_kpts_xys(H, kpts):
     xy_t = linalgtool.transform_points_with_homography(H, xy)
     return xy_t
     #xyz   = get_homog_xyzs(kpts)
-    #xyz_t = matrix_multiply(H, xyz)
+    #xyz_t = H @ xyz
     #xy_t  = linalgtool.add_homogenous_coordinate(xyz_t)
     #return xy_t
 
@@ -974,9 +975,9 @@ def get_invVR_mats_shape(invVR_mats):
         >>> np.random.seed(0)
         >>> invVR_mats = np.random.rand(1000, 3, 3).astype(np.float64)
         >>> output = get_invVR_mats_shape(invVR_mats)
-        >>> result = ut.hash_data(output)
-        >>> print(result)
-        pibujdiaimwcnmomserkcytyyikahjmp
+        >>> result = ub.hash_data(output)
+        >>> print(result[0:16])
+        e9c2e93471c0ec88
 
     References:
         TODO
@@ -1255,11 +1256,9 @@ def get_invVR_mats_oris(invVR_mats):
         >>> # LATEX PART
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_held_full)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
         >>>
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_full)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
 
 
         >>> from sympy import Symbol, Q, refine, atan2
@@ -1305,11 +1304,9 @@ def get_invVR_mats_oris(invVR_mats):
             print('%r.assumptions0 = %s' % (sym, ub.repr2(sym.assumptions0),))
 
 
-
         >>> #invTVR = sympy.simplify(RVT_full.inv())
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_full)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
 
     Sympy:
         >>> import sympy
@@ -1347,16 +1344,13 @@ def get_invVR_mats_oris(invVR_mats):
         print('v22 = ' + str(sympy.solve(inveq, v22)))
         >>> invVR = invV.multiply(R)
         >>> invV.matmul(R, hold=True)
-        >>> ut.eval
         >>> print(invVR)
         >>> print(repr(invVR))
         >>> vt.rrrr()
         >>> other_repr = vt.sympy_latex_repr(invV.matmul(R, hold=True))
         >>> print(other_repr)
-        >>> ut.copy_text_to_clipboard(other_repr)
         >>> expr1_repr = vt.sympy_latex_repr(invVR)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
 
 
     Sympy:
@@ -1395,16 +1389,13 @@ def get_invVR_mats_oris(invVR_mats):
         print('v22 = ' + str(sympy.solve(inveq, v22)))
         >>> invVR = invV.multiply(R)
         >>> invV.matmul(R, hold=True)
-        >>> ut.eval
         >>> print(invVR)
         >>> print(repr(invVR))
         >>> vt.rrrr()
         >>> other_repr = vt.sympy_latex_repr(invV.matmul(R, hold=True))
         >>> print(other_repr)
-        >>> ut.copy_text_to_clipboard(other_repr)
         >>> expr1_repr = vt.sympy_latex_repr(invVR)
         >>> print(expr1_repr)
-        >>> ut.copy_text_to_clipboard(expr1_repr)
         Matrix([
         [                 iv11*cos(theta),                  -iv11*sin(theta),  x],
         [iv21*cos(theta) + iv22*sin(theta), -iv21*sin(theta) + iv22*cos(theta),  y],
@@ -1436,23 +1427,6 @@ def get_invVR_mats_oris(invVR_mats):
         sympy.trigsimp(sympy.simplify(sympy.trigsimp(z)))
         ori = np.arctan2(_iv12s, _iv11s)
         z = ori.subs(dict(iv11=1, theta=1))
-
-    Timeit:
-        >>> import utool as ut
-        >>> setup = ut.codeblock(
-        ...     '''
-                import numpy as np
-                np.random.seed(0)
-                invVR_mats = np.random.rand(10000, 2, 2).astype(np.float64)
-                ''')
-        >>> stmt_list = ut.codeblock(
-        ...     '''
-                invVR_mats[:, 0, 1]
-                invVR_mats.T[1, 0]
-                '''
-        ... ).split('\n')
-        >>> ut.util_dev.rrr()
-        >>> ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))
     """
     # Extract only the needed shape components
     #_iv11s = invVR_mats[:, 0, 0]
@@ -1600,7 +1574,7 @@ def get_Z_mats(V_mats):
         Z_mats (ndarray): Z is a conic representation of an ellipse
     """
     Vt_mats = np.array(list(map(np.transpose, V_mats)))
-    Z_mats = matrix_multiply(Vt_mats, V_mats)
+    Z_mats = Vt_mats @ V_mats
     return Z_mats
 
 
@@ -1735,7 +1709,7 @@ def invert_invV_mats(invV_mats):
         >>> kpts = vt.demodata.get_dummy_kpts()
         >>> invV_mats = vt.get_invVR_mats3x3(kpts)
         >>> V_mats = invert_invV_mats(invV_mats)
-        >>> test = matrix_multiply(invV_mats, V_mats)
+        >>> test = invV_mats @ V_mats
         >>> # This should give us identity
         >>> assert np.allclose(test, np.eye(3))
     """
@@ -1828,7 +1802,7 @@ def get_kpts_wh(kpts, outer=True):
         >>> vert_pts2 = np.array([xs, (ys + radii.T[1])]).T
         >>> pt.draw_line_segments2(horiz_pts1, horiz_pts2, color='g')
         >>> pt.draw_line_segments2(vert_pts1, vert_pts2, color='b')
-        >>> ut.show_if_requested()
+        >>> pt.show_if_requested()
         np.array([[10.43315411, 58.5216589 ],
                   [ 4.71017647, 58.5216589 ],
                   [24.43314171, 45.09558868],
@@ -1911,7 +1885,7 @@ def get_kpts_image_extent(kpts, outer=False, only_xy=False):
         >>> pt.draw_kpts2(kpts, bbox=True)
         >>> ax = pt.gca()
         >>> pt.set_axis_extent(extent, ax)
-        >>> ut.show_if_requested()
+        >>> pt.show_if_requested()
         np.array([ 14.78, 48.05,  0.32, 51.58])
     """
     if len(kpts) == 0:
@@ -2183,7 +2157,7 @@ def get_uneven_point_sample(kpts):
     theta_list = np.linspace(0, TAU, nSamples)
     circle_pts = np.array([(np.cos(t_), np.sin(t_), 1) for t_ in theta_list])
     # Transform those points to the ellipse using invV
-    ellipse_pts1 = matrix_multiply(invV_mats, circle_pts.T).transpose(0, 2, 1)
+    ellipse_pts1 = (invV_mats @ circle_pts.T).transpose(0, 2, 1)
     return ellipse_pts1
 
 

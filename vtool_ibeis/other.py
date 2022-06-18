@@ -38,18 +38,18 @@ def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=np.float):
         >>> # test2
         >>> tup = (np.array([[1, 2, 3]]), np.array([[]]))
         >>> s = vt.safe_cat(tup, axis=0)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = ', ub.repr2(s)]))
         >>> ut.assert_eq(s.shape, (1, 3))
         >>> # test3
         >>> tup = (np.array([[1, 2, 3]]), np.array([[3, 4, 5]]))
         >>> s = vt.safe_cat(tup, axis=1)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
+        >>> print(ub.hzcat(['s = ', ub.repr2(s)]))
         >>> ut.assert_eq(s.shape, (1, 6))
         >>> # test3
         >>> tup = (np.array(1), np.array(2), np.array(3))
-        >>> s = vt.safe_cat(tup, axis=1)
-        >>> print(ub.hzcat(['s = ', ub.repr2(s)])
-        >>> ut.assert_eq(s.shape, (1, 6))
+        >>> s = vt.safe_cat(tup, axis=0)
+        >>> print(ub.hzcat(['s = ', ub.repr2(s)]))
+        >>> ut.assert_eq(s.shape, (3,))
     """
     if tup is None or len(tup) == 0:
         stack = np.empty(default_shape, dtype=default_dtype)
@@ -390,42 +390,42 @@ def compute_ndarray_unique_rowids_unsafe(arr):
     #assert arr.data == arr_void_view.data
 
 
-def nonunique_row_flags(arr):
-    import vtool_ibeis as vt
-    unique_rowx = unique_row_indexes(arr)
-    unique_flags = vt.index_to_boolmask(unique_rowx, len(arr))
-    nonunique_flags = np.logical_not(unique_flags)
-    return nonunique_flags
+# def nonunique_row_flags(arr):
+#     import vtool_ibeis as vt
+#     unique_rowx = unique_row_indexes(arr)
+#     unique_flags = vt.index_to_boolmask(unique_rowx, len(arr))
+#     nonunique_flags = np.logical_not(unique_flags)
+#     return nonunique_flags
 
 
-def nonunique_row_indexes(arr):
-    """ rows that are not unique (does not include the first instance of each pattern)
+# def nonunique_row_indexes(arr):
+#     """ rows that are not unique (does not include the first instance of each pattern)
 
-    Args:
-        arr (ndarray): 2d array
+#     Args:
+#         arr (ndarray): 2d array
 
-    Returns:
-        ndarray: nonunique_rowx
+#     Returns:
+#         ndarray: nonunique_rowx
 
-    SeeAlso:
-        unique_row_indexes
-        nonunique_row_flags
+#     SeeAlso:
+#         unique_row_indexes
+#         nonunique_row_flags
 
-    CommandLine:
-        python -m vtool_ibeis.other --test-unique_row_indexes
+#     CommandLine:
+#         python -m vtool_ibeis.other --test-unique_row_indexes
 
-    Example:
-        >>> # DISABLE_DOCTEST
-        >>> from vtool_ibeis.other import *  # NOQA
-        >>> arr = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 0], [.534, .432], [.534, .432], [1, 0], [0, 1]])
-        >>> nonunique_rowx = unique_row_indexes(arr)
-        >>> result = ('nonunique_rowx = %s' % (ub.repr2(nonunique_rowx),))
-        >>> print(result)
-        nonunique_rowx = np.array([4, 6, 7, 8], dtype=np.int64)
-    """
-    nonunique_flags = nonunique_row_flags(arr)
-    nonunique_rowx = np.where(nonunique_flags)[0]
-    return nonunique_rowx
+#     Example:
+#         >>> # DISABLE_DOCTEST
+#         >>> from vtool_ibeis.other import *  # NOQA
+#         >>> arr = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 0], [.534, .432], [.534, .432], [1, 0], [0, 1]])
+#         >>> nonunique_rowx = unique_row_indexes(arr)
+#         >>> result = ('nonunique_rowx = %s' % (ub.repr2(nonunique_rowx),))
+#         >>> print(result)
+#         nonunique_rowx = np.array([4, 6, 7, 8], dtype=np.int64)
+#     """
+#     nonunique_flags = nonunique_row_flags(arr)
+#     nonunique_rowx = np.where(nonunique_flags)[0]
+#     return nonunique_rowx
 
 
 def compute_unique_data_ids(data):
@@ -1850,6 +1850,7 @@ def safe_max(arr, fill=np.nan, finite=False, nans=True):
         >>> results = [results1, results2, results3, results4]
         >>> result = ('results = %s' % (ub.repr2(results, nl=1),))
         >>> print(result)
+
         results = [
             [nan, nan, nan, inf, inf, 1],
             [nan, nan, nan, nan, 1.0, 1],
@@ -1875,6 +1876,7 @@ def safe_min(arr, fill=np.nan, finite=False, nans=True):
         >>> results = [results1, results2, results3, results4]
         >>> result = ('results = %s' % (ub.repr2(results, nl=1),))
         >>> print(result)
+
         results = [
             [nan, nan, nan, inf, 1.0, 0],
             [nan, nan, nan, nan, 1.0, 0],

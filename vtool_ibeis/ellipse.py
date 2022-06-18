@@ -5,16 +5,16 @@ This module should handle all things elliptical
 """
 from __future__ import absolute_import, division, print_function
 from six.moves import zip, range
-from numpy.core.umath_tests import matrix_multiply
+# from numpy.core.umath_tests import matrix_multiply
+import operator as op
 import scipy.signal as spsignal
 import numpy as np
 from vtool_ibeis import keypoint as ktool
 from vtool_ibeis import image as gtool
-import ubelt as ub
 import utool as ut
 try:
     import cv2
-except ImportError as ex:
+except ImportError:
     print('ERROR: import cv2 is failing!')
     cv2 = ut.DynStruct()
 
@@ -205,7 +205,7 @@ def sample_uniform(kpts, nSamples=128):
     assert circle_pts.shape == (nSamples, 3)
     #-------------------------------
     # Get uneven points sample (get_uneven_point_sample)
-    polygon1_list = matrix_multiply(invV_mats3x3, circle_pts.T).transpose(0, 2, 1)
+    polygon1_list = op.matmul(invV_mats3x3, circle_pts.T).transpose(0, 2, 1)
     assert polygon1_list.shape == (nKp, nSamples, 3)
     # -------------------------------
     # The transformed points are not sampled uniformly... Bummer
@@ -266,12 +266,12 @@ def sample_uniform(kpts, nSamples=128):
     # This loops over the pt samples and performs the operation for every keypoint
     for num, dist, offset in zip(num_steps_list, distsT, offset_list):
         #if num == 0
-            #cut_list.append([])
-            #continue
+        #  cut_list.append([])
+        #  continue
         # This was a bitch to keep track of
         offset1 = (step_size - offset) / dist
         offset2 = ((num * step_size) - offset) / dist
-        cut_locs = [np.linspace(off1, off2, n, endpoint=True) for (off1, off2, n) in zip(offset1, offset2, num)]
+        cut_locs = [np.linspace(off1, off2, int(n), endpoint=True) for (off1, off2, n) in zip(offset1, offset2, num)]
         # post check for divide by 0
         cut_locs = [np.array([0 if np.isinf(c) else c for c in cut]) for cut in cut_locs]
         cut_list.append(cut_locs)
@@ -365,7 +365,7 @@ def gradient_magnitude(img):
 #    #iv31 = zeros(nKp)
 #    #iv32 = zeros(nKp)
 #    #iv33 = ones(nKp)
-#    ## np.dot operates over the -1 and -2 axis of arrays
+#    ## np.dot operates over the -1 and -2 axis of arrays:27
 #    ## Start with
 #    ##     invV.shape = (3, 3, nKp)
 #    #invV = np.array([[iv11, iv12, iv13],
@@ -400,8 +400,8 @@ def homogenous_circle_pts(nSamples):
 
 
 def circular_distance(arr=None):
-    dist_head_ = ((arr[0:-1] - arr[1:]) ** 2).sum(1)
-    dist_tail_  = ((arr[-1] - arr[0]) ** 2).sum(0)
+    dist_head_ = ((arr[0:-1] - arr[1:]) ** 2).sum(1).astype(float)
+    dist_tail_  = ((arr[-1] - arr[0]) ** 2).sum(0).astype(float)
     #dist_end_.shape = (1, len(dist_end_))
     #print(dist_most_.shape)
     #print(dist_end_.shape)

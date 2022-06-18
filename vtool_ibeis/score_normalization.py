@@ -820,6 +820,7 @@ def partition_scores(X, y, attrs=None):
         >>> result = ub.repr2(resdict, nobraces=True, with_dtype=False,
         >>>                      explicit=1, nl=2)
         >>> print(result)
+
         tp_scores=np.array([5, 6, 6, 7]),
         tn_scores=np.array([1, 2, 2]),
         part_attrs={
@@ -883,6 +884,7 @@ def flatten_scores(tp_scores, tn_scores, part_attrs=None):
         >>> result = ub.repr2(resdict, nobraces=True, with_dtype=False,
         >>>                      explicit=1, nl=1)
         >>> print(result)
+
         X=np.array([5, 6, 6, 7, 1, 2, 2]),
         y=np.array([1, 1, 1, 1, 0, 0, 0]),
         attrs={'qaid': np.array([21, 24, 25, 26, 11, 14, 15])},

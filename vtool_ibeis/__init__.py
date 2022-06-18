@@ -7,7 +7,12 @@ Autogenerate Command:
 """
 # flake8: noqa
 from __future__ import absolute_import, division, print_function
-__version__ = '2.1.1'
+
+__version__ = '2.2.0'
+__author__ = 'Jon Crall, Avi Weinstock, Chuck Stewart, Hendrik Weideman, Jason Parham, Zackary Rutfield'
+__author_email__ = 'erotemic@gmail.com'
+__url__ = 'https://github.com/Erotemic/vtool_ibeis'
+
 
 
 __submodules__ = [
@@ -348,7 +353,9 @@ from vtool_ibeis.other import (and_lists, argsort_groups, argsort_records,
                          list_compress_, list_take_, make_video, make_video2,
                          median_abs_dev, mult_lists, multigroup_lookup,
                          multigroup_lookup_naive, nearest_point,
-                         nonunique_row_flags, nonunique_row_indexes, norm01,
+                         # nonunique_row_flags,
+                         # nonunique_row_indexes,
+                               norm01,
                          or_lists, pad_vstack, rebuild_partition,
                          rowwise_operation, safe_argmax, safe_cat, safe_div,
                          safe_extreme, safe_max, safe_min, safe_vstack,
@@ -546,7 +553,9 @@ __all__ = ['AnnotPairFeatInfo', 'AnnoyWraper', 'AnnoyWrapper', 'AssignTup',
            'montage', 'mult_lists', 'multiaxis_reduce', 'multigroup_lookup',
            'multigroup_lookup_naive', 'nan_to_num', 'nearest_neighbors',
            'nearest_point', 'nearest_point', 'non_decreasing',
-           'non_increasing', 'nonunique_row_flags', 'nonunique_row_indexes',
+           'non_increasing',
+           # 'nonunique_row_flags',
+           # 'nonunique_row_indexes',
            'norm01', 'normalize', 'normalize_rows', 'normalize_scores',
            'normalized_nearest_neighbors', 'numpy_utils', 'offset_kpts',
            'open_image_size', 'open_pil_image', 'or_lists', 'ori_distance',

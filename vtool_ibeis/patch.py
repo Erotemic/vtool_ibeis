@@ -10,11 +10,11 @@ from vtool_ibeis import linalg as ltool
 from vtool_ibeis import image as gtool
 from vtool_ibeis import trig
 import utool as ut
-import ubelt as ub
+import ubelt as ub  # NOQA
 from .util_math import TAU
 try:
     import cv2
-except ImportError as ex:
+except ImportError:
     print('ERROR: import cv2 is failing!')
     cv2 = ut.DynStruct()
     cv2.INTER_LANCZOS4 = None
@@ -295,6 +295,7 @@ def inverted_sift_patch(sift, dim=32):
 
     Example:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.patch import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> patch = vt.get_test_patch(ut.get_argval('--name', default='star'))
@@ -570,6 +571,7 @@ def get_warped_patches(img, kpts, flags=cv2.INTER_LANCZOS4,
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.patch import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
@@ -1062,6 +1064,7 @@ def draw_kp_ori_steps():
 
     Example:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> import plottool_ibeis as pt
         >>> from vtool_ibeis.patch import *  # NOQA
         >>> draw_kp_ori_steps()
@@ -1334,6 +1337,7 @@ def find_dominant_kp_orientations(imgBGR, kp, bins=36, maxima_thresh=.8,
 
     Example:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.patch import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
