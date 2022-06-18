@@ -8,7 +8,7 @@ from six import next
 from six.moves import zip, range
 
 
-def safe_vstack(tup, default_shape=(0,), default_dtype=np.float):
+def safe_vstack(tup, default_shape=(0,), default_dtype=float):
     """ stacks a tuple even if it is empty """
     try:
         return np.vstack(tup)
@@ -23,7 +23,7 @@ def pad_vstack(arrs, fill_value=0):
     return np.vstack(padded)
 
 
-def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=np.float):
+def safe_cat(tup, axis=0, default_shape=(0,), default_dtype=float):
     """
     stacks a tuple even if it is empty
     Also deals with numpy bug where cat fails if an element in sequence is empty
@@ -118,7 +118,7 @@ def argsort_groups(scores_list, reverse=False, rng=np.random, randomize_levels=T
         >>> print(result)
 
     """
-    scores_list_ = [np.array(scores, copy=True).astype(np.float) for scores in scores_list]
+    scores_list_ = [np.array(scores, copy=True).astype(float) for scores in scores_list]
     breakers_list = [rng.rand(len(scores)) for scores in scores_list_]
     # replace nan with -inf, or inf randomize order between equal values
     replval = -np.inf if reverse else np.inf
@@ -2408,7 +2408,7 @@ def fromiter_nd(iter_, shape, dtype):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.other import *  # NOQA
-        >>> dtype = np.float
+        >>> dtype = float
         >>> total = 11
         >>> rng = np.random.RandomState(0)
         >>> iter_ = (rng.rand(5, 7, 3) for _ in range(total))
