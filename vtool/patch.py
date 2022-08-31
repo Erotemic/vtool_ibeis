@@ -839,7 +839,7 @@ def patch_gaussian_weighted_average_intensities(probchip, kpts_):
 
     patch_size = 41
     M_iter = vt.generate_to_patch_transforms(kpts_, patch_size)
-    dsize = np.ceil([patch_size, patch_size]).astype(np.int)
+    dsize = np.ceil([patch_size, patch_size]).astype(np.int64)
     # Preallocate patch
     patch = np.empty(dsize[::-1], dtype=np.uint8)
     weighted_patch = np.empty(dsize[::-1], dtype=np.float64)

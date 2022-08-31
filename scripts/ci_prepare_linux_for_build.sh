@@ -21,3 +21,5 @@ else
         libomp5 \
         libomp-dev
 fi
+
+python setup.py build_ext --inplace

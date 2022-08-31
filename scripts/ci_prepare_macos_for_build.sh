@@ -11,3 +11,5 @@ brew install \
     eigen \
     opencv \
     libomp
+
+python setup.py build_ext --inplace

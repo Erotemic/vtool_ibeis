@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>vtool.nearest_neighbors &mdash; wbia-vtool 4.0.2.dev2+dirty documentation</title>
+  <title>vtool.nearest_neighbors &mdash; wbia-vtool 4.0.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -27,7 +27,7 @@
             <a href="../../index.html" class="icon icon-home"> wbia-vtool
           </a>
               <div class="version">
-                4.0.2.dev2+dirty
+                4.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -249,7 +249,7 @@
 <span class="sd">        xdoctest -m ~/code/vtool/vtool/nearest_neighbors.py ann_flann_once:0</span>
 
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
 <span class="sd">        &gt;&gt;&gt; np.random.seed(1)</span>
 <span class="sd">        &gt;&gt;&gt; dpts = np.random.randint(0, 255, (5, 128)).astype(np.uint8)</span>
@@ -265,9 +265,8 @@
 <span class="sd">                      [1038324., 1243690., 1304896., 1320598., 1369036.]], dtype=np.float32),</span>
 <span class="sd">        )</span>
 
-
 <span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; # ENABLE_DOCTEST</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; # Test upper bounds on sift descriptors</span>
 <span class="sd">        &gt;&gt;&gt; # SeeAlso distance.understanding_pseudomax_props</span>
 <span class="sd">        &gt;&gt;&gt; from vtool.nearest_neighbors import *  # NOQA</span>
@@ -303,6 +302,7 @@
 <span class="sd">        &gt;&gt;&gt; print(result)</span>
 
 <span class="sd">     Example:</span>
+<span class="sd">        &gt;&gt;&gt; # DISABLE_DOCTEST</span>
 <span class="sd">        &gt;&gt;&gt; # Build theoretically maximally distant vectors</span>
 <span class="sd">        &gt;&gt;&gt; b = 512</span>
 <span class="sd">        &gt;&gt;&gt; D = 128</span>
