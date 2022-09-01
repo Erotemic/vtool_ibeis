@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pip install -r requirements/build.txt
+
 ./clean.sh
 python setup.py clean
 
