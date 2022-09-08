@@ -1,3 +1,6 @@
+"""
+Use version in ~/code/vtool_ibeis_ext/dev/build_base_docker2.py instead
+"""
 import ubelt as ub
 import os
 

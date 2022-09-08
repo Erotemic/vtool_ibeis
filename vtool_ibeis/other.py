@@ -456,7 +456,7 @@ def compute_unique_data_ids_(hashable_rows, iddict_=None):
     for row in hashable_rows:
         if row not in iddict_:
             iddict_[row] = len(iddict_)
-    dataid_list = ut.dict_take(iddict_, hashable_rows)
+    dataid_list = list(ub.take(iddict_, hashable_rows))
     return dataid_list
 
 
