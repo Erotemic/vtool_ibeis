@@ -1,11 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function
+import os
 import sys
 from os.path import exists
 from collections import OrderedDict
 from setuptools import find_packages
-from skbuild import setup
+from contextlib import contextmanager
+
+
+@contextmanager
+def silence_stdout():
+    old_target = sys.stdout
+    try:
+        with open(os.devnull, 'w') as new_target:
+            sys.stdout = new_target
+            yield new_target
+    finally:
+        sys.stdout = old_target
+
+
+with silence_stdout():
+    from skbuild import setup
 
 
 def native_mb_python_tag(plat_impl=None, version_info=None):
@@ -179,7 +195,6 @@ try:
 
         def __str__(self):
             return 'EmptyListWithLength()'
-
 
 except Exception:
     raise RuntimeError('FAILED TO ADD BUILD CONSTRUCTS')
