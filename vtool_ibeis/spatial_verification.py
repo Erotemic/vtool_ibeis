@@ -318,6 +318,7 @@ def compute_homog(xy1_mn, xy2_mn):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
         >>> import vtool_ibeis.demodata as demodata
@@ -334,6 +335,7 @@ def compute_homog(xy1_mn, xy2_mn):
 
     Example1:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
         >>> xy1_man, xy2_man, rchip1, rchip2, T1, T2 = testdata_matching_affine_inliers_normalized()

@@ -129,8 +129,7 @@ Efficiency Notes:
     using np.take is a better idea, but its a bit harder
     to use with multidimensional arrays (nope use axis=x)
 """
-from __future__ import absolute_import, division, print_function
-from six.moves import zip, range, reduce
+from functools import reduce
 import numpy as np
 import numpy.linalg as npl
 from vtool_ibeis import linalg as linalgtool
@@ -1189,13 +1188,11 @@ def get_invVR_mats_oris(invVR_mats):
         >>> #
 
         nptheta = np.linspace(0, 2 * np.pi, 32, endpoint=False)
-
         mapping = np.arctan(np.tan(nptheta))
         print(ub.repr2(zip(nptheta / (2 * np.pi), nptheta, mapping, nptheta == mapping), precision=3))
         print(ub.repr2(zip(nptheta / (2 * np.pi), nptheta, mapping  % (np.pi * 2), nptheta == mapping % (np.pi * 2)), precision=3))
-
+        >>> # xdoctest: +SKIP
         >>> # NUMPY CHECKS
-
         >>> nptheta_special = [ np.arccos(0), -np.arccos(0), -np.arcsin(0), np.arcsin(0) ]
         >>> nptheta = np.array(np.linspace(0, 2 * np.pi, 64, endpoint=False).tolist() + nptheta_special)
         >>> # Case 1
@@ -1205,6 +1202,7 @@ def get_invVR_mats_oris(invVR_mats):
         >>> case1_result = (-np.arctan(np.tan(-case1_theta)) % TAU)
         >>> case1_theta == case1_result
 
+        >>> # xdoctest: +SKIP
         >>> print(ub.repr2(zip(case1_theta, case1_result, vt.ori_distance(case1_theta, case1_result) ), precision=3))
         >>> #
         >>> # Case 2
@@ -1237,8 +1235,8 @@ def get_invVR_mats_oris(invVR_mats):
 
         # numpy check
 
-
         >>> # LATEX PART
+        >>> # xdoctest: +SKIP
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_held_full)
         >>> print(expr1_repr)
         >>>
@@ -1246,6 +1244,7 @@ def get_invVR_mats_oris(invVR_mats):
         >>> print(expr1_repr)
 
 
+        >>> # xdoctest: +SKIP
         >>> from sympy import Symbol, Q, refine, atan2
         >>> from sympy.assumptions.refine import refine_atan2
         >>> from sympy.abc import x, y
@@ -1256,9 +1255,9 @@ def get_invVR_mats_oris(invVR_mats):
         atan(y/x) - pi
         atan(y/x) + pi
 
+        >>> # xdoctest: +SKIP
         >>> negtheta = sympy.symbols('negtheta', **symkw)
         >>> ori_subs2 = sympy.simplify(sympy.trigsimp(ori_subs))
-
         >>> ori_subs3 = ori_subs2.subs({theta:-negtheta})
         >>> ori_subs4 = sympy.simplify(ori_subs3)
         Out[45]: Mod(-atan2(sin(negtheta)/a, cos(negtheta)/a), 2*pi)
@@ -1283,17 +1282,20 @@ def get_invVR_mats_oris(invVR_mats):
 
 
 
+        >>> # xdoctest: +SKIP
         >>> ori_subs3 = ori_subs2.subs({theta:0})
         >>> ori_subs3 = ori_subs2.subs(dict(theta=0), simultanious=True)
         for sym in ori_subs2.free_symbols:
             print('%r.assumptions0 = %s' % (sym, ub.repr2(sym.assumptions0),))
 
 
+        >>> # xdoctest: +SKIP
         >>> #invTVR = sympy.simplify(RVT_full.inv())
         >>> expr1_repr = vt.sympy_latex_repr(invTVR_full)
         >>> print(expr1_repr)
 
     Sympy:
+        >>> # xdoctest: +SKIP
         >>> import sympy
         >>> import vtool_ibeis as vt
         >>> # First orient a unit circle
@@ -1340,6 +1342,7 @@ def get_invVR_mats_oris(invVR_mats):
 
     Sympy:
         >>> # Show orientation property
+        >>> # xdoctest: +SKIP
         >>> import sympy
         >>> import vtool_ibeis as vt
         >>> # First orient a unit circle

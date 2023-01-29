@@ -10,6 +10,11 @@ from vtool_ibeis import exif
 import utool as ut
 import ubelt as ub
 
+try:
+    from packaging.version import parse as LooseVersion
+except ImportError:
+    from distutils.version import LooseVersion
+
 
 if cv2 is not None:
 
@@ -39,7 +44,6 @@ if cv2 is not None:
     try:
         IMREAD_COLOR = cv2.IMREAD_COLOR
     except AttributeError:
-        from distutils.version import LooseVersion
         cv2_version = LooseVersion(cv2.__version__)
         print('UNKNOWN cv2_version = {!r}'.format(cv2_version))
         assert cv2_version.version[0] <= 2
