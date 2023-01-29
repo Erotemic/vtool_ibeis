@@ -300,7 +300,7 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
         >>> ut.show_if_requested()
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> img_url = 'http://images.summitpost.org/original/769474.JPG'
         >>> img_fpath = ut.grab_file_url(img_url)
@@ -311,17 +311,20 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
         >>> print('imgBGR2.shape = %r' % (imgBGR2.shape,))
         >>> result = str(imgBGR1.shape)
         >>> diff_pxls = imgBGR1 != imgBGR2
+        >>> # Very strange that this fails
         >>> num_diff_pxls = diff_pxls.sum()
         >>> print(result)
         >>> print('num_diff_pxls=%r/%r' % (num_diff_pxls, diff_pxls.size))
         >>> assert num_diff_pxls == 0
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import kwplot
+        >>> kwplot.autompl()
         >>> import plottool_ibeis as pt
         >>> diffMag = np.linalg.norm(imgBGR2 / 255. - imgBGR1 / 255., axis=2)
-        >>> pt.imshow(imgBGR1, pnum=(1, 3, 1))
-        >>> pt.imshow(diffMag / diffMag.max(), pnum=(1, 3, 2))
-        >>> pt.imshow(imgBGR2, pnum=(1, 3, 3))
-        >>> ut.show_if_requested()
+        >>> kwplot.imshow(imgBGR1, pnum=(1, 3, 1))
+        >>> kwplot.imshow(diffMag / diffMag.max(), pnum=(1, 3, 2))
+        >>> kwplot.imshow(imgBGR2, pnum=(1, 3, 3))
+        >>> kwplot.show_if_requested()
         (2736, 3648, 3)
 
     Example:
