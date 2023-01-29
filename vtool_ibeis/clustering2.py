@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-# LICENCE
 """
 TODO:
     Does HDBSCAN work on 128 dim vectors?
     http://nbviewer.jupyter.org/github/lmcinnes/hdbscan/blob/master/notebooks/Comparing%20Clustering%20Algorithms.ipynb
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-from six.moves import zip, map  # NOQA
 import ubelt as ub
 import numpy as np
 import utool as ut

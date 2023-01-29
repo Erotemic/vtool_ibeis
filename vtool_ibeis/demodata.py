@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
 from vtool_ibeis import keypoint as ktool
 import vtool_ibeis.util_math as mtool
 import numpy as np

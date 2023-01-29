@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# LICENCE
 """
 References:
     http://www.exiv2.org/tags.html
@@ -7,9 +5,6 @@ References:
 TODO:
     https://github.com/recurser/exif-orientation-examples
 """
-from __future__ import absolute_import, division, print_function
-from six.moves import zip, range
-import six
 from PIL.ExifTags import TAGS, GPSTAGS
 import PIL.ExifTags  # NOQA
 from PIL import Image
@@ -20,8 +15,8 @@ from vtool_ibeis import image_shared
 
 
 # Inverse of PIL.ExifTags.TAGS
-EXIF_TAG_TO_TAGID = {val: key for (key, val) in six.iteritems(TAGS)}
-GPS_TAG_TO_GPSID  = {val: key for (key, val) in six.iteritems(GPSTAGS)}
+EXIF_TAG_TO_TAGID = {val: key for (key, val) in TAGS.items()}
+GPS_TAG_TO_GPSID  = {val: key for (key, val) in GPSTAGS.items()}
 
 # Relevant EXIF Tags
 #'GPSInfo': 34853

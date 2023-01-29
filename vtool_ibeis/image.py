@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-# LICENCE
-from __future__ import absolute_import, division, print_function, unicode_literals
 import six
 import os
 from os.path import exists, join  # NOQA
 from os.path import splitext
-from six.moves import zip, map, range  # NOQA
 import numpy as np
 from PIL import Image
 import cv2

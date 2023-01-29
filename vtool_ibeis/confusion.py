@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Module for -- Confusion matrix, contingency, error matrix,
 
 References:
     http://en.wikipedia.org/wiki/Confusion_matrix
 """
-from __future__ import absolute_import, division, print_function
 import utool as ut
 import ubelt as ub
 import numpy as np

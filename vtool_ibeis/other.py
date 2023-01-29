@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*
-from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import utool as ut
 import ubelt as ub
 import functools  # NOQA
-from six import next
-from six.moves import zip, range
 
 
 def safe_vstack(tup, default_shape=(0,), default_dtype=float):

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function
-from six.moves import range
 import numpy as np
-import utool as ut
-import ubelt as ub
+import utool as ut  # NOQA
+import ubelt as ub  # NOQA
 import cv2
 
 

@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*
 """
 These functions might be PR quality for numpy.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-import utool as ut
-import ubelt as ub
-from six import next
-from six.moves import zip, range
+import utool as ut  # NOQA
+import ubelt as ub  # NOQA
 
 
 def atleast_nd(arr, n, tofront=False):

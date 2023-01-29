@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """
     vt
     python -m utool.util_inspect check_module_usage --pat="matching.py"
 
 """
-from __future__ import absolute_import, division, print_function
 from vtool_ibeis import _rhomb_dist
 import six
 import warnings

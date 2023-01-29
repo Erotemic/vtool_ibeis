@@ -16,6 +16,8 @@ Repos relevant to the ibeis project:
 
 * https://github.com/Erotemic/vtool_ibeis
 
+* https://github.com/Erotemic/vtool_ibeis_ext
+
 * https://github.com/Erotemic/pyflann_ibeis
 
 * https://github.com/Erotemic/pyhesaff

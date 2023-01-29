@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 # LICENCE Apache 2 or whatever
 
 FIXME: monotization functions need more hueristics
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-import utool as ut
-import ubelt as ub
-from six.moves import range, zip
+import utool as ut  # NOQA
+import ubelt as ub  # NOQA
 
 
 TAU = np.pi * 2  # References: tauday.com
@@ -484,7 +481,7 @@ def test_language_modulus():
         http://en.wikipedia.org/wiki/Modulo_operation
     """
     import math
-    import utool as ut
+    import utool as ut  # NOQA
     TAU = math.pi * 2
     num_list = [-8, -1, 0, 1, 2, 6, 7, 29]
     modop_result_list = []

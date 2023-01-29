@@ -3,7 +3,6 @@ Wrapper around flann (with caching)
 
 python -c "import vtool_ibeis, doctest; print(doctest.testmod(vtool_ibeis.nearest_neighbors))"
 """
-from __future__ import absolute_import, division, print_function
 from os.path import exists, normpath, join
 import utool as ut
 import ubelt as ub

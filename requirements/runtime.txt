@@ -10,7 +10,8 @@ networkx>=2.5       ; python_version < '3.7' and python_version >= '3.6'    # Py
 networkx>=2.3       ; python_version < '3.6' and python_version >= '3.5'    # Python 3.5
 networkx>=1.11      ; python_version < '3.5' and python_version >= '2.7'    # Python 2.7
 
-Pillow>=9.1.0     ;                            python_version >= '3.10'    # Python 3.10+
+Pillow>=9.2.0     ; python_version < '4.0'  and python_version >= '3.11'  # Python 3.11+
+Pillow>=9.1.0     ; python_version < '3.11' and python_version >= '3.10'  # Python 3.10
 Pillow>=8.3.2     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
 Pillow>=8.3.2     ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
 Pillow>=9.0.0     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
@@ -28,7 +29,13 @@ scipy>=1.8.0     ; python_version < '3.9' and python_version >= '3.8'    # Pytho
 scipy>=1.6.0     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
 
 six >= 1.10.0
-scikit-image
+
+scikit-image>=0.19.3    ; python_version < '4.0'  and python_version >= '3.11'   # Python 3.11+
+scikit-image>=0.19.0    ; python_version < '3.11' and python_version >= '3.10'   # Python 3.10
+scikit-image>=0.18.0    ; python_version < '3.10' and python_version >= '3.9'   # Python 3.9
+scikit-image>=0.17.2    ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
+scikit-image>=0.17.2    ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
+scikit-image>=0.17.2    ; python_version < '3.7' and python_version >= '3.6'    # Python 3.6
 
 scikit-learn>=1.0.2     ;                            python_version >= '3.10'    # Python 3.10+
 scikit-learn>=1.0.2     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
@@ -41,8 +48,8 @@ statsmodels>=0.13.1    ; python_version < '3.10' and python_version >= '3.9'    
 statsmodels>=0.13.1    ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
 statsmodels>=0.9.0     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
 
-ubelt >= 0.9.0
-utool >= 2.1.5
+ubelt >= 1.2.3
+utool >= 2.1.7
 
-delorean
+delorean >= 1.0.0
 # python ~/local/tools/supported_python_versions_pip.py delorean

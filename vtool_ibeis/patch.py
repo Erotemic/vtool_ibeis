@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-# LICENCE
-from __future__ import absolute_import, division, print_function, unicode_literals
-import six  # NOQA
-from six.moves import zip
 import numpy as np
 from vtool_ibeis import histogram as htool
 from vtool_ibeis import keypoint as ktool
@@ -1075,7 +1070,6 @@ def draw_kp_ori_steps():
     # build test data
     import utool as ut
     import plottool_ibeis as pt
-    from six.moves import input
     import vtool_ibeis as vt
 
     if True:
@@ -1127,12 +1121,6 @@ def draw_kp_ori_steps():
         internal_tup = ut.exec_func_src(find_patch_dominant_orientations, globals_, locals_, key_list=keys, update=True)
         submax_ori_offsets = globals_['submax_ori_offsets']
         new_oris = (old_ori + (submax_ori_offsets - ktool.GRAVITY_THETA)) % TAU
-        # sourcecode = ut.get_func_sourcecode(find_patch_dominant_orientations, stripdef=True, stripret=True)
-        # six.exec_(sourcecode, globals_, locals_)
-        # submax_ori_offsets = locals_['submax_ori_offsets']
-        # new_oris = (old_ori + (submax_ori_offsets - ktool.GRAVITY_THETA)) % TAU
-        # keys = 'patch, gradx, grady, gmag, gori, hist, centers, gori_weights'.split(', ')
-        # internal_tup = ut.dict_take(locals_, keys)
         return new_oris, internal_tup
         # </HACKISH>
 
