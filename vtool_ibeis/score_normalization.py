@@ -825,7 +825,6 @@ def partition_scores(X, y, attrs=None):
             False: {'qaid': np.array([11, 14, 15])},
             True: {'qaid': np.array([21, 24, 25, 26])},
         },
-
     """
     import vtool_ibeis as vt
     import operator
