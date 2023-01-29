@@ -524,7 +524,6 @@ def get_invVR_mats3x3(kpts):
         ...    [30, 40, 1, 2, 3, TAU / 4.0],
         ... ])
         >>> invVR_mats3x3 = get_invVR_mats3x3(kpts)
-        >>> # verify results
         >>> result = kpts_repr(invVR_mats3x3)
         >>> print(result)
         array([[[ 1.,  0., 10.],
@@ -537,20 +536,6 @@ def get_invVR_mats3x3(kpts):
     #nKpts = len(kpts)
     invVR_mats2x2 = get_invVR_mats2x2(kpts)
     invVR_mats3x3 = augment_2x2_with_translation(kpts, invVR_mats2x2)
-    # Unpack shape components
-    #_iv11s = invVR_mats2x2.T[0, 0]
-    #_iv12s = invVR_mats2x2.T[1, 0]
-    #_iv21s = invVR_mats2x2.T[0, 1]
-    #_iv22s = invVR_mats2x2.T[1, 1]
-    ## Get translation components
-    #_iv13s, _iv23s = get_xys(kpts)
-    ## Use homogenous coordinates
-    #_zeros = np.zeros(nKpts)
-    #_ones = np.ones(nKpts)
-    #invVR_arrs =  np.array([[_iv11s, _iv12s, _iv13s],
-    #                        [_iv21s, _iv22s, _iv23s],
-    #                        [_zeros, _zeros, _ones]])  # R x C x N
-    #invVR_mats = np.rollaxis(invVR_arrs, 2)  # N x R x C
     return invVR_mats3x3
 
 
