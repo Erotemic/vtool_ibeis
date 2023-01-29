@@ -110,7 +110,7 @@ def get_exif_dict2(pil_img):
 
 def make_exif_dict_human_readable(exif_dict):
     exif_dict2 = {TAGS.get(key, key): val
-                  for (key, val) in six.iteritems(exif_dict)}
+                  for (key, val) in exif_dict.items()}
     return exif_dict2
 
 
@@ -118,7 +118,7 @@ def check_exif_keys(pil_img):
     info_ = pil_img._getexif()
     valid_keys = []
     invalid_keys = []
-    for key, val in six.iteritems(info_):
+    for key, val in info_.items():
         try:
             exif_keyval = TAGS[key]
             valid_keys.append((key, exif_keyval))
@@ -132,7 +132,7 @@ def read_all_exif_tags(pil_img):
     info_ = pil_img._getexif()
     exif = {} if info_ is None else {
         TAGS.get(key, key): val
-        for key, val in six.iteritems(info_)
+        for key, val in info_.items()
     }
     return exif
 
