@@ -3,20 +3,17 @@ OLD MODULE, needs reimplemenetation of select features and deprication
 
 This module should handle all things elliptical
 """
-from __future__ import absolute_import, division, print_function
-from six.moves import zip, range
 # from numpy.core.umath_tests import matrix_multiply
 import operator as op
 import scipy.signal as spsignal
 import numpy as np
 from vtool_ibeis import keypoint as ktool
 from vtool_ibeis import image as gtool
-import utool as ut
 try:
     import cv2
 except ImportError:
     print('ERROR: import cv2 is failing!')
-    cv2 = ut.DynStruct()
+    cv2 = object()
 
 
 def adaptive_scale(img_fpath, kpts, nScales=4, low=-.5, high=.5, nSamples=16):
@@ -60,7 +57,7 @@ def check_kpts_in_bounds(kpts_, width, height):
     minx = np.array([pts[0].min() for pts in bbox_pts]) > 0
     maxy = np.array([pts[1].max() for pts in bbox_pts]) < height
     miny = np.array([pts[1].min() for pts in bbox_pts]) > 0
-    isvalid = np.array(maxx * minx * maxy * miny, dtype=np.bool)
+    isvalid = np.array(maxx * minx * maxy * miny, dtype=bool)
     return isvalid
 
 

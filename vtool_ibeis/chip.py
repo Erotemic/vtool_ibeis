@@ -1,5 +1,3 @@
-# LICENCE
-from __future__ import absolute_import, division, print_function
 import numpy as np
 import numpy.linalg as npl
 from vtool_ibeis import linalg as ltool
@@ -7,10 +5,9 @@ from vtool_ibeis import image as gtool
 import utool as ut
 try:
     import cv2
-except ImportError as ex:
+except ImportError:
     print('ERROR: import cv2 is failing!')
-    cv2 = ut.DynStruct()
-    cv2.INTER_LANCZOS4 = None
+    raise
 
 
 def get_image_to_chip_transform(bbox, chipsz, theta):

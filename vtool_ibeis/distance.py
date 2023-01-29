@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-import utool as ut
 import ubelt as ub
 import itertools
-from six.moves import range, zip
 from collections import OrderedDict
 import scipy.spatial.distance as spdist
 from .util_math import TAU
@@ -129,8 +125,8 @@ def ori_distance(ori1, ori2, out=None):
                 func_orig()
                 '''
         >>> ).split('\n')
-        >>> ut.util_dev.rrr()
-        >>> ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))
+        >>> # ut.util_dev.rrr()
+        >>> # ut.util_dev.timeit_compare(stmt_list, setup, int(1E3))
 
     CommandLine:
         python -m vtool_ibeis.distance --test-ori_distance
@@ -258,7 +254,7 @@ def L2_sqrd(hist1, hist2, dtype=TEMP_VEC_DTYPE):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.distance import *  # NOQA
         >>> import numpy
-        >>> ut.exec_funckw(L2_sqrd, globals())
+        >>> #ut.exec_funckw(L2_sqrd, globals())
         >>> rng = np.random.RandomState(53)
         >>> hist1 = rng.rand(5, 2)
         >>> hist2 = rng.rand(5, 2)
@@ -622,10 +618,10 @@ def emd(hist1, hist2, cost_matrix='sift'):
 
     if len(hist1.shape) == 2:
         dist = np.array([
-            pyemd.emd(hist1_.astype(np.float), hist2_.astype(np.float), cost_matrix)
+            pyemd.emd(hist1_.astype(float), hist2_.astype(float), cost_matrix)
             for hist1_, hist2_ in zip(hist1, hist2)])
     else:
-        dist = pyemd.emd(hist1.astype(np.float), hist2.astype(np.float), cost_matrix)
+        dist = pyemd.emd(hist1.astype(float), hist2.astype(float), cost_matrix)
     return dist
 
 
@@ -634,7 +630,6 @@ def nearest_point(x, y, pts, conflict_mode='next', __next_counter=[0]):
 
     TODO: depricate
     """
-    #with ut.embed_on_exception_context:
     dists = (pts.T[0] - x) ** 2 + (pts.T[1] - y) ** 2
     fx = dists.argmin()
     mindist = dists[fx]
@@ -713,7 +708,7 @@ def haversine(latlon1, latlon2):
         >>> dist_vector_list = list(map(haversin_pdist, gpsarr_track_list_))
         >>> dist_matrix_list = list(map(spdist.squareform, dist_vector_list))
         >>> #xdoctest: +IGNORE_WHITESPACE
-        >>> result = ('dist_matrix_list = %s' % (ut.repr3(dist_matrix_list, precision=2, with_dtype=True),))
+        >>> result = ('dist_matrix_list = %s' % (ub.repr2(dist_matrix_list, precision=2, with_dtype=True),))
         >>> print(result)
     """
     # FIXME; lat, lon should be different columns not different rows
@@ -787,10 +782,10 @@ def pdist_argsort(x):
         sortx_2d = [(r, c) for r, c in zip(sortx_row, sortx_col) if (c > r)]
     else:
         num_rows = len(x) // 2
-        compare_idxs = ut.flatten([[(r, c)  for c in range(r + 1, num_rows)]
-                                   for r in range(num_rows)])
+        compare_idxs = list(ub.flatten([[(r, c)  for c in range(r + 1, num_rows)]
+                                        for r in range(num_rows)]))
         sortx = x.argsort()
-        sortx_2d = ut.take(compare_idxs, sortx)
+        sortx_2d = list(ub.take(compare_idxs, sortx))
     return sortx_2d
 
 

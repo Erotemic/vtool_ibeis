@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from six.moves import zip
 import warnings
 import scipy.signal
 import numpy as np
@@ -241,7 +238,7 @@ def argsubextrema2(op, ydata, xdata=None, thresh_factor=None, normalize_x=True,
 
     if thresh_factor is None:
         thresh_value = None
-        flags = np.ones(len(ydata), dtype=np.bool)
+        flags = np.ones(len(ydata), dtype=bool)
     else:
         # Find relative and flat extrema
         thresh_value = factor_op(abs_extreme_y, thresh_factor)
@@ -320,7 +317,7 @@ def argsubextrema2(op, ydata, xdata=None, thresh_factor=None, normalize_x=True,
 
     # Any non-flat mid extrema can be sublocalized
     other_argextrema = np.hstack([boundary_argextrema, flat_argextrema])
-    other_argextrema = other_argextrema.astype(np.int)
+    other_argextrema = other_argextrema.astype(int)
     other_subextrema_y = ydata[other_argextrema]
     if xdata is None:
         other_subextrema_x = other_argextrema
@@ -396,8 +393,8 @@ def linear_interpolation(arr, subindices):
         >>> assert np.allclose(subindices, subvalues)
         >>> assert np.allclose(2.3, linear_interpolation(arr, 2.3))
     """
-    idx1 = np.floor(subindices).astype(np.int)
-    idx2 = np.floor(subindices + 1).astype(np.int)
+    idx1 = np.floor(subindices).astype(int)
+    idx2 = np.floor(subindices + 1).astype(int)
     idx2 = np.minimum(idx2, len(arr) - 1)
     alpha = idx2 - subindices
     subvalues = arr[idx1] * (alpha) + arr[idx2] * (1 - alpha)
@@ -469,7 +466,7 @@ def hist_argmaxima2(hist, maxima_thresh=.8):
     # FIXME: Not handling general cases
     # [0] index because argrelmaxima returns a tuple
     if len(hist) == 0:
-        return np.empty(dtype=np.int)
+        return np.empty(dtype=int)
     comperetor = np.greater
     argmaxima_ = scipy.signal.argrelextrema(hist, comperetor)[0]
     if len(argmaxima_) == 0:

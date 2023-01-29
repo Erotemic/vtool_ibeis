@@ -5,11 +5,19 @@ requires = [ "setuptools>=41.0.1", "wheel>=0.37.1",]
 ignore_missing_imports = true
 
 [tool.xcookie]
-tags = [ "purepy", "github", "erotemic", "cv2"]
+rel_mod_parent_dpath = "."
+tags = [ "purepy", "github", "erotemic", "cv2", "notypes"]
 mod_name = "vtool_ibeis"
 repo_name = "vtool_ibeis"
 url = "https://github.com/Erotemic/vtool_ibeis"
-authors = ['Avi Weinstock', 'Chuck Stewart', 'Hendrik Weideman', 'Jason Parham', 'Jon Crall', 'Zackary Rutfield']
+description = "vision tools for IBEIS"
+os = [ "linux" ]
+ci_pypy_versions = []
+author = ['Jon Crall', 'Jason Parham', 'Hendrik Weideman', 'Avi Weinstock', 'Zackary Rutfield', 'Chuck Stewart']
+author_email="erotemic@gmail.com"
+min_python = 3.7
+version = "{mod_dpath}/__init__.py::__version__"
+license = "Apache 2"
 dev_status = "beta"
 
 

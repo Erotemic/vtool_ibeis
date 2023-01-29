@@ -267,10 +267,10 @@ def compute_affine(xy1_man, xy2_man):
 
     Example1:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis.keypoint as ktool
-        >>> import plottool_ibeis as pt
         >>> xy1_man, xy2_man, rchip1, rchip2, T1, T2 = testdata_matching_affine_inliers_normalized()
         >>> A_prime = compute_affine(xy1_man, xy2_man)
         >>> A = npl.solve(T2, A_prime).dot(T1)
@@ -278,6 +278,7 @@ def compute_affine(xy1_man, xy2_man):
         >>> result = np.array_str(A, precision=2)
         >>> print(result)
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import plottool_ibeis as pt
         >>> rchip2_blendA = pt.draw_sv.get_blended_chip(rchip1, rchip2, A)
         >>> pt.imshow(rchip2_blendA)
         >>> ut.show_if_requested()
@@ -318,6 +319,7 @@ def compute_homog(xy1_mn, xy2_mn):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
         >>> import vtool_ibeis.demodata as demodata
@@ -334,6 +336,7 @@ def compute_homog(xy1_mn, xy2_mn):
 
     Example1:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
         >>> xy1_man, xy2_man, rchip1, rchip2, T1, T2 = testdata_matching_affine_inliers_normalized()
@@ -461,7 +464,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
     ori_inliers_flag   = np.less(ori_err, ori_thresh)
     #np.logical_and(xy_inliers_flag, scale_inliers_flag)
     # TODO Add uniqueness of matches constraint
-    #hypo_inliers_flag = np.empty(xy_inliers_flag.size, dtype=np.bool)
+    #hypo_inliers_flag = np.empty(xy_inliers_flag.size, dtype=bool)
     hypo_inliers_flag = xy_inliers_flag  # Try to re-use memory
     np.logical_and(hypo_inliers_flag, ori_inliers_flag, out=hypo_inliers_flag)
     np.logical_and(hypo_inliers_flag, scale_inliers_flag, out=hypo_inliers_flag)
@@ -694,7 +697,6 @@ def test_homog_errors(H, kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh,
     Example0:
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
-        >>> import plottool_ibeis as pt
         >>> kpts1, kpts2, fm, aff_inliers, rchip1, rchip2, xy_thresh_sqrd = testdata_matching_affine_inliers()
         >>> H = estimate_refined_transform(kpts1, kpts2, fm, aff_inliers)
         >>> scale_thresh, ori_thresh = 2.0, 1.57
@@ -702,13 +704,13 @@ def test_homog_errors(H, kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh,
         >>> homog_tup1 = test_homog_errors(H, kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh, ori_thresh, full_homog_checks)
         >>> homog_tup = (homog_tup1[0], homog_tup1[2])
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import plottool_ibeis as pt
         >>> pt.draw_sv.show_sv(rchip1, rchip2, kpts1, kpts2, fm, homog_tup=homog_tup)
         >>> ut.show_if_requested()
 
     Example1:
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
-        >>> import plottool_ibeis as pt
         >>> kpts1, kpts2, fm_, aff_inliers, rchip1, rchip2, xy_thresh_sqrd = testdata_matching_affine_inliers()
         >>> H = estimate_refined_transform(kpts1, kpts2, fm_, aff_inliers)
         >>> scale_thresh, ori_thresh = 2.0, 1.57
@@ -731,6 +733,7 @@ def test_homog_errors(H, kpts1, kpts2, fm, xy_thresh_sqrd, scale_thresh,
         ...     'kpts1_m, kpts2_m, off_xy1_m, off_xy1_mt, dxy1_m, dxy1_mt, xy2_m, xy1_m, xy1_mt, scale_err, xy_err, ori_err'.split(', '))
         >>> #---------------
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import plottool_ibeis as pt
         >>> pt.figure(fnum=1, pnum=(1, 2, 1), title='orig points and offset point')
         >>> segments_list1 = np.array(list(zip(xy1_m.T.tolist(), off_xy1_m.T.tolist())))
         >>> pt.draw_line_segments(segments_list1, color=pt.LIGHT_BLUE)
@@ -871,11 +874,11 @@ def refine_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd,
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.keypoint as ktool
-        >>> import plottool_ibeis as pt
         >>> kpts1, kpts2, fm, aff_inliers, rchip1, rchip2, xy_thresh_sqrd = testdata_matching_affine_inliers()
         >>> homog_tup1 = refine_inliers(kpts1, kpts2, fm, aff_inliers, xy_thresh_sqrd)
         >>> homog_tup = (homog_tup1[0], homog_tup1[2])
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import plottool_ibeis as pt
         >>> pt.draw_sv.show_sv(rchip1, rchip2, kpts1, kpts2, fm, homog_tup=homog_tup)
         >>> ut.show_if_requested()
 

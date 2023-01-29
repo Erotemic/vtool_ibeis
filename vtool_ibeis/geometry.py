@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-# LICENCE
-from __future__ import absolute_import, division, print_function, unicode_literals
-from six.moves import zip
 import numpy as np
 import utool as ut
-import ubelt as ub
+import ubelt as ub  # NOQA
 import cv2
 
 
@@ -205,7 +201,7 @@ def closest_point_on_line_segment(p, e1, e2):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.geometry import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> #bbox = np.array([10, 10, 10, 10], dtype=np.float)
+        >>> #bbox = np.array([10, 10, 10, 10], dtype=float)
         >>> #verts_ = np.array(vt.verts_from_bbox(bbox, close=True))
         >>> #R = vt.rotation_around_bbox_mat3x3(vt.TAU / 3, bbox)
         >>> #verts = vt.transform_points_with_homography(R, verts_.T).T
@@ -325,8 +321,8 @@ def closest_point_on_bbox(p, bbox):
     Example1:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.geometry import *  # NOQA
-        >>> p_list = np.array([[19, 7], [7, 14], [14, 11], [8, 7], [23, 21]], dtype=np.float)
-        >>> bbox = np.array([10, 10, 10, 10], dtype=np.float)
+        >>> p_list = np.array([[19, 7], [7, 14], [14, 11], [8, 7], [23, 21]], dtype=float)
+        >>> bbox = np.array([10, 10, 10, 10], dtype=float)
         >>> [closest_point_on_bbox(p, bbox) for p in p_list]
     """
     import vtool_ibeis as vt
@@ -557,7 +553,7 @@ def point_inside_bbox(point, bbox):
         >>> ]).T
         >>> bbox = (3, 2, 5, 7)
         >>> flag = point_inside_bbox(point, bbox)
-        >>> flag = flag.astype(np.int)
+        >>> flag = flag.astype(int)
         >>> result = ('flag = %s' % (ub.repr2(flag),))
         >>> print(result)
         >>> # xdoctest: +REQUIRES(--show)

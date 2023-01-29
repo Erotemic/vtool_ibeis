@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-# LICENCE
-from __future__ import absolute_import, division, print_function, unicode_literals
-import six  # NOQA
-from six.moves import zip
 import numpy as np
 from vtool_ibeis import histogram as htool
 from vtool_ibeis import keypoint as ktool
@@ -732,7 +727,7 @@ def intern_warp_single_patch(img, x, y, ori, V,
     X = ltool.translation_mat3x3(half_patch_size, half_patch_size)  # Translate back to patch-image coordinates
     M = X.dot(S).dot(R).dot(V).dot(T)
     # Prepare to warp
-    dsize = np.ceil([patch_size, patch_size]).astype(np.int)
+    dsize = np.ceil([patch_size, patch_size]).astype(int)
     # Warp
     #warped_patch = gtool.warpAffine(img, M, dsize)
     warped_patch = cv2.warpAffine(img, M[0:2], tuple(dsize), **cv2_warp_kwargs)
@@ -781,7 +776,7 @@ def patch_gaussian_weighted_average_intensities(probchip, kpts_):
     import vtool_ibeis as vt
     patch_size = 41
     M_iter = vt.generate_to_patch_transforms(kpts_, patch_size)
-    dsize = np.ceil([patch_size, patch_size]).astype(np.int)
+    dsize = np.ceil([patch_size, patch_size]).astype(int)
     # Preallocate patch
     patch = np.empty(dsize[::-1], dtype=np.uint8)
     weighted_patch = np.empty(dsize[::-1], dtype=np.float64)
@@ -1075,7 +1070,6 @@ def draw_kp_ori_steps():
     # build test data
     import utool as ut
     import plottool_ibeis as pt
-    from six.moves import input
     import vtool_ibeis as vt
 
     if True:
@@ -1127,12 +1121,6 @@ def draw_kp_ori_steps():
         internal_tup = ut.exec_func_src(find_patch_dominant_orientations, globals_, locals_, key_list=keys, update=True)
         submax_ori_offsets = globals_['submax_ori_offsets']
         new_oris = (old_ori + (submax_ori_offsets - ktool.GRAVITY_THETA)) % TAU
-        # sourcecode = ut.get_func_sourcecode(find_patch_dominant_orientations, stripdef=True, stripret=True)
-        # six.exec_(sourcecode, globals_, locals_)
-        # submax_ori_offsets = locals_['submax_ori_offsets']
-        # new_oris = (old_ori + (submax_ori_offsets - ktool.GRAVITY_THETA)) % TAU
-        # keys = 'patch, gradx, grady, gmag, gori, hist, centers, gori_weights'.split(', ')
-        # internal_tup = ut.dict_take(locals_, keys)
         return new_oris, internal_tup
         # </HACKISH>
 

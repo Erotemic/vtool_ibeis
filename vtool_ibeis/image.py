@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-# LICENCE
-from __future__ import absolute_import, division, print_function, unicode_literals
 import six
 import os
 from os.path import exists, join  # NOQA
 from os.path import splitext
-from six.moves import zip, map, range  # NOQA
 import numpy as np
 from PIL import Image
 import cv2
@@ -13,6 +9,11 @@ from .util_math import TAU
 from vtool_ibeis import exif
 import utool as ut
 import ubelt as ub
+
+try:
+    from packaging.version import parse as LooseVersion
+except ImportError:
+    from distutils.version import LooseVersion
 
 
 if cv2 is not None:
@@ -43,7 +44,6 @@ if cv2 is not None:
     try:
         IMREAD_COLOR = cv2.IMREAD_COLOR
     except AttributeError:
-        from distutils.version import LooseVersion
         cv2_version = LooseVersion(cv2.__version__)
         print('UNKNOWN cv2_version = {!r}'.format(cv2_version))
         assert cv2_version.version[0] <= 2
@@ -177,11 +177,11 @@ def montage(img_list, dsize, rng=np.random, method='random', return_debug=False)
 
     if use_placement_prob:
         # TODO: place images in places that other images have not been placed yet
-        place_img = np.ones(shape[0:2], dtype=np.float)
+        place_img = np.ones(shape[0:2], dtype=float)
         #place_img[
         #place_img = vt.gaussian_patch(shape[0:2], np.array(shape[0:2]) * .1)
         #place_img = vt.gaussian_patch(shape[0:2], np.array(shape[0:2]) * .3)
-        temp_img = np.ones(shape[0:2], dtype=np.float)
+        temp_img = np.ones(shape[0:2], dtype=float)
         # Enumerate valid 2d locations
         xy_locs_ = np.meshgrid(np.arange(place_img.shape[1]),
                                np.arange(place_img.shape[0]))
@@ -304,7 +304,7 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
         >>> ut.show_if_requested()
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> img_url = 'http://images.summitpost.org/original/769474.JPG'
         >>> img_fpath = ut.grab_file_url(img_url)
@@ -315,17 +315,20 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
         >>> print('imgBGR2.shape = %r' % (imgBGR2.shape,))
         >>> result = str(imgBGR1.shape)
         >>> diff_pxls = imgBGR1 != imgBGR2
+        >>> # Very strange that this fails
         >>> num_diff_pxls = diff_pxls.sum()
         >>> print(result)
         >>> print('num_diff_pxls=%r/%r' % (num_diff_pxls, diff_pxls.size))
         >>> assert num_diff_pxls == 0
         >>> # xdoctest: +REQUIRES(--show)
+        >>> import kwplot
+        >>> kwplot.autompl()
         >>> import plottool_ibeis as pt
         >>> diffMag = np.linalg.norm(imgBGR2 / 255. - imgBGR1 / 255., axis=2)
-        >>> pt.imshow(imgBGR1, pnum=(1, 3, 1))
-        >>> pt.imshow(diffMag / diffMag.max(), pnum=(1, 3, 2))
-        >>> pt.imshow(imgBGR2, pnum=(1, 3, 3))
-        >>> ut.show_if_requested()
+        >>> kwplot.imshow(imgBGR1, pnum=(1, 3, 1))
+        >>> kwplot.imshow(diffMag / diffMag.max(), pnum=(1, 3, 2))
+        >>> kwplot.imshow(imgBGR2, pnum=(1, 3, 3))
+        >>> kwplot.show_if_requested()
         (2736, 3648, 3)
 
     Example:
@@ -1596,16 +1599,16 @@ def embed_in_square_image(img, target_size, img_origin=(.5, .5),
 
     ## Find start slice in the target image
     target_diff = np.floor(target_origin_abs - img_origin_abs)
-    target_rc_start = np.maximum(target_diff, 0).astype(np.int)
+    target_rc_start = np.maximum(target_diff, 0).astype(int)
 
-    img_rc_start = (-(target_diff - target_rc_start)).astype(np.int)
+    img_rc_start = (-(target_diff - target_rc_start)).astype(int)
     img_clip_rc_low = img_rc - img_rc_start
 
     end_hang = np.maximum((target_rc_start + img_clip_rc_low) - target_rc, 0)
     img_clip_rc = img_clip_rc_low - end_hang
 
-    img_rc_end = (img_rc_start + img_clip_rc).astype(np.int)
-    target_rc_end = (target_rc_start + img_clip_rc).astype(np.int)
+    img_rc_end = (img_rc_start + img_clip_rc).astype(int)
+    target_rc_end = (target_rc_start + img_clip_rc).astype(int)
 
     img_rc_slice = [slice(b, e) for (b, e) in zip(img_rc_start, img_rc_end)]
     target_rc_slice = [slice(b, e) for (b, e) in zip(target_rc_start, target_rc_end)]

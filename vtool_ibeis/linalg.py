@@ -33,7 +33,6 @@ TODO: Look at this file
 #     >>> print(xdev.align('\\\\\n'.join(sympy.latex(R).split(r'\\')).replace('{matrix}', '{matrix}\n'), '&')
 
 """
-from __future__ import absolute_import, division, print_function
 import cv2
 import numpy as np
 import numpy.linalg as npl

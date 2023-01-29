@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # Needs freetype-py>=1.0
 # The MIT License (MIT)
 #
@@ -27,7 +25,6 @@ References:
     https://dbader.org/blog/monochrome-font-rendering-with-freetype-and-python
     https://gist.github.com/dbader/5488053#file-fontdemo-py-L244
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 
 class Bitmap(object):

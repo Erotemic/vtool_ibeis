@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-# LICENCE: Apache2
-from __future__ import absolute_import, division, print_function
-from six.moves import zip, map, range  # NOQA
 import numpy as np
 import utool as ut
 import ubelt as ub

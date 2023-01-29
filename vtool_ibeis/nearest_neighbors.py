@@ -3,7 +3,6 @@ Wrapper around flann (with caching)
 
 python -c "import vtool_ibeis, doctest; print(doctest.testmod(vtool_ibeis.nearest_neighbors))"
 """
-from __future__ import absolute_import, division, print_function
 from os.path import exists, normpath, join
 import utool as ut
 import ubelt as ub
@@ -39,8 +38,8 @@ class AnnoyWrapper(object):
     def nn_index(self, qvecs, num_neighbs, checks=None):
         if checks is None:
             checks = self.params['checks']
-        idxs = np.empty((len(qvecs), num_neighbs), dtype=np.int)
-        dists = np.empty((len(qvecs), num_neighbs), dtype=np.float)
+        idxs = np.empty((len(qvecs), num_neighbs), dtype=int)
+        dists = np.empty((len(qvecs), num_neighbs), dtype=float)
         for i, qvec in enumerate(qvecs):
             idxs[i], dists[i] = self.ann.get_nns_by_vector(
                 qvec, n=num_neighbs, search_k=checks, include_distances=True)
@@ -176,6 +175,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
 
     Example0:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> np.random.seed(1)
         >>> dpts = np.random.randint(0, 255, (5, 128)).astype(np.uint8)
@@ -196,6 +196,7 @@ def ann_flann_once(dpts, qpts, num_neighbors, flann_params={}):
         >>> # ENABLE_DOCTEST
         >>> # Test upper bounds on sift descriptors
         >>> # SeeAlso distance.understanding_pseudomax_props
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import numpy as np
@@ -301,6 +302,7 @@ def get_flann_cfgstr(dpts, flann_params, cfgstr='', use_params_hash=True,
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> rng = np.random.RandomState(1)
         >>> dpts = rng.randint(0, 255, (10, 128)).astype(np.uint8)
@@ -404,6 +406,7 @@ def flann_augment(dpts, new_dpts, cache_dir, cfgstr, new_cfgstr, flann_params,
     """
     Example:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> import vtool_ibeis.demodata as demodata  # NOQA
         >>> dpts = demodata.get_dummy_dpts(ut.get_nth_prime(10))
@@ -452,6 +455,7 @@ def get_flann_params(algorithm='kdtree', **kwargs):
 
     Example:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> algorithm = ut.get_argval('--algo', default='kdtree')
         >>> flann_params = get_flann_params(algorithm)
@@ -660,6 +664,7 @@ def flann_index_time_experiment():
     Example:
         >>> # SLOW_DOCTEST
         >>> # xdoctest: +SKIP
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> result = flann_index_time_experiment()
         >>> print(result)
@@ -755,6 +760,7 @@ def invertible_stack(vecs_list, label_list):
 
     Example:
         >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyflann_ibeis)
         >>> from vtool_ibeis.nearest_neighbors import *  # NOQA
         >>> DESC_TYPE = np.uint8
         >>> label_list  = [1, 2, 3, 4, 5]

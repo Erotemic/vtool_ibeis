@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*
 """
 These functions might be PR quality for numpy.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-import utool as ut
-import ubelt as ub
-from six import next
-from six.moves import zip, range
+import utool as ut  # NOQA
+import ubelt as ub  # NOQA
 
 
 def atleast_nd(arr, n, tofront=False):
@@ -121,7 +117,7 @@ def fromiter_nd(iter_, shape, dtype):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.numpy_utils import *  # NOQA
-        >>> dtype = np.float
+        >>> dtype = float
         >>> total = 11
         >>> rng = np.random.RandomState(0)
         >>> iter_ = (rng.rand(5, 7, 3) for _ in range(total))
@@ -132,7 +128,7 @@ def fromiter_nd(iter_, shape, dtype):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.numpy_utils import *  # NOQA
-        >>> dtype = np.int
+        >>> dtype = int
         >>> qfxs = np.array([1, 2, 3])
         >>> dfxs = np.array([4, 5, 6])
         >>> iter_ = (np.array(x) for x in ut.product(qfxs, dfxs))
@@ -148,7 +144,7 @@ def fromiter_nd(iter_, shape, dtype):
         >>> sigma = 500
         >>> n_data = 1000
         >>> rng = np.random.RandomState(42)
-        >>> n_feat_list = np.clip(rng.randn(n_data) * sigma + mu, 0, np.inf).astype(np.int)
+        >>> n_feat_list = np.clip(rng.randn(n_data) * sigma + mu, 0, np.inf).astype(int)
         >>> # Make a large list of vectors of various sizes
         >>> print('Making random vectors')
         >>> vecs_list = [(rng.rand(num, feat_dim) * 255).astype(dtype) for num in n_feat_list]
@@ -229,7 +225,7 @@ def index_to_boolmask(index_list, maxval=None, isflat=True):
     #assert index_list.min() >= 0
     if maxval is None:
         maxval = index_list.max()
-    mask = np.zeros(maxval, dtype=np.bool)
+    mask = np.zeros(maxval, dtype=bool)
     if not isflat:
         # assumes non-flat
         mask.__setitem__(tuple(index_list.T), True)

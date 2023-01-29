@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
 from vtool_ibeis import keypoint as ktool
 import vtool_ibeis.util_math as mtool
 import numpy as np
@@ -314,7 +312,7 @@ def testdata_binary_scores():
         -0.6 , 5.76,  -0.79,  13.99,   9.82,  30.6 ,  -1.13,  -2.05,  21.3 ,
         -1.87,  17.61, -1.25,   8.64,  -2.06,   4.48,  19.48,  -0.64, 15.85,
         4.54,  -1.57,  -1.28, 12.3 ,  -1.39,  -0.04,  12.81, -0.09,   4.83,
-        6.42,   4.26,   7.65,  -0.43, -0.23,  -1.98], dtype=np.float)
+        6.42,   4.26,   7.65,  -0.43, -0.23,  -1.98], dtype=float)
 
     y = np.array([
         1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1,
@@ -358,7 +356,7 @@ def testdata_binary_scores():
         1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0,
         0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0,
         0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1,
-        0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1], dtype=np.bool)
+        0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1], dtype=bool)
     return X, y
 
 
