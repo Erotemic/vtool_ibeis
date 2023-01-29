@@ -461,7 +461,7 @@ def _test_hypothesis_inliers(Aff, invVR1s_m, xy2_m, det2_m, ori2_m,
     ori_inliers_flag   = np.less(ori_err, ori_thresh)
     #np.logical_and(xy_inliers_flag, scale_inliers_flag)
     # TODO Add uniqueness of matches constraint
-    #hypo_inliers_flag = np.empty(xy_inliers_flag.size, dtype=np.bool)
+    #hypo_inliers_flag = np.empty(xy_inliers_flag.size, dtype=bool)
     hypo_inliers_flag = xy_inliers_flag  # Try to re-use memory
     np.logical_and(hypo_inliers_flag, ori_inliers_flag, out=hypo_inliers_flag)
     np.logical_and(hypo_inliers_flag, scale_inliers_flag, out=hypo_inliers_flag)

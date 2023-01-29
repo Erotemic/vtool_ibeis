@@ -57,7 +57,7 @@ def check_kpts_in_bounds(kpts_, width, height):
     minx = np.array([pts[0].min() for pts in bbox_pts]) > 0
     maxy = np.array([pts[1].max() for pts in bbox_pts]) < height
     miny = np.array([pts[1].min() for pts in bbox_pts]) > 0
-    isvalid = np.array(maxx * minx * maxy * miny, dtype=np.bool)
+    isvalid = np.array(maxx * minx * maxy * miny, dtype=bool)
     return isvalid
 
 

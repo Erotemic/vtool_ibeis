@@ -1139,8 +1139,8 @@ def flag_intersection(arr1, arr2):
     """
     import vtool_ibeis as vt
     if arr1.size == 0 or arr2.size == 0:
-        flags = np.full(arr1.shape[0], False, dtype=np.bool)
-        #return np.empty((0,), dtype=np.bool)
+        flags = np.full(arr1.shape[0], False, dtype=bool)
+        #return np.empty((0,), dtype=bool)
     else:
         # flags = np.logical_or.reduce([arr1 == row for row in arr2]).T[0]
         flags = vt.iter_reduce_ufunc(np.logical_or, (arr1 == row_ for row_ in arr2)).ravel()
@@ -1368,13 +1368,13 @@ def get_uncovered_mask(covered_array, covering_array):
     """
     import vtool_ibeis as vt
     if len(covering_array) == 0:
-        return np.ones(np.shape(covered_array), dtype=np.bool)
+        return np.ones(np.shape(covered_array), dtype=bool)
     else:
         flags_iter = (np.not_equal(covered_array, item) for item in covering_array)
         mask_array = vt.iter_reduce_ufunc(np.logical_and, flags_iter)
         return mask_array
     #if len(covering_array) == 0:
-    #    return np.ones(np.shape(covered_array), dtype=np.bool)
+    #    return np.ones(np.shape(covered_array), dtype=bool)
     #else:
     #    flags_list = (np.not_equal(covered_array, item) for item in covering_array)
     #    mask_array = and_lists(*flags_list)
@@ -1383,7 +1383,7 @@ def get_uncovered_mask(covered_array, covering_array):
 
 #def get_uncovered_mask2(covered_array, covering_array):
 #    if len(covering_array) == 0:
-#        return np.ones(np.shape(covered_array), dtype=np.bool)
+#        return np.ones(np.shape(covered_array), dtype=bool)
 #    else:
 #        flags_iter = (np.not_equal(covered_array, item) for item in covering_array)
 #        mask_array = vt.iter_reduce_ufunc(np.logical_and, flags_iter)
@@ -2415,7 +2415,7 @@ def fromiter_nd(iter_, shape, dtype):
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.other import *  # NOQA
-        >>> dtype = np.int
+        >>> dtype = int
         >>> qfxs = np.array([1, 2, 3])
         >>> dfxs = np.array([4, 5, 6])
         >>> iter_ = (np.array(x) for x in ut.product(qfxs, dfxs))
@@ -2492,7 +2492,7 @@ def take_col_per_row(arr, colx_list):
         num_cols = 4
 
         arr = np.arange(10 * 4).reshape(10, 4)
-        colx_list = (np.random.rand(10) * 4).astype(np.int)
+        colx_list = (np.random.rand(10) * 4).astype(int)
 
         %timeit np.array([row[cx] for (row, cx) in zip(arr, colx_list)])
         %timeit arr.ravel().take(np.ravel_multi_index((np.arange(len(colx_list)), colx_list), arr.shape))

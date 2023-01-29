@@ -436,7 +436,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     # # # Create a mask denoting all unused elements
     # # num_unused = len(data)
     # # num_used = 0
-    # # is_unused = np.ones(len(data), dtype=np.bool)
+    # # is_unused = np.ones(len(data), dtype=bool)
     # # unused_didxs = list(range(len(data)))
     # # used_didxs = []
 

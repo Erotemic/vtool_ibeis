@@ -38,8 +38,8 @@ class AnnoyWrapper(object):
     def nn_index(self, qvecs, num_neighbs, checks=None):
         if checks is None:
             checks = self.params['checks']
-        idxs = np.empty((len(qvecs), num_neighbs), dtype=np.int)
-        dists = np.empty((len(qvecs), num_neighbs), dtype=np.float)
+        idxs = np.empty((len(qvecs), num_neighbs), dtype=int)
+        dists = np.empty((len(qvecs), num_neighbs), dtype=float)
         for i, qvec in enumerate(qvecs):
             idxs[i], dists[i] = self.ann.get_nns_by_vector(
                 qvec, n=num_neighbs, search_k=checks, include_distances=True)

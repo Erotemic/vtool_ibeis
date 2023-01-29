@@ -167,7 +167,7 @@ def group_indices(idx2_groupid, assume_sorted=False):
         >>> (keys, groupxs) = group_indices(idx2_groupid)
         >>> result = ut.repr2((keys, groupxs), nl=2, nobr=True, with_dtype=True)
         >>> print(result)
-        np.array([False,  True], dtype=np.bool),
+        np.array([False,  True], dtype=bool),
         [
             np.array([2, 4, 5], dtype=np.int64),
             np.array([0, 1, 3, 6], dtype=np.int64),
@@ -289,10 +289,10 @@ def find_duplicate_items(item_arr):
     sortx = item_arr.argsort()
     groupids_sorted = item_arr.take(sortx)
 
-    #duplicate_idxs = np.flatnonzero(~np.diff(groupids_sorted).astype(np.bool))
+    #duplicate_idxs = np.flatnonzero(~np.diff(groupids_sorted).astype(bool))
     diff = np.diff(groupids_sorted)
-    #notdiff = np.bitwise_not(diff.astype(np.bool))
-    edges = np.flatnonzero(diff.astype(np.bool)) + 1
+    #notdiff = np.bitwise_not(diff.astype(bool))
+    edges = np.flatnonzero(diff.astype(bool)) + 1
     duplicate_items = [group[0] for group in np.split(groupids_sorted, edges)
                        if group.shape[0] > 1]
     #duplicate_items = groupids_sorted.take(duplicate_idxs)

@@ -140,7 +140,7 @@ def demo_grabcut(bgr_img):
     with ut.Timer('grabcut'):
         post_mask = grabcut(bgr_img, prior_mask)
     if post_mask.dtype == np.uint8:
-        post_mask = post_mask.astype(np.float) / 255.0
+        post_mask = post_mask.astype(float) / 255.0
     seg_chip = mask_colored_img(bgr_img, post_mask, 'bgr')
     print('finished running grabcut')
     pt.imshow(post_mask * 255, pnum=(1, 2, 1))
@@ -186,12 +186,12 @@ from_hsv_flags = {
 
 def mask_colored_img(img_rgb, mask, encoding='bgr'):
     if mask.dtype == np.uint8:
-        mask = mask.astype(np.float) / 255.0
+        mask = mask.astype(float) / 255.0
     into_hsv_flag = into_hsv_flags[encoding]
     from_hsv_flag = from_hsv_flags[encoding]
     # Mask out value component
     img_hsv = cv2.cvtColor(img_rgb, into_hsv_flag)
-    img_hsv = np.array(img_hsv, dtype=np.float) / 255.0
+    img_hsv = np.array(img_hsv, dtype=float) / 255.0
     VAL_INDEX = 2
     img_hsv[:, :, VAL_INDEX] *= mask
     img_hsv = np.array(np.round(img_hsv * 255.0), dtype=np.uint8)
@@ -226,7 +226,7 @@ def grabcut2(rgb_chip):
     chip_mask = np.where(is_forground, 255, 0).astype('uint8')
     # Crop
     chip_mask = clean_mask(chip_mask)
-    chip_mask = np.array(chip_mask, np.float) / 255.0
+    chip_mask = np.array(chip_mask, float) / 255.0
     # Mask value component of HSV space
     seg_chip = mask_colored_img(rgb_chip, chip_mask, 'rgb')
     return seg_chip
@@ -264,10 +264,10 @@ def segment(img_fpath, bbox_, new_size=None):
     chip      = img_resz[y1:y2, x1:x2]
     chip_mask = img_mask[y1:y2, x1:x2]
     chip_mask = clean_mask(chip_mask)
-    chip_mask = np.array(chip_mask, np.float) / 255.0
+    chip_mask = np.array(chip_mask, float) / 255.0
     # Mask the value of HSV
     chip_hsv = cv2.cvtColor(chip, cv2.COLOR_RGB2HSV)
-    chip_hsv = np.array(chip_hsv, dtype=np.float) / 255.0
+    chip_hsv = np.array(chip_hsv, dtype=float) / 255.0
     chip_hsv[:, :, 2] *= chip_mask
     chip_hsv = np.array(np.round(chip_hsv * 255.0), dtype=np.uint8)
     seg_chip = cv2.cvtColor(chip_hsv, cv2.COLOR_HSV2RGB)

@@ -173,11 +173,11 @@ def montage(img_list, dsize, rng=np.random, method='random', return_debug=False)
 
     if use_placement_prob:
         # TODO: place images in places that other images have not been placed yet
-        place_img = np.ones(shape[0:2], dtype=np.float)
+        place_img = np.ones(shape[0:2], dtype=float)
         #place_img[
         #place_img = vt.gaussian_patch(shape[0:2], np.array(shape[0:2]) * .1)
         #place_img = vt.gaussian_patch(shape[0:2], np.array(shape[0:2]) * .3)
-        temp_img = np.ones(shape[0:2], dtype=np.float)
+        temp_img = np.ones(shape[0:2], dtype=float)
         # Enumerate valid 2d locations
         xy_locs_ = np.meshgrid(np.arange(place_img.shape[1]),
                                np.arange(place_img.shape[0]))
@@ -1592,16 +1592,16 @@ def embed_in_square_image(img, target_size, img_origin=(.5, .5),
 
     ## Find start slice in the target image
     target_diff = np.floor(target_origin_abs - img_origin_abs)
-    target_rc_start = np.maximum(target_diff, 0).astype(np.int)
+    target_rc_start = np.maximum(target_diff, 0).astype(int)
 
-    img_rc_start = (-(target_diff - target_rc_start)).astype(np.int)
+    img_rc_start = (-(target_diff - target_rc_start)).astype(int)
     img_clip_rc_low = img_rc - img_rc_start
 
     end_hang = np.maximum((target_rc_start + img_clip_rc_low) - target_rc, 0)
     img_clip_rc = img_clip_rc_low - end_hang
 
-    img_rc_end = (img_rc_start + img_clip_rc).astype(np.int)
-    target_rc_end = (target_rc_start + img_clip_rc).astype(np.int)
+    img_rc_end = (img_rc_start + img_clip_rc).astype(int)
+    target_rc_end = (target_rc_start + img_clip_rc).astype(int)
 
     img_rc_slice = [slice(b, e) for (b, e) in zip(img_rc_start, img_rc_end)]
     target_rc_slice = [slice(b, e) for (b, e) in zip(target_rc_start, target_rc_end)]

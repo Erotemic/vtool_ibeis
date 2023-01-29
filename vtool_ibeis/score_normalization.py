@@ -811,7 +811,7 @@ def partition_scores(X, y, attrs=None):
         >>> from vtool_ibeis.score_normalization import *  # NOQA
         >>> X = np.array([5, 6, 6, 7, 1, 2, 2])
         >>> attrs = {'qaid': np.array([21, 24, 25, 26, 11, 14, 15])}
-        >>> y = np.array([1, 1, 1, 1, 0, 0, 0], dtype=np.bool)
+        >>> y = np.array([1, 1, 1, 1, 0, 0, 0], dtype=bool)
         >>> tup = partition_scores(X, y, attrs)
         >>> resdict = ut.odict(zip(
         >>>     ['tp_scores', 'tn_scores', 'part_attrs'], tup))
@@ -877,7 +877,7 @@ def flatten_scores(tp_scores, tn_scores, part_attrs=None):
         >>> tup = flatten_scores(
         ... tp_scores, tn_scores, part_attrs)
         >>> (X, y, attrs) = tup
-        >>> y = y.astype(np.int)
+        >>> y = y.astype(int)
         >>> resdict = ut.odict(zip(['X', 'y', 'attrs'], [X, y, attrs]))
         >>> result = ub.repr2(resdict, nobraces=True, with_dtype=False,
         >>>                      explicit=1, nl=1)
@@ -888,7 +888,7 @@ def flatten_scores(tp_scores, tn_scores, part_attrs=None):
         attrs={'qaid': np.array([21, 24, 25, 26, 11, 14, 15])},
     """
     scores = np.hstack([tp_scores, tn_scores])
-    labels = np.zeros(scores.size, dtype=np.bool)
+    labels = np.zeros(scores.size, dtype=bool)
     labels[0:len(tp_scores)] = True
     if part_attrs is None:
         return scores, labels

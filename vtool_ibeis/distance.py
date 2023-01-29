@@ -618,10 +618,10 @@ def emd(hist1, hist2, cost_matrix='sift'):
 
     if len(hist1.shape) == 2:
         dist = np.array([
-            pyemd.emd(hist1_.astype(np.float), hist2_.astype(np.float), cost_matrix)
+            pyemd.emd(hist1_.astype(float), hist2_.astype(float), cost_matrix)
             for hist1_, hist2_ in zip(hist1, hist2)])
     else:
-        dist = pyemd.emd(hist1.astype(np.float), hist2.astype(np.float), cost_matrix)
+        dist = pyemd.emd(hist1.astype(float), hist2.astype(float), cost_matrix)
     return dist
 
 

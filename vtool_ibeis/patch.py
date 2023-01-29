@@ -727,7 +727,7 @@ def intern_warp_single_patch(img, x, y, ori, V,
     X = ltool.translation_mat3x3(half_patch_size, half_patch_size)  # Translate back to patch-image coordinates
     M = X.dot(S).dot(R).dot(V).dot(T)
     # Prepare to warp
-    dsize = np.ceil([patch_size, patch_size]).astype(np.int)
+    dsize = np.ceil([patch_size, patch_size]).astype(int)
     # Warp
     #warped_patch = gtool.warpAffine(img, M, dsize)
     warped_patch = cv2.warpAffine(img, M[0:2], tuple(dsize), **cv2_warp_kwargs)
@@ -776,7 +776,7 @@ def patch_gaussian_weighted_average_intensities(probchip, kpts_):
     import vtool_ibeis as vt
     patch_size = 41
     M_iter = vt.generate_to_patch_transforms(kpts_, patch_size)
-    dsize = np.ceil([patch_size, patch_size]).astype(np.int)
+    dsize = np.ceil([patch_size, patch_size]).astype(int)
     # Preallocate patch
     patch = np.empty(dsize[::-1], dtype=np.uint8)
     weighted_patch = np.empty(dsize[::-1], dtype=np.float64)
