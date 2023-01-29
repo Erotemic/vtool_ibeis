@@ -137,33 +137,9 @@ jobs:
           os: ubuntu-latest
           install-extras: tests-strict,runtime-strict,headless-strict
           arch: auto
-        - python-version: '3.7'
-          os: macOS-latest
-          install-extras: tests-strict,runtime-strict,headless-strict
-          arch: auto
-        - python-version: '3.7'
-          os: windows-latest
-          install-extras: tests-strict,runtime-strict,headless-strict
-          arch: auto
         - python-version: '3.11'
           os: ubuntu-latest
           install-extras: tests-strict,runtime-strict,optional-strict,headless-strict
-          arch: auto
-        - python-version: '3.11'
-          os: macOS-latest
-          install-extras: tests-strict,runtime-strict,optional-strict,headless-strict
-          arch: auto
-        - python-version: '3.11'
-          os: windows-latest
-          install-extras: tests-strict,runtime-strict,optional-strict,headless-strict
-          arch: auto
-        - python-version: '3.11'
-          os: macOS-latest
-          install-extras: tests,headless
-          arch: auto
-        - python-version: '3.11'
-          os: windows-latest
-          install-extras: tests,headless
           arch: auto
         - python-version: '3.7'
           os: ubuntu-latest
@@ -183,58 +159,6 @@ jobs:
           arch: auto
         - python-version: '3.11'
           os: ubuntu-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.7'
-          os: macOS-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.8'
-          os: macOS-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.9'
-          os: macOS-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.10'
-          os: macOS-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.11'
-          os: macOS-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.7'
-          os: windows-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.8'
-          os: windows-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.9'
-          os: windows-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.10'
-          os: windows-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: '3.11'
-          os: windows-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: pypy-3.7
-          os: ubuntu-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: pypy-3.7
-          os: macOS-latest
-          install-extras: tests,optional,headless
-          arch: auto
-        - python-version: pypy-3.7
-          os: windows-latest
           install-extras: tests,optional,headless
           arch: auto
     steps:
