@@ -1353,6 +1353,7 @@ def get_uncovered_mask(covered_array, covering_array):
         >>> flags = get_uncovered_mask(covered_array, covering_array)
         >>> result = ub.repr2(flags, with_dtype=True)
         >>> print(result)
+
         np.array([[ True, False,  True],
                   [False, False,  True],
                   [ True,  True,  True]], dtype=bool)

@@ -267,6 +267,7 @@ def compute_affine(xy1_man, xy2_man):
 
     Example1:
         >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.spatial_verification import *  # NOQA
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis.keypoint as ktool

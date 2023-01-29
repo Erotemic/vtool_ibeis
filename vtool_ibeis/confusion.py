@@ -497,7 +497,7 @@ class ConfusionMetrics(ub.NiceRepr):
             python -m vtool_ibeis.confusion --exec-interact_roc_factory --show
 
         Example:
-            >>> # DISABLE_DOCTEST
+            >>> # xdoctest: +SKIP
             >>> from vtool_ibeis.confusion import *  # NOQA
             >>> scores, labels = testdata_scores_labels()
             >>> self = ConfusionMetrics().fit(scores, labels)
@@ -796,15 +796,15 @@ def interpolate_replbounds(xdata, ydata, pt, maximize=True):
         >>> print('thresh = %r' % (thresh,))
 
     Example:
-        >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +SKIP
         >>> from vtool_ibeis.confusion import *  # NOQA
         >>> xdata = np.array([0.7,  0.8,  0.8,  0.9,  0.9, 0.9])
         >>> ydata = np.array([34,    26,   23,   22,   19,  17])
         >>> pt = np.array([.85, 1.0, -1.0])
         >>> interp_vals = interpolate_replbounds(xdata, ydata, pt)
         >>> result = ('interp_vals = %s' % (str(interp_vals),))
+        >>> assert np.allclose(results, [ 22.5,  17.,   34., ])
         >>> print(result)
-        interp_vals = [ 22.5  17.   34. ]
     """
     if not ut.issorted(xdata):
         if ut.issorted(xdata[::-1]):
@@ -937,7 +937,7 @@ def interact_roc_factory(confusions, target_tpr=None, show_operating_point=False
         python -m vtool_ibeis.confusion --exec-interact_roc_factory --show
 
     Example:
-        >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +SKIP
         >>> from vtool_ibeis.confusion import *  # NOQA
         >>> scores, labels = testdata_scores_labels()
         >>> print('scores = %r' % (scores,))
@@ -1024,7 +1024,7 @@ def draw_roc_curve(fpr, tpr, fnum=None, pnum=None, marker='', target_tpr=None,
         python -m vtool_ibeis.confusion --exec-draw_roc_curve --show --lightbg
 
     Example:
-        >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +SKIP
         >>> from vtool_ibeis.confusion import *  # NOQA
         >>> scores, labels = testdata_scores_labels()
         >>> confusions = ConfusionMetrics().fit(scores, labels)
