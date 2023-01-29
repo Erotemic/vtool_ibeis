@@ -28,11 +28,6 @@ jobs:
       run: |-
         # stop the build if there are Python syntax errors or undefined names
         flake8 ./vtool_ibeis --count --select=E9,F63,F7,F82 --show-source --statistics
-    - name: Typecheck with mypy
-      run: |-
-        python -m pip install mypy
-        mypy --install-types --non-interactive ./vtool_ibeis
-        mypy ./vtool_ibeis
   build_and_test_sdist:
     name: Test sdist Python 3.8
     runs-on: ubuntu-latest

@@ -8,4 +8,4 @@ pyflann_ibeis>=2.2.0     ; python_version < '3.8' and python_version >= '3.7'   
 
 pyhesaff >= 2.1.0
 
-vtool_ibeis_ext>=0.1.0
+vtool_ibeis_ext>=0.1.1
