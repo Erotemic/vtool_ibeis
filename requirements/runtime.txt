@@ -10,4 +10,4 @@ six
 statsmodels
 ubelt
 wbia-pyflann
-wbia-utool
+wbia-utool @ git+https://github.com/WildMeOrg/wbia-utool@main
