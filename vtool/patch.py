@@ -787,7 +787,7 @@ def intern_warp_single_patch(
     )  # Translate back to patch-image coordinates
     M = X.dot(S).dot(R).dot(V).dot(T)
     # Prepare to warp
-    dsize = np.ceil([patch_size, patch_size]).astype(np.int)
+    dsize = np.ceil([patch_size, patch_size]).astype(np.int64)
     # Warp
     # warped_patch = gtool.warpAffine(img, M, dsize)
     warped_patch = cv2.warpAffine(img, M[0:2], tuple(dsize), **cv2_warp_kwargs)
