@@ -15,7 +15,7 @@ class IntensityPreproc(object):
         >>> from vtool.image_filters import *
         >>> import vtool as vt
         >>> import utool as ut
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_file_url('https://cthulhu.dyn.wildme.io/public/testimgs/qVWQaex.jpg'))
         >>> filter_list = [
         >>>     ('medianblur', {}),
         >>>     ('adapteq', {}),
@@ -80,7 +80,7 @@ def manta_matcher_filters(chipBGR):
         >>> import utool as ut
         >>> import wbia
         >>> ibs = wbia.opendb('Mantas')
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_file_url('https://cthulhu.dyn.wildme.io/public/testimgs/qVWQaex.jpg'))
     """
     import cv2
 
@@ -110,7 +110,7 @@ def adapteq_fn(chipBGR):
         >>> from vtool.image_filters import *
         >>> import vtool as vt
         >>> import utool as ut
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_file_url('https://cthulhu.dyn.wildme.io/public/testimgs/qVWQaex.jpg'))
         >>> chip2 = adapteq_fn(chipBGR)
         >>> # xdoctest: +REQUIRES(--show)
         >>> import wbia.plottool as pt
@@ -137,7 +137,7 @@ def medianfilter_fn(chipBGR):
         >>> from vtool.image_filters import *
         >>> import vtool as vt
         >>> import utool as ut
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_file_url('https://cthulhu.dyn.wildme.io/public/testimgs/qVWQaex.jpg'))
         >>> chip2 = adapteq_fn(chipBGR)
         >>> # xdoctest: +REQUIRES(--show)
         >>> import wbia.plottool as pt
