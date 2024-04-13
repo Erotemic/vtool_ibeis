@@ -102,7 +102,7 @@ def demodata_match(cfgdict={}, apply=True, use_cache=True, recompute=False):
     cfgstr = ub.hash_data(cfgdict) + hashid
     cacher = ub.Cacher(
         'test_match_v5',
-        cfgstr=cfgstr,
+        depends=cfgstr,
         appname='vtool_ibeis',
         enabled=use_cache
     )
@@ -453,8 +453,10 @@ class PairwiseMatch(ub.NiceRepr):
         K, Knorm, symmetric, checks, weight_key = params
         annot1 = match.annot1
         annot2 = match.annot2
+        if verbose is None:
+            verbose = match.verbose
 
-        if match.verbose:
+        if verbose:
             print('[match] assign')
             print('[match] params = ' + ub.repr2(params))
 

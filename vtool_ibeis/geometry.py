@@ -23,9 +23,6 @@ def verts_from_bbox(bbox, close=False):
     Returns:
         list: verts
 
-    CommandLine:
-        python -m vtool_ibeis.geometry --test-verts_from_bbox
-
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.geometry import *  # NOQA
@@ -65,9 +62,6 @@ def draw_border(img_in, color=(0, 128, 255), thickness=2, out=None):
         color (tuple): in bgr
         thickness (int):
         out (None):
-
-    CommandLine:
-        python -m vtool_ibeis.geometry --test-draw_border --show
 
     Example:
         >>> # ENABLE_DOCTEST
