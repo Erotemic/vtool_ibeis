@@ -7,8 +7,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### [Version 2.3.0] - Released 202x-xx-xx
 
-### Fixed:
+### Changed
+* Remove usage of lena
+
+### Fixed
 * Removed codecov from test requirements
+* Fixed deprecated use of cfgstr in ubelt Cacher
 
 ### [Version 2.2.1] - Released 2023-01-29
 
