@@ -142,6 +142,7 @@ jobs:
         path: ./wheelhouse/vtool_ibeis*.whl
   test_purepy_wheels:
     name: ${{ matrix.python-version }} on ${{ matrix.os }}, arch=${{ matrix.arch }} with ${{ matrix.install-extras }}
+    if: "! startsWith(github.event.ref, 'refs/heads/release'))"
     runs-on: ${{ matrix.os }}
     needs:
     - build_purepy_wheels
