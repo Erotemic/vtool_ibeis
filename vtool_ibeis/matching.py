@@ -102,13 +102,13 @@ def demodata_match(cfgdict={}, apply=True, use_cache=True, recompute=False):
     cfgstr = ub.hash_data(cfgdict) + hashid
     cacher = ub.Cacher(
         'test_match_v5',
-        cfgstr=cfgstr,
+        depends=cfgstr,
         appname='vtool_ibeis',
         enabled=use_cache
     )
     match = cacher.tryload()
-    annot1 = lazy_test_annot('easy1.png')
-    annot2 = lazy_test_annot('easy2.png')
+    annot1 = lazy_test_annot('tsukuba_l')
+    annot2 = lazy_test_annot('tsukuba_r')
     if match is None or recompute:
         match = vt.PairwiseMatch(annot1, annot2)
         if apply:
@@ -141,8 +141,10 @@ class PairwiseMatch(ub.NiceRepr):
         >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.matching import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> imgR = vt.imread(ut.grab_test_imgpath('easy1.png'))
-        >>> imgL = vt.imread(ut.grab_test_imgpath('easy2.png'))
+        >>> #imgR = vt.imread(ut.grab_test_imgpath('easy1.png'))
+        >>> #imgL = vt.imread(ut.grab_test_imgpath('easy2.png'))
+        >>> imgR = vt.imread(ut.grab_test_imgpath('tsukuba_r'))
+        >>> imgL = vt.imread(ut.grab_test_imgpath('tsukuba_l'))
         >>> annot1 = {'rchip': imgR}
         >>> annot2 = {'rchip': imgL}
         >>> match = vt.PairwiseMatch(annot1, annot2)
@@ -162,8 +164,8 @@ class PairwiseMatch(ub.NiceRepr):
         >>> match.ishow()
         >>> from vtool_ibeis.matching import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> imgR = vt.imread(ut.grab_test_imgpath('easy1.png'))
-        >>> imgL = vt.imread(ut.grab_test_imgpath('easy2.png'))
+        >>> imgR = vt.imread(ut.grab_test_imgpath('tsukuba_r'))
+        >>> imgL = vt.imread(ut.grab_test_imgpath('tsukuba_l'))
         >>> annot1 = {'rchip': imgR}
         >>> annot2 = {'rchip': imgL}
         >>> match = vt.PairwiseMatch(annot1, annot2)
@@ -453,8 +455,10 @@ class PairwiseMatch(ub.NiceRepr):
         K, Knorm, symmetric, checks, weight_key = params
         annot1 = match.annot1
         annot2 = match.annot2
+        if verbose is None:
+            verbose = match.verbose
 
-        if match.verbose:
+        if verbose:
             print('[match] assign')
             print('[match] params = ' + ub.repr2(params))
 
@@ -1447,7 +1451,7 @@ def ensure_metadata_feats(annot, cfgdict={}):
         >>> # ENABLE_DOCTEST
         >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.matching import *  # NOQA
-        >>> rchip_fpath = ut.grab_test_imgpath('easy1.png')
+        >>> rchip_fpath = ut.grab_test_imgpath('astro')
         >>> annot = ut.LazyDict({'rchip_fpath': rchip_fpath})
         >>> cfgdict = {}
         >>> ensure_metadata_feats(annot, cfgdict)

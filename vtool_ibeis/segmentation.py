@@ -85,7 +85,7 @@ def demo_grabcut(bgr_img):
         >>> import utool as ut
         >>> import plottool_ibeis as pt
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('easy1.png')
+        >>> img_fpath = ut.grab_test_imgpath('astro')
         >>> bgr_img = vt.imread(img_fpath)
         >>> # execute function
         >>> print(bgr_img.shape)

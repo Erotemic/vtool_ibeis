@@ -37,7 +37,7 @@ def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> (kpts, vecs) = pyhesaff.detect_feats(img_fpath)
         >>> chip = vt.imread(img_fpath)
         >>> kpts = kpts[0:100]
@@ -129,7 +129,7 @@ def make_kpts_coverage_mask(
         >>> import vtool_ibeis as vt
         >>> import plottool_ibeis as pt
         >>> import pyhesaff
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> (kpts, vecs) = pyhesaff.detect_feats(img_fpath)
         >>> kpts = kpts[::10]
         >>> chip = vt.imread(img_fpath)
@@ -210,7 +210,7 @@ def warp_patch_onto_kpts(
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
-        >>> img_fpath    = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath    = ut.grab_test_imgpath('carl')
         >>> (kpts, vecs) = pyhesaff.detect_feats(img_fpath)
         >>> kpts = kpts[::15]
         >>> chip = vt.imread(img_fpath)
@@ -434,7 +434,8 @@ def gridsearch_kpts_coverage_mask():
     """
     import plottool_ibeis as pt
     cfgdict_list, cfglbl_list = get_coverage_kpts_gridsearch_configs()
-    kpts, chipsize, weights = testdata_coverage('easy1.png')
+    # kpts, chipsize, weights = testdata_coverage('easy1.png')
+    kpts, chipsize, weights = testdata_coverage('astro')
     imgmask_list = [
         255 *  make_kpts_coverage_mask(kpts, chipsize, weights,
                                        return_patch=False, **cfgdict)
@@ -459,18 +460,18 @@ def testdata_coverage(fname=None):
     # build test data
     kpts, vecs = vt.demodata.get_testdata_kpts(fname, with_vecs=True)
     # HACK IN DISTINCTIVENESS
-    if fname is not None:
-        from ibeis.algo.hots import distinctiveness_normalizer
-        cachedir = ub.ensure_app_cache_dir('ibeis', 'distinctiveness_model')
-        species = 'zebra_plains'
-        dstcnvs_normer = distinctiveness_normalizer.DistinctivnessNormalizer(species, cachedir=cachedir)
-        dstcnvs_normer.load(cachedir)
-        weights = dstcnvs_normer.get_distinctiveness(vecs)
-    else:
-        kpts = np.vstack((kpts, [0, 0, 1, 1, 1, 0]))
-        kpts = np.vstack((kpts, [0.01, 10, 1, 1, 1, 0]))
-        kpts = np.vstack((kpts, [0.94, 11.5, 1, 1, 1, 0]))
-        weights = np.ones(len(kpts))
+    # if fname is not None:
+    #     from ibeis.algo.hots import distinctiveness_normalizer
+    #     cachedir = ub.ensure_app_cache_dir('ibeis', 'distinctiveness_model')
+    #     species = 'zebra_plains'
+    #     dstcnvs_normer = distinctiveness_normalizer.DistinctivnessNormalizer(species, cachedir=cachedir)
+    #     dstcnvs_normer.load(cachedir)
+    #     weights = dstcnvs_normer.get_distinctiveness(vecs)
+    # else:
+    kpts = np.vstack((kpts, [0, 0, 1, 1, 1, 0]))
+    kpts = np.vstack((kpts, [0.01, 10, 1, 1, 1, 0]))
+    kpts = np.vstack((kpts, [0.94, 11.5, 1, 1, 1, 0]))
+    weights = np.ones(len(kpts))
     chipsize = tuple(vt.iceil(vt.get_kpts_image_extent(kpts)[2:4]).tolist())
     return kpts, chipsize, weights
 

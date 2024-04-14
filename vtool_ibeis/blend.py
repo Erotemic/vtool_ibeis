@@ -5,7 +5,7 @@ import ubelt as ub
 
 def testdata_blend(scale=128):
     import vtool_ibeis as vt
-    img_fpath = ut.grab_test_imgpath('lena.png')
+    img_fpath = ut.grab_test_imgpath('astro')
     img1 = vt.imread(img_fpath)
     rng = np.random.RandomState(0)
     img2 = vt.perlin_noise(img1.shape[0:2], scale=scale, rng=rng)[None, :].T

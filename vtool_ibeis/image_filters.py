@@ -14,7 +14,8 @@ class IntensityPreproc(object):
     Doctest:
         >>> from vtool_ibeis.image_filters import *
         >>> import vtool_ibeis as vt
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> #chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_test_imgpath('astro'))
         >>> filter_list = [
         >>>     ('medianblur', {}),
         >>>     ('adapteq', {}),
@@ -71,7 +72,9 @@ def manta_matcher_filters(chipBGR):
         >>> from ibeis.core_annots import *  # NOQA
         >>> import ibeis
         >>> ibs = ibeis.opendb('Mantas')
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> #chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_test_imgpath('astro'))
+
     """
     chipLAB = cv2.cvtColor(chipBGR, cv2.COLOR_BGR2LAB)
 
@@ -99,7 +102,8 @@ def adapteq_fn(chipBGR):
         >>> from vtool_ibeis.image_filters import *
         >>> import vtool_ibeis as vt
         >>> import utool as ut
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> #chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_test_imgpath('astro'))
         >>> chip2 = adapteq_fn(chipBGR)
         >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool_ibeis as pt
@@ -124,8 +128,9 @@ def medianfilter_fn(chipBGR):
         >>> from vtool_ibeis.image_filters import *
         >>> import vtool_ibeis as vt
         >>> import utool as ut
-        >>> chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
-        >>> chip2 = adapteq_fn(chipBGR)
+        >>> #chipBGR = vt.imread(ut.grab_file_url('http://i.imgur.com/qVWQaex.jpg'))
+        >>> chipBGR = vt.imread(ut.grab_test_imgpath('astro'))
+        >>> chip2 = medianfilter_fn(chipBGR)
         >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool_ibeis as pt
         >>> pt.imshow(chipBGR, pnum=(1, 2, 1), fnum=1)
@@ -197,7 +202,6 @@ def grabcut_fn(chipBGR):
     chipHSV = np.array(np.round(chipHSV * 255.0), dtype=np.uint8)
     seg_chipBGR = cv2.cvtColor(chipHSV, cv2.COLOR_HSV2BGR)
     return seg_chipBGR
-
 
 
 if __name__ == '__main__':

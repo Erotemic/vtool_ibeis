@@ -34,7 +34,7 @@ def make_grid_coverage_mask(kpts, chipsize, weights, pxl_per_bin=4,
         >>> from vtool_ibeis.coverage_grid import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> kpts, chipsize, weights = coverage_kpts.testdata_coverage('easy1.png')
+        >>> kpts, chipsize, weights = coverage_kpts.testdata_coverage('tsukuba_l')
         >>> pxl_per_bin = 4
         >>> grid_steps = 2
         >>> # execute function
@@ -323,7 +323,7 @@ def gridsearch_coverage_grid_mask():
     """
     import plottool_ibeis as pt
     cfgdict_list, cfglbl_list = get_coverage_grid_gridsearch_configs()
-    kpts, chipsize, weights = coverage_kpts.testdata_coverage('easy1.png')
+    kpts, chipsize, weights = coverage_kpts.testdata_coverage('astro')
     gridmask_list = [
         255 *  make_grid_coverage_mask(kpts, chipsize, weights, **cfgdict)
         for cfgdict in ub.ProgIter(cfgdict_list, desc='coverage grid')

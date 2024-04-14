@@ -41,7 +41,7 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
         >>> from vtool_ibeis.features import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img_fpath = ut.grab_test_imgpath(ut.get_argval('--fname', default='lena.png'))
+        >>> img_fpath = ut.grab_test_imgpath(ut.get_argval('--fname', default='astro'))
         >>> imgBGR = vt.imread(img_fpath)
         >>> feat_type = ub.argval('--feat_type', default='hesaff+sift')
         >>> import pyhesaff
@@ -109,8 +109,7 @@ def detect_opencv_keypoints():
     import vtool_ibeis as vt
     import numpy as np  # NOQA
 
-    #img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='lena.png'))
-    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='zebra.png'))
+    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='astro'))
     imgBGR = vt.imread(img_fpath)
     imgGray = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2GRAY)
 
@@ -251,7 +250,7 @@ def test_mser():
             info = {key: list(ub.compress(val, flags)) for key, val in self.info.items()}
             return Keypoints(subarr, info)
 
-    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='zebra.png'))
+    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='astro'))
     imgBGR = vt.imread(img_fpath)
     imgGray = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2GRAY)
     # http://docs.opencv.org/master/d3/d28/classcv_1_1MSER.html#gsc.tab=0

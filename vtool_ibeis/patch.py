@@ -570,7 +570,7 @@ def get_warped_patches(img, kpts, flags=cv2.INTER_LANCZOS4,
         >>> from vtool_ibeis.patch import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath)
         >>> use_cpp = ut.get_argflag('--use_cpp')
         >>> kpts, desc = vt.extract_features(img_fpath)
@@ -1065,18 +1065,14 @@ def draw_kp_ori_steps():
         >>> draw_kp_ori_steps()
         >>> pt.show_if_requested()
     """
-    #from vtool_ibeis.patch import *  # NOQA
-    #import vtool_ibeis as vt
     # build test data
     import utool as ut
     import plottool_ibeis as pt
-    import vtool_ibeis as vt
 
     if True:
         from ibeis.scripts.thesis import TMP_RC
         import matplotlib as mpl
         mpl.rcParams.update(TMP_RC)
-    #import vtool_ibeis as vt
     np.random.seed(0)
     USE_COMMANLINE = True
     if USE_COMMANLINE:
@@ -1085,24 +1081,16 @@ def draw_kp_ori_steps():
         kp = kpts[fx]
     else:
         fx = 0
-        USE_EXTERN_STAR = False
-        if USE_EXTERN_STAR:
-            img_fpath = ut.grab_test_imgpath('star.png')
-            imgBGR = vt.imread(img_fpath)
-            kpts, vecs = vt.extract_features(img_fpath)
-            kp = np.array([  3.14742985e+01,   2.95660381e+01,   1.96057682e+01, -5.11199608e-03,   2.05653343e+01,   0.00000000e+00],
-                          dtype=np.float32)
-        else:
-            #imgBGR = get_test_patch('stripe', jitter=True)
-            #imgBGR = get_test_patch('star', jitter=True)
-            imgBGR = get_test_patch('star2', jitter=True)
-            #imgBGR = get_test_patch('cross', jitter=False)
-            #imgBGR = cv2.resize(imgBGR, (41, 41), interpolation=cv2.INTER_LANCZOS4)
-            imgBGR = cv2.resize(imgBGR, (41, 41), interpolation=cv2.INTER_CUBIC)
-            theta = 0  # 3.4  # TAU / 16
-            #kpts = make_test_image_keypoints(imgBGR, scale=.9, theta=theta)
-            kpts = make_test_image_keypoints(imgBGR, scale=.3, theta=theta, shift=(.3, .1))
-            kp = kpts[0]
+        #imgBGR = get_test_patch('stripe', jitter=True)
+        #imgBGR = get_test_patch('star', jitter=True)
+        imgBGR = get_test_patch('star2', jitter=True)
+        #imgBGR = get_test_patch('cross', jitter=False)
+        #imgBGR = cv2.resize(imgBGR, (41, 41), interpolation=cv2.INTER_LANCZOS4)
+        imgBGR = cv2.resize(imgBGR, (41, 41), interpolation=cv2.INTER_CUBIC)
+        theta = 0  # 3.4  # TAU / 16
+        #kpts = make_test_image_keypoints(imgBGR, scale=.9, theta=theta)
+        kpts = make_test_image_keypoints(imgBGR, scale=.3, theta=theta, shift=(.3, .1))
+        kp = kpts[0]
     bins = 36
     maxima_thresh = .8
     converge_lists = []

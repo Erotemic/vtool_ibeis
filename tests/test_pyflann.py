@@ -102,7 +102,7 @@ pyflann.set_distance_type('hellinger', order=0)
 """
 
 
-def testdata_points(nPts=53, nDims=11, dtype=np.float64):
+def demodata_points(nPts=53, nDims=11, dtype=np.float64):
     pts = np.array(randint(0, 255, (nPts, nDims)), dtype=dtype)
     return pts
 
@@ -132,7 +132,7 @@ def test_pyflann_hkmeans():
     branch_size = 5
     num_branches = 7
     print('HKmeans')
-    pts = testdata_points(nPts=1009)
+    pts = demodata_points(nPts=1009)
     hkmean_centroids = flann.hierarchical_kmeans(pts, branch_size, num_branches,
                                                  max_iterations=1000, dtype=None)
     # print(utool.truncate_str(str(hkmean_centroids)))
@@ -161,7 +161,7 @@ def test_pyflann_kmeans():
         pytest.skip()
     flann = FLANN_CLS()
     num_clusters = 7
-    pts = testdata_points(nPts=1009)
+    pts = demodata_points(nPts=1009)
     kmeans_centroids = flann.kmeans(pts, num_clusters, max_iterations=None,
                                     dtype=None)
     # print(utool.truncate_str(str(kmeans_centroids)))
@@ -176,9 +176,9 @@ def test_pyflann_add_point():
     """
     # Test parameters
     num_neighbors = 3
-    pts = testdata_points(nPts=1009)
-    qpts = testdata_points(nPts=7)
-    newpts = testdata_points(nPts=1013)
+    pts = demodata_points(nPts=1009)
+    qpts = demodata_points(nPts=7)
+    newpts = demodata_points(nPts=1013)
 
     # build index
     print('Build Index')
@@ -204,9 +204,9 @@ def test_pyflann_add_point():
     assert np.all(indices2 < pts.shape[0] + newpts.shape[0]), 'but not more than the points being added'
     # Test parameters
     num_neighbors = 3
-    pts = testdata_points(nPts=1009)
-    qpts = testdata_points(nPts=7)
-    newpts = testdata_points(nPts=1013)
+    pts = demodata_points(nPts=1009)
+    qpts = demodata_points(nPts=7)
+    newpts = demodata_points(nPts=1013)
 
     # build index
     print('Build Index')
@@ -237,8 +237,8 @@ def test_pyflann_searches():
         pytest.skip()
     try:
         num_neighbors = 3
-        pts = testdata_points(nPts=5743, nDims=2)
-        qpts = testdata_points(nPts=7, nDims=2)
+        pts = demodata_points(nPts=5743, nDims=2)
+        qpts = demodata_points(nPts=7, nDims=2)
         import vtool_ibeis as vt
         # sample a radius
         radius = vt.L2(pts[0:1], qpts[0:1])[0] * 2 + 1
@@ -280,15 +280,14 @@ def test_pyflann_tune():
     """
     Example:
         >>> # ENABLE_DOCTEST
-        >>> result = test_pyflann_tune()
-        >>> print(result)
+        >>> test_pyflann_tune()
     """
     print('Create random qpts and database data')
     if FLANN_CLS is None:
         import pytest
         pytest.skip()
-    pts = testdata_points(nPts=1009)
-    qpts = testdata_points(nPts=7)
+    pts = demodata_points(nPts=1009)
+    qpts = demodata_points(nPts=7)
     num_neighbors = 3
     #num_data = len(data)
     # untuned query
@@ -313,8 +312,7 @@ def test_pyflann_tune():
     print(ub.hzcat(['index_untuned, dist_untuned = ', str(index_untuned),  str(dist_untuned)]))
 
     print(dist_untuned >= dist_tuned)
-
-    return tuned_params
+    print(f'tuned_params = {ub.urepr(tuned_params, nl=1)}')
 
 
 def test_pyflann_io():
@@ -329,8 +327,8 @@ def test_pyflann_io():
     num_neighbors = 3
     nPts = 1009
     nQPts = 31
-    qpts = testdata_points(nPts=nQPts)
-    pts = testdata_points(nPts=nPts)
+    qpts = demodata_points(nPts=nQPts)
+    pts = demodata_points(nPts=nPts)
     if FLANN_CLS is None:
         import pytest
         pytest.skip()
