@@ -958,8 +958,8 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
         >>> from vtool_ibeis.spatial_verification import *
         >>> import vtool_ibeis.demodata as demodata
         >>> import vtool_ibeis as vt
-        >>> fname1 = ut.get_argval('--fname1', type_=str, default='easy1.png')
-        >>> fname2 = ut.get_argval('--fname2', type_=str, default='easy2.png')
+        >>> fname1 = ut.get_argval('--fname1', type_=str, default='tsukuba_r')
+        >>> fname2 = ut.get_argval('--fname2', type_=str, default='tsukuba_l')
         >>> default_dict = vt.get_extract_features_default_params()
         >>> default_dict['ratio_thresh'] = .625
         >>> kwargs = ut.argparse_dict(default_dict)
@@ -993,8 +993,6 @@ def spatially_verify_kpts(kpts1, kpts2, fm,
         >>> aff_tup = (aff_inliers, Aff)
         >>> pt.draw_sv.show_sv(rchip1, rchip2, kpts1, kpts2, fm, aff_tup=aff_tup, homog_tup=homog_tup, refine_method=refine_method)
         >>> pt.show_if_requested()
-        tuple(numpy.ndarray, tuple(numpy.ndarray*3), numpy.ndarray, numpy.ndarray, tuple(numpy.ndarray*3), numpy.ndarray)
-
     """
     if len(fm) == 0:
         if VERBOSE_SVER:
