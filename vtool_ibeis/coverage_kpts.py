@@ -37,7 +37,7 @@ def make_kpts_heatmask(kpts, chipsize, cmap='plasma'):
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> (kpts, vecs) = pyhesaff.detect_feats(img_fpath)
         >>> chip = vt.imread(img_fpath)
         >>> kpts = kpts[0:100]
@@ -129,7 +129,7 @@ def make_kpts_coverage_mask(
         >>> import vtool_ibeis as vt
         >>> import plottool_ibeis as pt
         >>> import pyhesaff
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> (kpts, vecs) = pyhesaff.detect_feats(img_fpath)
         >>> kpts = kpts[::10]
         >>> chip = vt.imread(img_fpath)
@@ -210,7 +210,7 @@ def warp_patch_onto_kpts(
         >>> from vtool_ibeis.coverage_kpts import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import pyhesaff
-        >>> img_fpath    = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath    = ut.grab_test_imgpath('carl')
         >>> (kpts, vecs) = pyhesaff.detect_feats(img_fpath)
         >>> kpts = kpts[::15]
         >>> chip = vt.imread(img_fpath)

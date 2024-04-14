@@ -19,7 +19,7 @@ def compute_average_contrast(img):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.quality_classifier import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath, grayscale=True)
         >>> average_contrast, gradmag_sqrd = compute_average_contrast(img)
         >>> # xdoctest: +REQUIRES(module:plottool_ibeis)
@@ -104,7 +104,7 @@ def fourier_devtest(img):
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.quality_classifier import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath, grayscale=True)
         >>> magnitude_spectrum = fourier_devtest(img)
     """

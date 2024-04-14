@@ -570,7 +570,7 @@ def get_warped_patches(img, kpts, flags=cv2.INTER_LANCZOS4,
         >>> from vtool_ibeis.patch import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath)
         >>> use_cpp = ut.get_argflag('--use_cpp')
         >>> kpts, desc = vt.extract_features(img_fpath)

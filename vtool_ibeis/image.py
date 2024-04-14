@@ -289,12 +289,12 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
-        >>> img_fpath = ut.grab_test_imgpath('carl')
+        >>> img_fpath = ut.grab_test_imgpath('astro')
         >>> imgBGR1 = imread(img_fpath, grayscale=False)
         >>> imgBGR2 = imread(img_fpath, grayscale=True)
         >>> imgBGR3 = imread(img_fpath, orient=True)
-        >>> assert imgBGR1.shape == (448, 328, 3)
-        >>> assert imgBGR2.shape == (448, 328)
+        >>> assert imgBGR1.shape == (512, 512, 3)
+        >>> assert imgBGR2.shape == (512, 512)
         >>> assert np.all(imgBGR1 == imgBGR3)
         >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool_ibeis as pt

@@ -67,7 +67,7 @@ def draw_border(img_in, color=(0, 128, 255), thickness=2, out=None):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.geometry import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_in = vt.imread(ut.grab_test_imgpath('carl.jpg'))
+        >>> img_in = vt.imread(ut.grab_test_imgpath('carl'))
         >>> color = (0, 128, 255)
         >>> thickness = 20
         >>> out = None
@@ -115,7 +115,7 @@ def draw_verts(img_in, verts, color=(0, 128, 255), thickness=2, out=None):
         >>> import plottool_ibeis as pt
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img_in = vt.imread(ut.grab_test_imgpath('carl.jpg'))
+        >>> img_in = vt.imread(ut.grab_test_imgpath('carl'))
         >>> verts = ((10, 10), (10, 100), (100, 100), (100, 10))
         >>> color = (0, 128, 255)
         >>> thickness = 2
@@ -137,7 +137,7 @@ def draw_verts(img_in, verts, color=(0, 128, 255), thickness=2, out=None):
         >>> import plottool_ibeis as pt
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img_in = vt.imread(ut.grab_test_imgpath('carl.jpg'))
+        >>> img_in = vt.imread(ut.grab_test_imgpath('carl'))
         >>> verts = ((10, 10), (10, 100), (100, 100), (100, 10))
         >>> color = (0, 128, 255)
         >>> thickness = 2
