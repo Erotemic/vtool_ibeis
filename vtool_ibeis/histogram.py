@@ -975,8 +975,8 @@ def show_ori_image_ondisk():
         >>> pt.show_if_requested()
     """
     #if img_fpath is not None:
-    #    img_fpath = ut.get_argval('--fpath', type_=str, default=ut.grab_test_imgpath('star.png'))
-    #    img_fpath = ut.get_argval('--fpath', type_=str, default=ut.grab_test_imgpath('star.png'))
+    #    img_fpath = ut.get_argval('--fpath', type_=str, default=ut.grab_test_imgpath('astro'))
+    #    img_fpath = ut.get_argval('--fpath', type_=str, default=ut.grab_test_imgpath('astro'))
     #    img = vt.imread(img_fpath)
     #    ori_img_fpath     = ut.get_argval('--fpath-ori', type_=str,
     #    default=ut.augpath(img_fpath, '_ori'))

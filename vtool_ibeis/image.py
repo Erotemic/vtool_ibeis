@@ -1106,7 +1106,7 @@ def rotate_image_ondisk(img_fpath, theta, out_fpath=None, **kwargs):
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> # build test data
-        >>> img_fpath = ut.grab_test_imgpath('star.png')
+        >>> img_fpath = ut.grab_test_imgpath('astro')
         >>> theta = TAU * 3 / 8
         >>> # execute function
         >>> out_fpath = None
@@ -1508,9 +1508,9 @@ def padded_resize(img, target_size=(64, 64), interpolation=None):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> imgA = vt.imread(ut.grab_test_imgpath('carl.jpg'))
-        >>> imgB = vt.imread(ut.grab_test_imgpath('ada.jpg'))
-        >>> imgC = vt.imread(ut.grab_test_imgpath('carl.jpg'), grayscale=True)
+        >>> imgA = vt.imread(ut.grab_test_imgpath('carl'))
+        >>> imgB = vt.imread(ut.grab_test_imgpath('astro'))
+        >>> imgC = vt.imread(ut.grab_test_imgpath('carl'), grayscale=True)
         >>> #target_size = (64, 64)
         >>> target_size = (1024, 1024)
         >>> img3_list = [padded_resize(img, target_size) for img in [imgA, imgB, imgC]]
@@ -1554,7 +1554,7 @@ def embed_in_square_image(img, target_size, img_origin=(.5, .5),
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath)
         >>> target_size = tuple(np.array(vt.get_size(img)) * 3)
         >>> img_origin = (.5, .5)
@@ -1707,7 +1707,7 @@ def resize_to_maxdims(img, max_dsize=(64, 64),
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath)
         >>> max_dsize = (1024, 1024)
         >>> img2 = resize_to_maxdims(img, max_dsize)
@@ -1737,7 +1737,7 @@ def resize_thumb(img, max_dsize=(64, 64), interpolation=None):
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath)
         >>> max_dsize = (64, 64)
         >>> # execute function
@@ -2008,11 +2008,11 @@ def perlin_noise(size, scale=32.0, rng=np.random):
 def testdata_imglist():
     # build test data
     import vtool_ibeis as vt
-    img1 = vt.imread(ut.grab_test_imgpath('carl.jpg'))
-    img2 = vt.imread(ut.grab_test_imgpath('astro.png'))
-    img3 = vt.imread(ut.grab_test_imgpath('ada.jpg'))
-    img4 = vt.imread(ut.grab_test_imgpath('jeff.png'))
-    img5 = vt.imread(ut.grab_test_imgpath('star.png'))
+    img1 = vt.imread(ut.grab_test_imgpath('carl'))
+    img2 = vt.imread(ut.grab_test_imgpath('astro'))
+    img3 = vt.imread(ut.grab_test_imgpath('stars'))
+    img4 = vt.imread(ut.grab_test_imgpath('pm5644'))
+    img5 = vt.imread(ut.grab_test_imgpath('parrot'))
     img_list = [img1, img2, img3, img4, img5]
     return img_list
 
@@ -2423,9 +2423,9 @@ def ensure_3channel(patch):
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> patch1 = vt.imread(ut.grab_test_imgpath('astro.png'))[0:512, 0:500, :]
-        >>> patch2 = vt.imread(ut.grab_test_imgpath('ada.jpg'))[:, :, 0:1]
-        >>> patch3 = vt.imread(ut.grab_test_imgpath('jeff.png'))[0:390, 0:400, 0]
+        >>> patch1 = vt.imread(ut.grab_test_imgpath('astro'))[0:512, 0:500, :]
+        >>> patch2 = vt.imread(ut.grab_test_imgpath('carl'))[:, :, 0:1]
+        >>> patch3 = vt.imread(ut.grab_test_imgpath('paraview'))[0:390, 0:400, 0]
         >>> res1 = ensure_3channel(patch1)
         >>> res2 = ensure_3channel(patch2)
         >>> res3 = ensure_3channel(patch3)
@@ -2489,8 +2489,8 @@ def stack_images(img1, img2, vert=None, modifysize=False, return_sf=False,
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img1 = vt.imread(ut.grab_test_imgpath('carl.jpg'))
-        >>> img2 = vt.imread(ut.grab_test_imgpath('astro.png'))
+        >>> img1 = vt.imread(ut.grab_test_imgpath('carl'))
+        >>> img2 = vt.imread(ut.grab_test_imgpath('astro'))
         >>> vert = True
         >>> modifysize = False
         >>> # execute function
@@ -2645,11 +2645,11 @@ def stack_image_recurse(img_list1, img_list2=None, vert=True, modifysize=False,
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> # build test data
-        >>> img1 = vt.imread(ut.grab_test_imgpath('carl.jpg'))
-        >>> img2 = vt.imread(ut.grab_test_imgpath('astro.png'))
-        >>> img3 = vt.imread(ut.grab_test_imgpath('ada.jpg'))
-        >>> img4 = vt.imread(ut.grab_test_imgpath('jeff.png'))
-        >>> img5 = vt.imread(ut.grab_test_imgpath('star.png'))
+        >>> img1 = vt.imread(ut.grab_test_imgpath('carl'))
+        >>> img2 = vt.imread(ut.grab_test_imgpath('astro'))
+        >>> img3 = vt.imread(ut.grab_test_imgpath('paraview'))
+        >>> img4 = vt.imread(ut.grab_test_imgpath('lowcontrast'))
+        >>> img5 = vt.imread(ut.grab_test_imgpath('stars'))
         >>> img_list1 = [img1, img2, img3, img4, img5]
         >>> img_list2 = None
         >>> vert = True
@@ -2658,7 +2658,7 @@ def stack_image_recurse(img_list1, img_list2=None, vert=True, modifysize=False,
         >>> # verify results
         >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool_ibeis as pt
-        >>> imshow(imgB)
+        >>> pt.imshow(imgB)
         >>> #wh1 = img1.shape[0:2][::-1]
         >>> #wh2 = img2.shape[0:2][::-1]
         >>> #pt.draw_bbox((0, 0) + wh1, bbox_color=(1, 0, 0))
@@ -2732,8 +2732,8 @@ def filterflags_valid_images(gpaths, valid_formats=None,
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
-        >>> gpaths = [ut.grab_test_imgpath('carl.jpg'),
-        >>>           ut.grab_test_imgpath('astro.png')]
+        >>> gpaths = [ut.grab_test_imgpath('carl'),
+        >>>           ut.grab_test_imgpath('astro')]
         >>> flags = filterflags_valid_images(gpaths)
         >>> assert all(flags)
     """
