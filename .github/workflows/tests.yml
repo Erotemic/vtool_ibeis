@@ -432,7 +432,7 @@ jobs:
     - name: Tag Release Commit
       if: (startsWith(github.event.ref, 'refs/heads/release'))
       run: |-
-        export VERSION=$(python -c "import setup; print(setup.VERSION))"
+        export VERSION=$(python -c "import setup; print(setup.VERSION)")
         git tag "v$VERSION"
         git push origin "v$VERSION"
     - uses: softprops/action-gh-release@v1
