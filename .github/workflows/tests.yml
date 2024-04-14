@@ -266,8 +266,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && ! startsWith(github.event.ref, 'refs/tags') && ! startsWith(github.event.ref, 'refs/heads/release')
     needs:
-    - build_and_test_sdist
     - build_purepy_wheels
+    - build_and_test_sdist
     steps:
     - name: Checkout source
       uses: actions/checkout@v4.1.1
@@ -340,8 +340,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (startsWith(github.event.ref, 'refs/tags') || startsWith(github.event.ref, 'refs/heads/release'))
     needs:
-    - build_and_test_sdist
     - build_purepy_wheels
+    - build_and_test_sdist
     steps:
     - name: Checkout source
       uses: actions/checkout@v4.1.1
@@ -432,7 +432,7 @@ jobs:
     - name: Tag Release Commit
       if: (startsWith(github.event.ref, 'refs/heads/release'))
       run: |-
-        export VERSION=$(python -c "import setup; print(setup.VERSION)"
+        export VERSION=$(python -c "import setup; print(setup.VERSION))"
         git tag "v$VERSION"
         git push origin "v$VERSION"
     - uses: softprops/action-gh-release@v1
