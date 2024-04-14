@@ -280,8 +280,7 @@ def test_pyflann_tune():
     """
     Example:
         >>> # ENABLE_DOCTEST
-        >>> result = test_pyflann_tune()
-        >>> print(result)
+        >>> test_pyflann_tune()
     """
     print('Create random qpts and database data')
     if FLANN_CLS is None:
@@ -313,8 +312,7 @@ def test_pyflann_tune():
     print(ub.hzcat(['index_untuned, dist_untuned = ', str(index_untuned),  str(dist_untuned)]))
 
     print(dist_untuned >= dist_tuned)
-
-    return tuned_params
+    print(f'tuned_params = {ub.urepr(tuned_params, nl=1)}')
 
 
 def test_pyflann_io():
