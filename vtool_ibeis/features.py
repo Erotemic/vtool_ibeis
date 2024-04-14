@@ -109,8 +109,7 @@ def detect_opencv_keypoints():
     import vtool_ibeis as vt
     import numpy as np  # NOQA
 
-    #img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='astro'))
-    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='zebra.png'))
+    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='astro'))
     imgBGR = vt.imread(img_fpath)
     imgGray = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2GRAY)
 
@@ -251,7 +250,7 @@ def test_mser():
             info = {key: list(ub.compress(val, flags)) for key, val in self.info.items()}
             return Keypoints(subarr, info)
 
-    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='zebra.png'))
+    img_fpath = ut.grab_test_imgpath(ub.argval('--fname', default='astro'))
     imgBGR = vt.imread(img_fpath)
     imgGray = cv2.cvtColor(imgBGR, cv2.COLOR_BGR2GRAY)
     # http://docs.opencv.org/master/d3/d28/classcv_1_1MSER.html#gsc.tab=0

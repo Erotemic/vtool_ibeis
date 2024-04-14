@@ -289,12 +289,12 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> imgBGR1 = imread(img_fpath, grayscale=False)
         >>> imgBGR2 = imread(img_fpath, grayscale=True)
         >>> imgBGR3 = imread(img_fpath, orient=True)
-        >>> assert imgBGR1.shape == (250, 300, 3)
-        >>> assert imgBGR2.shape == (250, 300)
+        >>> assert imgBGR1.shape == (448, 328, 3)
+        >>> assert imgBGR2.shape == (448, 328)
         >>> assert np.all(imgBGR1 == imgBGR3)
         >>> # xdoctest: +REQUIRES(--show)
         >>> import plottool_ibeis as pt
@@ -332,7 +332,7 @@ def imread(img_fpath, grayscale=False, orient=False, flags=None,
         (2736, 3648, 3)
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest +SKIP("networking")
         >>> from vtool_ibeis.image import *  # NOQA
         >>> url = 'http://www.sherv.net/cm/emo/funny/2/big-dancing-banana-smiley-emoticon.gif'
         >>> img_fpath = ut.grab_file_url(url)
@@ -540,10 +540,10 @@ def imwrite(img_fpath, imgBGR, fallback=False):
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
         >>> import utool as ut
-        >>> img_fpath1 = ut.grab_test_imgpath('zebra.png')
+        >>> img_fpath1 = ut.grab_test_imgpath('astro')
         >>> imgBGR = vt.imread(img_fpath1)
         >>> img_dpath = ub.ensure_app_cache_dir('vtool_ibeis', 'testwrite')
-        >>> img_fpath2 = ut.unixjoin(img_dpath, 'zebra.png')
+        >>> img_fpath2 = ut.unixjoin(img_dpath, 'astro.png')
         >>> fallback = False
         >>> imwrite(img_fpath2, imgBGR, fallback=fallback)
         >>> imgBGR2 = vt.imread(img_fpath2)
@@ -555,7 +555,7 @@ def imwrite(img_fpath, imgBGR, fallback=False):
         if fallback:
             try:
                 imwrite_fallback(img_fpath, imgBGR)
-            except Exception as ex:
+            except Exception:
                 pass
         msg = '[vt.image] ERROR writing: %s' % (img_fpath,)
         ut.printex(ex, msg, keys=['imgBGR.shape'])
@@ -657,11 +657,11 @@ def open_image_size(image_fpath):
 
     Doctest:
         >>> from vtool_ibeis.image import *  # NOQA
-        >>> image_fpath = ut.grab_test_imgpath('patsy.jpg')
+        >>> image_fpath = ut.grab_test_imgpath('carl')
         >>> size = open_image_size(image_fpath)
         >>> result = ('size = %s' % (str(size),))
         >>> print(result)
-        size = (800, 441)
+        size = (328, 448)
 
     Ignore:
         # Confirm that Image.open is a lazy load
@@ -730,7 +730,7 @@ def warpAffine(img, Aff, dsize, assume_float01=True):
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> img_fpath = ut.grab_test_imgpath('carl')
         >>> img = vt.imread(img_fpath)
         >>> Aff = vt.rotation_mat3x3(TAU / 8)
         >>> dsize = vt.get_size(img)
@@ -1422,9 +1422,9 @@ def convert_colorspace(img, colorspace, src_colorspace='BGR'):
         >>> # DISABLE_DOCTEST
         >>> from vtool_ibeis.image import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> img_fpath = ut.grab_test_imgpath('zebra.png')
-        >>> img_fpath = ut.grab_file_url('http://itsnasb.com/wp-content/uploads/2013/03/lisa-frank-logo1.jpg')
-        >>> img_fpath = ut.grab_test_imgpath('carl.jpg')
+        >>> #img_fpath = ut.grab_file_url('http://itsnasb.com/wp-content/uploads/2013/03/lisa-frank-logo1.jpg')
+        >>> #img_fpath = ut.grab_test_imgpath('carl')
+        >>> img_fpath = ut.grab_test_imgpath('pm5644')
         >>> img = vt.imread(img_fpath)
         >>> img_float = vt.rectify_to_float01(img, np.float32)
         >>> colorspace = 'LAB'
