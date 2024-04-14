@@ -633,7 +633,7 @@ def get_testdata_kpts(fname=None, with_vecs=False):
         return kpts
 
 
-def testdata_ratio_matches(fname1='easy1.png', fname2='easy2.png', **kwargs):
+def testdata_ratio_matches(fname1='tsukuba_r', fname2='tsukuba_l', **kwargs):
     r"""
     Runs simple ratio-test matching between two images.
     Technically this is not demodata data.
@@ -659,8 +659,8 @@ def testdata_ratio_matches(fname1='easy1.png', fname2='easy2.png', **kwargs):
         >>> # xdoctest: +REQUIRES(module:pyhesaff)
         >>> from vtool_ibeis.demodata import *  # NOQA
         >>> import vtool_ibeis as vt
-        >>> fname1 = ut.get_argval('--fname1', type_=str, default='easy1.png')
-        >>> fname2 = ut.get_argval('--fname2', type_=str, default='easy2.png')
+        >>> fname1 = ut.get_argval('--fname1', type_=str, default='tsukuba_l')
+        >>> fname2 = ut.get_argval('--fname2', type_=str, default='tsukuba_r')
         >>> default_dict = vt.get_extract_features_default_params()
         >>> default_dict['ratio_thresh'] = .625
         >>> kwargs = ut.argparse_dict(default_dict)

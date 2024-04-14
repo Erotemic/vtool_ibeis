@@ -109,8 +109,10 @@ def test_cv2_flann():
     from vtool_ibeis import demodata
     import plottool_ibeis as pt
     import vtool_ibeis as vt
-    img1 = vt.imread(ut.grab_test_imgpath('easy1.png'))
-    img2 = vt.imread(ut.grab_test_imgpath('easy2.png'))
+    # img1 = vt.imread(ut.grab_test_imgpath('easy1.png'))
+    # img2 = vt.imread(ut.grab_test_imgpath('easy2.png'))
+    img1 = vt.imread(ut.grab_test_imgpath('tsukuba_l'))
+    img2 = vt.imread(ut.grab_test_imgpath('tsukuba_r'))
 
     stereo = cv2.StereoBM_create(numDisparities=16, blockSize=15)
     disparity = stereo.compute(img1, img2)

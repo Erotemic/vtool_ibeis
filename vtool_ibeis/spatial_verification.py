@@ -374,8 +374,8 @@ def testdata_matching_affine_inliers():
     ori_thresh = 1.57
     xy_thresh_sqrd = dlen_sqrd2 * xy_thresh
     featkw = ut.argparse_dict(vt.get_extract_features_default_params())
-    fname1 = ut.get_argval('--fname1', type_=str, default='easy1.png')
-    fname2 = ut.get_argval('--fname2', type_=str, default='easy2.png')
+    fname1 = ut.get_argval('--fname1', type_=str, default='tsukuba_l')
+    fname2 = ut.get_argval('--fname2', type_=str, default='tsukuba_r')
     (kpts1, kpts2, fm, fs, rchip1, rchip2) = demodata.testdata_ratio_matches(fname1, fname2, **featkw)
     aff_inliers, aff_errors, Aff = get_best_affine_inliers_(
         kpts1, kpts2, fm, fs, xy_thresh_sqrd, scale_thresh, ori_thresh)

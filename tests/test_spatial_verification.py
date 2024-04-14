@@ -131,7 +131,7 @@ def get_dummy_test_vars():
     return chip1, chip2, kpts1, kpts2, fm
 
 
-def get_dummy_test_vars1(fname1='easy1.png', fname2='easy2.png'):
+def get_dummy_test_vars1(fname1='tsukuba_r', fname2='tsukuba_l'):
     import utool as ut
     from vtool_ibeis import image as gtool
     from vtool_ibeis import features as feattool

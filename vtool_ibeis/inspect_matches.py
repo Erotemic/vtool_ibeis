@@ -69,8 +69,8 @@ class MatchInspector(INSPECT_BASE):
         >>> import vtool_ibeis as vt
         >>> gt.ensure_qapp()
         >>> ut.qtensure()
-        >>> annot1 = lazy_test_annot('easy1.png')
-        >>> annot2 = lazy_test_annot('easy2.png')
+        >>> annot1 = lazy_test_annot('tsukuba_r')
+        >>> annot2 = lazy_test_annot('tsukuba_l')
         >>> match = vt.PairwiseMatch(annot1, annot2)
         >>> self = MatchInspector(match=match)
         >>> self.show()
