@@ -19,7 +19,7 @@ min_python = 3.8
 max_python = 3.11
 version = "{mod_dpath}/__init__.py::__version__"
 license = "Apache 2"
-dev_status = "beta"
+dev_status = "stable"
 
 
 [tool.pytest.ini_options]
