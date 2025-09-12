@@ -470,7 +470,10 @@ def _imread_bytesio(image_stream, use_pil=False, flags=None, **kwargs):
         if flags is None:
             grayscale = kwargs.get('grayscale', False)
             flags = cv2.IMREAD_GRAYSCALE if grayscale else IMREAD_COLOR
-        nparr = np.fromstring(image_stream.getvalue(), np.uint8)
+        try:
+            nparr = np.fromstring(image_stream.getvalue(), np.uint8)
+        except Exception:
+            nparr = np.frombuffer(image_stream.getvalue(), np.uint8)
         imgBGR = cv2.imdecode(nparr, flags=flags)  # cv2.IMREAD_COLOR in OpenCV 3.1
     return imgBGR
 
