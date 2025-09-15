@@ -1,5 +1,7 @@
-import utool as ut
+#!/usr/bin/env python3
+import scriptconfig as scfg
 import ubelt as ub
+import utool as ut
 try:
     import guitool_ibeis as gt
     from guitool_ibeis import mpl_widget
@@ -345,10 +347,45 @@ def show_matching_dict(matches, metadata, *args, **kwargs):
     return interact
 
 
+class InspectMatchesCLI(scfg.DataConfig):
+    """
+    Run a 1vs1 matching
+    """
+    img1 = scfg.Value('tsukuba_r', type=str, position=1, help='key or path of test image 1')
+    img2 = scfg.Value('tsukuba_l', type=str, position=2, help='key or path of test image 2')
+
+    @classmethod
+    def main(cls, argv=1, **kwargs):
+        """
+        Example:
+            >>> # xdoctest: +SKIP
+            >>> from vtool_ibeis.inspect_matches import *  # NOQA
+            >>> argv = 0
+            >>> kwargs = dict()
+            >>> cls = InspectMatchesCLI
+            >>> config = cls(**kwargs)
+            >>> cls.main(argv=argv, **config)
+        """
+        import vtool_ibeis as vt
+        config = cls.cli(argv=argv, data=kwargs, strict=True, verbose='auto')
+        gt.ensure_qapp()
+        ut.qtensure()
+        annot1 = lazy_test_annot(config.img1)
+        annot2 = lazy_test_annot(config.img2)
+        match = vt.PairwiseMatch(annot1, annot2)
+        self = MatchInspector(match=match)
+        self.show()
+        # xdoctest: +REQUIRES(--show)
+        #self.update()
+        gt.qtapp_loop(qwin=self, freq=10)
+
+__cli__ = InspectMatchesCLI
+
 if __name__ == '__main__':
     """
+
     CommandLine:
-        xdoctest -m vtool_ibeis.inspect_matches
+        python ~/code/vtool_ibeis/vtool_ibeis/inspect_matches.py
+        python -m vtool_ibeis.inspect_matches /home/joncrall/Downloads/tmp/ibeis/IMG_0070_A.JPG /home/joncrall/Downloads/tmp/ibeis/IMG_0315_A.JPG
     """
-    import xdoctest
-    xdoctest.doctest_module(__file__)
+    __cli__.main()
