@@ -1266,9 +1266,14 @@ def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
         >>> C, Ax, Bx = intersect2d_numpy(A, B, return_indices=True)
         >>> # verify results
         >>> result = str((C.T, Ax, Bx))
-        >>> print(result)
-        (array([[ 85, 403, 412],
-               [ 32,  22, 103]]), array([2, 6, 7]), array([0, 1, 2]))
+        >>> import ubelt as ub
+        >>> print(f'C.T = {ub.urepr(C.T, nl=1, with_dtype=False)}')
+        >>> print(f'Ax = {ub.urepr(Ax, nl=1, with_dtype=False)}')
+        >>> print(f'Bx = {ub.urepr(Bx, nl=1, with_dtype=False)}')
+        C.T = np.array([[ 85, 403, 412],
+                  [ 32,  22, 103]])
+        Ax = np.array([2, 6, 7])
+        Bx = np.array([0, 1, 2])
 
     Example2:
         >>> # ENABLE_DOCTEST
@@ -1276,9 +1281,15 @@ def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
         >>> A = np.array([[1, 2, 3], [1, 1, 1]])
         >>> B = np.array([[1, 2, 3], [1, 2, 14]])
         >>> C, Ax, Bx = intersect2d_numpy(A, B, return_indices=True)
-        >>> result = str((C, Ax, Bx))
-        >>> print(result)
-        (array([[1, 2, 3]]), array([0]), array([0]))
+        >>> import ubelt as ub
+        >>> print(f'C.T = {ub.urepr(C.T, nl=1, with_dtype=False)}')
+        >>> print(f'Ax = {ub.urepr(Ax, nl=1, with_dtype=False)}')
+        >>> print(f'Bx = {ub.urepr(Bx, nl=1, with_dtype=False)}')
+        C.T = np.array([[1],
+                  [2],
+                  [3]])
+        Ax = np.array([0])
+        Bx = np.array([0])
     """
     nrows, ncols = A.shape
     A_, B_, C_ = intersect2d_structured_numpy(A, B, assume_unique)
