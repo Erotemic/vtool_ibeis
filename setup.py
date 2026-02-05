@@ -73,7 +73,7 @@ def parse_requirements(fname="requirements.txt", versions=False):
 
     Args:
         fname (str): path to requirements file
-        versions (bool | str, default=False):
+        versions (bool | str):
             If true include version specs.
             If strict, then pin to the minimum version.
 
@@ -109,7 +109,7 @@ def parse_requirements(fname="requirements.txt", versions=False):
                 info["package"] = line.split("#egg=")[1]
             else:
                 if "--find-links" in line:
-                    # setuptools doesnt seem to handle find links
+                    # setuptools does not seem to handle find links
                     line = line.split("--find-links")[0]
                 if ";" in line:
                     pkgpart, platpart = line.split(";")
@@ -162,7 +162,8 @@ def parse_requirements(fname="requirements.txt", versions=False):
                     if plat_deps is not None:
                         parts.append(";" + plat_deps)
                 item = "".join(parts)
-                yield item
+                if item:
+                    yield item
 
     packages = list(gen_packages_items())
     return packages
@@ -201,7 +202,6 @@ def parse_requirements(fname="requirements.txt", versions=False):
 NAME = "vtool_ibeis"
 INIT_PATH = "vtool_ibeis/__init__.py"
 VERSION = parse_version(INIT_PATH)
-
 if __name__ == "__main__":
     setupkw = {}
 
@@ -236,9 +236,9 @@ if __name__ == "__main__":
     }
     setupkw["name"] = NAME
     setupkw["version"] = VERSION
-    setupkw[
-        "author"
-    ] = "Jon Crall, Jason Parham, Hendrik Weideman, Avi Weinstock, Zackary Rutfield, Chuck Stewart"
+    setupkw["author"] = (
+        "Jon Crall, Jason Parham, Hendrik Weideman, Avi Weinstock, Zackary Rutfield, Chuck Stewart"
+    )
     setupkw["author_email"] = "erotemic@gmail.com"
     setupkw["url"] = "https://github.com/Erotemic/vtool_ibeis"
     setupkw["description"] = "vision tools for IBEIS"
@@ -248,15 +248,18 @@ if __name__ == "__main__":
     setupkw["packages"] = find_packages(".")
     setupkw["python_requires"] = ">=3.8"
     setupkw["classifiers"] = [
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
+        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ]
+    setupkw["package_data"] = {"": ["requirements/*.txt"]}
     setup(**setupkw)
