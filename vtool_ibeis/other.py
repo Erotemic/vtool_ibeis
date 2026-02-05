@@ -1672,12 +1672,13 @@ def find_first_true_indices(flags_list):
         >>> index_list = find_first_true_indices(flags_list)
         >>> # verify results
         >>> result = str(index_list)
-        >>> print(result)
-        [0, None, 1, 2]
+        >>> import ubelt as ub
+        >>> print(f'result = {ub.urepr(result, nl=1)}')
+        result = '[0, None, 1, 2]'
     """
     def tryget_fisrt_true(flags):
         index_list = np.where(flags)[0]
-        index = None if len(index_list) == 0 else index_list[0]
+        index = None if len(index_list) == 0 else int(index_list[0])
         return index
     index_list = [tryget_fisrt_true(flags) for flags in flags_list]
     return index_list
