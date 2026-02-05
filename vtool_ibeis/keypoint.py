@@ -659,7 +659,7 @@ def get_transforms_from_patch_image_kpts(kpts, patch_shape, scale_factor=1.0):
         %timeit np.array([S2.dot(A) for A in invVR_aff2Ds])
         %timeit op.matmul(S2, invVR_aff2Ds)
 
-        from six.moves import reduce
+        from functools import reduce
         perspective_list2 = np.array([S2.dot(A).dot(S1).dot(T1) for A in invVR_aff2Ds])
         perspective_list = reduce(op.matmul, (S2, invVR_aff2Ds, S1, T1))
         assert np.all(perspective_list == perspective_list2)

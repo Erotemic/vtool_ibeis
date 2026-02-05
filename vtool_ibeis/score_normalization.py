@@ -212,7 +212,7 @@ class ScoreNormalizer(ut.Cachable, ScoreNormVisualizeClass):
             >>> # ENABLE_DOCTEST
             >>> from vtool_ibeis.score_normalization import *  # NOQA
             >>> encoder = ScoreNormalizer()
-            >>> from six.moves import cPickle as pickle
+            >>> import pickle
             >>> dump = pickle.dumps(encoder)
             >>> encoder2 = pickle.loads(dump)
         """

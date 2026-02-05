@@ -1,6 +1,5 @@
 import utool as ut
 import ubelt as ub
-import six
 
 
 def extract_feature_from_patch(patch):
@@ -69,7 +68,7 @@ def extract_features(img_or_fpath, feat_type='hesaff+sift', **kwargs):
         # hacky
         from ibeis_cnn import _plugin
         (kpts, sift) = pyhesaff.detect_feats2(img_or_fpath, **kwargs)
-        if isinstance(img_or_fpath, six.string_types):
+        if isinstance(img_or_fpath, str):
             import vtool_ibeis as vt
             img_or_fpath = vt.imread(img_or_fpath)
         vecs_list = _plugin.extract_siam128_vecs([img_or_fpath], [kpts])

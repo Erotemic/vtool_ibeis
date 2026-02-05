@@ -282,7 +282,7 @@ def find_duplicate_items(item_arr):
         >>> np.random.seed(0)
         >>> item_arr = np.random.randint(100, size=30)
         >>> duplicate_items = find_duplicate_items(item_arr)
-        >>> assert duplicate_items == list(six.iterkeys(ut.find_duplicate_items(item_arr)))
+        >>> assert duplicate_items == list(ut.find_duplicate_items(item_arr).keys())
         >>> result = str(duplicate_items)
         >>> print(result)
         [9, 67, 87, 88]

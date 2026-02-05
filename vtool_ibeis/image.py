@@ -1,4 +1,3 @@
-import six
 import os
 from os.path import exists, join  # NOQA
 from os.path import splitext
@@ -82,7 +81,7 @@ def _rectify_border_mode(border_mode, default=cv2.BORDER_CONSTANT):
     """ Converts argument to cv2 style """
     if border_mode is None:
         return default
-    elif isinstance(border_mode, six.text_type):
+    elif isinstance(border_mode, str):
         return CV2_BORDER_TYPES[border_mode]
     else:
         return border_mode
@@ -102,7 +101,7 @@ def _rectify_interpolation(interp, default=cv2.INTER_LANCZOS4):
     """
     if interp is None:
         return default
-    elif isinstance(interp, six.text_type):
+    elif isinstance(interp, str):
         try:
             return CV2_INTERPOLATION_TYPES[interp]
         except KeyError:
@@ -441,7 +440,7 @@ def imread_remote_s3(img_fpath, **kwargs):
 
 
 def imread_remote_url(img_url, **kwargs):
-    from six.moves import urllib
+    import urllib
     import io
     print("USE PIL REMOTE")
     addinfourl = urllib.request.urlopen(img_url)
@@ -2202,7 +2201,7 @@ def combine_offset_lists(offsets_list, sfs_list, offset_tups, sf_tups):
     """ Helper for stacking """
     # combine the offsets
     import operator
-    from six.moves import reduce
+    from functools import reduce
 
     assert len(offsets_list) == len(offset_tups)
     assert len(sfs_list) == len(sf_tups)

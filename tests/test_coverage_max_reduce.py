@@ -64,7 +64,7 @@ def main():
             #yield warped
 
     print("THREE")
-    from six.moves import reduce
+    from functools import reduce
     import functools
     dstimg3 = np.zeros(shape, dtype=np.float32)
     maximum_partial = functools.partial(np.maximum, out=dstimg3)
