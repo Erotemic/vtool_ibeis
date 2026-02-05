@@ -1,12 +1,10 @@
 """
 DEPRICATE
 """
-from __future__ import absolute_import, division, print_function
 import utool
 import six
 from os.path import join, realpath
 from itertools import cycle
-from six.moves import range
 
 
 def get_testdata_dir(ensure=True, key='testdb1'):
