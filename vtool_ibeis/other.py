@@ -1691,9 +1691,6 @@ def find_k_true_indicies(flags_list, k):
     Args:
         flags_list (list): list of lists of booleans
 
-    CommandLine:
-        python -m utool.util_list --test-find_next_true_indices
-
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.other import *  # NOQA
@@ -1733,7 +1730,7 @@ def find_next_true_indices(flags_list, offset_list):
         flags_list (list): list of lists of booleans
 
     CommandLine:
-        python -m utool.util_list --test-find_next_true_indices
+        xdoctest vtool_ibeis.other find_next_true_indices
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -1747,15 +1744,15 @@ def find_next_true_indices(flags_list, offset_list):
         >>> # execute function
         >>> index_list = find_next_true_indices(flags_list, offset_list)
         >>> # verify results
-        >>> result = str(index_list)
-        >>> print(result)
-        [2, None, 2, None]
+        >>> import ubelt as ub
+        >>> print(f'index_list = {ub.urepr(index_list, nl=0)}')
+        index_list = [2, None, 2, None]
     """
     def tryget_next_true(flags, offset_):
         offset = offset_ + 1
         relative_flags = flags[offset:]
         rel_index_list = np.where(relative_flags)[0]
-        index = None if len(rel_index_list) == 0 else rel_index_list[0] + offset
+        index = None if len(rel_index_list) == 0 else int(rel_index_list[0] + offset)
         return index
     index_list = [None if offset is None else tryget_next_true(flags, offset)
                   for flags, offset in zip(flags_list, offset_list)]
