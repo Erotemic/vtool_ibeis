@@ -1701,9 +1701,14 @@ def find_k_true_indicies(flags_list, k):
         ...               [True, True, True]]
         >>> k = 2
         >>> indices = find_k_true_indicies(flags_list, k)
-        >>> result = str(indices)
-        >>> print(result)
-        [array([2]), None, array([1, 2]), array([0, 1])]
+        >>> import ubelt as np
+        >>> print(f'result = {ub.urepr(indices, nl=1, with_dtype=False)}')
+        result = [
+            np.array([2]),
+            None,
+            np.array([1, 2]),
+            np.array([0, 1]),
+        ]
     """
 
     if False:
