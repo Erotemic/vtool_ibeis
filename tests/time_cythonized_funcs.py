@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # This tests cython stuff not linalg stuff :P
-from __future__ import absolute_import, division, print_function
 import utool
 import vtool_ibeis
 from vtool_ibeis import keypoint as ktool

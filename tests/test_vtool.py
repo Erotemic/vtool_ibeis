@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-from six.moves import range
 import vtool_ibeis.keypoint as ktool
 import vtool_ibeis.linalg as ltool
 import numpy as np

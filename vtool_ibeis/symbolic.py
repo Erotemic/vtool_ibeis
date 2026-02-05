@@ -2,7 +2,6 @@
 Sympy helpers
 """
 import numpy as np
-import six
 import utool as ut
 import ubelt as ub
 
@@ -38,7 +37,7 @@ def evalprint(str_, globals_=None, locals_=None, simplify=False):
         globals_ = ut.get_parent_frame().f_globals
     if locals_ is None:
         locals_ = ut.get_parent_frame().f_locals
-    if isinstance(str_, six.string_types):
+    if isinstance(str_, str):
         var = eval(str_, globals_, locals_)
     else:
         var = str_
@@ -72,9 +71,9 @@ def check_expr_eq(expr1, expr2, verbose=True):
         >>> print(result)
     """
     import sympy
-    if isinstance(expr1, six.string_types):
+    if isinstance(expr1, str):
         expr1 = sympy.simplify(expr1)
-    if isinstance(expr2, six.string_types):
+    if isinstance(expr2, str):
         expr2 = sympy.simplify(expr2)
     print(ub.hzcat('Checking if ', repr(expr1), ' == ', repr(expr2)))
     random_point_check = expr1.equals(expr2)

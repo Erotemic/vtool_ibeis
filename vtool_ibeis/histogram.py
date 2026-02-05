@@ -20,18 +20,21 @@ def argsubmax(ydata, xdata=None):
         >>> xdata = [00, 10, 20,  30, 40]
         >>> result1 = argsubmax(ydata, xdata=None)
         >>> result2 = argsubmax(ydata, xdata=xdata)
-        >>> result = ub.repr2([result1, result2], precision=4, nl=1, nobr=True)
-        >>> print(result)
-        2.1667, 2.0208,
-        21.6667, 2.0208,
+        >>> import ubelt as ub
+        >>> print(f'result1 = {ub.urepr(result1, nl=0, precision=3)}')
+        >>> print(f'result2 = {ub.urepr(result2, nl=0, precision=3)}')
+        result1 = (2.167, 2.021)
+        result2 = (21.667, 2.021)
 
     Example:
         >>> from vtool_ibeis.histogram import *  # NOQA
         >>> hist_ = np.array([0, 1, 2, 3, 4])
         >>> centers = None
         >>> maxima_thresh=None
-        >>> argsubmax(hist_)
-        (4.0, 4.0)
+        >>> result = argsubmax(hist_)
+        >>> import ubelt as ub
+        >>> print(f'result = {ub.urepr(result, nl=0)}')
+        result = (4.0, 4.0)
     """
     if len(ydata) == 0:
         raise IndexError('zero length array')

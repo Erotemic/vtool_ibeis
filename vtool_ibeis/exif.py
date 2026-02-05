@@ -244,7 +244,7 @@ def get_lat_lon(exif_dict, default=(-1, -1)):
         python -m vtool_ibeis.exif --test-get_lat_lon
 
     Example:
-        >>> # DISABLE_DOCTEST
+        >>> # xdoctest: +SKIP("bad url")
         >>> from vtool_ibeis.exif import *  # NOQA
         >>> import numpy as np
         >>> image_fpath = ut.grab_file_url('http://images.summitpost.org/original/769474.JPG')
@@ -294,7 +294,7 @@ def get_orientation(exif_dict, default=0, on_error='warn'):
         python -m vtool_ibeis.exif --test-get_orientation
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +SKIP("bad url")
         >>> from vtool_ibeis.exif import *  # NOQA
         >>> from os.path import join
         >>> import numpy as np
@@ -334,7 +334,7 @@ def get_orientation_str(exif_dict, **kwargs):
         python -m vtool_ibeis.exif --test-get_orientation_str
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +SKIP("bad url")
         >>> from vtool_ibeis.exif import *  # NOQA
         >>> from os.path import join
         >>> import numpy as np
@@ -360,7 +360,7 @@ def get_unixtime(exif_dict, default=-1):
     TODO: Exif.Image.TimeZoneOffset
 
     Example:
-        >>> # ENABLE_DOCTEST
+        >>> # xdoctest: +SKIP("bad url")
         >>> from vtool_ibeis.exif import *  # NOQA
         >>> image_fpath = ut.grab_file_url('http://images.summitpost.org/original/769474.JPG')
         >>> pil_img = Image.open(image_fpath)

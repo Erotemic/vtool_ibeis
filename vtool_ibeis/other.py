@@ -1266,9 +1266,14 @@ def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
         >>> C, Ax, Bx = intersect2d_numpy(A, B, return_indices=True)
         >>> # verify results
         >>> result = str((C.T, Ax, Bx))
-        >>> print(result)
-        (array([[ 85, 403, 412],
-               [ 32,  22, 103]]), array([2, 6, 7]), array([0, 1, 2]))
+        >>> import ubelt as ub
+        >>> print(f'C.T = {ub.urepr(C.T, nl=1, with_dtype=False)}')
+        >>> print(f'Ax = {ub.urepr(Ax, nl=1, with_dtype=False)}')
+        >>> print(f'Bx = {ub.urepr(Bx, nl=1, with_dtype=False)}')
+        C.T = np.array([[ 85, 403, 412],
+                  [ 32,  22, 103]])
+        Ax = np.array([2, 6, 7])
+        Bx = np.array([0, 1, 2])
 
     Example2:
         >>> # ENABLE_DOCTEST
@@ -1276,9 +1281,15 @@ def intersect2d_numpy(A, B, assume_unique=False, return_indices=False):
         >>> A = np.array([[1, 2, 3], [1, 1, 1]])
         >>> B = np.array([[1, 2, 3], [1, 2, 14]])
         >>> C, Ax, Bx = intersect2d_numpy(A, B, return_indices=True)
-        >>> result = str((C, Ax, Bx))
-        >>> print(result)
-        (array([[1, 2, 3]]), array([0]), array([0]))
+        >>> import ubelt as ub
+        >>> print(f'C.T = {ub.urepr(C.T, nl=1, with_dtype=False)}')
+        >>> print(f'Ax = {ub.urepr(Ax, nl=1, with_dtype=False)}')
+        >>> print(f'Bx = {ub.urepr(Bx, nl=1, with_dtype=False)}')
+        C.T = np.array([[1],
+                  [2],
+                  [3]])
+        Ax = np.array([0])
+        Bx = np.array([0])
     """
     nrows, ncols = A.shape
     A_, B_, C_ = intersect2d_structured_numpy(A, B, assume_unique)
@@ -1672,12 +1683,13 @@ def find_first_true_indices(flags_list):
         >>> index_list = find_first_true_indices(flags_list)
         >>> # verify results
         >>> result = str(index_list)
-        >>> print(result)
-        [0, None, 1, 2]
+        >>> import ubelt as ub
+        >>> print(f'result = {ub.urepr(result, nl=1)}')
+        result = '[0, None, 1, 2]'
     """
     def tryget_fisrt_true(flags):
         index_list = np.where(flags)[0]
-        index = None if len(index_list) == 0 else index_list[0]
+        index = None if len(index_list) == 0 else int(index_list[0])
         return index
     index_list = [tryget_fisrt_true(flags) for flags in flags_list]
     return index_list
@@ -1691,9 +1703,6 @@ def find_k_true_indicies(flags_list, k):
     Args:
         flags_list (list): list of lists of booleans
 
-    CommandLine:
-        python -m utool.util_list --test-find_next_true_indices
-
     Example:
         >>> # ENABLE_DOCTEST
         >>> from vtool_ibeis.other import *  # NOQA
@@ -1703,9 +1712,14 @@ def find_k_true_indicies(flags_list, k):
         ...               [True, True, True]]
         >>> k = 2
         >>> indices = find_k_true_indicies(flags_list, k)
-        >>> result = str(indices)
-        >>> print(result)
-        [array([2]), None, array([1, 2]), array([0, 1])]
+        >>> import ubelt as np
+        >>> print(f'result = {ub.urepr(indices, nl=1, with_dtype=False)}')
+        result = [
+            np.array([2]),
+            None,
+            np.array([1, 2]),
+            np.array([0, 1]),
+        ]
     """
 
     if False:
@@ -1733,7 +1747,7 @@ def find_next_true_indices(flags_list, offset_list):
         flags_list (list): list of lists of booleans
 
     CommandLine:
-        python -m utool.util_list --test-find_next_true_indices
+        xdoctest vtool_ibeis.other find_next_true_indices
 
     Example:
         >>> # ENABLE_DOCTEST
@@ -1747,15 +1761,15 @@ def find_next_true_indices(flags_list, offset_list):
         >>> # execute function
         >>> index_list = find_next_true_indices(flags_list, offset_list)
         >>> # verify results
-        >>> result = str(index_list)
-        >>> print(result)
-        [2, None, 2, None]
+        >>> import ubelt as ub
+        >>> print(f'index_list = {ub.urepr(index_list, nl=0)}')
+        index_list = [2, None, 2, None]
     """
     def tryget_next_true(flags, offset_):
         offset = offset_ + 1
         relative_flags = flags[offset:]
         rel_index_list = np.where(relative_flags)[0]
-        index = None if len(rel_index_list) == 0 else rel_index_list[0] + offset
+        index = None if len(rel_index_list) == 0 else int(rel_index_list[0] + offset)
         return index
     index_list = [None if offset is None else tryget_next_true(flags, offset)
                   for flags, offset in zip(flags_list, offset_list)]

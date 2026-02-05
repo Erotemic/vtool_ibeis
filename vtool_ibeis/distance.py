@@ -732,6 +732,25 @@ def safe_pdist(arr, *args, **kwargs):
 
     SeeAlso:
         scipy.spatial.distance.pdist
+
+    Example:
+        >>> # xdoctest: +REQUIRES(module:vtool)
+        >>> import vtool_ibeis as vt
+        >>> import numpy as np
+        >>> arr = np.array([1, 2, 3, 4, 5])
+        >>> result = vt.safe_pdist(arr)
+        >>> assert result.shape == (10,)
+        >>> # metric needs to return a scalar, even if the inputs are vectors
+        >>> # Test the use-cases in ibeis
+        >>> result = vt.safe_pdist(arr, metric=lambda x, y: abs(x - y).item())
+        >>> assert result.shape == (10,)
+        >>> result = vt.safe_pdist(arr, metric=lambda *a: ut.unixtime_hourdiff(*a)[0])
+        >>> assert result.shape == (10,)
+        >>> result = vt.safe_pdist(arr, metric=lambda *a: vt.ori_distance(*a)[0])
+        >>> assert result.shape == (10,)
+        >>> latlon_arr = np.array([(40, 20), (20, 30), (-40, 20)])
+        >>> km_dists = ut.safe_pdist(latlon_arr, metric=vt.haversine)
+        >>> assert km_dists.shape == (3,)
     """
     if arr is None or len(arr) < 2:
         return None

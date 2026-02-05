@@ -382,12 +382,7 @@ class ConfusionMetrics(ub.NiceRepr):
         # sklearn has much faster implementation
         # n_fp - count the number of false positives with score >= threshold[i]
         # n_tp - count the number of true positives with score >= threshold[i]
-        try:
-            from sklearn.metrics._ranking import _binary_clf_curve
-        except ImportError:
-            from sklearn.metrics.ranking import _binary_clf_curve
-
-        n_fp, n_tp, thresholds = _binary_clf_curve(
+        n_fp, n_tp, thresholds = _binary_counts_at_thresholds(
             labels, scores, pos_label=1)
 
         n_samples = len(labels)
@@ -1158,6 +1153,58 @@ def draw_precision_recall_curve(recall_domain, p_interp, title_pref=None,
     #print('Interplated Precision')
     #print(ub.repr2(list(zip(recall_domain, p_interp))))
     #fig.show()
+
+
+def _binary_clf_curve_local(y_true, y_score, pos_label=1):
+    """
+    Minimal replacement for sklearn.metrics._ranking._binary_clf_curve (unweighted).
+    Returns: fps, tps, thresholds
+    """
+    import numpy as np
+
+    y_true = np.asarray(y_true)
+    y_score = np.asarray(y_score)
+
+    y_true = (y_true == pos_label)
+
+    # sort scores descending
+    desc = np.argsort(y_score, kind="mergesort")[::-1]
+    y_score = y_score[desc]
+    y_true = y_true[desc]
+
+    # indices where score changes
+    distinct = np.where(np.diff(y_score))[0]
+    threshold_idxs = np.r_[distinct, y_true.size - 1]
+
+    tps = np.cumsum(y_true)[threshold_idxs]
+    fps = (threshold_idxs + 1) - tps
+    thresholds = y_score[threshold_idxs]
+    return fps, tps, thresholds
+
+
+def _binary_counts_at_thresholds(labels, scores, pos_label=1):
+    """
+    Returns fps, tps, thresholds (like old _binary_clf_curve) using public API when available.
+    """
+    try:
+        from sklearn.metrics._ranking import _binary_clf_curve
+    except ImportError:
+        try:
+            from sklearn.metrics.ranking import _binary_clf_curve
+        except ImportError:
+            _binary_clf_curve = None
+
+    if _binary_clf_curve is not None:
+        n_fp, n_tp, thresholds = _binary_clf_curve(
+            labels, scores, pos_label=1)
+    else:
+        # scikit-learn >= 1.8
+        n_fp, n_tp, thresholds = _binary_clf_curve_local(labels, scores, pos_label)
+        # from sklearn.metrics import confusion_matrix_at_thresholds
+        # n_tp, n_fp, fns, tps, thresholds = confusion_matrix_at_thresholds(
+        #     labels, scores, pos_label=pos_label
+        # )
+    return n_fp, n_tp, thresholds
 
 
 if __name__ == '__main__':

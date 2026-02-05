@@ -1,12 +1,9 @@
 """
 DEPRICATE
 """
-from __future__ import absolute_import, division, print_function
 import utool
-import six
 from os.path import join, realpath
 from itertools import cycle
-from six.moves import range
 
 
 def get_testdata_dir(ensure=True, key='testdb1'):
@@ -35,10 +32,7 @@ def get_test_gpaths(ndata=None, names=None, **kwargs):
     # Get a some number of test images
     if ndata is not None:
         gpath_cycle = cycle(gpath_list)
-        if six.PY2:
-            gpath_list  = [gpath_cycle.next() for _ in range(ndata)]
-        else:
-            gpath_list  = [next(gpath_cycle) for _ in range(ndata)]
+        gpath_list  = [next(gpath_cycle) for _ in range(ndata)]
     return gpath_list
 
 

@@ -412,8 +412,6 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     """
     raise NotImplementedError('use sklearn or opencv')
     return kmeans_plusplus_sklearn(data, K)
-    # # import six
-
     # # rng = ut.ensure_rng(rng)
 
     # # if num_samples is None:
@@ -443,7 +441,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     # # prog = ut.ProgPartial(lbl='akmeans++ init', freq=1, adjust=True, bs=True)
     # # _iter = iter(prog(range(K)))
 
-    # # six.next(_iter)
+    # # next(_iter)
 
     # # # Choose an index and "use" it
     # # chosen_datax = rng.randint(0, num_unused)
