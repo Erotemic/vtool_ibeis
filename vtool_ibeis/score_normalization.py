@@ -25,17 +25,22 @@ def testdata_score_normalier(tp_bumps=[(6.5, 256)], tn_bumps=[(3.5, 256)], tp_sc
     encoder.fit(data, labels)
     return encoder, data, labels
 
+try:
+    _trapz = np.trapz
+except Exception:
+    _trapz = np.trapezoid
+
 
 def get_left_area(ydata, xdata, index_list):
     """ area to the left of each index point """
-    left_area = np.array([np.trapz(ydata[:ix + 1], xdata[:ix + 1])
+    left_area = np.array([_trapz(ydata[:ix + 1], xdata[:ix + 1])
                           for ix in index_list])
     return left_area
 
 
 def get_right_area(ydata, xdata, index_list):
     """ area to the right of each index point """
-    right_area = np.array([np.trapz(ydata[ix:], xdata[ix:])
+    right_area = np.array([_trapz(ydata[ix:], xdata[ix:])
                            for ix in index_list])
     return right_area
 
@@ -1017,8 +1022,8 @@ def learn_score_normalization(tp_support, tn_support, gridsize=1024, adjust=8,
 
     if True:
         # Make sure we still have probability functions
-        area_tp = np.trapz(p_score_given_tp, score_domain)
-        area_tn = np.trapz(p_score_given_tn, score_domain)
+        area_tp = _trapz(p_score_given_tp, score_domain)
+        area_tn = _trapz(p_score_given_tn, score_domain)
         if verbose:
             print('pre.area_tp = %r' % (area_tp,))
             print('pre.area_tn = %r' % (area_tn,))
@@ -1027,8 +1032,8 @@ def learn_score_normalization(tp_support, tn_support, gridsize=1024, adjust=8,
         p_score_given_tp = p_score_given_tp / area_tp
         p_score_given_tn = p_score_given_tn / area_tn
 
-        area_tp = np.trapz(p_score_given_tp, score_domain)
-        area_tn = np.trapz(p_score_given_tn, score_domain)
+        area_tp = _trapz(p_score_given_tp, score_domain)
+        area_tn = _trapz(p_score_given_tn, score_domain)
         #if ut.DEBUG2:
         if verbose:
             print('norm.area_tp = %r' % (area_tp,))
@@ -1055,12 +1060,12 @@ def learn_score_normalization(tp_support, tn_support, gridsize=1024, adjust=8,
     # Apply bayes
     p_tp_given_score = ut.bayes_rule(p_score_given_tp, p_tp, p_score)
     if ut.DEBUG2:
-        assert np.isclose(np.trapz(p_score, score_domain), 1.0)
-        assert np.isclose(np.trapz(p_score, p_tp_given_score), 1.0)
+        assert np.isclose(_trapz(p_score, score_domain), 1.0)
+        assert np.isclose(_trapz(p_score, p_tp_given_score), 1.0)
     if np.any(np.isnan(p_tp_given_score)):
         p_tp_given_score = vt.interpolate_nans(p_tp_given_score)
     if verbose:
-        # np.trapz(p_tp_given_score / np.trapz(p_tp_given_score, score_domain), score_domain)
+        # _trapz(p_tp_given_score / _trapz(p_tp_given_score, score_domain), score_domain)
         print('stats:p_score_given_tn = ' + ut.get_stats_str(p_score_given_tn, newlines=0, use_nan=True, precision=5))
         print('stats:p_score_given_tp = ' + ut.get_stats_str(p_score_given_tp, newlines=0, use_nan=True, precision=5))
         print('stats:p_score = ' + ut.get_stats_str(p_score, newlines=0, use_nan=True, precision=5))
