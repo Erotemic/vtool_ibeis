@@ -60,7 +60,7 @@ statsmodels>=0.13.1    ; python_version < '3.10' and python_version >= '3.9'    
 statsmodels>=0.13.1    ; python_version < '3.9' and python_version >= '3.8'    # Python 3.8
 statsmodels>=0.12.2     ; python_version < '3.8' and python_version >= '3.7'    # Python 3.7
 
-ubelt >= 1.3.4
+ubelt >= 1.3.6
 utool >= 2.2.0
 
 packaging>=21.3
