@@ -360,7 +360,7 @@ def akmeans_plusplus_init(data, K, num_samples=None, flann_params=None,
     CommandLine:
         python -m vtool_ibeis akmeans_plusplus_init:0
         python -m vtool_ibeis akmeans_plusplus_init:1
-        python -m vtool_ibeis akmeans_plusplus_init:0 --profile
+        python -m vtool_ibeis akmeans_plusplus_init:0
 
         vt
         cd vtool_ibeis

@@ -203,7 +203,6 @@ def mask_colored_img(img_rgb, mask, encoding='bgr'):
 # grabcut_mode = cv2.GC_EVAL
 # grabcut_mode = cv2.GC_INIT_WITH_RECT
 # cv2.GC_BGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD, cv2.GC_FGD
-#@profile
 def grabcut2(rgb_chip):
     (h, w) = rgb_chip.shape[0:2]
     _mask = np.zeros((h, w), dtype=np.uint8)  # Initialize: mask

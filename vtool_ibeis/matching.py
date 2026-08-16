@@ -942,7 +942,6 @@ SUM_OPS = {
 }
 
 
-@ut.reloadable_class
 class AnnotPairFeatInfo(object):
     """
     Information class about feature dimensions of PairwiseMatch.

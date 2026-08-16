@@ -4,19 +4,18 @@
 DEPRICATED USE clustering2.py
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
+from loguru import logger
 import utool as ut
 import sys
 import numpy as np
 import scipy.sparse as spsparse
 import vtool_ibeis.nearest_neighbors as nn
-(print, rrr, profile) = ut.inject2(__name__)
 
 
 CLUSTERS_FNAME = 'akmeans_clusters'
 DATAX2CL_FNAME = 'akmeans_datax2cl'
 
 
-#@profile
 def akmeans(data, num_clusters, max_iters=5, flann_params={},
             ave_unchanged_thresh=0,
             ave_unchanged_iterwin=10):
@@ -50,7 +49,7 @@ def precompute_akmeans(data, num_clusters, max_iters=5, flann_params={},
                        cache_dir=None, force_recomp=False, use_data_hash=True,
                        cfgstr='', refine=False, akmeans_cfgstr=None):
     """ precompute aproximate kmeans with builtin caching """
-    print('[akmeans] pre_akmeans()')
+    logger.info('[akmeans] pre_akmeans()')
     # filename prefix constants
     assert cache_dir is not None, 'choose a cache directory'
     # Build a cfgstr if the full one is not specified
@@ -63,7 +62,7 @@ def precompute_akmeans(data, num_clusters, max_iters=5, flann_params={},
             raise UserWarning('forceing recommpute')
         centroids        = ut.load_cache(cache_dir, CLUSTERS_FNAME, akmeans_cfgstr)
         datax2_clusterx = ut.load_cache(cache_dir, DATAX2CL_FNAME, akmeans_cfgstr)
-        print('[akmeans.precompute] load successful')
+        logger.info('[akmeans.precompute] load successful')
         if refine:
             # Refines the cluster centers if specified
             (datax2_clusterx, centroids) =\
@@ -76,9 +75,9 @@ def precompute_akmeans(data, num_clusters, max_iters=5, flann_params={},
     except UserWarning:
         pass
     # First time computation
-    print('[akmeans.precompute] pre_akmeans(): calling akmeans')
+    logger.info('[akmeans.precompute] pre_akmeans(): calling akmeans')
     (datax2_clusterx, centroids) = akmeans(data, num_clusters, max_iters, flann_params)
-    print('[akmeans.precompute] save and return')
+    logger.info('[akmeans.precompute] save and return')
     ut.save_cache(cache_dir, CLUSTERS_FNAME, akmeans_cfgstr, centroids)
     ut.save_cache(cache_dir, DATAX2CL_FNAME, akmeans_cfgstr, datax2_clusterx)
     return (datax2_clusterx, centroids)
@@ -88,7 +87,7 @@ def refine_akmeans(data, datax2_clusterx, centroids, max_iters=5,
                    flann_params={}, cache_dir=None, cfgstr='',
                    use_data_hash=True, akmeans_cfgstr=None):
     """ Refines the approximates centroids """
-    print('[akmeans.precompute] refining:')
+    logger.info('[akmeans.precompute] refining:')
     if akmeans_cfgstr is None:
         akmeans_cfgstr = nn.get_flann_cfgstr(data, flann_params, cfgstr, use_data_hash)
     datax2_clusterx_old = datax2_clusterx
@@ -114,7 +113,7 @@ def sparse_multiply_rows(csr_mat, vec):
 def force_quit_akmeans(signal, frame):
     # FIXME OR DEPRICATE
     try:
-        print(ut.unindedent('''
+        logger.info(ut.unindedent('''
                               --- algos ---
                               Caught Ctrl+C in:
                               function: %r
@@ -130,11 +129,11 @@ def force_quit_akmeans(signal, frame):
             if target_frame.f_code.co_name == target_frame_coname:
                 break
             if target_frame.f_code.co_name == '<module>':
-                print('Traced back to module level. Missed frame: %r ' %
+                logger.info('Traced back to module level. Missed frame: %r ' %
                       target_frame_coname)
                 break
             target_frame = target_frame.f_back
-            print('Is target frame?: ' + target_frame.f_code.co_name)
+            logger.info('Is target frame?: ' + target_frame.f_code.co_name)
 
         fpath = target_frame.f_back.f_back.f_locals['fpath']
 
@@ -143,7 +142,7 @@ def force_quit_akmeans(signal, frame):
         datax2_clusterx = target_frame.f_locals['datax2_clusterx']
         ut.save_npz(fpath + '.earlystop', datax2_clusterx, centroids)
     except Exception as ex:
-        print(repr(ex))
+        logger.info(repr(ex))
         ut.embed()
 
 
@@ -172,7 +171,6 @@ def _compute_cluster_centers(num_data, num_clusters, data, centroids, datax2_clu
     return centroids
 
 
-#@profile
 def _akmeans_iterate(data, centroids, datax2_clusterx_old, max_iters,
                      flann_params, ave_unchanged_thresh, ave_unchanged_iterwin):
     """ Helper function which continues the iterations of akmeans """
@@ -180,10 +178,10 @@ def _akmeans_iterate(data, centroids, datax2_clusterx_old, max_iters,
     num_clusters = centroids.shape[0]
     # Keep track of how many points have changed in each iteration
     xx2_unchanged = np.zeros(ave_unchanged_iterwin, dtype=centroids.dtype) + len(data)
-    print('[akmeans] Running akmeans: data.shape=%r ; num_clusters=%r' %
+    logger.info('[akmeans] Running akmeans: data.shape=%r ; num_clusters=%r' %
           (data.shape, num_clusters))
-    print('[akmeans] * max_iters = %r ' % max_iters)
-    print('[akmeans] * ave_unchanged_iterwin=%r ; ave_unchanged_thresh=%r' %
+    logger.info('[akmeans] * max_iters = %r ' % max_iters)
+    logger.info('[akmeans] * ave_unchanged_iterwin=%r ; ave_unchanged_thresh=%r' %
           (ave_unchanged_thresh, ave_unchanged_iterwin))
     #print('[akmeans] Printing akmeans info in format: time (iterx, ave(#changed), #unchanged)')
     xx = 0
@@ -209,9 +207,9 @@ def _akmeans_iterate(data, centroids, datax2_clusterx_old, max_iters,
             #if xx % 5 == 0:
             #    sys.stdout.flush()
     if xx == max_iters:
-        print('[akmeans]  * AKMEANS: converged in %d/%d iters' % (xx + 1, max_iters))
+        logger.info('[akmeans]  * AKMEANS: converged in %d/%d iters' % (xx + 1, max_iters))
     else:
-        print('[akmeans]  * AKMEANS: reached the maximum iterations after in %d/%d iters' % (xx + 1, max_iters))
+        logger.info('[akmeans]  * AKMEANS: reached the maximum iterations after in %d/%d iters' % (xx + 1, max_iters))
     sys.stdout.flush()
     return (datax2_clusterx, centroids)
 
@@ -232,20 +230,20 @@ def plot_clusters(data, datax2_clusterx, centroids, num_pca_dims=3,
     show_dims = min(num_pca_dims, data_dims)
     if data_dims != show_dims:
         # we can't physiologically see the data, so look at a projection
-        print('[akmeans] Doing PCA')
+        logger.info('[akmeans] Doing PCA')
         from sklearn import decomposition
         pcakw = dict(copy=True, n_components=show_dims, whiten=whiten)
         pca = decomposition.PCA(**pcakw).fit(data)
         pca_data = pca.transform(data)
         pca_clusters = pca.transform(centroids)
-        print('[akmeans] ...Finished PCA')
+        logger.info('[akmeans] ...Finished PCA')
     else:
         # pca is not necessary
-        print('[akmeans] No need for PCA')
+        logger.info('[akmeans] No need for PCA')
         pca_data = data
         pca_clusters = centroids
     K = len(centroids)
-    print(pca_data.shape)
+    logger.info(pca_data.shape)
     # Make a color for each cluster
     colors = np.array(df2.distinct_colors(K, brightness=.95))
     data_x = pca_data[:, 0]
