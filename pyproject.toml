@@ -85,11 +85,6 @@ packages.find.include = [
   "vtool_ibeis*",
 ]
 
-[tool.uv]
-# Supply-chain guard: ignore packages published too recently.
-# Accepts a relative window (e.g. "P7D" / "30 days") or a fixed date.
-exclude-newer = "P7D"
-
 [tool.mypy]
 ignore_missing_imports = true
 
