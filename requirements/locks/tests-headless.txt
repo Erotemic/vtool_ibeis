@@ -117,7 +117,6 @@ packaging==26.3
     #   pytest
     #   scikit-image
     #   statsmodels
-    #   vtool-ibeis
 pandas==2.3.3 ; python_full_version < '3.11'
     # via
     #   statsmodels
@@ -166,8 +165,6 @@ pytz==2026.3.post1
     # via
     #   pandas
     #   utool
-pyyaml==6.0.3 ; python_full_version < '4'
-    # via scriptconfig
 requests==2.32.5 ; python_full_version < '3.10'
     # via utool
 requests==2.34.2 ; python_full_version >= '3.10'
@@ -208,13 +205,10 @@ scipy==1.18.0 ; python_full_version >= '3.12' and python_full_version < '4'
     #   scikit-learn
     #   statsmodels
     #   vtool-ibeis
-scriptconfig==0.9.1
-    # via vtool-ibeis
-six==1.17.0
+six==1.17.0 ; python_full_version < '4'
     # via
     #   python-dateutil
     #   utool
-    #   vtool-ibeis
 smmap==5.0.3
     # via gitdb
 statsmodels==0.14.6 ; python_full_version < '4'
@@ -243,7 +237,6 @@ tzdata==2026.3 ; (python_full_version < '4' and sys_platform == 'emscripten') or
     # via pandas
 ubelt==1.4.3
     # via
-    #   scriptconfig
     #   utool
     #   vtool-ibeis
 urllib3==2.6.3 ; python_full_version < '3.10'

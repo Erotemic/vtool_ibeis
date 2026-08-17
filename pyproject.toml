@@ -103,7 +103,6 @@ run.branch = true
 report.exclude_lines = [
   ".*  # nocover",
   ".*  # pragma: no cover",
-  ".*if six.PY2:",
   "^ *pass *$",
   "^ *raise",
   "def __repr__",

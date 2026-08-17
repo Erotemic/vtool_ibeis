@@ -2885,19 +2885,6 @@ wheels = [
 ]
 
 [[package]]
-name = "scriptconfig"
-version = "0.9.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pyyaml", marker = "python_full_version < '4'" },
-    { name = "ubelt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/4c/6d0ecc5e29b498dc6b5402a0c561e97dd00ce1aeebdc5e494cc5fa8a0b6b/scriptconfig-0.9.1.tar.gz", hash = "sha256:9766c2ee601c4b8d97753ba13a914f8c0a212da4f6d2aec18ad628fd8b53d7ef", size = 112424, upload-time = "2026-03-02T17:33:34.405Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/00/2bf691dfc2b0170013d466fcdbbfc9d036e26d6049d74efaf7775401321d/scriptconfig-0.9.1-py3-none-any.whl", hash = "sha256:4b69e2f4eb681ec4480e9bb5d6c82d2f8c82a9badc703a261ee8940736101d86", size = 87103, upload-time = "2026-03-02T17:33:31.394Z" },
-]
-
-[[package]]
 name = "setuptools"
 version = "82.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3759,7 +3746,6 @@ dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "numpy", version = "2.5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' and python_full_version < '4'" },
-    { name = "packaging" },
     { name = "pillow", version = "11.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "pillow", version = "12.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10' and python_full_version < '4'" },
     { name = "scikit-image", version = "0.24.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -3772,8 +3758,6 @@ dependencies = [
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' and python_full_version < '4'" },
-    { name = "scriptconfig" },
-    { name = "six" },
     { name = "statsmodels", marker = "python_full_version < '4'" },
     { name = "ubelt" },
     { name = "utool" },
@@ -3879,7 +3863,6 @@ requires-dist = [
     { name = "opencv-python-headless", marker = "python_full_version >= '3.11' and python_full_version < '3.13' and extra == 'headless'", specifier = ">=4.5.5.64" },
     { name = "opencv-python-headless", marker = "python_full_version >= '3.13' and python_full_version < '4' and extra == 'all'", specifier = ">=4.10.0.84" },
     { name = "opencv-python-headless", marker = "python_full_version >= '3.13' and python_full_version < '4' and extra == 'headless'", specifier = ">=4.10.0.84" },
-    { name = "packaging", specifier = ">=21.3" },
     { name = "pillow", marker = "python_full_version == '3.9.*'", specifier = ">=8.3.2" },
     { name = "pillow", marker = "python_full_version == '3.10.*'", specifier = ">=9.1.0" },
     { name = "pillow", marker = "python_full_version == '3.11.*'", specifier = ">=9.4.0" },
@@ -3925,10 +3908,8 @@ requires-dist = [
     { name = "scipy", marker = "python_full_version == '3.12.*'", specifier = ">=1.11.2" },
     { name = "scipy", marker = "python_full_version == '3.13.*'", specifier = ">=1.14.1" },
     { name = "scipy", marker = "python_full_version >= '3.14' and python_full_version < '4'", specifier = ">=1.16.2" },
-    { name = "scriptconfig", specifier = ">=0.8.2" },
     { name = "setuptools", marker = "extra == 'all'", specifier = ">=34.1.0" },
     { name = "setuptools", marker = "extra == 'build'", specifier = ">=34.1.0" },
-    { name = "six", specifier = ">=1.17.0" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = ">=5.0.1" },
     { name = "sphinx-autoapi", marker = "extra == 'docs'", specifier = ">=1.8.4" },
     { name = "sphinx-autobuild", marker = "extra == 'docs'", specifier = ">=2021.3.14" },
