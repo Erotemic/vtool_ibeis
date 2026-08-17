@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import scriptconfig as scfg
+import kwconf as kw
 import ubelt as ub
 import utool as ut
 try:
@@ -347,26 +347,33 @@ def show_matching_dict(matches, metadata, *args, **kwargs):
     return interact
 
 
-class InspectMatchesCLI(scfg.DataConfig):
+class InspectMatchesCLI(kw.Config):
     """
     Run a 1vs1 matching
     """
-    img1 = scfg.Value('tsukuba_r', type=str, position=1, help='key or path of test image 1')
-    img2 = scfg.Value('tsukuba_l', type=str, position=2, help='key or path of test image 2')
+    img1 = kw.Value('tsukuba_r', type=str, position=1, help='key or path of test image 1')
+    img2 = kw.Value('tsukuba_l', type=str, position=2, help='key or path of test image 2')
 
     @classmethod
-    def main(cls, argv=1, **kwargs):
+    def main(cls, argv=True, **kwargs):
         """
         Example:
             >>> # xdoctest: +SKIP
             >>> from vtool_ibeis.inspect_matches import *  # NOQA
-            >>> argv = 0
+            >>> argv = False
             >>> kwargs = dict()
             >>> cls = InspectMatchesCLI
             >>> config = cls(**kwargs)
             >>> cls.main(argv=argv, **config)
         """
         import vtool_ibeis as vt
+        # Normalize the legacy integer argv convention for external callers.
+        # external callers that still pass 0 / 1. kwconf uses booleans.
+        if type(argv) is int:
+            if argv == 0:
+                argv = False
+            elif argv == 1:
+                argv = True
         config = cls.cli(argv=argv, data=kwargs, strict=True, verbose='auto')
         gt.ensure_qapp()
         ut.qtensure()

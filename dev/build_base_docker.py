@@ -282,12 +282,7 @@ def main():
             ''')
 
     MB_PYTHON_TAGS = [
-        'cp39-cp39',
-        'cp38-cp38',
-        'cp37-cp37m',
-        'cp36-cp36m',
-        # 'cp35-cp35m',
-        # 'cp27-cp27mu',
+        'cp310-cp310',
     ]
 
     parts = [docker_header]
