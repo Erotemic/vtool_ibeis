@@ -21,11 +21,10 @@ authors = [
   { name = "Zackary Rutfield" },
   { name = "Chuck Stewart" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -147,7 +146,7 @@ author = [
   "Chuck Stewart",
 ]
 author_email = "erotemic@gmail.com"
-min_python = "3.9"
+min_python = "3.10"
 max_python = "3.14"
 version = "{mod_dpath}/__init__.py::__version__"
 license = "Apache 2"

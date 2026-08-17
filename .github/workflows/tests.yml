@@ -168,22 +168,6 @@ jobs:
         # Xcookie generates an explicit list of environments that will be used
         # for testing instead of using the more concise matrix notation.
         include:
-        - python-version: '3.9'
-          install-extras: tests,headless
-          os: ubuntu-latest
-          arch: auto
-          allow-prereleases: 'false'
-          check-latest: 'false'
-          use-lockfile: 'true'
-          lock-requirements: requirements/locks/tests-headless.txt
-        - python-version: '3.9'
-          install-extras: tests,headless
-          os: windows-latest
-          arch: auto
-          allow-prereleases: 'false'
-          check-latest: 'false'
-          use-lockfile: 'true'
-          lock-requirements: requirements/locks/tests-headless.txt
         - python-version: '3.14'
           install-extras: tests,optional,headless
           os: ubuntu-latest
@@ -203,13 +187,6 @@ jobs:
         - python-version: '3.14'
           install-extras: tests,headless
           os: windows-latest
-          arch: auto
-          allow-prereleases: 'false'
-          check-latest: 'false'
-          use-lockfile: 'false'
-        - python-version: '3.9'
-          install-extras: tests,optional,headless
-          os: ubuntu-latest
           arch: auto
           allow-prereleases: 'false'
           check-latest: 'false'
@@ -245,13 +222,6 @@ jobs:
         - python-version: '3.14'
           install-extras: tests,optional,headless
           os: ubuntu-latest
-          arch: auto
-          allow-prereleases: 'false'
-          check-latest: 'false'
-          use-lockfile: 'false'
-        - python-version: '3.9'
-          install-extras: tests,optional,headless
-          os: windows-latest
           arch: auto
           allow-prereleases: 'false'
           check-latest: 'false'

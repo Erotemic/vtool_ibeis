@@ -3,13 +3,10 @@
 
 pyflann_ibeis>=2.4.2     ; python_version < '4.0'  and python_version >= '3.11'    # Python 3.11+
 pyflann_ibeis>=2.4.2     ; python_version < '3.11' and python_version >= '3.10'    # Python 3.10
-pyflann_ibeis>=2.4.2     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
 
 pyhesaff>=2.1.4     ; python_version < '4.0'  and python_version >= '3.11'    # Python 3.11+
 pyhesaff>=2.1.4     ; python_version < '3.11' and python_version >= '3.10'    # Python 3.10
-pyhesaff>=2.1.4     ; python_version < '3.10' and python_version >= '3.9'     # Python 3.9
 
 # xdev availpkg vtool_ibeis_ext --refresh
 vtool_ibeis_ext>=0.1.3     ; python_version < '4.0'  and python_version >= '3.11'    # Python 3.11+
 vtool_ibeis_ext>=0.1.3     ; python_version < '3.11' and python_version >= '3.10'    # Python 3.10
-vtool_ibeis_ext>=0.1.3     ; python_version < '3.10' and python_version >= '3.9'     # Python 3.9
