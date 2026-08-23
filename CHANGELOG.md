@@ -28,6 +28,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 * Loose / strict versioning
 
 
+## Version 2.4.1 - Unreleased
+
+
 ## [Version 2.2.0] 
 
 ### Added

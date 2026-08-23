@@ -334,8 +334,7 @@ def get_flann_fpath(dpts, cache_dir='default', cfgstr='', flann_params={},
     if cache_dir == 'default':
         if verbose:
             print('[flann] using default cache dir')
-        cache_dir = ub.ensure_app_cache_dir(appname)
-        ub.ensuredir(cache_dir)
+        cache_dir = str(ub.Path.appdir(appname, type='cache').ensuredir())
     flann_cfgstr = get_flann_cfgstr(dpts, flann_params, cfgstr,
                                     use_params_hash=use_params_hash,
                                     use_data_hash=use_data_hash)
