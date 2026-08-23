@@ -6,14 +6,13 @@
 
 networkx>=3.0           ; python_version < '4.0'   and python_version >= '3.13'   # Python 3.13+
 networkx>=2.8           ; python_version < '3.13'  and python_version >= '3.11'   # Python 3.11-3.12
-networkx>=2.7           ; python_version < '3.11'  and python_version >= '3.8'    # Python 3.8-3.10
+networkx>=2.7           ; python_version < '3.11'  and python_version >= '3.10'    # Python 3.10
 
 Pillow>=12.0.0    ; python_version < '4.0'  and python_version >= '3.14'  # Python 3.14+
 Pillow>=10.4.0    ; python_version < '3.14' and python_version >= '3.13'  # Python 3.13
 Pillow>=10.0.0    ; python_version < '3.13' and python_version >= '3.12'  # Python 3.12
 Pillow>=9.4.0     ; python_version < '3.12' and python_version >= '3.11'    # Python 3.11
 Pillow>=9.1.0     ; python_version < '3.11' and python_version >= '3.10'  # Python 3.10
-Pillow>=8.3.2     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
 
 # xdev availpkg numpy --refresh
 numpy>=2.3.4     ; python_version < '4.0'  and python_version >= '3.14'    # Python 3.14+
@@ -21,41 +20,33 @@ numpy>=2.1.0     ; python_version < '3.14'  and python_version >= '3.13'    # Py
 numpy>=1.26.0    ; python_version < '3.13' and python_version >= '3.12'    # Python 3.12
 numpy>=1.24.0  ; python_version < '3.12' and python_version >= '3.11'  # Python 3.11
 numpy>=1.21.6  ; python_version < '3.11' and python_version >= '3.10'  # Python 3.10
-numpy>=1.19.3  ; python_version < '3.10' and python_version >= '3.9'   # Python 3.9
 
 scipy>=1.16.2    ; python_version < '4.0'  and python_version >= '3.14'    # Python 3.14+
 scipy>=1.14.1    ; python_version < '3.14'  and python_version >= '3.13'    # Python 3.13
 scipy>=1.11.2    ; python_version < '3.13' and python_version >= '3.12'    # Python 3.12
 scipy>=1.9.2     ; python_version < '3.12' and python_version >= '3.11'    # Python 3.11
 scipy>=1.8.0     ; python_version < '3.11' and python_version >= '3.10'    # Python 3.10
-scipy>=1.8.0     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
-
-six >= 1.17.0
 
 scikit-image>=0.26.0    ; python_version < '4.0'  and python_version >= '3.14'   # Python 3.14+
 scikit-image>=0.25.0    ; python_version < '3.14' and python_version >= '3.13'   # Python 3.13
 scikit-image>=0.22.0    ; python_version < '3.13' and python_version >= '3.12'   # Python 3.12
 scikit-image>=0.20.0    ; python_version < '3.12' and python_version >= '3.11'   # Python 3.11
 scikit-image>=0.19.0    ; python_version < '3.11' and python_version >= '3.10'   # Python 3.10
-scikit-image>=0.18.0    ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
 
 scikit-learn>=1.7.2     ; python_version < '4.0'  and python_version >= '3.14'    # Python 3.14+
 scikit-learn>=1.5.2     ; python_version < '3.14' and python_version >= '3.13'    # Python 3.13
 scikit-learn>=1.3.1     ; python_version < '3.13' and python_version >= '3.12'    # Python 3.12
 scikit-learn>=1.1.3     ; python_version < '3.12' and python_version >= '3.11'    # Python 3.11
 scikit-learn>=1.0.2     ; python_version < '3.11' and python_version >= '3.10'    # Python 3.10
-scikit-learn>=1.0.2     ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
 
 statsmodels>=0.14.5    ; python_version < '4.0'  and python_version >= '3.14'    # Python 3.14+
 statsmodels>=0.14.3    ; python_version < '3.14' and python_version >= '3.13'    # Python 3.13
 statsmodels>=0.14.0    ; python_version < '3.13' and python_version >= '3.12'    # Python 3.12
 statsmodels>=0.13.3    ; python_version < '3.12' and python_version >= '3.11'    # Python 3.11
 statsmodels>=0.13.1    ; python_version < '3.11' and python_version >= '3.10'    # Python 3.10
-statsmodels>=0.13.1    ; python_version < '3.10' and python_version >= '3.9'    # Python 3.9
 
 ubelt >= 1.3.6
-utool >= 2.2.1
+utool >= 2.3.0
 
-packaging>=21.3
-
-scriptconfig>=0.8.2
+# CLI configuration backend.
+kwconf>=0.10.0
